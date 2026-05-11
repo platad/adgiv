@@ -7,20 +7,35 @@ async handleSubmit(text, files = []) {
     const typingId = 'typing-' + Date.now();
     this.messages.push({ id: typingId, role: 'assistant', content: '', created_at: new Date(), isTyping: true });
     try {
-        const res = await this.apiFetch('/chat/analyse', { method: 'POST', body: JSON.stringify({ session_id: this.sessionId, transcription: text, attached_files: files }) });
+        const res = await this.apiFetch('/chat/analyse', { 
+            method: 'POST', 
+            body: JSON.stringify({ 
+                session_id: this.sessionId, 
+                transcription: text, 
+                attached_files: files 
+            }) 
+        });
+
         const data = await res.json();
         this.messages = this.messages.filter(m => m.id !== typingId);
+
         if (data.success) {
             if (data.type === 'analysis_started') this.workflowBubble = { label: 'Menganalisis...' };
-            if (data.message) this.startStreaming(data.message.id, data.message.content, data.type);
+            if (data.message) {
+                // If it's a message object, use its content
+                const content = typeof data.message === 'object' ? data.message.content : data.message;
+                this.startStreaming(data.message.id || Date.now(), content, data.type);
+            }
         } else {
             this.isAnalysing = false;
-            this.messages.push({ id: Date.now(), role: 'assistant', content: 'Terjadi kesalahan.', created_at: new Date() });
+            const errorMsg = data.message || 'Terjadi kesalahan pada server.';
+            this.messages.push({ id: Date.now(), role: 'assistant', content: errorMsg, created_at: new Date() });
         }
     } catch (err) {
         this.messages = this.messages.filter(m => m.id !== typingId);
         this.isAnalysing = false;
-        this.messages.push({ id: Date.now(), role: 'assistant', content: 'Kesalahan jaringan.', created_at: new Date() });
+        console.error("Submit Error:", err);
+        this.messages.push({ id: Date.now(), role: 'assistant', content: 'Kesalahan koneksi atau server (Internal Server Error).', created_at: new Date() });
     }
     this.$nextTick(() => this.scrollToBottom());
 },

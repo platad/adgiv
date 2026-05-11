@@ -91,7 +91,6 @@ Route::get('/queue/work', function (Request $request) {
     }
 
     try {
-        // Run the worker until the queue is empty
         Artisan::call('queue:work', [
             '--stop-when-empty' => true,
             '--tries' => 3,
