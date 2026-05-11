@@ -48,10 +48,16 @@ class ChatController extends Controller
         $requestedId = $request->query('session');
 
         if ($requestedId) {
-            $activeSession = ChatSession::where('id', $requestedId)
-                ->where('user_id', $user->id)
+            $activeSession = ChatSession::where('id', (int)$requestedId)
+                ->where('user_id', Auth::id())
                 ->with(['document', 'messages' => fn($q) => $q->orderBy('created_at', 'asc')])
                 ->first();
+            
+            // Jika ID diminta tapi tidak ditemukan (bukan milik user ini), 
+            // arahkan ke halaman bersih tanpa parameter agar buat sesi baru
+            if (!$activeSession) {
+                return redirect()->route('chat.index');
+            }
         }
 
         // Fallback: create a fresh session if no session is requested or found
@@ -106,10 +112,10 @@ class ChatController extends Controller
         $session = ChatSession::with('document')->findOrFail($validated['session_id']);
 
         // Authorisation: user must own this session
-        if ($session->user_id !== Auth::id()) {
+        if ((int)$session->user_id !== (int)Auth::id()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Akses ditolak. Sesi ini bukan milik Anda (User ID mismatch). Silakan buat sesi baru.'
+                'message' => 'Akses ditolak. Sesi ini bukan milik Anda (Mismatch ID: ' . $session->user_id . ' vs ' . Auth::id() . '). Silakan logout dan login kembali.'
             ], 403);
         }
 
