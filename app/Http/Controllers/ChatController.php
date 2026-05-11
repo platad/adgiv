@@ -54,17 +54,15 @@ class ChatController extends Controller
                 ->first();
         }
 
-        // Fallback: find or create a fresh session
+        // Fallback: create a fresh session if no session is requested or found
         if (empty($activeSession)) {
-            $activeSession = ChatSession::where('user_id', $user->id)
-                ->where('status', 'active')
-                ->with(['document', 'messages' => fn($q) => $q->orderBy('created_at', 'asc')])
-                ->latest()
-                ->first()
-                ?? ChatSession::create([
-                    'user_id' => $user->id,
-                    'title'   => 'Sesi ' . now()->format('d M Y H:i'),
-                ]);
+            $activeSession = ChatSession::create([
+                'user_id' => $user->id,
+                'title'   => 'Sesi ' . now()->format('d M Y H:i'),
+            ]);
+            
+            // Redirect to the new session's URL to keep it consistent
+            return redirect()->route('chat.index', ['session' => $activeSession->id]);
         }
 
         return view('chat', compact('sessions', 'documents', 'activeSession'));
@@ -108,7 +106,12 @@ class ChatController extends Controller
         $session = ChatSession::with('document')->findOrFail($validated['session_id']);
 
         // Authorisation: user must own this session
-        abort_if($session->user_id !== Auth::id(), 403, 'Akses ditolak.');
+        if ($session->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak. Sesi ini bukan milik Anda (User ID mismatch). Silakan buat sesi baru.'
+            ], 403);
+        }
 
         $result = $this->conversationService->process($session, $validated['transcription'] ?? '', $validated['attached_files'] ?? []);
 

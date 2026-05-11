@@ -27,9 +27,9 @@
             <div class="group relative flex items-center rounded-xl transition {{ $session->id === $activeId ? 'bg-gray-100 ring-1 ring-gray-200' : 'hover:bg-gray-50' }}" id="session-row-{{ $session->id }}">
                 
                 {{-- Main clickable area --}}
-                <button
-                    class="flex items-center gap-3 flex-1 min-w-0 p-2.5 rounded-xl border-none bg-transparent cursor-pointer text-left"
-                    onclick="window.location.href='/chat?session={{ $session->id }}'"
+                <a
+                    href="{{ route('chat.index', ['session' => $session->id]) }}"
+                    class="flex items-center gap-3 flex-1 min-w-0 p-2.5 rounded-xl border-none bg-transparent cursor-pointer text-left no-underline"
                     id="session-item-{{ $session->id }}"
                     title="{{ $session->title }}"
                 >
@@ -43,7 +43,7 @@
                     <div class="flex-1 min-w-0">
                         <div class="text-[0.82rem] font-medium truncate {{ $session->id === $activeId ? 'text-black' : 'text-gray-600' }}">{{ Str::limit($session->title, 25) }}</div>
                     </div>
-                </button>
+                </a>
 
                 {{-- Delete button --}}
                 <button
