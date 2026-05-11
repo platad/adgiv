@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -78,4 +79,34 @@ Route::middleware(['auth'])->prefix('chat')->name('chat.')->group(function () {
     Route::post('/upload-document', [ChatController::class, 'uploadDocument'])->name('upload-document');
 
     Route::delete('/session/{session}', [ChatController::class, 'deleteSession'])->name('session.delete');
+});
+
+// ── Web-Triggered Queue Worker (For cPanel/Shared Hosting) ────────────────
+Route::get('/queue/work', function (Request $request) {
+    // Security check: Match token from .env or fallback to secret string
+    $token = config('app.queue_token', 'bima-secret-123');
+    
+    if ($request->get('token') !== $token) {
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
+    try {
+        // Run the worker until the queue is empty
+        Artisan::call('queue:work', [
+            '--stop-when-empty' => true,
+            '--tries' => 3,
+            '--backoff' => 3
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Queue processed.',
+            'output' => Artisan::output()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
 });
