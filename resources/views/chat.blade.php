@@ -52,18 +52,18 @@
                         </h3>
 
                         <div class="space-y-6">
-                            {{-- Placeholder if not analysing yet --}}
-                            <template x-if="!isAnalysing && messages.filter(m => m.role === 'assistant').length === 0">
+                            {{-- Placeholder if not analysing yet and no data --}}
+                            <template x-if="!isAnalysing && session.advice_category === '-' && messages.filter(m => m.role === 'assistant').length === 0">
                                 <div class="flex flex-col items-center justify-center py-20 text-center space-y-4">
                                     <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300">
                                         <i data-lucide="file-search" class="w-10 h-10"></i>
                                     </div>
-                                    <p class="text-gray-400 font-medium">Belum ada data untuk ditampilkan.<br>Silakan masukkan audio bimbingan.</p>
+                                    <p class="text-gray-400 font-medium tracking-tight">Belum ada data untuk ditampilkan.<br>Silakan masukkan audio bimbingan.</p>
                                 </div>
                             </template>
 
                             {{-- Final Results Display --}}
-                            <div x-show="messages.find(m => m.role === 'assistant' && !m.isTyping)" x-transition>
+                            <div x-show="session.advice_category !== '-' || messages.find(m => m.role === 'assistant' && !m.isTyping)" x-transition>
                                 <x-chat.analysis-results-dashboard />
                             </div>
                         </div>
