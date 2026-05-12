@@ -66,46 +66,20 @@ Route::post('/register', function (Request $req) {
 Route::middleware(['auth'])->prefix('chat')->name('chat.')->group(function () {
 
     Route::get('/', [ChatController::class, 'index'])->name('index');
+    Route::get('/sessions', [ChatController::class, 'listSessions'])->name('sessions.list');
 
     Route::post('/session', [ChatController::class, 'createSession'])->name('session.create');
-    Route::get('/sessions', [ChatController::class, 'sessions'])->name('sessions');
-    Route::get('/session/{session}/messages', [ChatController::class, 'sessionMessages'])
-        ->name('session.messages');
+    Route::get('/session/{session}/messages', [ChatController::class, 'sessionMessages'])->name('session.messages');
+    Route::get('/session/{id}/data', [ChatController::class, 'getSessionData']);
 
-    Route::post('/analyse', [ChatController::class, 'analyse'])->name('analyse');
+    Route::post('/analyse/step-1', [ChatController::class, 'analyseStep1'])->name('analyse.step1');
+    Route::post('/analyse/step-2', [ChatController::class, 'analyseStep2'])->name('analyse.step2');
+    Route::post('/analyse/step-3', [ChatController::class, 'analyseStep3'])->name('analyse.step3');
+    Route::post('/analyse/step-4', [ChatController::class, 'analyseStep4'])->name('analyse.step4');
+    Route::post('/analyse/step-5', [ChatController::class, 'analyseStep5'])->name('analyse.step5');
+    Route::post('/analyse/step-6', [ChatController::class, 'analyseStep6'])->name('analyse.step6');
 
     Route::post('/transcribe', [ChatController::class, 'transcribeAudio'])->name('transcribe');
 
-    Route::post('/upload-document', [ChatController::class, 'uploadDocument'])->name('upload-document');
-
     Route::delete('/session/{session}', [ChatController::class, 'deleteSession'])->name('session.delete');
-});
-
-// ── Web-Triggered Queue Worker (For cPanel/Shared Hosting) ────────────────
-Route::get('/queue/work', function (Request $request) {
-    // Security check: Match token from .env or fallback to secret string
-    $token = config('app.queue_token', 'bima-secret-123');
-    
-    if ($request->get('token') !== $token) {
-        return response()->json(['message' => 'Unauthorized'], 401);
-    }
-
-    try {
-        Artisan::call('queue:work', [
-            '--stop-when-empty' => true,
-            '--tries' => 3,
-            '--backoff' => 3
-        ]);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Queue processed.',
-            'output' => Artisan::output()
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage()
-        ], 500);
-    }
 });

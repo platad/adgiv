@@ -7,15 +7,29 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
 class ChatSession extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
+
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
+        'id',
         'user_id',
-        'document_id',
         'title',
         'status',
+        'raw_transcription',
+        'refined_transcription',
+        'matched_transcription',
+        'advice_category',
+        'character_category',
+        'intonation_analysis',
+        'summary_domain',
+        'aim_target',
+        'suggestions',
     ];
 
     protected $casts = [
@@ -28,10 +42,6 @@ class ChatSession extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function document(): BelongsTo
-    {
-        return $this->belongsTo(Document::class);
-    }
 
     public function messages(): HasMany
     {

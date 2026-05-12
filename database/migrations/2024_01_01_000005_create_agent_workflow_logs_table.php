@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('agent_workflow_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('chat_session_id')->constrained()->cascadeOnDelete();
+            $table->uuid('chat_session_id');
+            $table->foreign('chat_session_id')->references('id')->on('chat_sessions')->cascadeOnDelete();
             $table->string('agent_name');
             $table->enum('status', ['thinking', 'done', 'failed'])->default('thinking');
             $table->text('process_note')->nullable();

@@ -9,11 +9,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('chat_sessions', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('document_id')->nullable()->constrained()->nullOnDelete();
             $table->string('title')->default('Sesi Analisis Baru');
             $table->enum('status', ['active', 'completed', 'archived'])->default('active');
+            
+            $table->longText('raw_transcription')->nullable();
+            $table->longText('refined_transcription')->nullable();
+            $table->longText('matched_transcription')->nullable();
+            
+            $table->string('advice_category')->nullable();
+            $table->string('character_category')->nullable();
+            $table->string('intonation_analysis')->nullable();
+            $table->text('summary_domain')->nullable();
+            $table->text('aim_target')->nullable();
+            $table->text('suggestions')->nullable();
+
             $table->timestamps();
         });
     }
