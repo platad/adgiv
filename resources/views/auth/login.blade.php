@@ -1,7 +1,7 @@
 <x-layouts.guest>
     <x-slot:title>Masuk</x-slot:title>
 
-    <div class="mb-8">
+    <div class="mb-8 pt-18">
         <h2 class="text-2xl font-black text-gray-900 tracking-tight uppercase">Selamat Datang</h2>
         <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest mt-1">Masuk untuk mulai analisis bimbingan</p>
     </div>

@@ -1,7 +1,7 @@
 <x-layouts.guest>
     <x-slot:title>Daftar</x-slot:title>
 
-    <div class="mb-8">
+    <div class="mb-8 pt-10">
         <h2 class="text-2xl font-black text-gray-900 tracking-tight uppercase">Buat Akun Baru</h2>
         <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest mt-1">Bergabung dengan platform Supervisory AI</p>
     </div>

@@ -69,7 +69,7 @@
         {{-- Suggestions --}}
         <div class="p-6 lg:p-8 rounded-[2rem] lg:rounded-[2.5rem] bg-white border-2 border-green-50 shadow-sm">
             <h4 class="text-[0.7rem] lg:text-[0.65rem] font-black text-green-600 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                <i data-lucide="sparkles" class="w-4 h-4"></i> Saran Perbaikan (Kimi AI)
+                <i data-lucide="sparkles" class="w-4 h-4"></i> Saran Perbaikan
             </h4>
             <div class="text-[0.9rem] lg:text-gray-700 leading-relaxed font-medium" x-text="session.suggestions || '-'"></div>
         </div>
