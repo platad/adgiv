@@ -253,7 +253,7 @@ function voiceInputWidget() {
 
         async uploadAudio(file, fileId) {
             this.isLoading = true;
-            this.statusHint = 'Sedang mentranskripsi via Groq...';
+            this.statusHint = 'Sedang mentranskripsi via OpenAI...';
             
             try {
                 const formData = new FormData();
