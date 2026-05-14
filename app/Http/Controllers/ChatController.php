@@ -270,7 +270,7 @@ class ChatController extends Controller
         $content .= "### 🧠 BIMA Insights\n";
         $content .= "**Summary Domain:** " . ($session->summary_domain ?? '-') . "\n";
         $content .= "**Arah Tujuan:** " . ($session->aim_target ?? '-') . "\n";
-        $content .= "**Saran Perbaikan:** " . ($session->suggestions ?? '-') . "\n";
+        $content .= "**Kritik & Evaluasi Tajam:** " . ($session->suggestions ?? '-') . "\n";
 
         $session->messages()->create([
             'role'    => 'assistant',
