@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 class KimiApiService
 {
     private const BASE_URL = 'https://api.moonshot.ai/v1';
-    private const DEFAULT_MODEL = 'kimi-k2-6';
+    private const DEFAULT_MODEL = 'kimi-k2.5';
 
     public function __construct(
         private readonly string $apiKey = '',

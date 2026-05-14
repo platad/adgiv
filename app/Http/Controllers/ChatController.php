@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AgentPrompt;
 use App\Models\ChatSession;
 use App\Services\TranscriptionService;
+use App\Services\OpenAiService;
 use App\Services\KimiApiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ class ChatController extends Controller
 {
     public function __construct(
         private readonly TranscriptionService     $transcriptionService,
+        private readonly OpenAiService            $openAiService,
         private readonly KimiApiService           $kimiApiService,
     ) {}
 
@@ -113,7 +115,7 @@ class ChatController extends Controller
         }
 
         $agentPrompt = AgentPrompt::getActivePrompt('text_cleaner');
-        $result = $this->kimiApiService->complete($agentPrompt->system_prompt, $session->raw_transcription);
+        $result = $this->openAiService->complete($agentPrompt->system_prompt, $session->raw_transcription);
         $parsed = json_decode($result['content'], true);
 
         if (!$parsed || !isset($parsed['refined_text'])) {
@@ -145,7 +147,7 @@ class ChatController extends Controller
         $agentPrompt = AgentPrompt::getActivePrompt('text_matcher');
         
         $input = "Teks Asli: " . $session->raw_transcription . "\n\nTeks Rapih: " . $session->refined_transcription;
-        $result = $this->kimiApiService->complete($agentPrompt->system_prompt, $input);
+        $result = $this->openAiService->complete($agentPrompt->system_prompt, $input);
         $parsed = json_decode($result['content'], true);
 
         if (!$parsed || !isset($parsed['matched_text'])) {
@@ -176,7 +178,7 @@ class ChatController extends Controller
         $session = ChatSession::findOrFail($validated['session_id']);
         $agentPrompt = AgentPrompt::getActivePrompt('advice_classifier');
         
-        $result = $this->kimiApiService->complete($agentPrompt->system_prompt, $session->matched_transcription);
+        $result = $this->openAiService->complete($agentPrompt->system_prompt, $session->matched_transcription);
         $parsed = json_decode($result['content'], true);
 
         if (!$parsed || !isset($parsed['category'])) {
@@ -207,7 +209,7 @@ class ChatController extends Controller
         $session = ChatSession::findOrFail($validated['session_id']);
         $agentPrompt = AgentPrompt::getActivePrompt('character_classifier');
         
-        $result = $this->kimiApiService->complete($agentPrompt->system_prompt, $session->matched_transcription);
+        $result = $this->openAiService->complete($agentPrompt->system_prompt, $session->matched_transcription);
         $parsed = json_decode($result['content'], true);
 
         if (!$parsed || !isset($parsed['category'])) {
@@ -239,11 +241,11 @@ class ChatController extends Controller
 
         $promptInt = AgentPrompt::getActivePrompt('intonation_detector');
         $input = "Teks Rapih: " . $session->refined_transcription . "\n\nTeks Matched: " . $session->matched_transcription;
-        $resInt = $this->kimiApiService->complete($promptInt->system_prompt, $input);
+        $resInt = $this->openAiService->complete($promptInt->system_prompt, $input);
         $parsedInt = json_decode($resInt['content'], true);
         
         $promptIns = AgentPrompt::getActivePrompt('kimi_insights');
-        $resIns = $this->kimiApiService->complete($promptIns->system_prompt, $session->matched_transcription);
+        $resIns = $this->openAiService->complete($promptIns->system_prompt, $session->matched_transcription);
         $parsedIns = json_decode($resIns['content'], true);
 
         if (!$parsedInt || !$parsedIns) {
