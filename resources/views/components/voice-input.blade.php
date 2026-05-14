@@ -50,41 +50,50 @@
             <span class="text-sm font-bold" :class="isRecording ? 'text-red-600' : 'text-gray-400'" x-text="isRecording ? 'Sedang Mendengarkan...' : 'Ketuk Mic atau Drop File Audio'"></span>
             <span class="text-[0.65rem] font-bold text-gray-300 uppercase tracking-widest" x-show="!isRecording">Support: MP3, WAV, M4A, WEBM</span>
         </div>
+
         {{-- ── Transcription & Ready State ── --}}
-    <div class="w-full flex flex-col gap-4 animate-fade-in" x-show="step1Done" style="display:none;">
-        
-        {{-- Success Card --}}
-        <div class="w-full bg-green-50 border border-green-100 rounded-[1.5rem] p-6 flex items-center gap-6 shadow-sm">
-            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-green-500 shrink-0 shadow-sm">
-                <i data-lucide="check-circle-2" class="w-8 h-8"></i>
+        <div class="w-full flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500" x-show="step1Done" style="display:none;">
+            
+            {{-- Success Card --}}
+            <div class="w-full max-w-2xl mx-auto bg-emerald-50/50 backdrop-blur-sm border border-emerald-100 rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-6 flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 sm:gap-6 shadow-sm relative overflow-hidden mt-10">
+                {{-- Decorative background glow --}}
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-100/30 rounded-full blur-3xl"></div>
+                
+                <div class="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center text-emerald-500 shrink-0 shadow-sm relative z-10">
+                    <i data-lucide="check-circle-2" class="w-6 h-6 sm:w-10 sm:h-10"></i>
+                </div>
+                <div class="flex-1 relative z-10">
+                    <h4 class="text-sm sm:text-base font-black text-emerald-900 uppercase tracking-tight">Audio Berhasil Diupload</h4>
+                    <p class="text-[0.65rem] sm:text-xs font-bold text-emerald-600/70 uppercase tracking-widest mt-0.5 sm:mt-1">Transkripsi telah diamankan di database</p>
+                </div>
+                <button class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white border border-emerald-100 flex items-center justify-center text-emerald-300 hover:text-emerald-600 hover:bg-emerald-50 transition-all shadow-sm relative z-10" 
+                        @click="resetWidget()" title="Upload Ulang">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </button>
             </div>
-            <div class="flex-1">
-                <h4 class="text-sm font-black text-green-900 uppercase tracking-tight">Audio Berhasil Diupload</h4>
-                <p class="text-xs font-bold text-green-600/70 uppercase tracking-widest mt-0.5">Transkripsi telah disimpan di database</p>
+
+            {{-- Big Analyze Button --}}
+            <div class="relative group w-full max-w-2xl mx-auto">
+                <div class="absolute -inset-1 bg-gradient-to-r from-gray-900 to-gray-700 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <button
+                    class="relative w-full h-14 sm:h-16 rounded-[1.25rem] sm:rounded-2xl bg-gray-900 text-white font-black text-sm sm:text-lg flex items-center justify-center gap-3 sm:gap-4 hover:bg-black transition-all"
+                    @click="triggerAnalysis()"
+                >
+                    <span class="flex items-center gap-2 sm:gap-4 tracking-normal sm:tracking-widest">
+                        MULAI ANALISA
+                    </span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform ml-1 sm:ml-2"></i>
+                </button>
             </div>
-            <button class="p-2 text-green-300 hover:text-green-600 transition" @click="resetWidget()">
-                <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+
+            {{-- Show Transcription Modal Button --}}
+            <button 
+                class="flex items-center gap-2 self-center text-[0.7rem] font-black text-gray-400 uppercase tracking-[0.25em] hover:text-bima-red transition py-2 group"
+                @click="$dispatch('open-transcription-modal')">
+                <i data-lucide="file-text" class="w-3.5 h-3.5 opacity-50 group-hover:opacity-100"></i>
+                Lihat Hasil Transkripsi
             </button>
         </div>
-
-        {{-- Big Analyze Button --}}
-        <button
-            class="w-full h-16 rounded-2xl bg-gray-900 text-white font-black text-lg flex items-center justify-center gap-3 hover:bg-black transition-all shadow-xl shadow-gray-200 group"
-            @click="triggerAnalysis()"
-        >
-            <span class="flex items-center gap-3">
-                MULAI ANALISA
-            </span>
-            <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
-        </button>
-
-        {{-- Show Transcription Modal Button --}}
-        <button 
-            class="text-[0.65rem] font-black text-gray-400 uppercase tracking-[0.2em] hover:text-bima-red transition self-center mt-2"
-            @click="$dispatch('open-transcription-modal')">
-            Lihat Hasil Transkripsi
-        </button>
-    </div>
     </div>
 
     {{-- Status Hint --}}
