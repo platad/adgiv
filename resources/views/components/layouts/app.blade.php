@@ -50,28 +50,47 @@
 </head>
 <body class="min-h-screen bg-gray-50 flex font-sans antialiased">
 
-    {{-- Floating Sidebar Branding --}}
-    <aside class="fixed left-6 top-6 bottom-6 w-20 flex flex-col items-center py-8 bg-bima-red text-white rounded-[2.5rem] shadow-2xl z-50 overflow-hidden">
-        {{-- Logo --}}
-        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-bima-red shadow-inner mb-auto group cursor-pointer hover:scale-110 transition-transform">
-            <i data-lucide="brain" class="w-7 h-7"></i>
+    {{-- Mobile Header --}}
+    <div class="lg:hidden fixed top-0 left-0 right-0 h-16 bg-gray-900 z-[60] flex items-center justify-between px-6 border-b border-white/10">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-bima-red rounded-lg flex items-center justify-center text-white">
+                <i data-lucide="brain" class="w-5 h-5"></i>
+            </div>
+            <span class="text-white font-black tracking-tighter text-lg">BIMA <span class="text-bima-red">AI</span></span>
         </div>
+        <form method="POST" action="/logout" class="m-0">
+            @csrf
+            <button type="submit" class="text-white/60 hover:text-white">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+            </button>
+        </form>
+    </div>
 
-        {{-- App Name (Vertical) --}}
-        <div class="flex flex-col items-center gap-1 py-8">
-            <span class="[writing-mode:vertical-lr] rotate-180 text-lg font-black tracking-[0.3em] uppercase opacity-90">BIMA AI</span>
-            <div class="w-px h-12 bg-white/20 my-4"></div>
-            <span class="[writing-mode:vertical-lr] rotate-180 text-[0.6rem] font-bold tracking-widest uppercase opacity-60">Prototipe</span>
-        </div>
-
-        {{-- User profile & Logout --}}
-        <div class="mt-auto flex flex-col items-center gap-4 w-full pb-4">
-            <div class="relative group w-full flex flex-col items-center gap-4" x-data="{ userMenuOpen: false }">
-                {{-- Profile Initial --}}
-                <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-sm font-bold text-white border border-white/20 shadow-lg cursor-default">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+    {{-- Sidebar (Desktop) --}}
+    <aside class="hidden lg:flex w-24 bg-gray-900 flex-col items-center py-10 shrink-0 border-r border-white/5 z-50 fixed inset-y-0 left-0">
+        <div class="flex flex-col items-center gap-12 h-full">
+            {{-- Logo --}}
+            <div class="group cursor-pointer">
+                <div class="w-14 h-14 bg-bima-red rounded-[1.5rem] flex items-center justify-center text-white shadow-[0_10px_30px_rgba(204,0,0,0.4)] group-hover:scale-110 transition-transform duration-500">
+                    <i data-lucide="brain" class="w-8 h-8"></i>
                 </div>
+            </div>
 
+            {{-- Nav --}}
+            <nav class="flex flex-col gap-8">
+                <a href="#" class="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center group/nav transition-all">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                </a>
+                <a href="#" class="w-12 h-12 rounded-2xl hover:bg-white/5 text-white/40 hover:text-white flex items-center justify-center group/nav transition-all">
+                    <i data-lucide="message-square" class="w-5 h-5"></i>
+                </a>
+                <a href="#" class="w-12 h-12 rounded-2xl hover:bg-white/5 text-white/40 hover:text-white flex items-center justify-center group/nav transition-all">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                </a>
+            </nav>
+
+            {{-- Bottom Actions --}}
+            <div class="mt-auto flex flex-col gap-6">
                 {{-- Separator --}}
                 <div class="w-8 h-px bg-white/20"></div>
 
@@ -86,14 +105,14 @@
         </div>
     </aside>
 
-    {{-- Action Buttons (Beside Sidebar) --}}
-    <div class="fixed left-28 top-10 flex flex-col gap-4 z-40" x-data="{}">
+    {{-- Action Buttons (Floating) --}}
+    <div class="fixed right-6 bottom-24 lg:bottom-auto lg:left-28 lg:top-10 flex flex-col gap-4 z-40" x-data="{}">
         {{-- New Session --}}
         <button onclick="createNewSessionGlobal()" 
                 class="w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-bima-red hover:bg-bima-red hover:text-white transition-all group relative border border-red-50 cursor-pointer"
                 title="Sesi Baru">
             <i data-lucide="plus" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
-            <div class="absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">Sesi Baru</div>
+            <div class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">Sesi Baru</div>
         </button>
 
         {{-- History --}}
@@ -101,14 +120,14 @@
                 class="w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-gray-400 hover:text-bima-red transition-all group relative border border-gray-50 cursor-pointer"
                 title="Riwayat Sesi">
             <i data-lucide="history" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
-            <div class="absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">Riwayat</div>
+            <div class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">Riwayat</div>
         </button>
     </div>
 
     {{-- Main Content Wrapper --}}
-    <div class="flex-1 flex flex-col w-full pl-52 pr-8 py-10 relative">
+    <div class="flex-1 flex flex-col w-full px-4 pt-20 pb-24 lg:pl-52 lg:pr-8 lg:py-10 relative">
         {{-- The main panel --}}
-        <main class="flex-1 w-full bg-white shadow-2xl border border-gray-100 rounded-[3rem] flex flex-col relative overflow-hidden">
+        <main class="flex-1 w-full bg-white shadow-2xl border border-gray-100 rounded-[2rem] lg:rounded-[3rem] flex flex-col relative overflow-hidden">
             {{ $slot }}
         </main>
     </div>

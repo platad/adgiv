@@ -59,19 +59,19 @@
     {{-- Large Content Cards --}}
     <div class="space-y-6">
         {{-- Aim / Target --}}
-        <div class="p-8 rounded-[2.5rem] bg-bima-red text-white shadow-xl shadow-red-100">
-            <h4 class="text-[0.65rem] font-black uppercase tracking-[0.2em] mb-4 opacity-80 flex items-center gap-2">
+        <div class="p-6 lg:p-8 rounded-[2rem] lg:rounded-[2.5rem] bg-bima-red text-white shadow-xl shadow-red-100">
+            <h4 class="text-[0.6rem] lg:text-[0.65rem] font-black uppercase tracking-[0.2em] mb-4 opacity-80 flex items-center gap-2">
                 <i data-lucide="target" class="w-4 h-4"></i> Arah Tujuan
             </h4>
-            <p class="text-lg font-medium leading-relaxed" x-text="session.aim_target || '-'"></p>
+            <p class="text-base lg:text-lg font-medium leading-relaxed" x-text="session.aim_target || '-'"></p>
         </div>
 
         {{-- Suggestions --}}
-        <div class="p-8 rounded-[2.5rem] bg-white border-2 border-green-50 shadow-sm">
-            <h4 class="text-[0.65rem] font-black text-green-600 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+        <div class="p-6 lg:p-8 rounded-[2rem] lg:rounded-[2.5rem] bg-white border-2 border-green-50 shadow-sm">
+            <h4 class="text-[0.7rem] lg:text-[0.65rem] font-black text-green-600 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                 <i data-lucide="sparkles" class="w-4 h-4"></i> Saran Perbaikan (Kimi AI)
             </h4>
-            <div class="text-gray-700 leading-relaxed font-medium" x-text="session.suggestions || '-'"></div>
+            <div class="text-[0.9rem] lg:text-gray-700 leading-relaxed font-medium" x-text="session.suggestions || '-'"></div>
         </div>
     </div>
 </div>
