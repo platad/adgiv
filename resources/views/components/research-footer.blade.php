@@ -1,13 +1,32 @@
 @props(['isDark' => false])
 
 <div class="mt-12 pt-10 {{ !$isDark ? 'border-t border-gray-100/50' : '' }} px-4 lg:px-0">
+    {{-- SVG Filter to remove black background --}}
+    <svg width="0" height="0" class="absolute">
+        <filter id="remove-black" color-interpolation-filters="sRGB">
+            <feColorMatrix type="matrix" values="1 0 0 0 0 
+                                                 0 1 0 0 0 
+                                                 0 0 1 0 0 
+                                                 1 1 1 0 -0.1" />
+        </filter>
+    </svg>
+
     <div class="flex flex-col items-center lg:items-start text-center lg:text-left space-y-8">
         {{-- Logos Image --}}
         <div class="w-full">
-            <div class="{{ $isDark ? 'bg-white p-6 rounded-2xl shadow-xl' : '' }}">
-                <img src="{{ asset('assets/img/image.png') }}" 
-                     class="w-full max-w-lg mx-auto lg:mx-0 drop-shadow-sm hover:scale-[1.02] transition-transform duration-500" 
-                     alt="UMPO & UMPRI Collaboration">
+            <div class="{{ $isDark ? 'bg-black/40 backdrop-blur-xl border border-white/5 p-6 rounded-[2rem]' : '' }} inline-flex flex-wrap items-center justify-center lg:justify-start gap-10">
+                <div class="relative group">
+                    <img src="{{ asset('assets/img/Bima Kemendikbut.png') }}" 
+                         style="{{ $isDark ? 'filter: url(#remove-black);' : '' }}"
+                         class="h-10 sm:h-12 lg:h-14 w-auto object-contain drop-shadow-sm hover:scale-[1.05] transition-transform duration-500" 
+                         alt="Bima Kemendikbud">
+                </div>
+                
+                <div class="h-8 w-px {{ $isDark ? 'bg-white/10' : 'bg-gray-200' }} hidden sm:block"></div>
+
+                <img src="{{ asset('assets/img/logo_Universitas-Muhammadiyah-Ponorogo-1.png') }}" 
+                     class="h-12 sm:h-14 lg:h-16 w-auto object-contain drop-shadow-sm hover:scale-[1.05] transition-transform duration-500" 
+                     alt="Universitas Muhammadiyah Ponorogo">
             </div>
         </div>
 
