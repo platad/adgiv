@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'BIMA AI' }} – Multi-Agent Voice Analysis</title>
+    <title>{{ $title ?? 'Supervisory AI' }} – Multi-Agent Voice Analysis</title>
     <meta name="description" content="BIMA – Sistem analisis suara berbasis Multi-Agent AI untuk membedakan Mahasiswa dan Dosen.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&display=swap" rel="stylesheet">
@@ -129,7 +129,7 @@
     <div class="guest-card">
         <div class="brand">
             <div class="brand-icon">🧠</div>
-            <h1>BIMA AI</h1>
+            <h1>Supervisory AI</h1>
             <p>Multi-Agent Voice Analysis System</p>
         </div>
         <div class="panel">

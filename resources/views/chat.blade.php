@@ -1,5 +1,5 @@
 <x-layouts.app :activeSessionId="$activeSession->id">
-    <x-slot:title>BIMA AI Dashboard Analisis</x-slot:title>
+    <x-slot:title>Supervisory AI Dashboard Analisis</x-slot:title>
 
     <div class="flex-1 flex flex-col w-full bg-gray-50/30 overflow-hidden"
          x-data="chatApp(@js($activeSession->id), @js($activeSession->title))"
@@ -15,7 +15,7 @@
                     </div>
                     <div>
                         <h2 class="text-xl lg:text-2xl font-black text-gray-900 tracking-tight">Mulai Analisis Bimbingan</h2>
-                        <p class="text-xs lg:text-sm text-gray-500 font-medium italic">Rekam atau unggah audio untuk memulai workflow BIMA AI</p>
+                        <p class="text-xs lg:text-sm text-gray-500 font-medium italic">Rekam atau unggah audio untuk memulai workflow Supervisory AI</p>
                     </div>
                 </div>
                 

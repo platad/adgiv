@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'BIMA AI' }} – Multi-Agent Voice Analysis</title>
-    <meta name="description" content="BIMA – Sistem analisis suara berbasis Multi-Agent AI untuk membedakan Mahasiswa dan Dosen.">
+    <title>{{ $title ?? 'Supervisory AI' }} – Multi-Agent Voice Analysis</title>
+    <meta name="description" content="Supervisory AI – Sistem analisis suara berbasis Multi-Agent AI untuk membedakan Mahasiswa dan Dosen.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -30,10 +30,10 @@
 
     <div class="w-full max-w-sm relative z-10">
         <div class="text-center mb-10 group cursor-default">
-            <div class="w-20 h-20 bg-gradient-to-br from-bima-red to-bima-red-dark rounded-[2rem] mx-auto mb-6 flex items-center justify-center text-white shadow-[0_20px_50px_rgba(204,0,0,0.3)] transition-all group-hover:scale-110 group-hover:rotate-3 duration-500">
-                <i data-lucide="brain" class="w-10 h-10"></i>
+            <div class="w-20 h-20 bg-gradient-to-br from-bima-red to-bima-red-dark rounded-[2rem] mx-auto mb-6 flex items-center justify-center text-white shadow-[0_20px_50px_rgba(204,0,0,0.3)] transition-all group-hover:scale-110 group-hover:rotate-3 duration-500 p-4">
+                <x-application-logo class="w-full h-full" />
             </div>
-            <h1 class="text-3xl font-black tracking-tight text-gray-900 uppercase">BIMA <span class="text-bima-red">AI</span></h1>
+            <h1 class="text-3xl font-black tracking-tight text-gray-900 uppercase">Supervisory <span class="text-bima-red">AI</span></h1>
             <p class="text-[0.65rem] font-bold text-gray-400 mt-2 uppercase tracking-[0.3em] leading-relaxed">Multi-Agent Voice Analysis System</p>
         </div>
         

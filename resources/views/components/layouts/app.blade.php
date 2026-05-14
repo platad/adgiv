@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Chat' }} – BIMA AI</title>
-    <meta name="description" content="BIMA – Analisis suara Multi-Agent AI untuk klasifikasi Mahasiswa vs Dosen.">
+    <title>{{ $title ?? 'Chat' }} – Supervisory AI</title>
+    <meta name="description" content="Supervisory AI – Analisis suara Multi-Agent AI untuk klasifikasi Mahasiswa vs Dosen.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -53,10 +53,10 @@
     {{-- Mobile Header --}}
     <div class="lg:hidden fixed top-0 left-0 right-0 h-16 bg-gray-900 z-[60] flex items-center justify-between px-6 border-b border-white/10">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-bima-red rounded-lg flex items-center justify-center text-white">
-                <i data-lucide="brain" class="w-5 h-5"></i>
+            <div class="w-10 h-10 bg-bima-red rounded-lg flex items-center justify-center text-white p-2">
+                <x-application-logo class="w-full h-full" />
             </div>
-            <span class="text-white font-black tracking-tighter text-lg">BIMA <span class="text-bima-red">AI</span></span>
+            <span class="text-white font-black tracking-tighter text-lg">Supervisory <span class="text-bima-red">AI</span></span>
         </div>
         <form method="POST" action="/logout" class="m-0">
             @csrf
@@ -71,14 +71,14 @@
         <div class="flex flex-col items-center gap-8 h-full">
             {{-- Logo --}}
             <div class="group cursor-pointer">
-                <div class="w-14 h-14 bg-bima-red rounded-[1.5rem] flex items-center justify-center text-white shadow-[0_10px_30px_rgba(204,0,0,0.4)] group-hover:scale-110 transition-transform duration-500">
-                    <i data-lucide="brain" class="w-8 h-8"></i>
+                <div class="w-14 h-14 bg-bima-red rounded-[1.5rem] flex items-center justify-center text-white shadow-[0_10px_30px_rgba(204,0,0,0.4)] group-hover:scale-110 transition-transform duration-500 p-3">
+                    <x-application-logo class="w-full h-full" />
                 </div>
             </div>
 
             {{-- Vertical Branding --}}
             <div class="flex flex-col items-center gap-1 py-4">
-                <span class="[writing-mode:vertical-lr] rotate-180 text-lg font-black tracking-[0.3em] text-white uppercase opacity-90">BIMA AI</span>
+                <span class="[writing-mode:vertical-lr] rotate-180 text-lg font-black tracking-[0.3em] text-white uppercase opacity-90">Supervisory AI</span>
                 <div class="w-px h-12 bg-white/20 my-4"></div>
                 <span class="[writing-mode:vertical-lr] rotate-180 text-[0.6rem] font-bold tracking-widest text-white/60 uppercase">Prototipe</span>
             </div>

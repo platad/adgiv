@@ -1,6 +1,6 @@
 {{-- resources/views/components/chat/scripts/methods-submit.blade.php --}}
 async handleMultiStepAnalysis(text) {
-    console.log("[BIMA AI] Starting Multi-Step Analysis", { text });
+    console.log("[Supervisory AI] Starting Multi-Step Analysis", { text });
     if (this.isAnalysing) return;
     
     this.isAnalysing = true;
@@ -80,7 +80,7 @@ async handleMultiStepAnalysis(text) {
         this.messages = this.messages.filter(m => m.id !== typingId);
         this.isAnalysing = false;
         this.activeStep = null;
-        console.error("[BIMA AI] Workflow Error:", err);
+        console.error("[Supervisory AI] Workflow Error:", err);
         this.messages.push({ id: Date.now(), role: 'assistant', content: 'Kesalahan Sistem: ' + err.message, created_at: new Date() });
     }
     this.$nextTick(() => this.scrollToBottom());

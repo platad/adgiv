@@ -143,7 +143,7 @@ function voiceInputWidget() {
                 if (data.success && data.session.raw_transcription && data.session.raw_transcription !== '-') {
                     this.step1Done = true;
                     this.transcript = data.session.raw_transcription;
-                    console.log("[BIMA AI] Restored Step 1 state from DB");
+                    console.log("[Supervisory AI] Restored Step 1 state from DB");
                 }
             } catch (e) { console.error("Voice input init failed", e); }
 
@@ -265,7 +265,7 @@ function voiceInputWidget() {
                     await this.saveTranscriptToDb(data.transcription);
                 }
             } catch (err) {
-                console.error('[BIMA AI] Transcription Error:', err);
+                console.error('[Supervisory AI] Transcription Error:', err);
                 this.statusHint = 'Gagal Transkripsi.';
             } finally {
                 this.isLoading = false;
