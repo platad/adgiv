@@ -68,7 +68,7 @@
 
     {{-- Sidebar (Desktop) --}}
     <aside class="hidden lg:flex w-24 bg-gray-900 flex-col items-center py-10 shrink-0 border-r border-white/5 z-50 fixed inset-y-0 left-0">
-        <div class="flex flex-col items-center gap-12 h-full">
+        <div class="flex flex-col items-center gap-8 h-full">
             {{-- Logo --}}
             <div class="group cursor-pointer">
                 <div class="w-14 h-14 bg-bima-red rounded-[1.5rem] flex items-center justify-center text-white shadow-[0_10px_30px_rgba(204,0,0,0.4)] group-hover:scale-110 transition-transform duration-500">
@@ -76,17 +76,30 @@
                 </div>
             </div>
 
+            {{-- Vertical Branding --}}
+            <div class="flex flex-col items-center gap-1 py-4">
+                <span class="[writing-mode:vertical-lr] rotate-180 text-lg font-black tracking-[0.3em] text-white uppercase opacity-90">BIMA AI</span>
+                <div class="w-px h-12 bg-white/20 my-4"></div>
+                <span class="[writing-mode:vertical-lr] rotate-180 text-[0.6rem] font-bold tracking-widest text-white/60 uppercase">Prototipe</span>
+            </div>
+
             {{-- Nav --}}
-            <nav class="flex flex-col gap-8">
-                <a href="#" class="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center group/nav transition-all">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                </a>
-                <a href="#" class="w-12 h-12 rounded-2xl hover:bg-white/5 text-white/40 hover:text-white flex items-center justify-center group/nav transition-all">
-                    <i data-lucide="message-square" class="w-5 h-5"></i>
-                </a>
-                <a href="#" class="w-12 h-12 rounded-2xl hover:bg-white/5 text-white/40 hover:text-white flex items-center justify-center group/nav transition-all">
-                    <i data-lucide="settings" class="w-5 h-5"></i>
-                </a>
+            <nav class="flex flex-col gap-6" x-data="{}">
+                {{-- New Session --}}
+                <button onclick="createNewSessionGlobal()" 
+                        class="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center hover:bg-bima-red transition-all group relative cursor-pointer"
+                        title="Sesi Baru">
+                    <i data-lucide="plus" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
+                    <div class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">Sesi Baru</div>
+                </button>
+
+                {{-- History --}}
+                <button @click="$dispatch('open-history')" 
+                        class="w-12 h-12 rounded-2xl bg-white/5 text-white/40 hover:text-white hover:bg-white/10 flex items-center justify-center transition-all group relative cursor-pointer"
+                        title="Riwayat Sesi">
+                    <i data-lucide="history" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
+                    <div class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">Riwayat</div>
+                </button>
             </nav>
 
             {{-- Bottom Actions --}}
@@ -105,29 +118,23 @@
         </div>
     </aside>
 
-    {{-- Action Buttons (Floating) --}}
-    <div class="fixed right-6 bottom-24 lg:bottom-auto lg:left-28 lg:top-10 flex flex-col gap-4 z-40" x-data="{}">
-        {{-- New Session --}}
-        <button onclick="createNewSessionGlobal()" 
-                class="w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-bima-red hover:bg-bima-red hover:text-white transition-all group relative border border-red-50 cursor-pointer"
-                title="Sesi Baru">
-            <i data-lucide="plus" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
-            <div class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">Sesi Baru</div>
+    {{-- Mobile Bottom Nav (Action access for mobile) --}}
+    <div class="lg:hidden fixed bottom-6 left-6 right-6 h-16 bg-gray-900/90 backdrop-blur-xl rounded-[2rem] border border-white/10 z-[70] flex items-center justify-around px-6 shadow-2xl" x-data="{}">
+        <button onclick="createNewSessionGlobal()" class="text-white/60 hover:text-bima-red transition cursor-pointer">
+            <i data-lucide="plus-circle" class="w-7 h-7"></i>
         </button>
-
-        {{-- History --}}
-        <button @click="$dispatch('open-history')" 
-                class="w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-gray-400 hover:text-bima-red transition-all group relative border border-gray-50 cursor-pointer"
-                title="Riwayat Sesi">
-            <i data-lucide="history" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
-            <div class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">Riwayat</div>
+        <button @click="$dispatch('open-history')" class="text-white/60 hover:text-white transition cursor-pointer">
+            <i data-lucide="history" class="w-7 h-7"></i>
+        </button>
+        <button @click="location.reload()" class="text-white/60 hover:text-white transition cursor-pointer">
+            <i data-lucide="refresh-cw" class="w-6 h-6"></i>
         </button>
     </div>
 
     {{-- Main Content Wrapper --}}
     <div class="flex-1 flex flex-col w-full px-4 pt-20 pb-24 lg:pl-52 lg:pr-8 lg:py-10 relative">
         {{-- The main panel --}}
-        <main class="flex-1 w-full bg-white shadow-2xl border border-gray-100 rounded-[2rem] lg:rounded-[3rem] flex flex-col relative overflow-hidden">
+        <main class="flex-1 w-full flex flex-col relative overflow-hidden">
             {{ $slot }}
         </main>
     </div>

@@ -7,7 +7,7 @@
          x-on:start-multi-step-analysis.window="handleMultiStepAnalysis($event.detail.text)">
         
         {{-- ── Top: Input Section ── --}}
-        <div class="shrink-0 bg-white border-b border-gray-100 p-4 lg:p-8 shadow-sm z-10">
+        <div class="shrink-0 p-4 lg:p-8 z-10">
             <div class="w-full max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row md:items-center gap-4 mb-6">
                     <div class="w-12 h-12 bg-bima-red rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
