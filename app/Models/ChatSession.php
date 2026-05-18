@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class ChatSession extends Model
@@ -30,18 +29,26 @@ class ChatSession extends Model
         'summary_domain',
         'aim_target',
         'suggestions',
+        'audio_duration',
+        'segment_count',
+        'analysis_status',
+        'workflow_state',
+        'raw_whisper_response',
     ];
 
     protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'audio_duration'       => 'float',
+        'segment_count'        => 'integer',
+        'workflow_state'       => 'array',
+        'raw_whisper_response' => 'array',
+        'created_at'           => 'datetime',
+        'updated_at'           => 'datetime',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
-
 
     public function messages(): HasMany
     {
@@ -51,5 +58,15 @@ class ChatSession extends Model
     public function agentWorkflowLogs(): HasMany
     {
         return $this->hasMany(AgentWorkflowLog::class)->orderBy('created_at');
+    }
+
+    public function segments(): HasMany
+    {
+        return $this->hasMany(TranscriptSegment::class)->orderBy('segment_index');
+    }
+
+    public function segmentAnalysisLogs(): HasMany
+    {
+        return $this->hasMany(SegmentAnalysisLog::class)->orderBy('created_at');
     }
 }

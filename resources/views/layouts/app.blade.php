@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Chat' }} – Supervisory AI</title>
-    <meta name="description" content="BIMA – Analisis suara Multi-Agent AI untuk klasifikasi Mahasiswa vs Dosen.">
+    <meta name="description" content="Supervisory AI – Analisis suara Multi-Agent AI untuk klasifikasi Mahasiswa vs Dosen.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -159,7 +159,7 @@
                 <div class="user-avatar">{{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}</div>
                 <div class="user-info">
                     <div class="name">{{ auth()->user()->name ?? 'User' }}</div>
-                    <div class="role">Peneliti BIMA</div>
+                    <div class="role">Peneliti Supervisory AI</div>
                 </div>
                 <form method="POST" action="/logout" style="margin:0">
                     @csrf

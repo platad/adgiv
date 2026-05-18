@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -6,6 +6,92 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans:
+        "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
+    --color-bima-red: #dc2626;
+}
+
+/* ── BIMA Custom Animations ────────────────────────────────────── */
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slide-in-from-bottom-4 {
+    from {
+        transform: translateY(1rem);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse-ring {
+    0% {
+        transform: scale(0.95);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.1);
+        opacity: 0;
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.4s ease-out;
+}
+
+.animate-in {
+    animation: fade-in 0.5s ease-out;
+}
+
+.fade-in {
+    animation: fade-in 0.3s ease-out;
+}
+
+.slide-in-from-bottom-4 {
+    animation: slide-in-from-bottom-4 0.4s ease-out;
+}
+
+/* ── Segment Card Hover Effect ─────────────────────────────────── */
+
+.group\/card:hover {
+    transform: translateX(4px);
+    transition: transform 0.2s ease;
+}
+
+/* ── Power Marker Colors ───────────────────────────────────────── */
+
+.power-up {
+    color: #dc2626;
+} /* ↑ Power-over */
+.power-down {
+    color: #2563eb;
+} /* ↓ Power-under */
+.power-equal {
+    color: #16a34a;
+} /* ↔ Balanced */
+
+/* ── Root Cause Log Scrollbar ──────────────────────────────────── */
+
+.analysis-log-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+.analysis-log-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+.analysis-log-scroll::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 4px;
 }

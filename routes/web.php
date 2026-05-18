@@ -1,24 +1,26 @@
 <?php
 
-use App\Http\Controllers\ChatController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AnalysisController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes – BIMA Multi-Agent AI Debate System
+| Web Routes – BIMA Multi-Agent AI Voice Analysis (Multi-Modal v3)
 |--------------------------------------------------------------------------
 */
 
 Route::get('/', function () {
     return auth()->check()
-        ? redirect()->route('chat.index')
+        ? redirect()->route('dashboard')
         : redirect()->route('login');
 });
+
+// ── Authentication ──────────────────────────────────────────────
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -31,7 +33,7 @@ Route::post('/login', function (Request $req) {
     ]);
     if (Auth::attempt($credentials, $req->boolean('remember'))) {
         $req->session()->regenerate();
-        return redirect()->intended(route('chat.index'));
+        return redirect()->intended(route('dashboard'));
     }
     return back()->withErrors(['email' => 'Email atau password salah.'])->onlyInput('email');
 })->middleware('guest');
@@ -59,27 +61,27 @@ Route::post('/register', function (Request $req) {
         'password' => Hash::make($validated['password']),
     ]);
     Auth::login($user);
-    return redirect()->route('chat.index');
+    return redirect()->route('dashboard');
 })->middleware('guest');
 
+// ── App Routes (Auth Protected) ─────────────────────────────────
 
-Route::middleware(['auth'])->prefix('chat')->name('chat.')->group(function () {
+Route::middleware(['auth'])->group(function () {
+    
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/realtime-data', [DashboardController::class, 'getRealtimeChartData'])->name('dashboard.realtime-data');
+    Route::get('/dashboard/history-data', [DashboardController::class, 'getHistoryData'])->name('dashboard.history-data');
 
-    Route::get('/', [ChatController::class, 'index'])->name('index');
-    Route::get('/sessions', [ChatController::class, 'listSessions'])->name('sessions.list');
-
-    Route::post('/session', [ChatController::class, 'createSession'])->name('session.create');
-    Route::get('/session/{session}/messages', [ChatController::class, 'sessionMessages'])->name('session.messages');
-    Route::get('/session/{id}/data', [ChatController::class, 'getSessionData']);
-
-    Route::post('/analyse/step-1', [ChatController::class, 'analyseStep1'])->name('analyse.step1');
-    Route::post('/analyse/step-2', [ChatController::class, 'analyseStep2'])->name('analyse.step2');
-    Route::post('/analyse/step-3', [ChatController::class, 'analyseStep3'])->name('analyse.step3');
-    Route::post('/analyse/step-4', [ChatController::class, 'analyseStep4'])->name('analyse.step4');
-    Route::post('/analyse/step-5', [ChatController::class, 'analyseStep5'])->name('analyse.step5');
-    Route::post('/analyse/step-6', [ChatController::class, 'analyseStep6'])->name('analyse.step6');
-
-    Route::post('/transcribe', [ChatController::class, 'transcribeAudio'])->name('transcribe');
-
-    Route::delete('/session/{session}', [ChatController::class, 'deleteSession'])->name('session.delete');
+    // Analysis Workflow
+    Route::prefix('analysis')->name('analysis.')->group(function () {
+        Route::get('/create', [AnalysisController::class, 'create'])->name('create'); // Input voice
+        Route::post('/store', [AnalysisController::class, 'store'])->name('store');   // Save audio, create Analysis record
+        Route::get('/{id}/processing', [AnalysisController::class, 'processing'])->name('processing'); // Step-by-step view
+        Route::post('/{id}/process', [AnalysisController::class, 'processAudio'])->name('process'); // Trigger AI Multi-Modal
+        Route::get('/{id}/result', [AnalysisController::class, 'result'])->name('result'); // Final annotated view
+        Route::post('/{id}/feedback', [AnalysisController::class, 'feedback'])->name('feedback'); // Submit Kesesuaian
+        Route::post('/{id}/line-feedback', [AnalysisController::class, 'lineFeedback'])->name('line-feedback'); // Submit Line-by-line Feedback
+        Route::delete('/{id}', [AnalysisController::class, 'destroy'])->name('destroy'); // Delete Analysis
+    });
 });
