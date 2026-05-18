@@ -46,8 +46,8 @@
                             penelitian kami sebelumnya
                             <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
                                 <span class="block font-black text-red-400 uppercase tracking-widest mb-1">Riset Utama BIMA UMPO</span>
-                                Nimasari, E. P., dkk. (2025). "Text Mining for Advice Giving in Higher Education: Komparasi Pola Klasifikasi Bimbingan Akademik Berbasis IndoBERT". Jurnal Ilmu Pendidikan UMPO. <br/>
-                                <a href="https://doi.org/10.25126/jtiik.2023106567" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">Kredit Riset Utama BIMA UMPO ➔</a>
+                                Nimasari, E. P., dkk. (2024). "How Do Doctoral Students Perceive Supervision? Lessons Learned from Indonesia". The Qualitative Report. <br/>
+                                <a href="https://doi.org/10.46743/2160-3715/2024.6984" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">Kredit Riset Utama BIMA UMPO ➔</a>
                             </span>
                         </span>, 
                         klasifikasi wacana bimbingan akademik dilakukan menggunakan model 
