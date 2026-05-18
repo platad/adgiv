@@ -106,9 +106,9 @@
             <nav class="flex flex-col gap-6">
                 {{-- New Analysis --}}
                 <a href="{{ route('analysis.create') }}"
-                    class="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center hover:bg-bima-red transition-all group relative cursor-pointer"
+                    class="w-12 h-12 rounded-2xl {{ request()->routeIs('analysis.create') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
                     title="Analisa Baru">
-                    <i data-lucide="mic" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
+                    <i data-lucide="mic" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
                     <div
                         class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
                         Analisa Baru</div>
@@ -116,12 +116,22 @@
 
                 {{-- Dashboard/History --}}
                 <a href="{{ route('dashboard') }}"
-                    class="w-12 h-12 rounded-2xl bg-white/5 text-white/40 hover:text-white hover:bg-white/10 flex items-center justify-center transition-all group relative cursor-pointer"
+                    class="w-12 h-12 rounded-2xl {{ request()->routeIs('dashboard') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
                     title="Dashboard">
                     <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
                     <div
                         class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
                         Dashboard</div>
+                </a>
+
+                {{-- Methodology --}}
+                <a href="{{ route('methodology') }}"
+                    class="w-12 h-12 rounded-2xl {{ request()->routeIs('methodology') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
+                    title="Metodologi C-CDA">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                    <div
+                        class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
+                        Metodologi</div>
                 </a>
             </nav>
 

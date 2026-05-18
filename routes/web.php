@@ -72,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/realtime-data', [DashboardController::class, 'getRealtimeChartData'])->name('dashboard.realtime-data');
     Route::get('/dashboard/history-data', [DashboardController::class, 'getHistoryData'])->name('dashboard.history-data');
+    Route::get('/methodology', [DashboardController::class, 'methodology'])->name('methodology');
 
     // Analysis Workflow
     Route::prefix('analysis')->name('analysis.')->group(function () {
