@@ -461,6 +461,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
                         body: JSON.stringify({ is_accurate: status, comments: this.comments })
@@ -483,21 +484,20 @@
                     <div class="flex-grow text-center md:text-left">
                         <h3
                             class="text-lg font-black uppercase tracking-widest mb-2 flex items-center justify-center md:justify-start gap-2">
-                            <i data-lucide="clipboard-check" class="w-5 h-5 text-bima-red"></i> Validasi Pakar
+                            <x-application-logo class="w-5 h-5 text-bima-red" /> Penilaian Kesesuaian Hasil
                         </h3>
-                        <p class="text-gray-400 text-sm font-medium">Bantu kami meningkatkan metrik akurasi. Apakah
-                            anotasi dari sistem Supervisory AI ini sudah sesuai dengan standar?</p>
+                        <p class="text-gray-300 text-sm font-medium leading-relaxed">Sebagai pakar atau peninjau akademis, penilaian Anda sangat berharga bagi penyempurnaan akurasi kami. Menurut Anda, apakah hasil anotasi intonasi dan saran bimbingan sistem ini sudah sesuai dengan fakta percakapan riil?</p>
                     </div>
 
                     <div class="flex-shrink-0 w-full md:w-auto flex items-center gap-4">
                         <div class="flex gap-3 w-full" x-show="!loading">
                             <button @click="submitFeedback(1)"
-                                class="flex-1 md:flex-none px-6 py-3 bg-green-600 hover:bg-green-500 text-white font-bold text-sm uppercase tracking-wider rounded-2xl transition-all hover:scale-105 cursor-pointer">
-                                <i data-lucide="thumbs-up" class="w-4 h-4 inline-block mr-1"></i> Sesuai
+                                class="flex-1 md:flex-none px-6 py-3.5 bg-green-600 hover:bg-green-500 text-white font-bold text-xs uppercase tracking-wider rounded-2xl transition-all hover:scale-105 cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-green-600/20">
+                                <i data-lucide="check-circle" class="w-4 h-4"></i> Sudah Sesuai
                             </button>
                             <button @click="submitFeedback(0)"
-                                class="flex-1 md:flex-none px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-bold text-sm uppercase tracking-wider rounded-2xl transition-all hover:scale-105 cursor-pointer">
-                                <i data-lucide="thumbs-down" class="w-4 h-4 inline-block mr-1"></i> Kurang
+                                class="flex-1 md:flex-none px-6 py-3.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider rounded-2xl transition-all hover:scale-105 cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-red-600/20">
+                                <i data-lucide="alert-circle" class="w-4 h-4"></i> Belum Sesuai
                             </button>
                         </div>
 
@@ -517,10 +517,12 @@
             </div>
 
             <div x-show="submitted" x-transition.opacity style="display: none;"
-                class="bg-green-50 border border-green-100 rounded-[2rem] p-6 text-center text-green-700">
-                <i data-lucide="check-circle" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
-                <p class="font-bold text-sm uppercase tracking-widest">Terima kasih atas feedback Anda.</p>
-                <p class="text-xs mt-1">Data telah direkam dalam metrik global Supervisory AI.</p>
+                class="bg-green-50 border border-green-200 rounded-[2.5rem] p-8 text-center text-green-800 shadow-sm">
+                <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    <i data-lucide="check-circle" class="w-6 h-6"></i>
+                </div>
+                <p class="font-black text-sm uppercase tracking-wider">Apresiasi Kami Atas Umpan Balik Anda!</p>
+                <p class="text-xs mt-1 text-green-600 font-medium">Validasi Anda berhasil direkam untuk terus meningkatkan akurasi algoritma metrik Supervisory AI.</p>
             </div>
         </div>
 
