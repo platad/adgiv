@@ -1,3 +1,22 @@
+@php
+    $isCompleted = $analysis->status === 'completed';
+    $totalChunks = $analysis->result_data['total_chunks'] ?? count($analysis->result_data['chunks'] ?? []);
+    if ($isCompleted) {
+        $transcription = $analysis->result_data['transcription'] ?? [];
+    } else {
+        $chunks = $analysis->result_data['chunks'] ?? [];
+        $transcription = [];
+        foreach ($chunks as $chunkIdx => $chunk) {
+            $chunkTrans = $chunk['transcription'] ?? [];
+            foreach ($chunkTrans as $block) {
+                if (is_array($block)) {
+                    $block['chunk_index'] = $chunkIdx + 1;
+                    $transcription[] = $block;
+                }
+            }
+        }
+    }
+@endphp
 <x-layouts.app title="Hasil Analisa">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in" x-data="{
         showRaw: false,
@@ -76,9 +95,13 @@
                 </button>
                 
                 {{-- Dynamic Status Badge --}}
-                <span x-show="synthesisStatus === 'completed'"
-                    class="inline-flex items-center px-4 py-2 rounded-xl bg-green-50 text-green-700 text-xs font-bold uppercase tracking-widest">
-                    <i data-lucide="check-circle-2" class="w-4 h-4 mr-2"></i> Analisa Selesai
+                <span x-show="synthesisStatus === 'completed'" class="inline-flex items-center gap-2">
+                    <span class="inline-flex items-center px-4 py-2 rounded-xl bg-purple-50 text-purple-700 text-xs font-bold uppercase tracking-widest border border-purple-100 shadow-sm">
+                        <i data-lucide="music-4" class="w-3.5 h-3.5 mr-1.5 text-purple-500"></i> {{ $totalChunks > 0 ? $totalChunks : '8' }} Potongan Audio Tergabung
+                    </span>
+                    <span class="inline-flex items-center px-4 py-2 rounded-xl bg-green-50 text-green-700 text-xs font-bold uppercase tracking-widest border border-green-100 shadow-sm">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1.5 text-green-500"></i> Analisa Selesai
+                    </span>
                 </span>
                 <span x-show="synthesisStatus === 'processing' || synthesisStatus === 'pending'" style="display: none;"
                     class="inline-flex items-center px-4 py-2 rounded-xl bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-widest animate-pulse">
@@ -101,24 +124,6 @@
             </div>
         </div>
 
-        @php
-            $isCompleted = $analysis->status === 'completed';
-            if ($isCompleted) {
-                $transcription = $analysis->result_data['transcription'] ?? [];
-            } else {
-                $chunks = $analysis->result_data['chunks'] ?? [];
-                $transcription = [];
-                foreach ($chunks as $chunkIdx => $chunk) {
-                    $chunkTrans = $chunk['transcription'] ?? [];
-                    foreach ($chunkTrans as $block) {
-                        if (is_array($block)) {
-                            $block['chunk_index'] = $chunkIdx + 1;
-                            $transcription[] = $block;
-                        }
-                    }
-                }
-            }
-        @endphp
 
         {{-- Conversation Dynamics Chart & Agent Analysis --}}
         <div class="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/40 p-8 border border-gray-100 mb-8"
@@ -487,8 +492,9 @@
                                     class="inline-flex items-center px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold uppercase tracking-widest text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:hover:bg-transparent transition-colors cursor-pointer focus:outline-none">
                                     <i data-lucide="chevron-left" class="w-4 h-4 mr-1"></i> Prev
                                 </button>
-                                <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">
-                                    Halaman <span x-text="currentPage" class="text-gray-900 font-extrabold"></span> dari <span x-text="Math.ceil(totalRows / pageSize)"></span>
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-widest text-center">
+                                    Halaman <span x-text="currentPage" class="text-gray-900 font-black"></span> dari <span x-text="Math.ceil(totalRows / pageSize)"></span>
+                                    <span class="block md:inline-block md:ml-1 text-[0.65rem] text-gray-400 font-medium lowercase tracking-normal">(total <span x-text="totalRows" class="font-bold text-gray-600"></span> baris transkrip)</span>
                                 </span>
                                 <button type="button" 
                                     @click="currentPage = Math.min(Math.ceil(totalRows / pageSize), currentPage + 1)" 

@@ -119,6 +119,7 @@ class AnalysisController extends Controller
 
             $synthesizedResult = $this->aiService->synthesizeChunks($chunks);
             $finalResult = $this->parseAdviceAction->execute($synthesizedResult);
+            $finalResult['total_chunks'] = count($chunks);
             $analysis->update([
                 'status' => 'completed',
                 'result_data' => $finalResult

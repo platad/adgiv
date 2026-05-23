@@ -56,7 +56,11 @@ class ParseAdviceGivingAction
 
                     $textHtml = $block['text_html'] ?? '';
                     $textHtml = str_replace($idWithBrackets, $tooltipHtml, $textHtml);
-                    $textHtml = str_replace($idWithoutBrackets, $tooltipHtml, $textHtml);
+                    
+                    if (preg_match('/MARKER_\d+$/i', $idWithoutBrackets)) {
+                        $textHtml = str_replace($idWithoutBrackets, $tooltipHtml, $textHtml);
+                    }
+                    
                     $block['text_html'] = $textHtml;
                 }
             }
@@ -68,8 +72,9 @@ class ParseAdviceGivingAction
                 $block['text_html'] ?? ''
             );
 
-            // Clean up any empty brackets that might enclose replaced markers or leftover format leaks
+            // Clean up any remaining unmatched marker tags and empty brackets to prevent format leaks in UI
             if (isset($block['text_html'])) {
+                $block['text_html'] = preg_replace('/\[MARKER_\d+\]/i', '', $block['text_html']);
                 $block['text_html'] = preg_replace('/\[\s*\]/', '', $block['text_html']);
             }
 
