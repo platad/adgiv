@@ -15,15 +15,15 @@ class StoreAnalysisRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'audio' => ['required', 'file', 'mimes:mp3,wav', 'max:102400'], // 100MB limit
+            'audio' => ['required', 'file', 'mimes:mp3,wav,m4a,webm,ogg,aac', 'max:51200'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'audio.max' => 'Ukuran file audio maksimal adalah 100MB.',
-            'audio.mimes' => 'Format file audio tidak didukung oleh AI saat ini. Harap gunakan format MP3 atau WAV.',
+            'audio.max' => 'Ukuran file audio maksimal adalah 50MB.',
+            'audio.mimes' => 'Format file audio harus berformat MP3, WAV, M4A, WEBM, OGG, atau AAC.',
         ];
     }
 }

@@ -6,6 +6,47 @@
         insightType: '',
         insightExplanation: '',
         insightRelation: '',
+        activeMobileTab: 'transkrip',
+        
+        // Alpine Progressive loading states
+        synthesisStatus: '{{ $analysis->status }}',
+        synthesisError: null,
+        currentPage: 1,
+        pageSize: {{ $analysis->status === 'completed' ? '10' : '1000' }},
+        totalRows: 0,
+        
+        async startBackgroundSynthesis() {
+            if (this.synthesisStatus === 'completed') return;
+            this.synthesisStatus = 'processing';
+            this.synthesisError = null;
+            
+            try {
+                const response = await fetch('{{ route("analysis.process", $analysis->id) }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').content,
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (response.ok && data.status === 'success') {
+                    this.synthesisStatus = 'completed';
+                    window.location.reload();
+                } else {
+                    this.synthesisStatus = 'failed';
+                    this.synthesisError = data.message || 'Gagal menyusun halaman hasil analisa.';
+                }
+            } catch (err) {
+                this.synthesisStatus = 'failed';
+                this.synthesisError = 'Koneksi terputus. Silakan coba kembali.';
+            }
+        },
+
+        init() {
+            if (this.synthesisStatus !== 'completed') {
+                this.startBackgroundSynthesis();
+            }
+        },
     
         openInsight(title, type, explanation, relation) {
             this.insightTitle = title;
@@ -33,9 +74,19 @@
                     <i data-lucide="code" class="w-4 h-4 mr-2"></i> <span
                         x-text="showRaw ? 'Tutup Raw Data' : 'Lihat Raw Data'"></span>
                 </button>
-                <span
+                
+                {{-- Dynamic Status Badge --}}
+                <span x-show="synthesisStatus === 'completed'"
                     class="inline-flex items-center px-4 py-2 rounded-xl bg-green-50 text-green-700 text-xs font-bold uppercase tracking-widest">
                     <i data-lucide="check-circle-2" class="w-4 h-4 mr-2"></i> Analisa Selesai
+                </span>
+                <span x-show="synthesisStatus === 'processing' || synthesisStatus === 'pending'" style="display: none;"
+                    class="inline-flex items-center px-4 py-2 rounded-xl bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-widest animate-pulse">
+                    <i data-lucide="loader-2" class="w-4.5 h-4.5 mr-2 animate-spin text-blue-500"></i> Menyusun Laporan...
+                </span>
+                <span x-show="synthesisStatus === 'failed'" style="display: none;"
+                    class="inline-flex items-center px-4 py-2 rounded-xl bg-red-50 text-red-700 text-xs font-bold uppercase tracking-widest animate-shake">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 mr-2"></i> Penyusunan Gagal
                 </span>
             </div>
         </div>
@@ -50,7 +101,24 @@
             </div>
         </div>
 
-        @php $transcription = $analysis->result_data['transcription'] ?? []; @endphp
+        @php
+            $isCompleted = $analysis->status === 'completed';
+            if ($isCompleted) {
+                $transcription = $analysis->result_data['transcription'] ?? [];
+            } else {
+                $chunks = $analysis->result_data['chunks'] ?? [];
+                $transcription = [];
+                foreach ($chunks as $chunkIdx => $chunk) {
+                    $chunkTrans = $chunk['transcription'] ?? [];
+                    foreach ($chunkTrans as $block) {
+                        if (is_array($block)) {
+                            $block['chunk_index'] = $chunkIdx + 1;
+                            $transcription[] = $block;
+                        }
+                    }
+                }
+            }
+        @endphp
 
         {{-- Conversation Dynamics Chart & Agent Analysis --}}
         <div class="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/40 p-8 border border-gray-100 mb-8"
@@ -145,17 +213,50 @@
             </div>
         </div>
 
+        {{-- Mobile Tab Switcher --}}
+        <div class="lg:hidden flex bg-gray-100 p-1 rounded-2xl mb-6 relative z-10" x-show="!showRaw">
+            <button @click="activeMobileTab = 'transkrip'"
+                class="flex-1 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
+                :class="activeMobileTab === 'transkrip' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-400'">
+                <i data-lucide="file-text" class="w-4 h-4"></i> Transkrip
+            </button>
+            <button @click="activeMobileTab = 'ringkasan'"
+                class="flex-1 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
+                :class="activeMobileTab === 'ringkasan' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-400'">
+                <i data-lucide="brain-circuit" class="w-4 h-4"></i> Ringkasan
+            </button>
+        </div>
+
         {{-- Main Content: Two Columns --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8" x-show="!showRaw">
 
             {{-- Left Column: Document View --}}
             <div
-                class="lg:col-span-2 bg-white rounded-3xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100">
-                <div class="p-8 md:p-10 space-y-12">
-                    @php $transcription = $analysis->result_data['transcription'] ?? []; @endphp
+                class="lg:col-span-2 bg-white rounded-3xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100 transition-all duration-300"
+                :class="activeMobileTab === 'transkrip' ? 'block' : 'hidden lg:block'">
+                <div class="p-8 md:p-10 space-y-12" x-init="totalRows = {{ count($transcription) }}">
                     @if (is_array($transcription) && count($transcription) > 0)
                         @foreach ($transcription as $index => $block)
-                            <div class="flex flex-col gap-4 group">
+                            @php
+                                $chunkIndex = $block['chunk_index'] ?? null;
+                                $prevChunkIndex = ($index > 0) ? ($transcription[$index - 1]['chunk_index'] ?? null) : null;
+                            @endphp
+                            
+                            {{-- Progressive mode segment header --}}
+                            @if (!$isCompleted && $chunkIndex !== null && ($index === 0 || $prevChunkIndex !== $chunkIndex))
+                                <div class="my-8 py-3 px-6 bg-gradient-to-r from-gray-50 to-gray-150 border border-gray-200/50 rounded-2xl flex items-center justify-between shadow-sm animate-fade-in relative overflow-hidden">
+                                    <div class="absolute top-0 left-0 h-full w-1 bg-bima-red"></div>
+                                    <span class="text-xs font-black uppercase tracking-wider text-gray-500 flex items-center gap-2">
+                                        <i data-lucide="layers" class="w-3.5 h-3.5 text-bima-red animate-pulse"></i> Segmen Analisa {{ $chunkIndex }}
+                                    </span>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-xl text-[0.6rem] font-black uppercase tracking-widest bg-green-50 text-green-700 border border-green-200">
+                                        Selesai Diproses
+                                    </span>
+                                </div>
+                            @endif
+
+                            <div class="flex flex-col gap-4 group" 
+                                 x-show="synthesisStatus !== 'completed' || ({{ $index }} >= (currentPage - 1) * pageSize && {{ $index }} < (currentPage) * pageSize)">
                                 <div class="flex flex-col md:flex-row gap-4 md:gap-8">
                                     {{-- Speaker & Timestamp Column --}}
                                     <div class="md:w-32 flex-shrink-0 pt-1">
@@ -373,20 +474,60 @@
                             </div>
 
                             @if (!$loop->last)
-                                <div class="h-px w-full bg-gray-100"></div>
+                                <div class="h-px w-full bg-gray-100" x-show="synthesisStatus !== 'completed' || ({{ $index }} >= (currentPage - 1) * pageSize && {{ $index }} < (currentPage) * pageSize - 1)"></div>
                             @endif
                         @endforeach
+
+                        <!-- Dynamic Pagination Navigation Control -->
+                        <template x-if="synthesisStatus === 'completed' && Math.ceil(totalRows / pageSize) > 1">
+                            <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-between">
+                                <button type="button" 
+                                    @click="currentPage = Math.max(1, currentPage - 1)" 
+                                    :disabled="currentPage === 1"
+                                    class="inline-flex items-center px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold uppercase tracking-widest text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:hover:bg-transparent transition-colors cursor-pointer focus:outline-none">
+                                    <i data-lucide="chevron-left" class="w-4 h-4 mr-1"></i> Prev
+                                </button>
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                                    Halaman <span x-text="currentPage" class="text-gray-900 font-extrabold"></span> dari <span x-text="Math.ceil(totalRows / pageSize)"></span>
+                                </span>
+                                <button type="button" 
+                                    @click="currentPage = Math.min(Math.ceil(totalRows / pageSize), currentPage + 1)" 
+                                    :disabled="currentPage === Math.ceil(totalRows / pageSize)"
+                                    class="inline-flex items-center px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold uppercase tracking-widest text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:hover:bg-transparent transition-colors cursor-pointer focus:outline-none">
+                                    Next <i data-lucide="chevron-right" class="w-4 h-4 ml-1"></i>
+                                </button>
+                            </div>
+                        </template>
                     @else
-                        <div class="text-center py-12 text-gray-400">
-                            <i data-lucide="file-x" class="w-12 h-12 mx-auto mb-4 opacity-50"></i>
-                            <p class="font-medium">Tidak ada data transkripsi yang dapat ditampilkan.</p>
+                        {{-- Beautiful Progressive Skeleton Loader when first chunk is compiling --}}
+                        <div class="space-y-8 animate-pulse py-6">
+                            <div class="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex items-center gap-3 text-blue-700 mb-6">
+                                <i data-lucide="info" class="w-4 h-4 animate-bounce"></i>
+                                <span class="text-xs font-bold uppercase tracking-wider">Sedang memproses segmen pertama audio...</span>
+                            </div>
+                            @for ($i = 0; $i < 3; $i++)
+                                <div class="flex flex-col gap-4">
+                                    <div class="flex gap-8">
+                                        <div class="w-32 flex-shrink-0 space-y-2">
+                                            <div class="h-4 bg-gray-200 rounded-lg w-16"></div>
+                                            <div class="h-3 bg-gray-100 rounded-lg w-20"></div>
+                                        </div>
+                                        <div class="flex-grow space-y-3">
+                                            <div class="h-5 bg-gray-200 rounded-2xl w-full"></div>
+                                            <div class="h-5 bg-gray-200 rounded-2xl w-5/6"></div>
+                                            <div class="h-5 bg-gray-100 rounded-2xl w-3/4"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endfor
                         </div>
                     @endif
                 </div>
             </div>
 
             {{-- Right Column: Summary Dashboard --}}
-            <div class="lg:col-span-1 space-y-6">
+            <div class="lg:col-span-1 space-y-6 transition-all duration-300"
+                :class="activeMobileTab === 'ringkasan' ? 'block' : 'hidden lg:block'">
                 @php $summary = $analysis->result_data['summary'] ?? []; @endphp
 
                 <div
@@ -621,6 +762,55 @@
                         Tutup
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Floating Compilation Status Indicator -->
+        <div x-show="synthesisStatus !== 'completed'" style="display: none;"
+            class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-2xl bg-white/95 backdrop-blur-xl border rounded-3xl p-5 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all"
+            :class="synthesisStatus === 'failed' ? 'border-red-200 bg-red-50/95' : 'border-gray-200/50'">
+            
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-2xl flex items-center justify-center p-2 relative"
+                    :class="synthesisStatus === 'failed' ? 'bg-red-100 text-red-600' : 'bg-bima-red/10 text-bima-red'">
+                    <template x-if="synthesisStatus !== 'failed'">
+                        <div class="absolute inset-0 rounded-2xl bg-bima-red/20 animate-ping"></div>
+                    </template>
+                    <div class="w-5 h-5 flex items-center justify-center">
+                        <svg class="w-full h-full" :class="synthesisStatus !== 'failed' ? 'animate-spin-slow' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
+                            <line x1="12" y1="22" x2="12" y2="15.5"></line>
+                            <line x1="12" y1="15.5" x2="22" y2="8.5"></line>
+                            <line x1="12" y1="15.5" x2="2" y2="8.5"></line>
+                            <polyline points="2 8.5 12 15.5 22 8.5"></polyline>
+                            <polyline points="12 2 12 15.5"></polyline>
+                        </svg>
+                    </div>
+                </div>
+                <div>
+                    <span class="block text-[0.6rem] font-black uppercase tracking-widest"
+                        :class="synthesisStatus === 'failed' ? 'text-red-500' : 'text-gray-400'">Real-time Compiler</span>
+                    <p class="text-xs font-bold uppercase tracking-wider"
+                        :class="synthesisStatus === 'failed' ? 'text-red-700' : 'text-gray-800'"
+                        x-text="synthesisStatus === 'failed' ? (synthesisError || 'Gagal menyusun halaman hasil analisa.') : 'Supervisory AI sedang menyusun halaman hasil analisa audio...'"></p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <template x-if="synthesisStatus === 'failed'">
+                    <button type="button" @click="startBackgroundSynthesis" class="bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-1 cursor-pointer border border-transparent shadow-md focus:outline-none">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 6H16"></path>
+                        </svg>
+                        Coba Lagi
+                    </button>
+                </template>
+                <template x-if="synthesisStatus !== 'failed'">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex h-2.5 w-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+                        <span class="text-[0.65rem] font-black uppercase tracking-widest text-blue-600">Sintesis</span>
+                    </div>
+                </template>
             </div>
         </div>
 

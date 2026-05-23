@@ -154,17 +154,24 @@
     </aside>
 
     {{-- Mobile Bottom Nav (Action access for mobile) --}}
-    <div class="lg:hidden fixed bottom-6 left-6 right-6 h-16 bg-gray-900/90 backdrop-blur-xl rounded-[2rem] border border-white/10 z-[70] flex items-center justify-around px-6 shadow-2xl"
-        x-data="{}">
-        <button onclick="createNewSessionGlobal()" class="text-white/60 hover:text-bima-red transition cursor-pointer">
-            <i data-lucide="plus-circle" class="w-7 h-7"></i>
-        </button>
-        <button @click="$dispatch('open-history')" class="text-white/60 hover:text-white transition cursor-pointer">
-            <i data-lucide="history" class="w-7 h-7"></i>
-        </button>
-        <button @click="location.reload()" class="text-white/60 hover:text-white transition cursor-pointer">
-            <i data-lucide="refresh-cw" class="w-6 h-6"></i>
-        </button>
+    <div class="lg:hidden fixed bottom-6 left-6 right-6 h-16 bg-gray-900/95 backdrop-blur-xl rounded-[2rem] border border-white/10 z-[70] flex items-center justify-around px-4 shadow-2xl">
+        {{-- Dashboard --}}
+        <a href="{{ route('dashboard') }}" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('dashboard') ? 'text-bima-red font-black' : 'text-white/60' }} transition">
+            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">Dash</span>
+        </a>
+
+        {{-- Analisa Baru --}}
+        <a href="{{ route('analysis.create') }}" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('analysis.create') ? 'text-bima-red font-black' : 'text-white/60' }} transition">
+            <i data-lucide="mic" class="w-5 h-5"></i>
+            <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">Analisa</span>
+        </a>
+
+        {{-- Methodology --}}
+        <a href="{{ route('methodology') }}" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('methodology') ? 'text-bima-red font-black' : 'text-white/60' }} transition">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+            <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">Metode</span>
+        </a>
     </div>
 
     {{-- Main Content Wrapper --}}

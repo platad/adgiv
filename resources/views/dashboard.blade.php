@@ -150,8 +150,8 @@
                 <p class="text-gray-500 font-medium">Belum ada riwayat analisa.</p>
             </div>
 
-            <!-- Table View -->
-            <div x-show="total > 0" class="overflow-x-auto" style="display: none;">
+            <!-- Table View (Desktop Only) -->
+            <div x-show="total > 0" class="hidden sm:block overflow-x-auto" style="display: none;">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50/50 text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest">
@@ -215,6 +215,55 @@
                         </template>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Card View (Mobile Only) -->
+            <div x-show="total > 0" class="block sm:hidden divide-y divide-gray-100" style="display: none;">
+                <template x-for="item in items" :key="item.id">
+                    <div class="p-5 flex flex-col gap-4 hover:bg-gray-50/50 transition-colors">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 flex-shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                                </div>
+                                <div>
+                                    <span class="font-bold text-gray-950 block text-sm" x-text="item.title"></span>
+                                    <span class="text-[0.65rem] text-gray-400 font-bold uppercase tracking-wider mt-0.5 block" x-text="item.created_at_formatted"></span>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-full text-[0.6rem] font-black uppercase tracking-wider inline-block border flex-shrink-0"
+                                  :class="{
+                                      'bg-green-50 text-green-700 border-green-100': item.status === 'completed',
+                                      'bg-amber-50 text-amber-700 border-amber-100': item.status === 'pending' || item.status === 'processing',
+                                      'bg-red-50 text-red-700 border-red-100': item.status === 'failed'
+                                  }" 
+                                  x-text="item.status">
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between border-t border-gray-50 pt-3">
+                            <button @click="confirmDelete(item.id, item.title)" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-all flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                Hapus
+                            </button>
+                            
+                            <div class="flex items-center gap-2">
+                                <!-- Lihat Hasil -->
+                                <template x-if="item.status === 'completed'">
+                                    <a :href="item.result_route" class="px-4 py-2 bg-gray-950 hover:bg-gray-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer">
+                                        Hasil
+                                    </a>
+                                </template>
+                                <!-- Lanjutkan -->
+                                <template x-if="item.status === 'pending' || item.status === 'processing'">
+                                    <a :href="item.processing_route" class="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer">
+                                        Lanjutkan
+                                    </a>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
 
             <!-- Dynamic Pagination Footer -->

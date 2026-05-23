@@ -28,4 +28,14 @@ interface LlmConfigurationInterface
      * Get the temperature setting for the LLM.
      */
     public function getTemperature(): float;
+
+    /**
+     * Get the model identifier for the synthesis/reduction phase.
+     */
+    public function getSynthesisModelName(): string;
+
+    /**
+     * Get the system prompt for the synthesis/reduction phase.
+     */
+    public function getSynthesisSystemPrompt(): string;
 }

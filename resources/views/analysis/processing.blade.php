@@ -3,38 +3,26 @@
         x-data="processingFlow('{{ route('analysis.process', $analysis->id) }}')">
 
         <div
-            class="bg-white p-10 md:p-16 rounded-[3rem] shadow-2xl shadow-gray-200/50 text-center w-full max-w-2xl border border-gray-100">
+            class="bg-white p-10 md:p-16 rounded-[3rem] shadow-2xl shadow-gray-200/50 text-center w-full max-w-2xl border border-gray-100 animate-scale-up">
 
-            {{-- Main Animation (Simplified) --}}
+            {{-- Dynamic Icon Container --}}
             <div class="relative w-24 h-24 mx-auto mb-10">
-                <div
-                    class="absolute inset-0 bg-bima-red text-white rounded-full flex items-center justify-center shadow-lg shadow-red-500/20 z-10">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="w-10 h-10">
-                        <path d="M12 4.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 1 0 0-5Z" />
-                        <path d="m10.2 13.2 2.1 2.1" />
-                        <path d="M13.2 10.2 19 6" />
-                        <path d="M10.8 13.8 5 18" />
-                        <path d="M6 10.8 2 12" />
-                        <path d="M18 12.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 1 0 0-5Z" />
-                        <path d="M12 19.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 1 0 0-5Z" />
-                    </svg>
+                <div class="absolute inset-0 bg-bima-red text-white rounded-full flex items-center justify-center shadow-lg shadow-red-500/20 z-10 p-5">
+                    <x-application-logo class="w-full h-full animate-pulse text-white" />
                 </div>
+                <div class="absolute inset-0 border-4 border-dashed border-bima-red/20 rounded-full animate-spin"></div>
             </div>
 
-            <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter mb-4">Supervisory AI Sedang Bekerja
-            </h1>
-            <p class="text-gray-500 font-medium mb-8">Memproses sesi <span
-                    class="font-bold text-gray-900">"{{ $analysis->title }}"</span></p>
+            <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter mb-4">Supervisory AI Sedang Bekerja</h1>
+            <p class="text-gray-500 font-medium mb-8">Memproses sesi <span class="font-bold text-gray-900">"{{ $analysis->title }}"</span></p>
 
-            {{-- Step indicators --}}
-            <div class="space-y-4 max-w-sm mx-auto text-left">
+            {{-- Step Indicators --}}
+            <div class="space-y-4 max-w-md mx-auto text-left">
                 <template x-for="(step, index) in steps" :key="index">
                     <div class="flex flex-col transition-all duration-500"
                         :class="{ 'opacity-100 scale-100': currentStep >= index, 'opacity-40 scale-95': currentStep < index }">
                         <div class="flex items-center gap-4">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300"
                                 :class="{
                                     'bg-green-100 text-green-600': currentStep > index,
                                     'bg-bima-red text-white animate-pulse': currentStep === index,
@@ -57,9 +45,9 @@
 
                                 <span class="text-xs font-bold" x-show="currentStep < index" x-text="index + 1"></span>
                             </div>
-                            <span class="text-sm font-bold uppercase tracking-wider"
+                            <span class="text-sm font-bold uppercase tracking-wider transition-colors duration-300"
                                 :class="{ 'text-gray-900': currentStep >= index, 'text-gray-400': currentStep < index }"
-                                x-text="step.title || step"></span>
+                                x-text="step.title"></span>
                         </div>
 
                         {{-- Sub steps --}}
@@ -100,14 +88,30 @@
                 </template>
             </div>
 
-            {{-- Error Message --}}
+            {{-- Error Message Box --}}
             <div x-show="error" style="display: none;"
-                class="mt-8 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm font-bold">
-                <i data-lucide="alert-triangle" class="w-5 h-5 inline-block mr-2"></i>
-                <span x-text="error"></span>
-                <div class="mt-4">
-                    <a href="{{ route('analysis.create') }}" class="underline hover:text-red-800">Kembali dan coba
-                        lagi</a>
+                class="mt-8 p-6 bg-red-50 border border-red-100 rounded-3xl text-red-600 text-sm font-semibold animate-shake text-center">
+                <div class="flex items-center justify-center gap-2 mb-3">
+                    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <span class="text-base font-black uppercase tracking-tight text-gray-900">Gagal Memproses Hasil</span>
+                </div>
+                <p class="text-gray-600 mb-6 leading-relaxed" x-text="error"></p>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    {{-- Retry Synthesis Button --}}
+                    <button type="button" @click="handleRetry" class="w-full sm:w-auto bg-bima-red hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-md shadow-red-500/10 cursor-pointer flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Ulangi Proses Sintesis
+                    </button>
+                    
+                    {{-- Go Back / Upload New File --}}
+                    <a href="{{ route('analysis.create') }}" class="w-full sm:w-auto bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-6 py-3 rounded-xl transition-all text-center">
+                        Upload Ulang File
+                    </a>
                 </div>
             </div>
 
@@ -119,49 +123,48 @@
             Alpine.data('processingFlow', (processUrl) => ({
                 steps: [
                     {
-                        title: 'Mengirim data ke server AI...',
+                        title: 'Mengompilasi Potongan Analisis',
                         subSteps: [
-                            'Mengunggah berkas audio percakapan...',
-                            'Validasi format berkas & bitrate suara...',
-                            'Alokasi sumber daya Multi-Agent AI...'
+                            'Membaca data dari 3 segmen audio teranalisis...',
+                            'Menyelaraskan stempel waktu (timestamps) secara kronologis...'
                         ]
                     },
                     {
-                        title: 'Multimodal AI mendengarkan intonasi...',
+                        title: 'Agen AI GPT-4o Menggabungkan Hasil',
                         subSteps: [
-                            'Mendeteksi gelombang frekuensi suara...',
-                            'Mengukur kenaikan intonasi (pitch up)...',
-                            'Mengukur penurunan nada tegas (pitch down)...'
+                            'Menginisialisasi Agen Sintesis GPT-4o...',
+                            'Menghapus tumpang-tindih teks (deduplication) pada wilayah overlap...',
+                            'Penyuntingan tata bahasa wacana bimbingan akademik...'
                         ]
                     },
                     {
-                        title: 'Mentranskripsi dan mengidentifikasi speaker...',
+                        title: 'Sinkronisasi Elemen C-CDA',
                         subSteps: [
-                            'Transkripsi teks baris-demi-baris...',
-                            'Diarisasi pembicara (Dosen vs Mahasiswa)...',
-                            'Penyelarasan stempel waktu (timestamps)...'
+                            'Menyusun peta klasifikasi Advice-Giving...',
+                            'Menghitung indeks dinamika kuasa (Power Relation)...',
+                            'Mengekstrak tipe saran bimbingan (Direktif/Korektif)...'
                         ]
                     },
                     {
-                        title: 'Menganotasi elemen Advice-Giving...',
+                        title: 'Evaluasi Metrik Akademik',
                         subSteps: [
-                            'Mengekstrak kalimat saran akademik...',
-                            'Menganalisis tipe rekomendasi (korektif/direktif)...',
-                            'Pemetaan karakter relasi (CDA)...'
+                            'Menghitung tingkat akurasi model vokal secara presisi...',
+                            'Melakukan kalkulasi nilai kesesuaian Cohen\'s Kappa...'
                         ]
                     },
                     {
-                        title: 'Menyusun hasil akhir...',
+                        title: 'Menyusun Dashboard Hasil',
                         subSteps: [
-                            'Sinkronisasi anotasi dengan teks transkripsi...',
-                            'Membuat visualisasi grafik dinamika alur...',
-                            'Mengompilasi interpretasi Supervisory AI...'
+                            'Mengompilasi interpretasi akhir Supervisory AI...',
+                            'Mempersiapkan visualisasi grafik interaktif...'
                         ]
                     }
                 ],
                 currentStep: 0,
                 currentSubStep: 0,
                 error: null,
+                isCompleted: false,
+                visualInterval: null,
 
                 init() {
                     this.startVisualSteps();
@@ -169,10 +172,10 @@
                 },
 
                 startVisualSteps() {
-                    // Let's create an interval to tick sub-steps and steps
-                    const interval = setInterval(() => {
-                        if (this.error || this.currentStep >= 5) {
-                            clearInterval(interval);
+                    if (this.visualInterval) clearInterval(this.visualInterval);
+                    this.visualInterval = setInterval(() => {
+                        if (this.error || this.isCompleted) {
+                            clearInterval(this.visualInterval);
                             return;
                         }
 
@@ -183,9 +186,20 @@
                             if (this.currentStep < 4) {
                                 this.currentStep++;
                                 this.currentSubStep = 0;
+                            } else {
+                                clearInterval(this.visualInterval);
                             }
                         }
-                    }, 2200); // Progresses sub-step/step every 2.2s
+                    }, 1800); // Progress smoothly every 1.8s
+                },
+
+                handleRetry() {
+                    this.error = null;
+                    this.currentStep = 0;
+                    this.currentSubStep = 0;
+                    this.isCompleted = false;
+                    this.startVisualSteps();
+                    this.triggerAnalysis();
                 },
 
                 async triggerAnalysis() {
@@ -193,8 +207,7 @@
                         const response = await fetch(processUrl, {
                             method: 'POST',
                             headers: {
-                                'X-CSRF-TOKEN': document.querySelector(
-                                    'meta[name="csrf-token"]').content,
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                                 'Accept': 'application/json'
                             }
                         });
@@ -202,19 +215,20 @@
                         const data = await response.json();
 
                         if (response.ok && data.status === 'success') {
-                            // Instantly complete all steps to show perfect success state!
+                            this.isCompleted = true;
+                            // Jump instantly to completed state
                             this.currentStep = 4;
-                            this.currentSubStep = 2;
+                            this.currentSubStep = 1;
+                            
                             setTimeout(() => {
                                 window.location.href = data.redirect;
-                            }, 1000);
+                            }, 800);
                         } else {
-                            this.error = data.message ||
-                                'Terjadi kesalahan sistem saat pemrosesan.';
-                            this.currentStep = -1; // Stop animation
+                            this.error = data.message || 'Terjadi kesalahan sistem saat penggabungan oleh Agen AI.';
+                            this.currentStep = -1;
                         }
                     } catch (err) {
-                        this.error = 'Koneksi terputus. Silakan periksa jaringan Anda.';
+                        this.error = 'Koneksi terputus. Silakan periksa jaringan server Anda.';
                         this.currentStep = -1;
                     }
                 }

@@ -1,0 +1,44 @@
+{
+  "summary": {
+    "kategori_advice": "Bimbingan Bertahap",
+    "karakter_relasi": "Power-maintaining (Keseimbangan Kuasa)",
+    "intonasi_dominan": "Kalimat Perintah / Instruksi",
+    "ranah_pembicaraan": "Pembicaraan ini berfokus pada proses penulisan dan validitas data.",
+    "arah_tujuan": "Tujuan utama dari pembicaraan ini adalah untuk memastikan bahwa penulisan skripsi memenuhi standar akademis yang diperlukan, termasuk validitas data dan format penulisan yang benar.",
+    "saran_perbaikan": "Kalimat sudah baik dan jelas. Teruskan semangatnya dalam menyusun skripsi!"
+  },
+  "transcription": [
+    {
+      "speaker": "Dosen",
+      "timestamp": "00:00 - 00:08",
+      "text_html": "Untuk literature review ya, ini gimana caranya supaya diluaskan lagi [MARKER_1] Apalagi cuma satu section ya. [PAUSE] <b>Ini masih terlalu sedikit [MARKER_2]</b>",
+      "is_advice": true,
+      "advice_type": "down",
+      "agent_insight": "Dosen memberikan instruksi korektif agar mahasiswa memperluas tinjauan pustaka karena dirasa belum memenuhi standar minimum.",
+      "advice_relation": "Kalimat ini merupakan instruksi tindak tutur korektif pertama Dosen yang menanggapi template baru pilihan Mahasiswa pada Baris 1.",
+      "intonation_markers": [
+        {
+          "id": "[MARKER_1]",
+          "type": "up",
+          "reason": "Dosen menggunakan intonasi naik untuk memancing respons atau memberikan pertanyaan retoris.",
+          "relation": "Berelasi dengan kalimat Mahasiswa di Baris 1 untuk menegaskan fokus perubahan literature review."
+        },
+        {
+          "id": "[MARKER_2]",
+          "type": "down",
+          "reason": "Penurunan nada di akhir menunjukan instruksi absolut yang tidak bisa ditawar.",
+          "relation": "Menegaskan ketidaksetujuan atas satu section literature review yang terlalu tipis."
+        }
+      ]
+    },
+    {
+      "speaker": "Mahasiswa",
+      "timestamp": "00:09 - 00:12",
+      "text_html": "Baik, Bu. Saya akan coba cari referensi jurnal baru lagi [UP]",
+      "is_advice": false,
+      "advice_type": "neutral",
+      "agent_insight": "Mahasiswa menunjukkan persetujuan dan penerimaan instruksi secara koperatif.",
+      "advice_relation": "Merupakan tanggapan koperatif langsung terhadap instruksi Dosen di Baris 2."
+    }
+  ]
+}

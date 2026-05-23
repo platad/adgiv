@@ -10,17 +10,13 @@ class AudioStorageService
 {
     /**
      * Store the uploaded audio file and return its absolute path.
-     * Ensures max limit handling implicitly via standard PHP/Laravel rules,
-     * but we provide a clean interface here.
+     * Extremely lightweight and fully compatible with cPanel shared hosting 
+     * by avoiding any shell/exec commands or external FFmpeg dependencies.
      */
     public function storeAudio(UploadedFile $file): string
     {
-        // 100MB validation should be done in Request, here we just store.
         $filename = 'audio_' . time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-        
-        // Store in local storage disk 'public/analyses'
         $path = $file->storeAs('analyses', $filename, 'public');
-
-        return storage_path('app/public/' . $path);
+        return Storage::disk('public')->path($path);
     }
 }

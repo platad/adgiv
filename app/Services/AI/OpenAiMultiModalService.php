@@ -39,6 +39,7 @@ class OpenAiMultiModalService implements MultiModalAnalysisInterface
                     'model' => $this->config->getModelName(),
                     'temperature' => $this->config->getTemperature(),
                     'modalities' => ['text'],
+                    'max_completion_tokens' => 4096,
                     'messages' => [
                         [
                             'role' => 'system',
@@ -87,51 +88,139 @@ class OpenAiMultiModalService implements MultiModalAnalysisInterface
         }
     }
 
+    public function synthesizeChunks(array $chunks): array
+    {
+        $resolvedKey = $this->resolvedKey();
+        if (empty($resolvedKey)) {
+            throw new \RuntimeException("OpenAI API Key is not configured.");
+        }
+
+        $chunksJson = json_encode($chunks, JSON_PRETTY_PRINT);
+        
+        // Load clean prompt from resources folder
+        $promptTemplate = file_get_contents(resource_path('prompts/synthesis.md'));
+        $prompt = str_replace('{CHUNKS_JSON}', $chunksJson, $promptTemplate);
+
+        try {
+            $response = Http::withToken($resolvedKey)
+                 ->timeout(300)
+                 ->post('https://api.openai.com/v1/chat/completions', [
+                     'model' => $this->config->getSynthesisModelName(),
+                     'temperature' => 0.1,
+                     'max_completion_tokens' => 8192,
+                     'response_format' => ['type' => 'json_object'],
+                     'messages' => [
+                         [
+                             'role' => 'system',
+                             'content' => $this->config->getSynthesisSystemPrompt()
+                         ],
+                         [
+                             'role' => 'user',
+                             'content' => $prompt
+                         ]
+                     ]
+                 ]);
+ 
+             if ($response->failed()) {
+                 Log::error('[OpenAiMultiModal] Synthesis Error', ['body' => $response->body()]);
+                 throw new \RuntimeException('Gagal menyatukan hasil potongan bimbingan.');
+             }
+ 
+             $json = $response->json();
+             $content = $json['choices'][0]['message']['content'] ?? '[]';
+             
+             // Highly robust cleaning of markdown codeblocks
+             $cleanContent = $content;
+             if (preg_match('/```json\s*(.*?)\s*```/s', $content, $matches)) {
+                 $cleanContent = $matches[1];
+             } else {
+                 $cleanContent = preg_replace('/^```[a-zA-Z]*\s*/', '', $cleanContent);
+                 $cleanContent = preg_replace('/\s*```$/', '', $cleanContent);
+             }
+             $cleanContent = trim($cleanContent);
+ 
+             $parsed = json_decode($cleanContent, true);
+             
+             // Fallback 1: If decoding failed, try extracting content between first '{' and last '}'
+             if (!$parsed) {
+                 $firstBrace = strpos($cleanContent, '{');
+                 $lastBrace = strrpos($cleanContent, '}');
+                 if ($firstBrace !== false && $lastBrace !== false) {
+                     $jsonCandidate = substr($cleanContent, $firstBrace, $lastBrace - $firstBrace + 1);
+                     $parsed = json_decode($jsonCandidate, true);
+                 }
+             }
+
+             // Fallback 2: ULTRA RESILIENT PARTIAL JSON REPAIR (Token Saver & Truncation Healer)
+             if (!$parsed) {
+                 Log::warning('[OpenAiMultiModal] Attempting premium structural repair on truncated JSON string.');
+                 $repairedContent = trim($cleanContent);
+                 
+                 // If it ends inside a word or string without closing quote
+                 // Count unescaped double quotes
+                 $quoteCount = preg_match_all('/(?<!\\\\)"/', $repairedContent);
+                 if ($quoteCount % 2 !== 0) {
+                     $repairedContent .= '"'; // Close current active string
+                 }
+
+                 // Structurally rebuild the JSON tree balance
+                 $brackets = [];
+                 $len = strlen($repairedContent);
+                 $inString = false;
+                 
+                 for ($i = 0; $i < $len; $i++) {
+                     $char = $repairedContent[$i];
+                     if ($char === '"' && ($i === 0 || $repairedContent[$i-1] !== '\\')) {
+                         $inString = !$inString;
+                     }
+                     if (!$inString) {
+                         if ($char === '{' || $char === '[') {
+                             $brackets[] = $char;
+                         } else if ($char === '}' || $char === ']') {
+                             array_pop($brackets);
+                         }
+                     }
+                 }
+
+                 // Close open elements from the stack in reverse order
+                 while (!empty($brackets)) {
+                     $openBracket = array_pop($brackets);
+                     if ($openBracket === '{') {
+                         // Check if we are inside a key-value or array of objects and need to close current transcription array index
+                         $repairedContent = rtrim($repairedContent, ", \t\n\r");
+                         $repairedContent .= '}';
+                     } else if ($openBracket === '[') {
+                         $repairedContent = rtrim($repairedContent, ", \t\n\r");
+                         $repairedContent .= ']';
+                     }
+                 }
+
+                 $parsed = json_decode($repairedContent, true);
+                 if ($parsed) {
+                     Log::info('[OpenAiMultiModal] JSON Structural repair succeeded! Incomplete elements healed.');
+                 }
+             }
+
+             if (!$parsed) {
+                 Log::error('[OpenAiMultiModal] Synthesis JSON Parsing Failure details', [
+                     'json_error' => json_last_error_msg(),
+                     'raw_content' => $content,
+                     'clean_content' => $cleanContent
+                 ]);
+                 throw new \RuntimeException('Gagal mengurai format JSON hasil penggabungan. Error: ' . json_last_error_msg());
+             }
+ 
+             return $parsed;
+ 
+         } catch (\Throwable $e) {
+             Log::error('[OpenAiMultiModal] Synthesis Exception: ' . $e->getMessage());
+             throw $e;
+         }
+    }
+
     private function mockResponse(): array
     {
-        return [
-            "summary" => [
-                "kategori_advice" => "Bimbingan Bertahap",
-                "karakter_relasi" => "Power-maintaining (Keseimbangan Kuasa)",
-                "intonasi_dominan" => "Kalimat Perintah / Instruksi",
-                "ranah_pembicaraan" => "Pembicaraan ini berfokus pada proses penulisan dan validitas data.",
-                "arah_tujuan" => "Tujuan utama dari pembicaraan ini adalah untuk memastikan bahwa penulisan skripsi memenuhi standar akademis yang diperlukan, termasuk validitas data dan format penulisan yang benar.",
-                "saran_perbaikan" => "Kalimat sudah baik dan jelas. Teruskan semangatnya dalam menyusun skripsi!"
-            ],
-            "transcription" => [
-                [
-                    "speaker" => "Dosen",
-                    "timestamp" => "00:00 - 00:08",
-                    "text_html" => "Untuk literature review ya, ini gimana caranya supaya diluaskan lagi [MARKER_1] Apalagi cuma satu section ya. [PAUSE] <b>Ini masih terlalu sedikit [MARKER_2]</b>",
-                    "is_advice" => true,
-                    "advice_type" => "down",
-                    "agent_insight" => "Dosen memberikan instruksi korektif agar mahasiswa memperluas tinjauan pustaka karena dirasa belum memenuhi standar minimum.",
-                    "advice_relation" => "Kalimat ini merupakan instruksi tindak tutur korektif pertama Dosen yang menanggapi template baru pilihan Mahasiswa pada Baris 1.",
-                    "intonation_markers" => [
-                        [
-                            "id" => "[MARKER_1]",
-                            "type" => "up",
-                            "reason" => "Dosen menggunakan intonasi naik untuk memancing respons atau memberikan pertanyaan retoris.",
-                            "relation" => "Berelasi dengan kalimat Mahasiswa di Baris 1 untuk menegaskan fokus perubahan literature review."
-                        ],
-                        [
-                            "id" => "[MARKER_2]",
-                            "type" => "down",
-                            "reason" => "Penurunan nada di akhir menunjukan instruksi absolut yang tidak bisa ditawar.",
-                            "relation" => "Menegaskan ketidaksetujuan atas satu section literature review yang terlalu tipis."
-                        ]
-                    ]
-                ],
-                [
-                    "speaker" => "Mahasiswa",
-                    "timestamp" => "00:09 - 00:12",
-                    "text_html" => "Baik, Bu. Saya akan coba cari referensi jurnal baru lagi [UP]",
-                    "is_advice" => false,
-                    "advice_type" => "neutral",
-                    "agent_insight" => "Mahasiswa menunjukkan persetujuan dan penerimaan instruksi secara koperatif.",
-                    "advice_relation" => "Merupakan tanggapan koperatif langsung terhadap instruksi Dosen di Baris 2."
-                ]
-            ]
-        ];
+        $mockJson = file_get_contents(resource_path('mocks/synthesis_mock.json'));
+        return json_decode($mockJson, true) ?? [];
     }
 }

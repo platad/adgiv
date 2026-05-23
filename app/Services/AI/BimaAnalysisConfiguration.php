@@ -23,7 +23,7 @@ class BimaAnalysisConfiguration implements LlmConfigurationInterface
 
     public function getModelName(): string
     {
-        return 'gpt-4o-audio-preview';
+        return 'gpt-audio-1.5';
     }
 
     public function getTimeout(): int
@@ -34,5 +34,15 @@ class BimaAnalysisConfiguration implements LlmConfigurationInterface
     public function getTemperature(): float
     {
         return 0.2;
+    }
+
+    public function getSynthesisModelName(): string
+    {
+        return 'gpt-4.1-2025-04-14';
+    }
+
+    public function getSynthesisSystemPrompt(): string
+    {
+        return "Anda adalah Agen Sintesis BIMA (C-CDA Synthesizer). Gabungkan analisis potongan bimbingan akademik secara sangat presisi, hapus tumpang-tindih (deduplicate) pada bagian bertumpukan secara semantik, hitung ulang durasi, dan pastikan format JSON valid.";
     }
 }

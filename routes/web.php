@@ -77,9 +77,11 @@ Route::middleware(['auth'])->group(function () {
     // Analysis Workflow
     Route::prefix('analysis')->name('analysis.')->group(function () {
         Route::get('/create', [AnalysisController::class, 'create'])->name('create'); // Input voice
+        Route::post('/initialize', [AnalysisController::class, 'initialize'])->name('initialize'); // Initialize Analysis record
+        Route::post('/{id}/chunk', [AnalysisController::class, 'storeChunk'])->name('chunk'); // Upload & analyze an audio chunk
         Route::post('/store', [AnalysisController::class, 'store'])->name('store');   // Save audio, create Analysis record
         Route::get('/{id}/processing', [AnalysisController::class, 'processing'])->name('processing'); // Step-by-step view
-        Route::post('/{id}/process', [AnalysisController::class, 'processAudio'])->name('process'); // Trigger AI Multi-Modal
+        Route::post('/{id}/process', [AnalysisController::class, 'processAudio'])->name('process'); // Trigger AI Multi-Modal Synthesis
         Route::get('/{id}/result', [AnalysisController::class, 'result'])->name('result'); // Final annotated view
         Route::post('/{id}/feedback', [AnalysisController::class, 'feedback'])->name('feedback'); // Submit Kesesuaian
         Route::post('/{id}/line-feedback', [AnalysisController::class, 'lineFeedback'])->name('line-feedback'); // Submit Line-by-line Feedback
