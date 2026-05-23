@@ -103,7 +103,7 @@
                                 <span x-show="activeStep <= 3">3</span>
                                 <i data-lucide="check" class="w-3 h-3" x-show="activeStep > 3" style="display: none;"></i>
                             </div>
-                            <span x-text="'Analisis Potongan (' + currentChunkIndex + '/' + totalChunksCount + ') GPT-Audio-1.5'"></span>
+                            <span x-text="'Analisis Potongan (' + currentChunkIndex + '/' + totalChunksCount + ') GPT-4o-Audio'"></span>
                         </div>
 
                         {{-- Chunk Status Sublist --}}
@@ -339,7 +339,7 @@
                             this.currentChunkIndex = chunkIndex;
                             this.activeStep = 3;
                             this.progressPercent = 20 + Math.round((i / chunks.length) * 75);
-                            this.progressText = `Mengirim & menganalisis Potongan ${chunkIndex}/${numChunks} dengan GPT-Audio-1.5...`;
+                            this.progressText = `Mengirim & menganalisis Potongan ${chunkIndex}/${numChunks} dengan GPT-4o-Audio...`;
 
                             const formData = new FormData();
                             formData.append('audio_chunk', chunks[i], `chunk_${chunkIndex}.wav`);
@@ -367,7 +367,7 @@
                         this.progressText = 'Selesai! Menyusun halaman hasil progresif...';
 
                         setTimeout(() => {
-                            window.location.href = `/analysis/${analysisId}/result`;
+                            window.location.href = `/analysis/${analysisId}/processing`;
                         }, 800);
 
                     } catch (err) {

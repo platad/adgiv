@@ -23,7 +23,7 @@ class BimaAnalysisConfiguration implements LlmConfigurationInterface
 
     public function getModelName(): string
     {
-        return 'gpt-audio-1.5';
+        return 'gpt-4o-mini-audio-preview';
     }
 
     public function getTimeout(): int
@@ -38,7 +38,7 @@ class BimaAnalysisConfiguration implements LlmConfigurationInterface
 
     public function getSynthesisModelName(): string
     {
-        return 'gpt-4.1-2025-04-14';
+        return 'gpt-4o-mini';
     }
 
     public function getSynthesisSystemPrompt(): string

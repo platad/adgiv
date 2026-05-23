@@ -99,8 +99,7 @@ class AnalysisController extends Controller
     {
         $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
         
-        // Auto-redirect directly to the progressive real-time result page to prevent blocking screens!
-        return redirect()->route('analysis.result', $analysis->id);
+        return view('analysis.processing', compact('analysis'));
     }
 
     public function processAudio($id)
@@ -135,6 +134,10 @@ class AnalysisController extends Controller
     public function result($id)
     {
         $analysis = Analysis::with('feedback')->where('user_id', Auth::id())->findOrFail($id);
+        
+        if ($analysis->status !== 'completed') {
+            return redirect()->route('analysis.processing', $analysis->id);
+        }
         
         return view('analysis.result', compact('analysis'));
     }
