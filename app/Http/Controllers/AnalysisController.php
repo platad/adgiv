@@ -196,6 +196,18 @@ class AnalysisController extends Controller
         ]);
     }
 
+    public function printReport($id)
+    {
+        $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
+        
+        if ($analysis->status !== 'completed') {
+            return redirect()->route('analysis.result', $id)
+                ->with('error', 'Laporan belum siap dicetak. Silakan tunggu hingga analisis selesai.');
+        }
+
+        return view('analysis.print', compact('analysis'));
+    }
+
     public function destroy($id)
     {
         $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);

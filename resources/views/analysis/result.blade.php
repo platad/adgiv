@@ -17,64 +17,162 @@
         }
     }
 @endphp
-<x-layouts.app title="Hasil Analisa">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in" x-data="{
-        showRaw: false,
-        showInsightModal: false,
-        insightTitle: '',
-        insightType: '',
-        insightExplanation: '',
-        insightRelation: '',
-        activeMobileTab: 'transkrip',
-        
-        // Alpine Progressive loading states
-        synthesisStatus: '{{ $analysis->status }}',
-        synthesisError: null,
-        currentPage: 1,
-        pageSize: {{ $analysis->status === 'completed' ? '10' : '1000' }},
-        totalRows: 0,
-        
-        async startBackgroundSynthesis() {
-            if (this.synthesisStatus === 'completed') return;
-            this.synthesisStatus = 'processing';
-            this.synthesisError = null;
+<x-slot name="styles">
+    <style>
+        @media print {
+            /* Hide non-printable elements */
+            aside, nav, header, footer, button, .no-print, 
+            [class*="mobile-header"], [class*="mobile-nav"],
+            .lg\:hidden, .fixed, .absolute, .pointer-events-none,
+            #insightModal, [x-show="showRaw"] {
+                display: none !important;
+            }
             
-            try {
-                const response = await fetch('{{ route("analysis.process", $analysis->id) }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').content,
-                        'Accept': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                if (response.ok && data.status === 'success') {
-                    this.synthesisStatus = 'completed';
-                    window.location.reload();
-                } else {
-                    this.synthesisStatus = 'failed';
-                    this.synthesisError = data.message || 'Gagal menyusun halaman hasil analisa.';
-                }
-            } catch (err) {
-                this.synthesisStatus = 'failed';
-                this.synthesisError = 'Koneksi terputus. Silakan coba kembali.';
+            /* Reset body background for printing */
+            body {
+                background: white !important;
+                color: black !important;
             }
-        },
-
-        init() {
-            if (this.synthesisStatus !== 'completed') {
-                this.startBackgroundSynthesis();
+            
+            /* Remove left sidebar padding completely */
+            .lg\:pl-52, .lg\:pr-8, .lg\:py-10 {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                margin: 0 !important;
             }
-        },
-    
-        openInsight(title, type, explanation, relation) {
-            this.insightTitle = title;
-            this.insightType = type;
-            this.insightExplanation = explanation;
-            this.insightRelation = relation || 'Tidak ada relasi khusus dengan baris lain.';
-            this.showInsightModal = true;
+            
+            .flex-1.flex.flex-col.w-full {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            main {
+                overflow: visible !important;
+            }
+            
+            /* Force all paginated dialogue rows to print together */
+            [id^="baris-"] {
+                display: flex !important;
+                page-break-inside: avoid !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                border-bottom: 1px solid #f3f4f6 !important;
+                background-color: transparent !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+            
+            /* Force layout columns to block layout on paper */
+            .lg\:col-span-2, .lg\:col-span-1, .lg\:w-2/3, .lg\:w-1/3 {
+                width: 100% !important;
+                float: none !important;
+            }
+            
+            .grid {
+                display: block !important;
+            }
+            
+            .flex {
+                display: flex !important;
+            }
+            
+            /* Clean container border box rules for printing */
+            .bg-white {
+                box-shadow: none !important;
+                border: 1px solid #e5e7eb !important;
+                page-break-inside: avoid !important;
+                margin-bottom: 1.5rem !important;
+                border-radius: 1rem !important;
+                padding: 1.5rem !important;
+            }
+            
+            /* Hide pagination navigation footer */
+            .mt-8.pt-6.border-t.border-gray-100 {
+                display: none !important;
+            }
         }
-    }">
+    </style>
+</x-slot>
+
+<x-layouts.app title="Hasil Analisa">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in" 
+        x-data="{
+            showRaw: false,
+            showInsightModal: false,
+            insightTitle: '',
+            insightType: '',
+            insightExplanation: '',
+            insightRelation: '',
+            activeMobileTab: 'transkrip',
+            
+            // Alpine Progressive loading states
+            synthesisStatus: '{{ $analysis->status }}',
+            synthesisError: null,
+            currentPage: 1,
+            pageSize: {{ $analysis->status === 'completed' ? '10' : '1000' }},
+            totalRows: 0,
+            
+            async startBackgroundSynthesis() {
+                if (this.synthesisStatus === 'completed') return;
+                this.synthesisStatus = 'processing';
+                this.synthesisError = null;
+                
+                try {
+                    const response = await fetch('{{ route("analysis.process", $analysis->id) }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[\'name=csrf-token\']')?.content || document.querySelector('meta[name=\'csrf-token\']')?.content,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const data = await response.json();
+                    if (response.ok && data.status === 'success') {
+                        this.synthesisStatus = 'completed';
+                        window.location.reload();
+                    } else {
+                        this.synthesisStatus = 'failed';
+                        this.synthesisError = data.message || 'Gagal menyusun halaman hasil analisa.';
+                    }
+                } catch (err) {
+                    this.synthesisStatus = 'failed';
+                    this.synthesisError = 'Koneksi terputus. Silakan coba kembali.';
+                }
+            },
+    
+            init() {
+                if (this.synthesisStatus !== 'completed') {
+                    this.startBackgroundSynthesis();
+                }
+            },
+        
+            openInsight(title, type, explanation, relation) {
+                this.insightTitle = title;
+                this.insightType = type;
+                this.insightExplanation = explanation;
+                this.insightRelation = relation || 'Tidak ada relasi khusus dengan baris lain.';
+                this.showInsightModal = true;
+            }
+        }"
+        @go-to-baris.window="
+            const idx = $event.detail.index;
+            const targetPage = Math.ceil((idx + 1) / pageSize);
+            currentPage = targetPage;
+            activeMobileTab = 'transkrip';
+            setTimeout(() => {
+                const el = document.getElementById('baris-' + idx);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.classList.add('bg-amber-50', 'ring-4', 'ring-amber-200/50', 'scale-[1.01]', 'border-amber-200');
+                    setTimeout(() => {
+                        el.classList.remove('bg-amber-50', 'ring-4', 'ring-amber-200/50', 'scale-[1.01]', 'border-amber-200');
+                    }, 2000);
+                }
+            }, 150);
+        "
+    >
+        
 
         {{-- Header --}}
         <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-100 pb-8">
@@ -87,29 +185,34 @@
                 <p class="text-gray-500 font-medium mt-2 text-sm">Transkripsi Multimodal & Anotasi Bimbingan</p>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap md:flex-nowrap items-center gap-3 shrink-0">
+                <a x-show="synthesisStatus === 'completed'" href="{{ route('analysis.print', $analysis->id) }}" target="_blank"
+                    class="inline-flex items-center px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-[0.7rem] font-black uppercase tracking-widest transition-colors shadow-sm shadow-purple-500/10 cursor-pointer whitespace-nowrap">
+                    <i data-lucide="printer" class="w-3.5 h-3.5 mr-2"></i> Cetak Laporan
+                </a>
+
                 <button @click="showRaw = !showRaw"
-                    class="inline-flex items-center px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold uppercase tracking-widest transition-colors">
-                    <i data-lucide="code" class="w-4 h-4 mr-2"></i> <span
-                        x-text="showRaw ? 'Tutup Raw Data' : 'Lihat Raw Data'"></span>
+                    class="inline-flex items-center px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 text-[0.7rem] font-black uppercase tracking-widest transition-colors whitespace-nowrap cursor-pointer">
+                    <i data-lucide="code" class="w-3.5 h-3.5 mr-2"></i> <span
+                        x-text="showRaw ? 'Tutup Raw' : 'Lihat Raw'"></span>
                 </button>
                 
                 {{-- Dynamic Status Badge --}}
-                <span x-show="synthesisStatus === 'completed'" class="inline-flex items-center gap-2">
-                    <span class="inline-flex items-center px-4 py-2 rounded-xl bg-purple-50 text-purple-700 text-xs font-bold uppercase tracking-widest border border-purple-100 shadow-sm">
-                        <i data-lucide="music-4" class="w-3.5 h-3.5 mr-1.5 text-purple-500"></i> {{ $totalChunks > 0 ? $totalChunks : '8' }} Potongan Audio Tergabung
+                <span x-show="synthesisStatus === 'completed'" class="inline-flex flex-wrap md:flex-nowrap items-center gap-2 shrink-0">
+                    <span class="inline-flex items-center px-4 py-2.5 rounded-xl bg-purple-50 text-purple-700 text-[0.7rem] font-black uppercase tracking-widest border border-purple-100 shadow-sm whitespace-nowrap">
+                        <i data-lucide="music-4" class="w-3.5 h-3.5 mr-1.5 text-purple-500"></i> {{ $totalChunks > 0 ? $totalChunks : '8' }} Chunks
                     </span>
-                    <span class="inline-flex items-center px-4 py-2 rounded-xl bg-green-50 text-green-700 text-xs font-bold uppercase tracking-widest border border-green-100 shadow-sm">
-                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1.5 text-green-500"></i> Analisa Selesai
+                    <span class="inline-flex items-center px-4 py-2.5 rounded-xl bg-green-50 text-green-700 text-[0.7rem] font-black uppercase tracking-widest border border-green-100 shadow-sm whitespace-nowrap">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1.5 text-green-500"></i> Selesai
                     </span>
                 </span>
                 <span x-show="synthesisStatus === 'processing' || synthesisStatus === 'pending'" style="display: none;"
-                    class="inline-flex items-center px-4 py-2 rounded-xl bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-widest animate-pulse">
-                    <i data-lucide="loader-2" class="w-4.5 h-4.5 mr-2 animate-spin text-blue-500"></i> Menyusun Laporan...
+                    class="inline-flex items-center px-4 py-2.5 rounded-xl bg-blue-50 text-blue-700 text-[0.7rem] font-black uppercase tracking-widest animate-pulse whitespace-nowrap">
+                    <i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin text-blue-500"></i> Menyusun...
                 </span>
                 <span x-show="synthesisStatus === 'failed'" style="display: none;"
-                    class="inline-flex items-center px-4 py-2 rounded-xl bg-red-50 text-red-700 text-xs font-bold uppercase tracking-widest animate-shake">
-                    <i data-lucide="alert-triangle" class="w-4 h-4 mr-2"></i> Penyusunan Gagal
+                    class="inline-flex items-center px-4 py-2.5 rounded-xl bg-red-50 text-red-700 text-[0.7rem] font-black uppercase tracking-widest animate-shake whitespace-nowrap">
+                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5 mr-2"></i> Gagal
                 </span>
             </div>
         </div>
@@ -260,7 +363,8 @@
                                 </div>
                             @endif
 
-                            <div class="flex flex-col gap-4 group" 
+                            <div id="baris-{{ $index }}"
+                                 class="flex flex-col gap-4 group rounded-3xl p-4 transition-all duration-700 border border-transparent" 
                                  x-show="synthesisStatus !== 'completed' || ({{ $index }} >= (currentPage - 1) * pageSize && {{ $index }} < (currentPage) * pageSize)">
                                 <div class="flex flex-col md:flex-row gap-4 md:gap-8">
                                     {{-- Speaker & Timestamp Column --}}
@@ -891,6 +995,16 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        onClick: function(e, activeEls) {
+                            if (activeEls && activeEls.length > 0) {
+                                const idx = activeEls[0].index;
+                                window.dispatchEvent(new CustomEvent('go-to-baris', { detail: { index: idx } }));
+                            }
+                        },
+                        onHover: function(e, el) {
+                            const canvas = e.chart.canvas;
+                            canvas.style.cursor = el.length ? 'pointer' : 'default';
+                        },
                         plugins: {
                             legend: {
                                 display: false

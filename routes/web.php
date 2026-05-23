@@ -83,6 +83,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/processing', [AnalysisController::class, 'processing'])->name('processing'); // Step-by-step view
         Route::post('/{id}/process', [AnalysisController::class, 'processAudio'])->name('process'); // Trigger AI Multi-Modal Synthesis
         Route::get('/{id}/result', [AnalysisController::class, 'result'])->name('result'); // Final annotated view
+        Route::get('/{id}/print', [AnalysisController::class, 'printReport'])->name('print'); // Print-friendly clean report view
         Route::post('/{id}/feedback', [AnalysisController::class, 'feedback'])->name('feedback'); // Submit Kesesuaian
         Route::post('/{id}/line-feedback', [AnalysisController::class, 'lineFeedback'])->name('line-feedback'); // Submit Line-by-line Feedback
         Route::delete('/{id}', [AnalysisController::class, 'destroy'])->name('destroy'); // Delete Analysis
