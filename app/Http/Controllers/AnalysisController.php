@@ -30,14 +30,17 @@ class AnalysisController extends Controller
     {
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'locale' => ['nullable', 'string', 'in:id,en,zh'],
         ]);
+
+        $locale = $request->input('locale', 'id');
 
         $analysis = Analysis::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
             'audio_path' => 'client-cached',
             'status' => 'pending',
-            'result_data' => ['chunks' => []],
+            'result_data' => ['chunks' => [], 'language' => $locale],
         ]);
 
         return response()->json([
@@ -46,7 +49,7 @@ class AnalysisController extends Controller
         ]);
     }
 
-    public function storeChunk(Request $request, $id)
+    public function storeChunk(Request $request, int $id)
     {
         $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
 
@@ -59,8 +62,9 @@ class AnalysisController extends Controller
         $absolutePath = Storage::disk('local')->path($tempPath);
 
         try {
-            $rawResult = $this->aiService->analyzeAudio($absolutePath);
-            
+            $locale = $analysis->result_data['language'] ?? 'id';
+            $rawResult = $this->aiService->analyzeAudio($absolutePath, $locale);
+
             @unlink($absolutePath);
 
             $resultData = $analysis->result_data ?? [];
@@ -95,20 +99,20 @@ class AnalysisController extends Controller
         return redirect()->route('analysis.result', $analysis->id);
     }
 
-    public function processing($id)
+    public function processing(int $id)
     {
         $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
-        
+
         return view('analysis.processing', compact('analysis'));
     }
 
-    public function processAudio($id)
+    public function processAudio(int $id)
     {
         $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
-        
+
         try {
             $analysis->update(['status' => 'processing']);
-            
+
             $resultData = $analysis->result_data ?? [];
             $chunks = $resultData['chunks'] ?? [];
 
@@ -116,7 +120,8 @@ class AnalysisController extends Controller
                 throw new \RuntimeException('Tidak ditemukan data potongan audio untuk diproses.');
             }
 
-            $synthesizedResult = $this->aiService->synthesizeChunks($chunks);
+            $locale = $analysis->result_data['language'] ?? 'id';
+            $synthesizedResult = $this->aiService->synthesizeChunks($chunks, $locale);
             $finalResult = $this->parseAdviceAction->execute($synthesizedResult);
             $finalResult['total_chunks'] = count($chunks);
             $analysis->update([
@@ -131,18 +136,18 @@ class AnalysisController extends Controller
         }
     }
 
-    public function result($id)
+    public function result(int $id)
     {
         $analysis = Analysis::with('feedback')->where('user_id', Auth::id())->findOrFail($id);
-        
+
         if ($analysis->status !== 'completed') {
             return redirect()->route('analysis.processing', $analysis->id);
         }
-        
+
         return view('analysis.result', compact('analysis'));
     }
 
-    public function feedback(StoreAnalysisFeedbackRequest $request, $id)
+    public function feedback(StoreAnalysisFeedbackRequest $request, int $id)
     {
         $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
 
@@ -166,7 +171,7 @@ class AnalysisController extends Controller
         return back()->with('success', 'Terima kasih atas penilaian Anda. Metrik sistem telah diperbarui.');
     }
 
-    public function lineFeedback(Request $request, $id)
+    public function lineFeedback(Request $request, int $id)
     {
         $request->validate([
             'index' => 'required|integer',
@@ -181,9 +186,9 @@ class AnalysisController extends Controller
         }
 
         $currentFeedback = $resultData['transcription'][$request->index]['user_feedback'] ?? 'none';
-        
+
         if ($currentFeedback === $request->type) {
-            $resultData['transcription'][$request->index]['user_feedback'] = 'none'; // toggle off
+            $resultData['transcription'][$request->index]['user_feedback'] = 'none';
             unset($resultData['transcription'][$request->index]['feedback_at']);
         } else {
             $resultData['transcription'][$request->index]['user_feedback'] = $request->type;
@@ -199,10 +204,10 @@ class AnalysisController extends Controller
         ]);
     }
 
-    public function printReport($id)
+    public function printReport(int $id)
     {
         $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
-        
+
         if ($analysis->status !== 'completed') {
             return redirect()->route('analysis.result', $id)
                 ->with('error', 'Laporan belum siap dicetak. Silakan tunggu hingga analisis selesai.');
@@ -211,10 +216,10 @@ class AnalysisController extends Controller
         return view('analysis.print', compact('analysis'));
     }
 
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
-        
+
         if ($analysis->audio_path) {
             Storage::delete($analysis->audio_path);
         }

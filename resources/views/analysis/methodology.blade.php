@@ -1,7 +1,9 @@
 <x-layouts.app>
-    <x-slot name="title">Metodologi C-CDA</x-slot>
+    <x-slot name="title">
+        {{ app()->getLocale() === 'zh' ? 'C-CDA 方法论' : (app()->getLocale() === 'en' ? 'C-CDA Methodology' : 'Metodologi C-CDA') }}
+    </x-slot>
 
-    <div x-data="{ showStatsModal: false, showDatasetModal: false }" class="space-y-10 pb-12">
+    <div x-data="{ showStatsModal: false, showDatasetModal: false, appLang: '{{ app()->getLocale() }}' }" class="space-y-10 pb-12">
         {{-- Header Banner --}}
         <div class="relative bg-gray-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl overflow-hidden border border-white/5">
             {{-- Glowing Backdrops --}}
@@ -10,14 +12,23 @@
 
             <div class="relative z-10 max-w-4xl">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-bima-red/10 text-bima-red border border-bima-red/20 text-[0.65rem] font-black uppercase tracking-widest mb-6">
-                    <x-application-logo class="w-3.5 h-3.5" /> Kerangka Ilmiah Prototipe BIMA
+                    <x-application-logo class="w-3.5 h-3.5" /> 
+                    <span class="lang-id">Kerangka Ilmiah Prototipe BIMA</span>
+                    <span class="lang-en">BIMA Prototype Scientific Framework</span>
+                    <span class="lang-zh">BIMA 原型科学框架</span>
                 </span>
                 <h1 class="text-3xl md:text-4xl font-black tracking-tight leading-tight uppercase mb-4">
                     Computational Critical Discourse Analysis <br class="hidden md:inline" />
-                    <span class="text-bima-red bg-clip-text">Berbasis G-MLLM</span>
+                    <span class="text-bima-red bg-clip-text">
+                        <span class="lang-id">Berbasis G-MLLM</span>
+                        <span class="lang-en">Powered by G-MLLM</span>
+                        <span class="lang-zh">基于 G-MLLM 的建模</span>
+                    </span>
                 </h1>
                 <p class="text-gray-300 text-sm md:text-base font-medium leading-relaxed max-w-3xl">
-                    Digitalisasi dan otomatisasi kajian wacana kritis (AWK) akademis dosen-mahasiswa dengan memanfaatkan kecerdasan buatan multimodal yang terpadu secara langsung (*end-to-end*) dari suara ke ekstraksi makna relasional.
+                    <span class="lang-id">Digitalisasi dan otomatisasi kajian wacana kritis (AWK) akademis dosen-mahasiswa dengan memanfaatkan kecerdasan buatan multimodal yang terpadu secara langsung (*end-to-end*) dari suara ke ekstraksi makna relasional.</span>
+                    <span class="lang-en">Digitalization and automation of critical discourse analysis (CDA) in supervisor-student academic interactions by utilizing integrated end-to-end multimodal artificial intelligence directly from audio waves to relational semantic extraction.</span>
+                    <span class="lang-zh">利用从语音输入到关系语义提取的端到端一体化多模态人工智能，数字化和自动化导师-学生学术互动的批判性话语分析（CDA）。</span>
                 </p>
             </div>
         </div>
@@ -35,65 +46,165 @@
                             <i data-lucide="git-compare" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">Analisis Komparasi</span>
-                            <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">Mengapa G-MLLM Unggul dari IndoBERT?</h3>
+                            <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">
+                                <span class="lang-id">Analisis Komparasi</span>
+                                <span class="lang-en">Comparative Analysis</span>
+                                <span class="lang-zh">对比分析</span>
+                            </span>
+                            <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">
+                                <span class="lang-id">Mengapa G-MLLM Unggul dari IndoBERT?</span>
+                                <span class="lang-en">Why Does G-MLLM Outperform IndoBERT?</span>
+                                <span class="lang-zh">为什么 G-MLLM 优于 IndoBERT？</span>
+                            </h3>
                         </div>
                     </div>
 
                     <p class="text-gray-600 text-xs font-medium leading-relaxed mb-6">
-                        Dalam 
-                        <span class="relative group cursor-pointer border-b-2 border-dashed border-red-500 pb-0.5 font-bold text-gray-900">
-                            penelitian kami sebelumnya
-                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
-                                <span class="block font-black text-red-400 uppercase tracking-widest mb-1">Riset Utama BIMA UMPO</span>
-                                Nimasari, E. P., dkk. (2024). "How Do Doctoral Students Perceive Supervision? Lessons Learned from Indonesia". The Qualitative Report. <br/>
-                                <a href="https://doi.org/10.46743/2160-3715/2024.6984" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">Kredit Riset Utama BIMA UMPO ➔</a>
-                            </span>
-                        </span>, 
-                        klasifikasi wacana bimbingan akademik dilakukan menggunakan model 
-                        <span class="relative group cursor-pointer border-b-2 border-dashed border-red-500 pb-0.5 font-bold text-gray-900">
-                            IndoBERT
-                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
-                                <span class="block font-black text-red-400 uppercase tracking-widest mb-1">Publikasi Utama AACL</span>
-                                Wilie, B., et al. (2020). "IndoNLU: Benchmark and Resources for Evaluating Indonesian Natural Language Understanding". <br/>
-                                <a href="https://arxiv.org/abs/2009.05387" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">Kunjungi Paper arXiv: 2009.05387 ➔</a>
-                            </span>
-                        </span> 
-                        yang berbasis teks tunggal (<i>single-modality</i>). Riset kali ini bertindak sebagai kelanjutan strategis dengan membandingkan model klasik tersebut dengan arsitektur 
-                        <span class="relative group cursor-pointer border-b-2 border-dashed border-red-500 pb-0.5 font-bold text-gray-900">
-                            G-MLLM
-                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
-                                <span class="block font-black text-red-400 uppercase tracking-widest mb-1">OpenAI System Card</span>
-                                OpenAI. (2024). "GPT-4o System Card: Multimodal Capability and Safety Evaluation". <br/>
-                                <a href="https://openai.com/index/gpt-4o-system-card/" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">Kunjungi OpenAI Card ➔</a>
-                            </span>
-                        </span> 
-                        yang baru, guna menyoroti lompatan performa dan keunggulan pemrosesan multimodal yang revolusioner.
+                        <span class="lang-id">
+                            Dalam 
+                            <span class="relative group cursor-pointer border-b-2 border-dashed border-red-500 pb-0.5 font-bold text-gray-900">
+                                penelitian kami sebelumnya
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
+                                    <span class="block font-black text-red-400 uppercase tracking-widest mb-1">Riset Utama BIMA UMPO</span>
+                                    Nimasari, E. P., dkk. (2024). "How Do Doctoral Students Perceive Supervision? Lessons Learned from Indonesia". The Qualitative Report. <br/>
+                                    <a href="https://doi.org/10.46743/2160-3715/2024.6984" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">Kredit Riset Utama BIMA UMPO ➔</a>
+                                </span>
+                            </span>, 
+                            klasifikasi wacana bimbingan akademik dilakukan menggunakan model 
+                            <span class="relative group cursor-pointer border-b-2 border-dashed border-red-500 pb-0.5 font-bold text-gray-900">
+                                IndoBERT
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
+                                    <span class="block font-black text-red-400 uppercase tracking-widest mb-1">Publikasi Utama AACL</span>
+                                    Wilie, B., et al. (2020). "IndoNLU: Benchmark and Resources for Evaluating Indonesian Natural Language Understanding". <br/>
+                                    <a href="https://arxiv.org/abs/2009.05387" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">Kunjungi Paper arXiv: 2009.05387 ➔</a>
+                                </span>
+                            </span> 
+                            yang berbasis teks tunggal (<i>single-modality</i>). Riset kali ini bertindak sebagai kelanjutan strategis dengan membandingkan model klasik tersebut dengan arsitektur 
+                            <span class="relative group cursor-pointer border-b-2 border-dashed border-red-500 pb-0.5 font-bold text-gray-900">
+                                G-MLLM
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
+                                    <span class="block font-black text-red-400 uppercase tracking-widest mb-1">OpenAI System Card</span>
+                                    OpenAI. (2024). "GPT-4o System Card: Multimodal Capability and Safety Evaluation". <br/>
+                                    <a href="https://openai.com/index/gpt-4o-system-card/" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">Kunjungi OpenAI Card ➔</a>
+                                </span>
+                            </span> 
+                            yang baru, guna menyoroti lompatan performa dan keunggulan pemrosesan multimodal yang revolusioner.
+                        </span>
+                        <span class="lang-en">
+                            In 
+                            <span class="relative group cursor-pointer border-b-2 border-dashed border-red-500 pb-0.5 font-bold text-gray-900">
+                                our previous research
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
+                                    <span class="block font-black text-red-400 uppercase tracking-widest mb-1">BIMA UMPO Key Research</span>
+                                    Nimasari, E. P., et al. (2024). "How Do Doctoral Students Perceive Supervision? Lessons Learned from Indonesia". The Qualitative Report. <br/>
+                                    <a href="https://doi.org/10.46743/2160-3715/2024.6984" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">Core Research Credit ➔</a>
+                                </span>
+                            </span>, 
+                            academic supervision discourse classification was conducted using the 
+                            <span class="relative group cursor-pointer border-b-2 border-dashed border-red-500 pb-0.5 font-bold text-gray-900">
+                                IndoBERT
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
+                                    <span class="block font-black text-red-400 uppercase tracking-widest mb-1">AACL Core Publication</span>
+                                    Wilie, B., et al. (2020). "IndoNLU: Benchmark and Resources for Evaluating Indonesian Natural Language Understanding". <br/>
+                                    <a href="https://arxiv.org/abs/2009.05387" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">Visit arXiv Paper: 2009.05387 ➔</a>
+                                </span>
+                            </span> 
+                            single-modality text model. This research acts as a strategic sequel by contrasting that classical approach with the new 
+                            <span class="relative group cursor-pointer border-b-2 border-dashed border-red-500 pb-0.5 font-bold text-gray-900">
+                                G-MLLM
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
+                                    <span class="block font-black text-red-400 uppercase tracking-widest mb-1">OpenAI System Card</span>
+                                    OpenAI. (2024). "GPT-4o System Card: Multimodal Capability and Safety Evaluation". <br/>
+                                    <a href="https://openai.com/index/gpt-4o-system-card/" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">Visit OpenAI Card ➔</a>
+                                </span>
+                            </span> 
+                            architecture, highlighting performance leaps and revolutionary multimodal processing advantages.
+                        </span>
+                        <span class="lang-zh">
+                            在 
+                            <span class="relative group cursor-pointer border-b-2 border-dashed border-red-500 pb-0.5 font-bold text-gray-900">
+                                我们先前的研究
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
+                                    <span class="block font-black text-red-400 uppercase tracking-widest mb-1">BIMA UMPO 核心研究</span>
+                                    Nimasari, E. P., 等. (2024). "How Do Doctoral Students Perceive Supervision? Lessons Learned from Indonesia". The Qualitative Report. <br/>
+                                    <a href="https://doi.org/10.46743/2160-3715/2024.6984" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">核心研究学分 ➔</a>
+                                </span>
+                            </span> 中，
+                            学术指导话语的分类是通过 
+                            <span class="relative group cursor-pointer border-b-2 border-dashed border-red-500 pb-0.5 font-bold text-gray-900">
+                                IndoBERT
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
+                                    <span class="block font-black text-red-400 uppercase tracking-widest mb-1">AACL 核心发表</span>
+                                    Wilie, B., et al. (2020). "IndoNLU: Benchmark and Resources for Evaluating Indonesian Natural Language Understanding". <br/>
+                                    <a href="https://arxiv.org/abs/2009.05387" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">访问 arXiv 论文: 2009.05387 ➔</a>
+                                </span>
+                            </span> 
+                            单模态文本模型进行的。本阶段研究作为战略延伸，通过将经典模型与全新的 
+                            <span class="relative group cursor-pointer border-b-2 border-dashed border-red-500 pb-0.5 font-bold text-gray-900">
+                                G-MLLM
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
+                                    <span class="block font-black text-red-400 uppercase tracking-widest mb-1">OpenAI System Card</span>
+                                    OpenAI. (2024). "GPT-4o System Card: Multimodal Capability and Safety Evaluation". <br/>
+                                    <a href="https://openai.com/index/gpt-4o-system-card/" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">访问 OpenAI Card ➔</a>
+                                </span>
+                            </span> 
+                            架构进行对比，旨在凸显性能的大幅飞跃以及革命性的多模态处理优势。
+                        </span>
                     </p>
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
                                 <tr class="border-b border-gray-100">
-                                    <th class="py-4 font-black uppercase text-gray-400 tracking-wider">Parameter Dimensi</th>
-                                    <th class="py-4 px-4 font-black uppercase text-red-600 tracking-wider bg-red-50/30 rounded-t-2xl">Arsitektur G-MLLM (Sistem Ini)</th>
-                                    <th class="py-4 px-4 font-black uppercase text-gray-500 tracking-wider">Pendekatan Klasik (IndoBERT)</th>
+                                    <th class="py-4 font-black uppercase text-gray-400 tracking-wider">
+                                        <span class="lang-id">Parameter Dimensi</span>
+                                        <span class="lang-en">Dimensional Parameter</span>
+                                        <span class="lang-zh">维度参数</span>
+                                    </th>
+                                    <th class="py-4 px-4 font-black uppercase text-red-600 tracking-wider bg-red-50/30 rounded-t-2xl">
+                                        <span class="lang-id">Arsitektur G-MLLM (Sistem Ini)</span>
+                                        <span class="lang-en">G-MLLM Architecture (This System)</span>
+                                        <span class="lang-zh">G-MLLM 架构 (本系统)</span>
+                                    </th>
+                                    <th class="py-4 px-4 font-black uppercase text-gray-500 tracking-wider">
+                                        <span class="lang-id">Pendekatan Klasik (IndoBERT)</span>
+                                        <span class="lang-en">Classical Approach (IndoBERT)</span>
+                                        <span class="lang-zh">经典方法 (IndoBERT)</span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50 font-medium text-gray-600">
                                 <tr>
-                                    <td class="py-4 font-bold text-gray-800">Modalitas Input</td>
-                                    <td class="py-4 px-4 bg-red-50/10 text-red-900 font-semibold">Multimodal Nativ (Audio & Teks bersamaan)</td>
-                                    <td class="py-4 px-4 text-gray-500">Single-Modality (Hanya Teks Bisunya saja)</td>
+                                    <td class="py-4 font-bold text-gray-800">
+                                        <span class="lang-id">Modalitas Input</span>
+                                        <span class="lang-en">Input Modality</span>
+                                        <span class="lang-zh">输入模态</span>
+                                    </td>
+                                    <td class="py-4 px-4 bg-red-50/10 text-red-900 font-semibold">
+                                        <span class="lang-id">Multimodal Nativ (Audio & Teks bersamaan)</span>
+                                        <span class="lang-en">Native Multimodal (Simultaneous Audio & Text)</span>
+                                        <span class="lang-zh">原生多模态 (音频与文本同步处理)</span>
+                                    </td>
+                                    <td class="py-4 px-4 text-gray-500">
+                                        <span class="lang-id">Single-Modality (Hanya Teks Bisunya saja)</span>
+                                        <span class="lang-en">Single-Modality (Mute Text Only)</span>
+                                        <span class="lang-zh">单模态 (仅限静音文本)</span>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td class="py-4 font-bold text-gray-800">Informasi Non-Verbal</td>
+                                    <td class="py-4 font-bold text-gray-800">
+                                        <span class="lang-id">Informasi Non-Verbal</span>
+                                        <span class="lang-en">Non-Verbal Information</span>
+                                        <span class="lang-zh">非言语信息</span>
+                                    </td>
                                     <td class="py-4 px-4 bg-red-50/10 text-red-900 font-semibold">
                                         <span class="inline-flex items-center gap-1.5 text-green-700">
                                             <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                             </svg>
-                                            Mampu mendeteksi intonasi naik/turun, jeda, & ketegasan
+                                            <span class="lang-id">Mampu mendeteksi intonasi naik/turun, jeda, & ketegasan</span>
+                                            <span class="lang-en">Capable of detecting rising/falling intonation, pauses, & assertiveness</span>
+                                            <span class="lang-zh">能够检测升/降语调、停顿与语气强弱</span>
                                         </span>
                                     </td>
                                     <td class="py-4 px-4 text-gray-500">
@@ -101,19 +212,45 @@
                                             <svg class="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
-                                            Hilang total saat transkripsi teks manual
+                                            <span class="lang-id">Hilang total saat transkripsi teks manual</span>
+                                            <span class="lang-en">Completely lost during manual text transcription</span>
+                                            <span class="lang-zh">在手工文本转录过程中完全丢失</span>
                                         </span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="py-4 font-bold text-gray-800">Alur Pemrosesan</td>
-                                    <td class="py-4 px-4 bg-red-50/10 text-red-900 font-semibold">End-to-End Speech-to-Semantic (Satu Langkah)</td>
-                                    <td class="py-4 px-4 text-gray-500">Cascade (Audio ➔ ASR ➔ IndoBERT) *Rawan Eror Akumulasi</td>
+                                    <td class="py-4 font-bold text-gray-800">
+                                        <span class="lang-id">Alur Pemrosesan</span>
+                                        <span class="lang-en">Processing Flow</span>
+                                        <span class="lang-zh">处理流程</span>
+                                    </td>
+                                    <td class="py-4 px-4 bg-red-50/10 text-red-900 font-semibold">
+                                        <span class="lang-id">End-to-End Speech-to-Semantic (Satu Langkah)</span>
+                                        <span class="lang-en">End-to-End Speech-to-Semantic (Single Step)</span>
+                                        <span class="lang-zh">端到端语音到语义建模 (单步)</span>
+                                    </td>
+                                    <td class="py-4 px-4 text-gray-500">
+                                        <span class="lang-id">Cascade (Audio ➔ ASR ➔ IndoBERT) *Rawan Eror Akumulasi</span>
+                                        <span class="lang-en">Cascade (Audio ➔ ASR ➔ IndoBERT) *Prone to cumulative errors</span>
+                                        <span class="lang-zh">级联架构 (音频 ➔ ASR ➔ IndoBERT) *易产生误差累积</span>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td class="py-4 font-bold text-gray-800">Ketergantungan Data</td>
-                                    <td class="py-4 px-4 bg-red-50/10 text-red-900 font-semibold">In-Context Learning (Mengatasi data langka)</td>
-                                    <td class="py-4 px-4 text-gray-500">Sangat Tinggi (Butuh ribuan dataset berlabel)</td>
+                                    <td class="py-4 font-bold text-gray-800">
+                                        <span class="lang-id">Ketergantungan Data</span>
+                                        <span class="lang-en">Data Dependency</span>
+                                        <span class="lang-zh">数据依赖</span>
+                                    </td>
+                                    <td class="py-4 px-4 bg-red-50/10 text-red-900 font-semibold">
+                                        <span class="lang-id">In-Context Learning (Mengatasi data langka)</span>
+                                        <span class="lang-en">In-Context Learning (Mitigates data scarcity)</span>
+                                        <span class="lang-zh">上下文学习 (有效解决低资源样本瓶颈)</span>
+                                    </td>
+                                    <td class="py-4 px-4 text-gray-500">
+                                        <span class="lang-id">Sangat Tinggi (Butuh ribuan dataset berlabel)</span>
+                                        <span class="lang-en">Very High (Requires thousands of labeled records)</span>
+                                        <span class="lang-zh">极高 (高度依赖数千条手工标注数据集)</span>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -127,36 +264,68 @@
                             <i data-lucide="database" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">Solusi Ilmiah BIMA</span>
-                            <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">Human-in-the-Loop Expert Bootstrapping</h3>
+                            <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">
+                                <span class="lang-id">Solusi Ilmiah BIMA</span>
+                                <span class="lang-en">BIMA Scientific Solution</span>
+                                <span class="lang-zh">BIMA 科学方案</span>
+                            </span>
+                            <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">
+                                Human-in-the-Loop Expert Bootstrapping
+                            </h3>
                         </div>
                     </div>
 
                     <p class="text-gray-600 text-xs font-medium leading-relaxed mb-8">
-                        Karena tidak adanya dataset publik mengenai percakapan bimbingan akademik teranotasi AWK di Indonesia, sistem ini menerapkan alur pengumpulan data pintar interaktif untuk melahirkan korpus digital standar emas pertama di Indonesia.
+                        <span class="lang-id">Karena tidak adanya dataset publik mengenai percakapan bimbingan akademik teranotasi AWK di Indonesia, sistem ini menerapkan alur pengumpulan data pintar interaktif untuk melahirkan korpus digital standar emas pertama di Indonesia.</span>
+                        <span class="lang-en">Due to the absence of public datasets on annotated academic supervision discourse in Indonesia, this system implements an interactive smart data collection flow to establish the first gold-standard digital corpus in Indonesia.</span>
+                        <span class="lang-zh">由于印度尼西亚国内尚无关于学术指导对话标注（CDA）的公开数据集，本系统引入了一种交互式智能数据采集流程，以构建印尼首个黄金标准数字语料库。</span>
                     </p>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
                         {{-- Step 1 --}}
                         <div class="bg-gray-50 border border-gray-100 rounded-3xl p-5 relative overflow-hidden group">
                             <div class="absolute -right-3 -bottom-3 text-gray-200/40 font-black text-6xl pointer-events-none group-hover:scale-110 transition-transform">01</div>
-                            <span class="block text-[0.55rem] font-black text-red-600 uppercase tracking-widest mb-2">Tahap Awal</span>
+                            <span class="block text-[0.55rem] font-black text-red-600 uppercase tracking-widest mb-2">
+                                <span class="lang-id">Tahap Awal</span>
+                                <span class="lang-en">Initial Phase</span>
+                                <span class="lang-zh">初始阶段</span>
+                            </span>
                             <h4 class="text-xs font-black text-gray-800 uppercase mb-2">Few-Shot ICL</h4>
-                            <p class="text-[0.65rem] leading-relaxed text-gray-500">Anotasi awal suara menggunakan kecerdasan modalitas G-MLLM dasar.</p>
+                            <p class="text-[0.65rem] leading-relaxed text-gray-500">
+                                <span class="lang-id">Anotasi awal suara menggunakan kecerdasan modalitas G-MLLM dasar.</span>
+                                <span class="lang-en">Initial voice annotation utilizing base G-MLLM modal intelligence.</span>
+                                <span class="lang-zh">利用基础多模态 G-MLLM 智能进行初始语音标注。</span>
+                            </p>
                         </div>
                         {{-- Step 2 --}}
                         <div class="bg-red-50/30 border border-red-100 rounded-3xl p-5 relative overflow-hidden group">
                             <div class="absolute -right-3 -bottom-3 text-red-100/50 font-black text-6xl pointer-events-none group-hover:scale-110 transition-transform">02</div>
-                            <span class="block text-[0.55rem] font-black text-red-600 uppercase tracking-widest mb-2">Validasi Ahli</span>
+                            <span class="block text-[0.55rem] font-black text-red-600 uppercase tracking-widest mb-2">
+                                <span class="lang-id">Validasi Ahli</span>
+                                <span class="lang-en">Expert Validation</span>
+                                <span class="lang-zh">专家验证</span>
+                            </span>
                             <h4 class="text-xs font-black text-gray-800 uppercase mb-2">Expert Feedback Loop</h4>
-                            <p class="text-[0.65rem] leading-relaxed text-gray-600">Dosen senior memberikan umpan balik kesesuaian melalui dashboard.</p>
+                            <p class="text-[0.65rem] leading-relaxed text-gray-600">
+                                <span class="lang-id">Dosen senior memberikan umpan balik kesesuaian melalui dashboard.</span>
+                                <span class="lang-en">Senior supervisors provide accuracy feedback directly via the dashboard.</span>
+                                <span class="lang-zh">资深导师通过控制面板直接提供结果准确性反馈。</span>
+                            </p>
                         </div>
                         {{-- Step 3 --}}
                         <div class="bg-gray-900 border border-gray-800 rounded-3xl p-5 relative overflow-hidden group text-white">
                             <div class="absolute -right-3 -bottom-3 text-white/5 font-black text-6xl pointer-events-none group-hover:scale-110 transition-transform">03</div>
-                            <span class="block text-[0.55rem] font-black text-bima-red uppercase tracking-widest mb-2">Luaran Final</span>
+                            <span class="block text-[0.55rem] font-black text-bima-red uppercase tracking-widest mb-2">
+                                <span class="lang-id">Luaran Final</span>
+                                <span class="lang-en">Final Output</span>
+                                <span class="lang-zh">最终产出</span>
+                            </span>
                             <h4 class="text-xs font-black uppercase mb-2">Gold-Standard Dataset</h4>
-                            <p class="text-[0.65rem] leading-relaxed text-gray-400">Terbentuk korpus bimbingan teranotasi AWK pertama untuk riset nasional.</p>
+                            <p class="text-[0.65rem] leading-relaxed text-gray-400">
+                                <span class="lang-id">Terbentuk korpus bimbingan teranotasi AWK pertama untuk riset nasional.</span>
+                                <span class="lang-en">Establishment of the first annotated supervision corpus for national academic research.</span>
+                                <span class="lang-zh">建成首个已标注指导对话语料库，助力国家学术研究。</span>
+                            </p>
                         </div>
                     </div>
 
@@ -164,7 +333,9 @@
                     <div class="mt-8 flex justify-end">
                         <button @click="showDatasetModal = true" class="py-3 px-6 rounded-2xl bg-bima-red text-white hover:bg-bima-red/90 hover:shadow-lg hover:shadow-red-500/20 transition-all font-black text-xs flex items-center gap-2 cursor-pointer border-none">
                             <i data-lucide="database" class="w-4 h-4"></i>
-                            Jelajahi Korpus Teranotasi ({{ count($evaluatedLines) }} Baris Wacana)
+                            <span class="lang-id">Jelajahi Korpus Teranotasi ({{ count($evaluatedLines) }} Baris Wacana)</span>
+                            <span class="lang-en">Explore Annotated Corpus ({{ count($evaluatedLines) }} Discourse Lines)</span>
+                            <span class="lang-zh">检索已标注语料库 (共 {{ count($evaluatedLines) }} 行话语数据)</span>
                         </button>
                     </div>
                 </div>
@@ -181,8 +352,16 @@
                             <i data-lucide="shield-check" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">Metrik Pengujian</span>
-                            <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">Akurasi & Validitas</h3>
+                            <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">
+                                <span class="lang-id">Metrik Pengujian</span>
+                                <span class="lang-en">Testing Metrics</span>
+                                <span class="lang-zh">测评指标</span>
+                            </span>
+                            <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">
+                                <span class="lang-id">Akurasi & Validitas</span>
+                                <span class="lang-en">Accuracy & Validity</span>
+                                <span class="lang-zh">准确度与效度</span>
+                            </h3>
                         </div>
                     </div>
 
@@ -190,43 +369,81 @@
                         {{-- Score 1 --}}
                         <div class="flex items-center justify-between border-b border-gray-50 pb-4">
                             <div>
-                                <h4 class="text-xs font-black text-gray-800 uppercase tracking-tight">Kesesuaian Global</h4>
-                                <p class="text-[0.6rem] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Konsensus Ekspert Sesi</p>
+                                <h4 class="text-xs font-black text-gray-800 uppercase tracking-tight">
+                                    <span class="lang-id">Kesesuaian Global</span>
+                                    <span class="lang-en">Global Consensus</span>
+                                    <span class="lang-zh">全局一致性</span>
+                                </h4>
+                                <p class="text-[0.6rem] text-gray-400 font-bold uppercase tracking-wider mt-0.5">
+                                    <span class="lang-id">Konsensus Ekspert Sesi</span>
+                                    <span class="lang-en">Session Expert Consensus</span>
+                                    <span class="lang-zh">会话级专家共识</span>
+                                </p>
                             </div>
                             <div class="text-right">
                                 <span class="block font-black text-xl text-green-600">{{ $accuracyRate }}%</span>
-                                <span class="block text-[0.55rem] font-black text-green-600 bg-green-50 px-2 py-0.5 rounded-lg uppercase tracking-wider mt-0.5">{{ $totalFeedbacks }} Sesi</span>
+                                <span class="block text-[0.55rem] font-black text-green-600 bg-green-50 px-2 py-0.5 rounded-lg uppercase tracking-wider mt-0.5">
+                                    <span class="lang-id">{{ $totalFeedbacks }} Sesi</span>
+                                    <span class="lang-en">{{ $totalFeedbacks }} Sessions</span>
+                                    <span class="lang-zh">{{ $totalFeedbacks }} 会话</span>
+                                </span>
                             </div>
                         </div>
 
                         {{-- Score 2 --}}
                         <div class="flex items-center justify-between border-b border-gray-50 pb-4">
                             <div>
-                                <h4 class="text-xs font-black text-gray-800 uppercase tracking-tight">Kesesuaian Kalimat</h4>
-                                <p class="text-[0.6rem] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Evaluasi Baris Wacana</p>
+                                <h4 class="text-xs font-black text-gray-800 uppercase tracking-tight">
+                                    <span class="lang-id">Kesesuaian Kalimat</span>
+                                    <span class="lang-en">Sentence Accuracy</span>
+                                    <span class="lang-zh">单行一致性</span>
+                                </h4>
+                                <p class="text-[0.6rem] text-gray-400 font-bold uppercase tracking-wider mt-0.5">
+                                    <span class="lang-id">Evaluasi Baris Wacana</span>
+                                    <span class="lang-en">Discourse Line Evaluation</span>
+                                    <span class="lang-zh">话语行评估指标</span>
+                                </p>
                             </div>
                             <div class="text-right">
                                 <span class="block font-black text-xl text-gray-800">{{ $sentenceAccuracy }}%</span>
-                                <span class="block text-[0.55rem] font-black text-gray-400 bg-gray-50 px-2 py-0.5 rounded-lg uppercase tracking-wider mt-0.5">{{ $totalSentencesEvaluated }} Baris</span>
+                                <span class="block text-[0.55rem] font-black text-gray-400 bg-gray-50 px-2 py-0.5 rounded-lg uppercase tracking-wider mt-0.5">
+                                    <span class="lang-id">{{ $totalSentencesEvaluated }} Baris</span>
+                                    <span class="lang-en">{{ $totalSentencesEvaluated }} Lines</span>
+                                    <span class="lang-zh">{{ $totalSentencesEvaluated }} 行</span>
+                                </span>
                             </div>
                         </div>
 
                         {{-- Score 3 --}}
                         <div class="flex items-center justify-between">
                             <div>
-                                <h4 class="text-xs font-black text-gray-800 uppercase tracking-tight">Inter-Rater Agreement</h4>
-                                <p class="text-[0.6rem] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Koefisien Cohen's Kappa (κ)</p>
+                                <h4 class="text-xs font-black text-gray-800 uppercase tracking-tight">
+                                    <span class="lang-id">Inter-Rater Agreement</span>
+                                    <span class="lang-en">Inter-Rater Agreement</span>
+                                    <span class="lang-zh">评分者间一致性</span>
+                                </h4>
+                                <p class="text-[0.6rem] text-gray-400 font-bold uppercase tracking-wider mt-0.5">
+                                    <span class="lang-id">Koefisien Cohen's Kappa (κ)</span>
+                                    <span class="lang-en">Cohen's Kappa Coefficient (κ)</span>
+                                    <span class="lang-zh">Cohen's Kappa 系数 (κ)</span>
+                                </p>
                             </div>
                             <div class="text-right">
                                 <span class="block font-black text-xl text-gray-800">{{ $kappa }}</span>
-                                <span class="block text-[0.55rem] font-black text-gray-400 bg-gray-50 px-2 py-0.5 rounded-lg uppercase tracking-wider mt-0.5">Empiris DB</span>
+                                <span class="block text-[0.55rem] font-black text-gray-400 bg-gray-50 px-2 py-0.5 rounded-lg uppercase tracking-wider mt-0.5">
+                                    <span class="lang-id">Empiris DB</span>
+                                    <span class="lang-en">Empirical DB</span>
+                                    <span class="lang-zh">经验数据库</span>
+                                </span>
                             </div>
                         </div>
 
                         {{-- Stats Trigger --}}
                         <button @click="showStatsModal = true" class="mt-4 w-full py-3 px-4 rounded-2xl bg-green-50 text-green-700 hover:bg-green-100 transition-all font-bold text-xs flex items-center justify-center gap-2 cursor-pointer border border-green-100">
                             <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
-                            Analisis Sebaran & Grafik
+                            <span class="lang-id">Analisis Sebaran & Grafik</span>
+                            <span class="lang-en">Distribution Analysis & Charts</span>
+                            <span class="lang-zh">分布分析与图表</span>
                         </button>
                     </div>
                 </div>
@@ -240,8 +457,16 @@
                             <i data-lucide="award" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <span class="block text-[0.6rem] font-black text-red-200 uppercase tracking-widest">Luaran Riset</span>
-                            <h3 class="text-base font-black uppercase tracking-wide">Pilar Novelty</h3>
+                            <span class="block text-[0.6rem] font-black text-red-200 uppercase tracking-widest">
+                                <span class="lang-id">Luaran Riset</span>
+                                <span class="lang-en">Research Outputs</span>
+                                <span class="lang-zh">研究产出</span>
+                            </span>
+                            <h3 class="text-base font-black uppercase tracking-wide">
+                                <span class="lang-id">Pilar Novelty</span>
+                                <span class="lang-en">Core Pillars of Novelty</span>
+                                <span class="lang-zh">核心创新点</span>
+                            </h3>
                         </div>
                     </div>
 
@@ -249,24 +474,48 @@
                         <div class="flex gap-4">
                             <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-xs text-bima-red shrink-0">1</div>
                             <div>
-                                <h4 class="text-xs font-bold uppercase tracking-wide">Otomatisasi AWK Komputasional</h4>
-                                <p class="text-[0.65rem] text-gray-400 mt-1 leading-relaxed">Menggantikan proses manual kajian AWK yang lama dengan pemetaan komputasi asinkron berkecepatan tinggi.</p>
+                                <h4 class="text-xs font-bold uppercase tracking-wide">
+                                    <span class="lang-id">Otomatisasi AWK Komputasional</span>
+                                    <span class="lang-en">Automated Computational CDA</span>
+                                    <span class="lang-zh">自动计算 CDA 建模</span>
+                                </h4>
+                                <p class="text-[0.65rem] text-gray-400 mt-1 leading-relaxed">
+                                    <span class="lang-id">Menggantikan proses manual kajian AWK yang lama dengan pemetaan komputasi asinkron berkecepatan tinggi.</span>
+                                    <span class="lang-en">Replacing the labor-intensive manual CDA study processes with high-speed asynchronous computational mapping.</span>
+                                    <span class="lang-zh">利用高速异步计算映射，取代费时费力的人工 CDA 分析过程。</span>
+                                </p>
                             </div>
                         </div>
 
                         <div class="flex gap-4">
                             <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-xs text-bima-red shrink-0">2</div>
                             <div>
-                                <h4 class="text-xs font-bold uppercase tracking-wide">Multimodalitas Akustik Tunggal</h4>
-                                <p class="text-[0.65rem] text-gray-400 mt-1 leading-relaxed">Menjadi riset pertama di Indonesia yang mendeteksi relasi kuasa langsung dari gelombang suara mentah, bukan sekadar dari transkrip bisu.</p>
+                                <h4 class="text-xs font-bold uppercase tracking-wide">
+                                    <span class="lang-id">Multimodalitas Akustik Tunggal</span>
+                                    <span class="lang-en">Single Acoustic Multimodality</span>
+                                    <span class="lang-zh">纯声学多模态建模</span>
+                                </h4>
+                                <p class="text-[0.65rem] text-gray-400 mt-1 leading-relaxed">
+                                    <span class="lang-id">Menjadi riset pertama di Indonesia yang mendeteksi relasi kuasa langsung dari gelombang suara mentah, bukan sekadar dari transkrip bisu.</span>
+                                    <span class="lang-en">Marking the first research in Indonesia to detect power relations directly from raw audio waveforms, not just silent text transcripts.</span>
+                                    <span class="lang-zh">印尼国内首个直接从原始音频波形中检测权力关系的研究，而非局限于文字转录本身。</span>
+                                </p>
                             </div>
                         </div>
 
                         <div class="flex gap-4">
                             <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-xs text-bima-red shrink-0">3</div>
                             <div>
-                                <h4 class="text-xs font-bold uppercase tracking-wide">Visualisasi Interaktif Dinamis</h4>
-                                <p class="text-[0.65rem] text-gray-400 mt-1 leading-relaxed">Kurva intonasi reaktif yang memvisualisasikan dinamika fluktuasi kontrol wacana selama bimbingan secara real-time.</p>
+                                <h4 class="text-xs font-bold uppercase tracking-wide">
+                                    <span class="lang-id">Visualisasi Interaktif Dinamis</span>
+                                    <span class="lang-en">Dynamic Interactive Visualization</span>
+                                    <span class="lang-zh">动态交互式可视化</span>
+                                </h4>
+                                <p class="text-[0.65rem] text-gray-400 mt-1 leading-relaxed">
+                                    <span class="lang-id">Kurva intonasi reaktif yang memvisualisasikan dinamika fluktuasi kontrol wacana selama bimbingan secara real-time.</span>
+                                    <span class="lang-en">Reactive intonation curves that visualize the dynamics of discourse control fluctuations during supervision sessions in real-time.</span>
+                                    <span class="lang-zh">自适应语调曲线，可实时直观呈现指导会话期间话语控制波动的动态过程。</span>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -295,51 +544,101 @@
                             <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">Sebaran Statistik Riset</span>
-                            <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">Transparansi Metrik & Rumus Perhitungan Empiris</h3>
+                            <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">
+                                <span class="lang-id">Sebaran Statistik Riset</span>
+                                <span class="lang-en">Research Statistical Distribution</span>
+                                <span class="lang-zh">研究统计分布</span>
+                            </span>
+                            <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">
+                                <span class="lang-id">Transparansi Metrik & Rumus Perhitungan Empiris</span>
+                                <span class="lang-en">Metrics Transparency & Empirical Calculation Formula</span>
+                                <span class="lang-zh">指标透明度与经验计算公式</span>
+                            </h3>
                         </div>
                     </div>
 
                     <p class="text-gray-500 text-xs font-semibold leading-relaxed mb-6">
-                        Berikut adalah rincian data mentah, rumus matematika, dan alur komputasi empiris yang melandasi hasil akurasi sistem kecerdasan Supervisory AI Anda:
+                        <span class="lang-id">Berikut adalah rincian data mentah, rumus matematika, dan alur komputasi empiris yang melandasi hasil akurasi sistem kecerdasan Supervisory AI Anda:</span>
+                        <span class="lang-en">The following is the detailed raw data, mathematical formulas, and empirical computing flow that underpin the accuracy of your Supervisory AI system:</span>
+                        <span class="lang-zh">以下是支撑您的 Supervisory AI 智能系统准确度的详细原始数据、数学公式和经验计算流程:</span>
                     </p>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         {{-- Card 1: Sesi Global --}}
                         <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                            <span class="text-[0.55rem] font-black text-gray-400 uppercase tracking-wider block mb-2">Input Sesi Global</span>
+                            <span class="text-[0.55rem] font-black text-gray-400 uppercase tracking-wider block mb-2">
+                                <span class="lang-id">Input Sesi Global</span>
+                                <span class="lang-en">Global Session Inputs</span>
+                                <span class="lang-zh">全局会话输入</span>
+                            </span>
                             <div class="grid grid-cols-2 gap-2 text-xs font-medium text-gray-600">
-                                <div>Sesi Akurat:</div>
+                                <div>
+                                    <span class="lang-id">Sesi Akurat:</span>
+                                    <span class="lang-en">Accurate Sessions:</span>
+                                    <span class="lang-zh">准确会话数:</span>
+                                </div>
                                 <div class="font-bold text-gray-900 text-right">{{ $accurateFeedbacks }} Sesi</div>
-                                <div>Sesi Koreksi:</div>
+                                <div>
+                                    <span class="lang-id">Sesi Koreksi:</span>
+                                    <span class="lang-en">Corrected Sessions:</span>
+                                    <span class="lang-zh">纠偏会话数:</span>
+                                </div>
                                 <div class="font-bold text-gray-900 text-right">{{ $totalFeedbacks - $accurateFeedbacks }} Sesi</div>
-                                <div class="border-t border-gray-200 pt-2">Total Sesi:</div>
+                                <div class="border-t border-gray-200 pt-2">
+                                    <span class="lang-id">Total Sesi:</span>
+                                    <span class="lang-en">Total Sessions:</span>
+                                    <span class="lang-zh">总会话数:</span>
+                                </div>
                                 <div class="border-t border-gray-200 pt-2 font-bold text-gray-900 text-right">{{ $totalFeedbacks }} Sesi</div>
                             </div>
                         </div>
 
                         {{-- Card 2: Kalimat Wacana --}}
                         <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                            <span class="text-[0.55rem] font-black text-gray-400 uppercase tracking-wider block mb-2">Input Kalimat Wacana</span>
+                            <span class="text-[0.55rem] font-black text-gray-400 uppercase tracking-wider block mb-2">
+                                <span class="lang-id">Input Kalimat Wacana</span>
+                                <span class="lang-en">Discourse Sentence Inputs</span>
+                                <span class="lang-zh">话语单行输入</span>
+                            </span>
                             <div class="grid grid-cols-2 gap-2 text-xs font-medium text-gray-600">
-                                <div>Kalimat Sesuai:</div>
+                                <div>
+                                    <span class="lang-id">Kalimat Sesuai:</span>
+                                    <span class="lang-en">Accurate Lines:</span>
+                                    <span class="lang-zh">符合行数:</span>
+                                </div>
                                 <div class="font-bold text-gray-900 text-right">{{ $positiveSentences }} Baris</div>
-                                <div>Kalimat Koreksi:</div>
+                                <div>
+                                    <span class="lang-id">Kalimat Koreksi:</span>
+                                    <span class="lang-en">Corrected Lines:</span>
+                                    <span class="lang-zh">纠正行数:</span>
+                                </div>
                                 <div class="font-bold text-gray-900 text-right">{{ $negativeSentences }} Baris</div>
-                                <div class="border-t border-gray-200 pt-2">Total Kalimat:</div>
+                                <div class="border-t border-gray-200 pt-2">
+                                    <span class="lang-id">Total Kalimat:</span>
+                                    <span class="lang-en">Total Lines:</span>
+                                    <span class="lang-zh">总行数:</span>
+                                </div>
                                 <div class="border-t border-gray-200 pt-2 font-bold text-gray-900 text-right">{{ $totalSentencesEvaluated }} Baris</div>
                             </div>
                         </div>
 
                         {{-- Card 3: Kappa Variables --}}
                         <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                            <span class="text-[0.55rem] font-black text-gray-400 uppercase tracking-wider block mb-2">Variabel Cohen's Kappa</span>
+                            <span class="text-[0.55rem] font-black text-gray-400 uppercase tracking-wider block mb-2">
+                                <span class="lang-id">Variabel Cohen's Kappa</span>
+                                <span class="lang-en">Cohen's Kappa Variables</span>
+                                <span class="lang-zh">Cohen's Kappa 变量</span>
+                            </span>
                             <div class="grid grid-cols-2 gap-2 text-xs font-medium text-gray-600">
                                 <div>Observed (Po):</div>
                                 <div class="font-bold text-gray-900 text-right">{{ $totalSentencesEvaluated > 0 ? round($positiveSentences / $totalSentencesEvaluated, 3) : 0.8 }}</div>
                                 <div>Chance (Pe):</div>
-                                <div class="font-bold text-gray-900 text-right">0.500</div>
-                                <div class="border-t border-gray-200 pt-2">Koefisien (κ):</div>
+                                <div class="font-bold text-gray-900 text-right font-mono">0.500</div>
+                                <div class="border-t border-gray-200 pt-2">
+                                    <span class="lang-id">Koefisien (κ):</span>
+                                    <span class="lang-en">Coefficient (κ):</span>
+                                    <span class="lang-zh">Kappa 系数 (κ):</span>
+                                </div>
                                 <div class="border-t border-gray-200 pt-2 font-bold text-green-600 text-right">{{ $kappa }}</div>
                             </div>
                         </div>
@@ -349,7 +648,11 @@
                         {{-- Section 1: Global Accuracy --}}
                         <div class="border-b border-gray-100 pb-6">
                             <div class="flex justify-between items-center text-xs font-black text-gray-800 uppercase mb-2">
-                                <span>Akurasi Konsensus Sesi Global</span>
+                                <span>
+                                    <span class="lang-id">Akurasi Konsensus Sesi Global</span>
+                                    <span class="lang-en">Global Session Consensus Accuracy</span>
+                                    <span class="lang-zh">全局会话专家共识准确率</span>
+                                </span>
                                 <span class="text-green-600 text-sm font-black">{{ $accuracyRate }}%</span>
                             </div>
                             <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden flex mb-4">
@@ -361,16 +664,32 @@
                             
                             {{-- Mathematical Formulation --}}
                             <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 font-mono text-[0.7rem] text-gray-700 leading-relaxed space-y-2">
-                                <div class="font-black text-gray-500 uppercase tracking-wider text-[0.55rem] font-sans mb-1">Rumus Komputasi & Alur Matematika</div>
-                                <div>Formula: Akurasi = (Sesi Akurat / Total Sesi) x 100%</div>
-                                <div class="text-gray-900 font-bold">Langkah: ({{ $accurateFeedbacks }} / {{ $totalFeedbacks }}) x 100% = {{ $accuracyRate }}%</div>
+                                <div class="font-black text-gray-500 uppercase tracking-wider text-[0.55rem] font-sans mb-1">
+                                    <span class="lang-id">Rumus Komputasi & Alur Matematika</span>
+                                    <span class="lang-en">Computation Formula & Mathematical Flow</span>
+                                    <span class="lang-zh">计算公式与数学流程</span>
+                                </div>
+                                <div>
+                                    <span class="lang-id">Formula: Akurasi = (Sesi Akurat / Total Sesi) x 100%</span>
+                                    <span class="lang-en">Formula: Accuracy = (Accurate Sessions / Total Sessions) x 100%</span>
+                                    <span class="lang-zh">公式: 准确率 = (准确会话 / 总会话) x 100%</span>
+                                </div>
+                                <div class="text-gray-900 font-bold">
+                                    <span class="lang-id">Langkah: ({{ $accurateFeedbacks }} / {{ $totalFeedbacks }}) x 100% = {{ $accuracyRate }}%</span>
+                                    <span class="lang-en">Steps: ({{ $accurateFeedbacks }} / {{ $totalFeedbacks }}) x 100% = {{ $accuracyRate }}%</span>
+                                    <span class="lang-zh">计算步骤: ({{ $accurateFeedbacks }} / {{ $totalFeedbacks }}) x 100% = {{ $accuracyRate }}%</span>
+                                </div>
                             </div>
                         </div>
 
                         {{-- Section 2: Sentence Accuracy --}}
                         <div class="border-b border-gray-100 pb-6">
                             <div class="flex justify-between items-center text-xs font-black text-gray-800 uppercase mb-2">
-                                <span>Akurasi Anotasi Kalimat Wacana</span>
+                                <span>
+                                    <span class="lang-id">Akurasi Anotasi Kalimat Wacana</span>
+                                    <span class="lang-en">Discourse Sentence Annotation Accuracy</span>
+                                    <span class="lang-zh">话语行标注一致准确率</span>
+                                </span>
                                 <span class="text-green-600 text-sm font-black">{{ $sentenceAccuracy }}%</span>
                             </div>
                             <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden flex mb-4">
@@ -382,9 +701,21 @@
                             
                             {{-- Mathematical Formulation --}}
                             <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 font-mono text-[0.7rem] text-gray-700 leading-relaxed space-y-2">
-                                <div class="font-black text-gray-500 uppercase tracking-wider text-[0.55rem] font-sans mb-1">Rumus Komputasi & Alur Matematika</div>
-                                <div>Formula: Akurasi = (Kalimat Sesuai / Total Kalimat Dinilai) x 100%</div>
-                                <div class="text-gray-900 font-bold">Langkah: ({{ $positiveSentences }} / {{ $totalSentencesEvaluated }}) x 100% = {{ $sentenceAccuracy }}%</div>
+                                <div class="font-black text-gray-500 uppercase tracking-wider text-[0.55rem] font-sans mb-1">
+                                    <span class="lang-id">Rumus Komputasi & Alur Matematika</span>
+                                    <span class="lang-en">Computation Formula & Mathematical Flow</span>
+                                    <span class="lang-zh">计算公式与数学流程</span>
+                                </div>
+                                <div>
+                                    <span class="lang-id">Formula: Akurasi = (Kalimat Sesuai / Total Kalimat Dinilai) x 100%</span>
+                                    <span class="lang-en">Formula: Accuracy = (Accurate Lines / Total Rated Lines) x 100%</span>
+                                    <span class="lang-zh">公式: 准确率 = (符合行数 / 总评定行数) x 100%</span>
+                                </div>
+                                <div class="text-gray-900 font-bold">
+                                    <span class="lang-id">Langkah: ({{ $positiveSentences }} / {{ $totalSentencesEvaluated }}) x 100% = {{ $sentenceAccuracy }}%</span>
+                                    <span class="lang-en">Steps: ({{ $positiveSentences }} / {{ $totalSentencesEvaluated }}) x 100% = {{ $sentenceAccuracy }}%</span>
+                                    <span class="lang-zh">计算步骤: ({{ $positiveSentences }} / {{ $totalSentencesEvaluated }}) x 100% = {{ $sentenceAccuracy }}%</span>
+                                </div>
                             </div>
                         </div>
 
@@ -394,7 +725,11 @@
                                 $kappaPercentage = max(0, min(100, $kappa * 100));
                             @endphp
                             <div class="flex justify-between items-center text-xs font-black text-gray-800 uppercase mb-2">
-                                <span>Koefisien Reliabilitas Inter-Rater (κ)</span>
+                                <span>
+                                    <span class="lang-id">Koefisien Reliabilitas Inter-Rater (κ)</span>
+                                    <span class="lang-en">Inter-Rater Reliability Coefficient (κ)</span>
+                                    <span class="lang-zh">评分者间一致性信度系数 (κ)</span>
+                                </span>
                                 <span class="text-green-600 text-sm font-black">{{ $kappa }}</span>
                             </div>
                             <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden flex mb-4">
@@ -406,10 +741,22 @@
                             
                             {{-- Mathematical Formulation --}}
                             <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 font-mono text-[0.7rem] text-gray-700 leading-relaxed space-y-2">
-                                <div class="font-black text-gray-500 uppercase tracking-wider text-[0.55rem] font-sans mb-1">Rumus Komputasi & Alur Matematika</div>
+                                <div class="font-black text-gray-500 uppercase tracking-wider text-[0.55rem] font-sans mb-1">
+                                    <span class="lang-id">Rumus Komputasi & Alur Matematika</span>
+                                    <span class="lang-en">Computation Formula & Mathematical Flow</span>
+                                    <span class="lang-zh">计算公式与数学流程</span>
+                                </div>
                                 <div>Formula: Kappa = (Po - Pe) / (1 - Pe)</div>
-                                <div>Di mana: Po (Observed Agreement) = {{ $totalSentencesEvaluated > 0 ? round($positiveSentences / $totalSentencesEvaluated, 3) : 0.8 }} || Pe (Chance Agreement) = 0.5</div>
-                                <div class="text-gray-900 font-bold">Langkah: ({{ $totalSentencesEvaluated > 0 ? round($positiveSentences / $totalSentencesEvaluated, 3) : 0.8 }} - 0.5) / (1 - 0.5) = {{ $kappa }}</div>
+                                <div>
+                                    <span class="lang-id">Di mana: Po (Observed Agreement) = {{ $totalSentencesEvaluated > 0 ? round($positiveSentences / $totalSentencesEvaluated, 3) : 0.8 }} || Pe (Chance Agreement) = 0.5</span>
+                                    <span class="lang-en">Where: Po (Observed Agreement) = {{ $totalSentencesEvaluated > 0 ? round($positiveSentences / $totalSentencesEvaluated, 3) : 0.8 }} || Pe (Chance Agreement) = 0.5</span>
+                                    <span class="lang-zh">其中: Po (观测一致性) = {{ $totalSentencesEvaluated > 0 ? round($positiveSentences / $totalSentencesEvaluated, 3) : 0.8 }} || Pe (偶然一致性) = 0.5</span>
+                                </div>
+                                <div class="text-gray-900 font-bold">
+                                    <span class="lang-id">Langkah: ({{ $totalSentencesEvaluated > 0 ? round($positiveSentences / $totalSentencesEvaluated, 3) : 0.8 }} - 0.5) / (1 - 0.5) = {{ $kappa }}</span>
+                                    <span class="lang-en">Steps: ({{ $totalSentencesEvaluated > 0 ? round($positiveSentences / $totalSentencesEvaluated, 3) : 0.8 }} - 0.5) / (1 - 0.5) = {{ $kappa }}</span>
+                                    <span class="lang-zh">计算步骤: ({{ $totalSentencesEvaluated > 0 ? round($positiveSentences / $totalSentencesEvaluated, 3) : 0.8 }} - 0.5) / (1 - 0.5) = {{ $kappa }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -437,26 +784,48 @@
                                 <i data-lucide="database" class="w-5 h-5"></i>
                             </div>
                             <div>
-                                <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">Eksplorasi Korpus BIMA</span>
-                                <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">Korpus Digital Percakapan Teranotasi (Gold Dataset)</h3>
+                                <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">
+                                    <span class="lang-id">Eksplorasi Korpus BIMA</span>
+                                    <span class="lang-en">BIMA Corpus Explorer</span>
+                                    <span class="lang-zh">BIMA 语料库检索</span>
+                                </span>
+                                <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">
+                                    <span class="lang-id">Korpus Digital Percakapan Teranotasi (Gold Dataset)</span>
+                                    <span class="lang-en">Annotated Digital Conversation Corpus (Gold Dataset)</span>
+                                    <span class="lang-zh">已标注数字对话语料库 (黄金数据集)</span>
+                                </h3>
                             </div>
                         </div>
 
                         {{-- Stats Badge --}}
                         <div class="flex gap-3">
                             <div class="bg-gray-50 border border-gray-100 rounded-2xl py-2 px-4 text-center">
-                                <span class="block text-[0.5rem] font-black text-gray-400 uppercase tracking-wider">Akurasi Kalimat</span>
+                                <span class="block text-[0.5rem] font-black text-gray-400 uppercase tracking-wider">
+                                    <span class="lang-id">Akurasi Kalimat</span>
+                                    <span class="lang-en">Sentence Accuracy</span>
+                                    <span class="lang-zh">单行准确度</span>
+                                </span>
                                 <span class="block font-black text-sm text-green-600">{{ $sentenceAccuracy }}%</span>
                             </div>
                             <div class="bg-gray-50 border border-gray-100 rounded-2xl py-2 px-4 text-center">
-                                <span class="block text-[0.5rem] font-black text-gray-400 uppercase tracking-wider">Jumlah Dataset</span>
-                                <span class="block font-black text-sm text-gray-800">{{ count($evaluatedLines) }} Baris</span>
+                                <span class="block text-[0.5rem] font-black text-gray-400 uppercase tracking-wider">
+                                    <span class="lang-id">Jumlah Dataset</span>
+                                    <span class="lang-en">Dataset Size</span>
+                                    <span class="lang-zh">数据集规模</span>
+                                </span>
+                                <span class="block font-black text-sm text-gray-800">
+                                    <span class="lang-id">{{ count($evaluatedLines) }} Baris</span>
+                                    <span class="lang-en">{{ count($evaluatedLines) }} Lines</span>
+                                    <span class="lang-zh">{{ count($evaluatedLines) }} 行</span>
+                                </span>
                             </div>
                         </div>
                     </div>
 
                     <p class="text-gray-500 text-xs font-semibold leading-relaxed mb-6">
-                        Berikut adalah daftar seluruh baris wacana bimbingan akademik yang telah divalidasi langsung oleh Dosen Senior melalui tombol Jempol Atas (Sesuai) maupun Jempol Bawah (Koreksi) pada dashboard Supervisory AI.
+                        <span class="lang-id">Berikut adalah daftar seluruh baris wacana bimbingan akademik yang telah divalidasi langsung oleh Dosen Senior melalui tombol Jempol Atas (Sesuai) maupun Jempol Bawah (Koreksi) pada dashboard Supervisory AI.</span>
+                        <span class="lang-en">The following is the list of all academic supervision discourse lines validated directly by Senior Supervisors via the Thumbs Up (Accurate) or Thumbs Down (Corrected) buttons on the Supervisory AI dashboard.</span>
+                        <span class="lang-zh">以下是资深导师通过 Supervisory AI 面板上的“符合事实”（大拇指向上）或“有待商榷”（大拇指向下）按钮直接验证的所有学术指导对话行列表。</span>
                     </p>
 
                     {{-- Table --}}
@@ -464,11 +833,31 @@
                         <table class="w-full text-left text-xs border-collapse">
                             <thead class="sticky top-0 bg-gray-950 text-white font-black uppercase text-[0.65rem] tracking-wider z-20">
                                 <tr>
-                                    <th class="py-4 px-5">Sesi Rekaman</th>
-                                    <th class="py-4 px-5">Pembicara</th>
-                                    <th class="py-4 px-5">Transkrip Wacana (AWK)</th>
-                                    <th class="py-4 px-5 text-center">Status Validasi</th>
-                                    <th class="py-4 px-5">Penjelasan Politeness / Power</th>
+                                    <th class="py-4 px-5">
+                                        <span class="lang-id">Sesi Rekaman</span>
+                                        <span class="lang-en">Recording Session</span>
+                                        <span class="lang-zh">录音会话</span>
+                                    </th>
+                                    <th class="py-4 px-5">
+                                        <span class="lang-id">Pembicara</span>
+                                        <span class="lang-en">Speaker</span>
+                                        <span class="lang-zh">说话人</span>
+                                    </th>
+                                    <th class="py-4 px-5">
+                                        <span class="lang-id">Transkrip Wacana (AWK)</span>
+                                        <span class="lang-en">Discourse Transcript (CDA)</span>
+                                        <span class="lang-zh">对话转录 (CDA)</span>
+                                    </th>
+                                    <th class="py-4 px-5 text-center">
+                                        <span class="lang-id">Status Validasi</span>
+                                        <span class="lang-en">Validation Status</span>
+                                        <span class="lang-zh">验证状态</span>
+                                    </th>
+                                    <th class="py-4 px-5">
+                                        <span class="lang-id">Penjelasan Politeness / Power</span>
+                                        <span class="lang-en">Politeness / Power Explanation</span>
+                                        <span class="lang-zh">礼貌与权力解析</span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 font-medium text-gray-700">
@@ -478,8 +867,18 @@
                                             {{ $line['analysis_title'] }}
                                         </td>
                                         <td class="py-4 px-5 shrink-0">
-                                            <span class="px-2.5 py-1 rounded-lg text-[0.65rem] font-bold uppercase tracking-wider {{ $line['speaker'] === 'Dosen' ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-blue-50 text-blue-600 border border-blue-100' }}">
-                                                {{ $line['speaker'] }}
+                                            <span class="px-2.5 py-1 rounded-lg text-[0.65rem] font-bold uppercase tracking-wider {{ strtolower($line['speaker'] ?? '') === 'dosen' ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-blue-50 text-blue-600 border border-blue-100' }}">
+                                                @if(strtolower($line['speaker'] ?? '') === 'dosen')
+                                                    <span class="lang-id">Dosen</span>
+                                                    <span class="lang-en">Supervisor</span>
+                                                    <span class="lang-zh">导师</span>
+                                                @elseif(strtolower($line['speaker'] ?? '') === 'mahasiswa')
+                                                    <span class="lang-id">Mahasiswa</span>
+                                                    <span class="lang-en">Student</span>
+                                                    <span class="lang-zh">学生</span>
+                                                @else
+                                                    {{ $line['speaker'] }}
+                                                @endif
                                             </span>
                                         </td>
                                         <td class="py-4 px-5 text-gray-800 leading-relaxed font-semibold max-w-[300px]">
@@ -491,14 +890,18 @@
                                                     <svg class="w-3.5 h-3.5 text-green-600 shrink-0" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                                     </svg>
-                                                    SESUAI
+                                                    <span class="lang-id">SESUAI</span>
+                                                    <span class="lang-en">ACCURATE</span>
+                                                    <span class="lang-zh">符合事实</span>
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[0.65rem] font-black text-red-700 bg-red-50 border border-red-100 uppercase tracking-widest">
                                                     <svg class="w-3.5 h-3.5 text-red-600 shrink-0" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                                     </svg>
-                                                    KOREKSI
+                                                    <span class="lang-id">KOREKSI</span>
+                                                    <span class="lang-en">CORRECTED</span>
+                                                    <span class="lang-zh">有待商榷</span>
                                                 </span>
                                             @endif
                                         </td>
@@ -510,7 +913,9 @@
                                     <tr>
                                         <td colspan="5" class="py-12 text-center text-gray-400 font-bold">
                                             <i data-lucide="database-backup" class="w-8 h-8 mx-auto mb-3 opacity-50"></i>
-                                            Belum ada responden/evaluasi baris kalimat wacana yang terekam di database.
+                                            <span class="lang-id">Belum ada responden/evaluasi baris kalimat wacana yang terekam di database.</span>
+                                            <span class="lang-en">No discourse line evaluation has been recorded in the database yet.</span>
+                                            <span class="lang-zh">数据库中尚无已记录的话语行评估数据。</span>
                                         </td>
                                     </tr>
                                 @endforelse

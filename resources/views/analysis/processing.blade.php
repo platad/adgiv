@@ -13,8 +13,16 @@
                 <div class="absolute inset-0 border-4 border-dashed border-bima-red/20 rounded-full animate-spin"></div>
             </div>
 
-            <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter mb-4">Supervisory AI Sedang Bekerja</h1>
-            <p class="text-gray-500 font-medium mb-8">Memproses sesi <span class="font-bold text-gray-900">"{{ $analysis->title }}"</span></p>
+            <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter mb-4">
+                <span class="lang-id">Supervisory AI Sedang Bekerja</span>
+                <span class="lang-en">Supervisory AI is Working</span>
+                <span class="lang-zh">Supervisory AI 正在深度处理中</span>
+            </h1>
+            <p class="text-gray-500 font-medium mb-8">
+                <span class="lang-id">Memproses sesi <span class="font-bold text-gray-900">"{{ $analysis->title }}"</span></span>
+                <span class="lang-en">Processing session <span class="font-bold text-gray-900">"{{ $analysis->title }}"</span></span>
+                <span class="lang-zh">正在计算分析会话：<span class="font-bold text-gray-900">"{{ $analysis->title }}"</span></span>
+            </p>
 
             {{-- Step Indicators --}}
             <div class="space-y-4 max-w-md mx-auto text-left">
@@ -95,7 +103,11 @@
                     <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
-                    <span class="text-base font-black uppercase tracking-tight text-gray-900">Gagal Memproses Hasil</span>
+                    <span class="text-base font-black uppercase tracking-tight text-gray-900">
+                        <span class="lang-id">Gagal Memproses Hasil</span>
+                        <span class="lang-en">Failed to Process Results</span>
+                        <span class="lang-zh">计算融合诊断结果失败</span>
+                    </span>
                 </div>
                 <p class="text-gray-600 mb-6 leading-relaxed" x-text="error"></p>
                 
@@ -105,12 +117,16 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
-                        Ulangi Proses Sintesis
+                        <span class="lang-id">Ulangi Proses Sintesis</span>
+                        <span class="lang-en">Retry Synthesis Process</span>
+                        <span class="lang-zh">重试融合计算</span>
                     </button>
                     
                     {{-- Go Back / Upload New File --}}
                     <a href="{{ route('analysis.create') }}" class="w-full sm:w-auto bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-6 py-3 rounded-xl transition-all text-center">
-                        Upload Ulang File
+                        <span class="lang-id">Upload Ulang File</span>
+                        <span class="lang-en">Re-upload File</span>
+                        <span class="lang-zh">重新上传文件</span>
                     </a>
                 </div>
             </div>
@@ -119,13 +135,90 @@
     </div>
 
     <script>
+        const activeLang = '{{ app()->getLocale() }}';
         document.addEventListener('alpine:init', () => {
             Alpine.data('processingFlow', (processUrl) => ({
-                steps: [
+                steps: (activeLang === 'zh') ? [
+                    {
+                        title: '整合分析切片',
+                        subSteps: [
+                            '正在读取所有已分析的音频分段数据...',
+                            '正在按时间线对齐时间戳记录...'
+                        ]
+                    },
+                    {
+                        title: 'GPT-4o 智能体融合计算',
+                        subSteps: [
+                            '正在初始化 GPT-4o 深度融合智能体...',
+                            '正在对重叠区域进行文本去重处理...',
+                            '正在优化和润色学术话语语义转译...'
+                        ]
+                    },
+                    {
+                        title: '同步 C-CDA 语义参数',
+                        subSteps: [
+                            '正在构建 Advice-Giving 建议特征图谱...',
+                            '正在测算学术话语支配性权力指数 (Power Relation)...',
+                            '正在分类学术建议策略维度 (指令性/启发性)...'
+                        ]
+                    },
+                    {
+                        title: '计算系统性能度量',
+                        subSteps: [
+                            '正在测算本会话的主观声学分类置信度...',
+                            '正在计算系统专家标定 Cohen\'s Kappa 一致性系数...'
+                        ]
+                    },
+                    {
+                        title: '构建可视化仪表板',
+                        subSteps: [
+                            '正在归纳整理 Supervisory AI 核心诊断报告...',
+                            '正在初始化交互式多模态分析图表...'
+                        ]
+                    }
+                ] : ((activeLang === 'en') ? [
+                    {
+                        title: 'Compiling Analysis Chunks',
+                        subSteps: [
+                            'Reading analyzed audio segment records...',
+                            'Aligning conversational timestamps chronologically...'
+                        ]
+                    },
+                    {
+                        title: 'GPT-4o Agent Merging Results',
+                        subSteps: [
+                            'Initializing GPT-4o synthesis agent...',
+                            'Performing sequence text deduplication in overlap regions...',
+                            'Polishing and structuring academic discourse transcription...'
+                        ]
+                    },
+                    {
+                        title: 'Synchronizing C-CDA Elements',
+                        subSteps: [
+                            'Structuring advice-giving classification map...',
+                            'Calculating conversational power dynamics index...',
+                            'Extracting academic advice types (Directive/Corrective)...'
+                        ]
+                    },
+                    {
+                        title: 'Evaluating Academic Metrics',
+                        subSteps: [
+                            'Evaluating precision rates and speech confidence levels...',
+                            'Calculating experts annotations Cohen\'s Kappa agreement rate...'
+                        ]
+                    },
+                    {
+                        title: 'Assembling Results Dashboard',
+                        subSteps: [
+                            'Compiling Supervisory AI diagnostic summaries...',
+                            'Preparing dynamic multi-modal data visualizations...'
+                        ]
+                    }
+                ] : [
                     {
                         title: 'Mengompilasi Potongan Analisis',
                         subSteps: [
-                            'Membaca data dari 3 segmen audio teranalisis...',
+                            'Membaca data dari segmen audio teranalisis...',
                             'Menyelaraskan stempel waktu (timestamps) secara kronologis...'
                         ]
                     },
@@ -159,7 +252,7 @@
                             'Mempersiapkan visualisasi grafik interaktif...'
                         ]
                     }
-                ],
+                ]),
                 currentStep: 0,
                 currentSubStep: 0,
                 error: null,
@@ -224,11 +317,11 @@
                                 window.location.href = data.redirect;
                             }, 800);
                         } else {
-                            this.error = data.message || 'Terjadi kesalahan sistem saat penggabungan oleh Agen AI.';
+                            this.error = data.message || (activeLang === 'zh' ? '智能体融合数据时服务器发生错误。' : (activeLang === 'en' ? 'Server error occurred during AI agent synthesis.' : 'Terjadi kesalahan sistem saat penggabungan oleh Agen AI.'));
                             this.currentStep = -1;
                         }
                     } catch (err) {
-                        this.error = 'Koneksi terputus. Silakan periksa jaringan server Anda.';
+                        this.error = (activeLang === 'zh' ? '网络连接已断开，请检查您的服务器链路状态。' : (activeLang === 'en' ? 'Network connection lost. Please check your server status.' : 'Koneksi terputus. Silakan periksa jaringan server Anda.'));
                         this.currentStep = -1;
                     }
                 }

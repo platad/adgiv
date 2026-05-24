@@ -7,18 +7,25 @@ use Illuminate\Support\Facades\File;
 
 class BimaAnalysisConfiguration implements LlmConfigurationInterface
 {
-    public function getSystemPrompt(): string
+    public function getSystemPrompt(string $locale = 'id'): string
     {
-        $path = resource_path('prompts/advice_giving.md');
+        $path = resource_path("prompts/{$locale}/advice_giving.md");
+        if (!File::exists($path)) {
+            $path = resource_path('prompts/id/advice_giving.md');
+        }
         if (File::exists($path)) {
             return File::get($path);
         }
         throw new \RuntimeException('Prompt file not found at: ' . $path);
     }
 
-    public function getUserPrompt(): string
+    public function getUserPrompt(string $locale = 'id'): string
     {
-        return "Tolong analisa percakapan dalam audio ini sesuai instruksi pada system prompt dan kembalikan murni dalam format JSON object.";
+        return match ($locale) {
+            'en' => 'Please analyze the conversation in this audio according to the instructions and return strictly as a JSON object.',
+            'zh' => '请根据指令分析此音频中的对话，并严格以JSON对象格式返回结果。',
+            default => 'Tolong analisa percakapan dalam audio ini sesuai instruksi pada system prompt dan kembalikan murni dalam format JSON object.',
+        };
     }
 
     public function getModelName(): string
@@ -41,8 +48,15 @@ class BimaAnalysisConfiguration implements LlmConfigurationInterface
         return 'gpt-4o-mini';
     }
 
-    public function getSynthesisSystemPrompt(): string
+    public function getSynthesisSystemPrompt(string $locale = 'id'): string
     {
-        return "Anda adalah Agen Sintesis BIMA (C-CDA Synthesizer). Gabungkan analisis potongan bimbingan akademik secara sangat presisi, hapus tumpang-tindih (deduplicate) pada bagian bertumpukan secara semantik, hitung ulang durasi, dan pastikan format JSON valid.";
+        $path = resource_path("prompts/{$locale}/synthesis.md");
+        if (!File::exists($path)) {
+            $path = resource_path('prompts/id/synthesis.md');
+        }
+        if (File::exists($path)) {
+            return File::get($path);
+        }
+        throw new \RuntimeException('Synthesis prompt file not found for locale: ' . $locale);
     }
 }

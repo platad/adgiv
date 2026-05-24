@@ -55,12 +55,187 @@ class DashboardController extends Controller
             $totalSentencesEvaluated = 42; // Simulated base for demonstration
         }
 
+        // --- NEW: Dynamic User-level aggregates for actual data ---
+        $completedAnalyses = Analysis::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->get();
+
+        $totalDurationSeconds = 0;
+        foreach ($completedAnalyses as $analysis) {
+            $duration = $analysis->duration_seconds;
+            
+            // Fallback: If duration_seconds is 0 or null, parse result_data transcription timestamps
+            if (!$duration || $duration == 0) {
+                $data = $analysis->result_data;
+                if (is_array($data) && isset($data['transcription'])) {
+                    $trans = $data['transcription'];
+                    if (is_array($trans) && count($trans) > 0) {
+                        $lastBlock = end($trans);
+                        $timestamp = $lastBlock['timestamp'] ?? '';
+                        if ($timestamp) {
+                            $duration = $this->parseTimestampToSeconds($timestamp);
+                        }
+                    }
+                }
+            }
+            
+            // Second fallback: If still 0, calculate based on chunks or standard baseline
+            if (!$duration || $duration == 0) {
+                $chunksCount = count($analysis->result_data['chunks'] ?? []);
+                $duration = $chunksCount > 0 ? ($chunksCount * 15) : 12;
+            }
+            
+            $totalDurationSeconds += $duration;
+        }
+        
+        // Convert duration to human readable format (ID/EN/ZH)
+        $totalDurationFormatted = '';
+        if ($totalDurationSeconds > 0) {
+            $hours = floor($totalDurationSeconds / 3600);
+            $minutes = floor(($totalDurationSeconds % 3600) / 60);
+            $secs = $totalDurationSeconds % 60;
+            
+            if ($hours > 0) {
+                $totalDurationFormatted = [
+                    'id' => "{$hours} Jam {$minutes} Menit",
+                    'en' => "{$hours} hrs {$minutes} mins",
+                    'zh' => "{$hours} 小时 {$minutes} 分钟",
+                ];
+            } elseif ($minutes > 0) {
+                $totalDurationFormatted = [
+                    'id' => "{$minutes} Menit {$secs} Detik",
+                    'en' => "{$minutes} mins {$secs} secs",
+                    'zh' => "{$minutes} 分钟 {$secs} 秒",
+                ];
+            } else {
+                $totalDurationFormatted = [
+                    'id' => "{$secs} Detik",
+                    'en' => "{$secs} Secs",
+                    'zh' => "{$secs} 秒",
+                ];
+            }
+        } else {
+            $totalDurationFormatted = [
+                'id' => '0 Menit',
+                'en' => '0 Mins',
+                'zh' => '0 分钟',
+            ];
+        }
+
+        // Aggregate Advice Category & Relationship Pattern Distributions
+        $categoriesCount = [];
+        $relationsCount = [];
+        $recentInsights = [];
+
+        foreach ($completedAnalyses as $analysis) {
+            $data = $analysis->result_data;
+            if (is_array($data) && isset($data['summary'])) {
+                $summary = $data['summary'];
+                
+                // Category Advice
+                $cat = $summary['kategori_advice'] ?? null;
+                if ($cat && $cat !== '-') {
+                    $categoriesCount[$cat] = ($categoriesCount[$cat] ?? 0) + 1;
+                }
+                
+                // Relationship Character
+                $rel = $summary['karakter_relasi'] ?? null;
+                if ($rel && $rel !== '-') {
+                    $relationsCount[$rel] = ($relationsCount[$rel] ?? 0) + 1;
+                }
+            }
+        }
+
+        // Determine top dominant category
+        arsort($categoriesCount);
+        $topCategory = count($categoriesCount) > 0 ? key($categoriesCount) : null;
+
+        // Fallbacks for brand new databases to keep layout looking premium
+        $isSimulatedData = false;
+        if (count($categoriesCount) === 0) {
+            $isSimulatedData = true;
+            $categoriesCount = [
+                'Saran Bimbingan Akademik' => 3,
+                'Instruksi Direktif Dosen' => 2,
+                'Saran Akademik Terarah' => 1
+            ];
+            $relationsCount = [
+                'Koperatif & Dialogis' => 3,
+                'Relasi Kuasa Direktif Dosen' => 2,
+                'Kondusif & Seimbang' => 1
+            ];
+            $topCategory = 'Saran Bimbingan Akademik';
+        }
+
+        // Extract top 3 completed sessions for actionable AI Insights
+        $insightLimit = 3;
+        $insightCount = 0;
+        foreach ($completedAnalyses as $analysis) {
+            if ($insightCount >= $insightLimit) break;
+            
+            $data = $analysis->result_data;
+            if (is_array($data) && isset($data['summary'])) {
+                $summary = $data['summary'];
+                $saran = $summary['saran_perbaikan'] ?? null;
+                
+                if ($saran && $saran !== '-') {
+                    $recentInsights[] = [
+                        'id' => $analysis->id,
+                        'title' => $analysis->title,
+                        'created_at_formatted' => $analysis->created_at->format('d M Y'),
+                        'kategori_advice' => $summary['kategori_advice'] ?? 'Saran Akademik Terarah',
+                        'karakter_relasi' => $summary['karakter_relasi'] ?? 'Koperatif & Dialogis',
+                        'intonasi_dominan' => $summary['intonasi_dominan'] ?? 'Intonasi Seimbang',
+                        'saran_perbaikan' => $saran,
+                        'arah_tujuan' => $summary['arah_tujuan'] ?? '-',
+                        'result_route' => route('analysis.result', $analysis->id)
+                    ];
+                    $insightCount++;
+                }
+            }
+        }
+
+        // Provide simulated premium actionable items if no analyses have summaries yet
+        if (count($recentInsights) === 0) {
+            $recentInsights = [
+                [
+                    'id' => 0,
+                    'title' => 'Simulasi Bimbingan Skripsi Awal',
+                    'created_at_formatted' => now()->format('d M Y'),
+                    'kategori_advice' => 'Saran Bimbingan Akademik',
+                    'karakter_relasi' => 'Koperatif & Dialogis',
+                    'intonasi_dominan' => 'Intonasi Seimbang',
+                    'saran_perbaikan' => 'Luaskan Literature Review pada Bab 2 dengan menambahkan minimal 5 jurnal internasional bereputasi 5 tahun terakhir.',
+                    'arah_tujuan' => 'Meningkatkan kredibilitas landasan teori dan memperkuat validitas metodologis riset.',
+                    'result_route' => '#'
+                ],
+                [
+                    'id' => 0,
+                    'title' => 'Panduan Metodologi Kuantitatif',
+                    'created_at_formatted' => now()->subDay()->format('d M Y'),
+                    'kategori_advice' => 'Saran Akademik Terarah',
+                    'karakter_relasi' => 'Dialogis Kondusif',
+                    'intonasi_dominan' => 'Intonasi Turun Dominan',
+                    'saran_perbaikan' => 'Perjelas teknik sampling penarikan data kuisioner agar bias respons tereduksi secara signifikan.',
+                    'arah_tujuan' => 'Memastikan kesesuaian teknik sampling dengan analisis statistik regresi berganda.',
+                    'result_route' => '#'
+                ]
+            ];
+        }
+
         return view('dashboard', compact(
             'history', 
             'accuracyRate', 
             'totalFeedbacks', 
             'sentenceAccuracy', 
-            'totalSentencesEvaluated'
+            'totalSentencesEvaluated',
+            'totalDurationSeconds',
+            'totalDurationFormatted',
+            'categoriesCount',
+            'relationsCount',
+            'topCategory',
+            'recentInsights',
+            'isSimulatedData'
         ));
     }
 
@@ -231,5 +406,19 @@ class DashboardController extends Controller
             'kappa',
             'evaluatedLines'
         ));
+    }
+
+    private function parseTimestampToSeconds(string $timestamp): int
+    {
+        $parts = explode('-', $timestamp);
+        $endTimeStr = trim(end($parts));
+        
+        $timeParts = explode(':', $endTimeStr);
+        if (count($timeParts) === 2) {
+            return ((int)$timeParts[0] * 60) + (int)$timeParts[1];
+        } elseif (count($timeParts) === 3) {
+            return ((int)$timeParts[0] * 3600) + ((int)$timeParts[1] * 60) + (int)$timeParts[2];
+        }
+        return 0;
     }
 }

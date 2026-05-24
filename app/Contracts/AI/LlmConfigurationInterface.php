@@ -6,13 +6,17 @@ interface LlmConfigurationInterface
 {
     /**
      * Get the system prompt (instructions for the LLM).
+     *
+     * @param string $locale The language locale (e.g., 'id', 'en', 'zh').
      */
-    public function getSystemPrompt(): string;
+    public function getSystemPrompt(string $locale = 'id'): string;
 
     /**
      * Get the specific user prompt to attach along with the payload.
+     *
+     * @param string $locale The language locale (e.g., 'id', 'en', 'zh').
      */
-    public function getUserPrompt(): string;
+    public function getUserPrompt(string $locale = 'id'): string;
 
     /**
      * Get the model identifier (e.g., gpt-4o-audio-preview, gemini-1.5-pro).
@@ -36,6 +40,8 @@ interface LlmConfigurationInterface
 
     /**
      * Get the system prompt for the synthesis/reduction phase.
+     *
+     * @param string $locale The language locale (e.g., 'id', 'en', 'zh').
      */
-    public function getSynthesisSystemPrompt(): string;
+    public function getSynthesisSystemPrompt(string $locale = 'id'): string;
 }

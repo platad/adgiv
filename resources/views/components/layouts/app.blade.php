@@ -1,11 +1,20 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ app()->getLocale() }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Chat' }} – Supervisory AI</title>
+    <title>
+        @if(app()->getLocale() === 'zh')
+            {{ $title ?? '控制面板' }}
+        @elseif(app()->getLocale() === 'en')
+            {{ $title ?? 'Dashboard' }}
+        @else
+            {{ $title ?? 'Dashboard' }}
+        @endif
+        – Supervisory AI
+    </title>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <meta name="description"
         content="Supervisory AI – Analisis suara Multi-Agent AI untuk klasifikasi Mahasiswa vs Dosen.">
@@ -45,6 +54,21 @@
             scrollbar-width: thin;
             scrollbar-color: #cc0000 transparent;
         }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .scrollbar-none::-webkit-scrollbar {
+            display: none !important;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .scrollbar-none {
+            -ms-overflow-style: none !important;  /* IE and Edge */
+            scrollbar-width: none !important;  /* Firefox */
+        }
+
+        /* Language visibility class switching */
+        html[lang="id"] .lang-en, html[lang="id"] .lang-zh { display: none !important; }
+        html[lang="en"] .lang-id, html[lang="en"] .lang-zh { display: none !important; }
+        html[lang="zh"] .lang-id, html[lang="zh"] .lang-en { display: none !important; }
     </style>
 
     {{ $styles ?? '' }}
@@ -72,7 +96,7 @@
             <span class="text-white font-black tracking-tighter text-lg">Supervisory <span
                     class="text-bima-red">AI</span></span>
         </div>
-        <form method="POST" action="/logout" class="m-0">
+        <form method="POST" action="{{ route('logout') }}" class="m-0">
             @csrf
             <button type="submit" class="text-white/60 hover:text-white">
                 <i data-lucide="log-out" class="w-5 h-5"></i>
@@ -82,66 +106,76 @@
 
     {{-- Sidebar (Desktop) --}}
     <aside
-        class="hidden lg:flex w-24 bg-gray-900 flex-col items-center py-10 shrink-0 border-r border-white/5 z-50 fixed inset-y-0 left-0">
-        <div class="flex flex-col items-center gap-8 h-full">
+        class="hidden lg:flex w-24 bg-gray-900 flex-col items-center py-6 shrink-0 border-r border-white/5 z-50 fixed inset-y-0 left-0 overflow-y-auto scrollbar-none">
+        <div class="flex flex-col items-center justify-between min-h-[640px] h-full w-full">
             {{-- Logo --}}
-            <div class="group cursor-pointer">
+            <div class="group cursor-pointer shrink-0">
                 <div
                     class="w-14 h-14 bg-bima-red rounded-[1.5rem] flex items-center justify-center text-white shadow-[0_10px_30px_rgba(204,0,0,0.4)] group-hover:scale-110 transition-transform duration-500 p-3">
                     <x-application-logo class="w-full h-full" />
                 </div>
             </div>
 
-            {{-- Vertical Branding --}}
-            <div class="flex flex-col items-center gap-1 py-4">
-                <span
-                    class="[writing-mode:vertical-lr] rotate-180 text-lg font-black tracking-[0.3em] text-white uppercase opacity-90">Supervisory
-                    AI</span>
-                <div class="w-px h-12 bg-white/20 my-4"></div>
-                <span
-                    class="[writing-mode:vertical-lr] rotate-180 text-[0.6rem] font-bold tracking-widest text-white/60 uppercase">Prototipe</span>
+            {{-- Vertical Branding & Nav Container --}}
+            <div class="flex flex-col items-center gap-6 my-auto shrink-0">
+                {{-- Vertical Branding --}}
+                <div class="flex flex-col items-center gap-1 py-2">
+                    <span
+                        class="[writing-mode:vertical-lr] rotate-180 text-lg font-black tracking-[0.3em] text-white uppercase opacity-90 select-none">Supervisory
+                        AI</span>
+                    <div class="w-px h-10 bg-white/20 my-2"></div>
+                    <span
+                        class="[writing-mode:vertical-lr] rotate-180 text-[0.6rem] font-bold tracking-widest text-white/60 uppercase select-none">Prototipe</span>
+                </div>
+
+                {{-- Nav --}}
+                <nav class="flex flex-col gap-4">
+                    {{-- New Analysis --}}
+                    <a href="{{ route('analysis.create') }}"
+                        class="w-12 h-12 rounded-2xl {{ request()->routeIs('analysis.create') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
+                        title="Analisa Baru">
+                        <i data-lucide="mic" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                        <div
+                            class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
+                            Analisa Baru</div>
+                    </a>
+
+                    {{-- Dashboard/History --}}
+                    <a href="{{ route('dashboard') }}"
+                        class="w-12 h-12 rounded-2xl {{ request()->routeIs('dashboard') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
+                        title="Dashboard">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                        <div
+                            class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
+                            Dashboard</div>
+                    </a>
+
+                    {{-- Methodology --}}
+                    <a href="{{ route('methodology') }}"
+                        class="w-12 h-12 rounded-2xl {{ request()->routeIs('methodology') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
+                        title="Metodologi C-CDA">
+                        <i data-lucide="book-open" class="w-5 h-5"></i>
+                        <div
+                            class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
+                            Metodologi</div>
+                    </a>
+                </nav>
             </div>
 
-            {{-- Nav --}}
-            <nav class="flex flex-col gap-6">
-                {{-- New Analysis --}}
-                <a href="{{ route('analysis.create') }}"
-                    class="w-12 h-12 rounded-2xl {{ request()->routeIs('analysis.create') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
-                    title="Analisa Baru">
-                    <i data-lucide="mic" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
-                    <div
-                        class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
-                        Analisa Baru</div>
-                </a>
-
-                {{-- Dashboard/History --}}
-                <a href="{{ route('dashboard') }}"
-                    class="w-12 h-12 rounded-2xl {{ request()->routeIs('dashboard') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
-                    title="Dashboard">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                    <div
-                        class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
-                        Dashboard</div>
-                </a>
-
-                {{-- Methodology --}}
-                <a href="{{ route('methodology') }}"
-                    class="w-12 h-12 rounded-2xl {{ request()->routeIs('methodology') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
-                    title="Metodologi C-CDA">
-                    <i data-lucide="book-open" class="w-5 h-5"></i>
-                    <div
-                        class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
-                        Metodologi</div>
-                </a>
-            </nav>
-
             {{-- Bottom Actions --}}
-            <div class="mt-auto flex flex-col gap-6">
+            <div class="mt-auto flex flex-col items-center gap-4 shrink-0">
+                {{-- Language Switcher Pill --}}
+                <div class="flex flex-col bg-white/5 p-1 rounded-2xl gap-1 border border-white/5 w-12 items-center">
+                    <button type="button" onclick="setGlobalLanguage('id')" id="global-lang-id" class="w-9 h-9 rounded-xl text-[0.6rem] font-black tracking-widest border-none cursor-pointer transition-all duration-300">ID</button>
+                    <button type="button" onclick="setGlobalLanguage('en')" id="global-lang-en" class="w-9 h-9 rounded-xl text-[0.6rem] font-black tracking-widest border-none cursor-pointer transition-all duration-300">EN</button>
+                    <button type="button" onclick="setGlobalLanguage('zh')" id="global-lang-zh" class="w-9 h-9 rounded-xl text-[0.6rem] font-black tracking-widest border-none cursor-pointer transition-all duration-300">ZH</button>
+                </div>
+
                 {{-- Separator --}}
                 <div class="w-8 h-px bg-white/20"></div>
 
                 {{-- Logout Button --}}
-                <form method="POST" action="/logout" class="m-0">
+                <form method="POST" action="{{ route('logout') }}" class="m-0">
                     @csrf
                     <button type="submit"
                         class="w-12 h-12 rounded-2xl bg-white/5 hover:bg-red-500/20 hover:text-white text-white/60 transition flex items-center justify-center group/logout"
@@ -406,6 +440,47 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function setGlobalLanguage(lang) {
+            // Write to cookie (for backend autoredirect)
+            document.cookie = "locale=" + lang + "; path=/; max-age=" + (30 * 24 * 60 * 60);
+            
+            // Save in localStorage (cache browser)
+            localStorage.setItem('lang', lang);
+            
+            // Switch lang attribute on html tag
+            document.documentElement.setAttribute('lang', lang);
+            
+            // Synchronize active URL path
+            const currentPath = window.location.pathname; // e.g. "/id/dashboard"
+            const pathParts = currentPath.split('/'); // ["", "id", "dashboard"]
+            if (pathParts.length > 1 && ['id', 'en', 'zh'].includes(pathParts[1])) {
+                if (pathParts[1] !== lang) {
+                    pathParts[1] = lang;
+                    const newPath = pathParts.join('/');
+                    window.location.href = newPath + window.location.search + window.location.hash;
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const activeLang = '{{ app()->getLocale() }}';
+            
+            const btnId = document.getElementById('global-lang-id');
+            const btnEn = document.getElementById('global-lang-en');
+            const btnZh = document.getElementById('global-lang-zh');
+            
+            const activeClass = "bg-bima-red text-white shadow-sm font-black";
+            const inactiveClass = "text-white/40 hover:text-white hover:bg-white/5 font-semibold";
+            
+            if (btnId && btnEn && btnZh) {
+                btnId.className = "w-9 h-9 rounded-xl text-[0.6rem] border-none cursor-pointer transition-all duration-300 flex items-center justify-center " + (activeLang === 'id' ? activeClass : inactiveClass);
+                btnEn.className = "w-9 h-9 rounded-xl text-[0.6rem] border-none cursor-pointer transition-all duration-300 flex items-center justify-center " + (activeLang === 'en' ? activeClass : inactiveClass);
+                btnZh.className = "w-9 h-9 rounded-xl text-[0.6rem] border-none cursor-pointer transition-all duration-300 flex items-center justify-center " + (activeLang === 'zh' ? activeClass : inactiveClass);
+            }
+        });
+    </script>
 
     {{ $scripts ?? '' }}
 </body>
