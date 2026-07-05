@@ -71,7 +71,7 @@ class AnalysisController extends Controller
 
     public function processing(Analysis $analysis)
     {
-        abort_if($analysis->user_id !== Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id(), 403);
 
         if ($analysis->isCompleted()) {
             return redirect()->route('analysis.result', $analysis->slug);
@@ -84,7 +84,8 @@ class AnalysisController extends Controller
 
     public function processChunk(Request $request, Analysis $analysis)
     {
-        abort_if($analysis->user_id !== Auth::id(), 403);
+        Log::info('[DEBUG] processChunk reached for slug: ' . $analysis->slug . ' by Auth: ' . Auth::id() . ' Analysis User: ' . $analysis->user_id);
+        abort_if($analysis->user_id != Auth::id(), 403);
 
         $validated = $request->validate([
             'audio' => ['required', 'file', 'mimes:wav,mp3,webm,ogg', 'max:51200'], // max 50MB per chunk

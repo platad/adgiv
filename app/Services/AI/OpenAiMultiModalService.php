@@ -101,7 +101,6 @@ class OpenAiMultiModalService implements MultiModalAnalysisInterface
 
         $chunksJson = json_encode($chunks, JSON_PRETTY_PRINT);
 
-        // Load locale-aware synthesis prompt template
         $promptPath = resource_path("prompts/{$locale}/synthesis.md");
         if (!file_exists($promptPath)) {
             $promptPath = resource_path('prompts/id/synthesis.md');
@@ -137,7 +136,6 @@ class OpenAiMultiModalService implements MultiModalAnalysisInterface
             $json = $response->json();
             $content = $json['choices'][0]['message']['content'] ?? '[]';
 
-            // Highly robust cleaning of markdown codeblocks
             $cleanContent = $content;
             if (preg_match('/```json\s*(.*?)\s*```/s', $content, $matches)) {
                 $cleanContent = $matches[1];
@@ -149,7 +147,6 @@ class OpenAiMultiModalService implements MultiModalAnalysisInterface
 
             $parsed = json_decode($cleanContent, true);
 
-            // Fallback 1: If decoding failed, try extracting content between first '{' and last '}'
             if (!$parsed) {
                 $firstBrace = strpos($cleanContent, '{');
                 $lastBrace = strrpos($cleanContent, '}');
@@ -159,19 +156,14 @@ class OpenAiMultiModalService implements MultiModalAnalysisInterface
                 }
             }
 
-            // Fallback 2: ULTRA RESILIENT PARTIAL JSON REPAIR (Token Saver & Truncation Healer)
             if (!$parsed) {
                 Log::warning('[OpenAiMultiModal] Attempting premium structural repair on truncated JSON string.');
                 $repairedContent = trim($cleanContent);
-
-                // If it ends inside a word or string without closing quote
-                // Count unescaped double quotes
                 $quoteCount = preg_match_all('/(?<!\\\\)"/', $repairedContent);
                 if ($quoteCount % 2 !== 0) {
-                    $repairedContent .= '"'; // Close current active string
+                    $repairedContent .= '"';
                 }
 
-                // Structurally rebuild the JSON tree balance
                 $brackets = [];
                 $len = strlen($repairedContent);
                 $inString = false;
@@ -190,11 +182,9 @@ class OpenAiMultiModalService implements MultiModalAnalysisInterface
                     }
                 }
 
-                // Close open elements from the stack in reverse order
                 while (!empty($brackets)) {
                     $openBracket = array_pop($brackets);
                     if ($openBracket === '{') {
-                        // Check if we are inside a key-value or array of objects and need to close current transcription array index
                         $repairedContent = rtrim($repairedContent, ", \t\n\r");
                         $repairedContent .= '}';
                     } else if ($openBracket === '[') {
