@@ -122,7 +122,9 @@ class AnalysisController extends Controller
         $chunk->update(['prompt_used' => $systemPrompt]);
 
         try {
-            $result = $this->callOpenAiWithRetry($path, $locale, 3);
+            $absolutePath = Storage::disk('local')->path($path);
+            Log::info('[DEBUG] Processing absolute path: ' . $absolutePath);
+            $result = $this->callOpenAiWithRetry($absolutePath, $locale, 3);
             $durationMs = (int) ((microtime(true) - $startTime) * 1000);
 
             $chunk->update([
@@ -133,7 +135,6 @@ class AnalysisController extends Controller
                 'completed_at' => now(),
             ]);
 
-            // Update processed chunks count
             $analysis->update([
                 'processed_chunks' => AnalysisChunk::where('analysis_id', $analysis->id)->where('status', 'done')->count(),
             ]);
