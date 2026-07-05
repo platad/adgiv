@@ -260,24 +260,31 @@
                 });
             },
 
+            isProcessing: false,
             async startProcessing() {
+                if (this.isProcessing) return;
+                this.isProcessing = true;
+                
                 this.globalStatus = 'processing';
                 this.globalProgress = 20;
 
                 for (let i = 1; i <= this.totalChunks; i++) {
-                    const status = this.chunkStatusMap[i];
-                    if (status !== 'done') {
+                    if (this.chunkStatusMap[i] !== 'done' && this.chunkStatusMap[i] !== 'running') {
                         await this.processChunk(i);
                     }
                 }
 
-                if (this.processedChunks !== this.totalChunks) {
+                const doneCount = Object.values(this.chunkStatusMap).filter(s => s === 'done').length;
+                if (doneCount !== this.totalChunks) {
                     this.globalStatus = 'partial_failure';
-                    this.appendLog('warning', 'Beberapa potongan gagal. Silakan klik Coba Lagi pada potongan yang gagal.');
+                    this.appendLog('warning', 'Beberapa potongan gagal. Silakan klik Coba Lagi.');
                 }
+                this.isProcessing = false;
             },
 
             async processChunk(index) {
+                if (this.chunkStatusMap[index] === 'running' || this.chunkStatusMap[index] === 'done') return;
+                
                 this.updateChunkStatus(index, 'running');
                 this.appendLog('info', `Mengirim potongan ${index}...`);
                 
@@ -302,11 +309,12 @@
                     
                     if (res.ok && data.status === 'success') {
                         this.updateChunkStatus(index, 'done');
-                        this.processedChunks++;
-                        this.globalProgress = 20 + Math.floor((this.processedChunks / this.totalChunks) * 70);
+                        const doneCount = Object.values(this.chunkStatusMap).filter(s => s === 'done').length;
+                        this.processedChunks = doneCount;
+                        this.globalProgress = 20 + Math.floor((doneCount / this.totalChunks) * 70);
                         this.appendLog('success', `Potongan ${index} selesai dianalisis.`);
                         
-                        if (this.processedChunks === this.totalChunks) {
+                        if (doneCount === this.totalChunks) {
                             this.finalize();
                         }
                     } else {
