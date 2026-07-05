@@ -222,10 +222,9 @@
             },
             
             updateChunkStatus(index, newStatus) {
-                const i = this.chunks.findIndex(c => c.index === index);
-                if (i !== -1) {
-                    this.chunks[i] = { ...this.chunks[i], status: newStatus };
-                }
+                this.chunks = this.chunks.map(c => 
+                    c.index === index ? { ...c, status: newStatus } : c
+                );
             },
 
             appendLog(level, msg) {
