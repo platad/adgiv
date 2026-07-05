@@ -162,17 +162,50 @@ class AnalysisController extends Controller
         }
     }
 
+    private function shiftTimestamps(array $result, int $chunkIndex, int $chunkDuration = 30): array
+    {
+        $offsetSeconds = ($chunkIndex - 1) * $chunkDuration;
+        
+        if (!isset($result['transcription']) || !is_array($result['transcription'])) {
+            return $result;
+        }
+
+        foreach ($result['transcription'] as &$item) {
+            if (isset($item['timestamp']) && preg_match('/(\d{2}):(\d{2})\s*-\s*(\d{2}):(\d{2})/', $item['timestamp'], $matches)) {
+                $startMin = (int)$matches[1];
+                $startSec = (int)$matches[2];
+                $endMin = (int)$matches[3];
+                $endSec = (int)$matches[4];
+
+                $startTotal = ($startMin * 60) + $startSec + $offsetSeconds;
+                $endTotal = ($endMin * 60) + $endSec + $offsetSeconds;
+
+                $newStart = sprintf('%02d:%02d', floor($startTotal / 60), $startTotal % 60);
+                $newEnd = sprintf('%02d:%02d', floor($endTotal / 60), $endTotal % 60);
+
+                $item['timestamp'] = "$newStart - $newEnd";
+            }
+        }
+
+        return $result;
+    }
+
     public function finalize(Analysis $analysis)
     {
         abort_if($analysis->user_id != Auth::id(), 403);
         
-        $chunks = AnalysisChunk::where('analysis_id', $analysis->id)
+        $chunkModels = AnalysisChunk::where('analysis_id', $analysis->id)
             ->where('status', 'done')
             ->orderBy('chunk_index')
-            ->pluck('result_data')
-            ->filter()
-            ->values()
-            ->toArray();
+            ->get();
+
+        $chunks = [];
+        foreach ($chunkModels as $cm) {
+            $data = $cm->result_data;
+            if ($data) {
+                $chunks[] = $this->shiftTimestamps($data, $cm->chunk_index, 30);
+            }
+        }
 
         if (empty($chunks)) {
             return response()->json(['status' => 'error', 'message' => 'Tidak ada chunk yang berhasil.'], 400);

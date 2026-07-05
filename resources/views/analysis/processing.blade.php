@@ -1,5 +1,5 @@
 <x-layouts.app title="Memproses Analisa — {{ $analysis->title }}">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10" x-data="processingApp()" x-init="init()">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" x-data="processingApp()" x-init="init()">
 
         {{-- Header --}}
         <div class="mb-6">
@@ -20,8 +20,12 @@
             <div class="bg-bima-red h-full rounded-full transition-all duration-700" :style="`width: ${globalProgress}%`"></div>
         </div>
 
-        {{-- Processing Card --}}
-        <div class="bg-white border border-gray-100 rounded-[2rem] shadow-xl shadow-gray-100/60 divide-y divide-gray-50 overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {{-- Kolom Kiri: Proses Utama --}}
+            <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+                
+                {{-- Processing Card --}}
+                <div class="bg-white border border-gray-100 rounded-[2rem] shadow-xl shadow-gray-100/60 divide-y divide-gray-50 overflow-hidden">
 
             {{-- STEP 1: Upload (Slicing) --}}
             <div class="p-6 flex items-start gap-4">
@@ -63,7 +67,7 @@
                 </div>
 
                 {{-- Per-chunk rows --}}
-                <div class="space-y-2">
+                <div class="space-y-2 max-h-[400px] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
                     <template x-for="chunk in chunks" :key="chunk.index">
                         <div class="flex items-center gap-3 p-3 rounded-xl text-xs font-bold border"
                             :class="{
@@ -122,10 +126,11 @@
                     </p>
                 </div>
             </div>
-        </div>
-        
-        {{-- Aktivitas Sistem (Modern Log) --}}
-        <div class="mt-8 bg-white border border-gray-100 rounded-2xl shadow-sm shadow-gray-100/50 p-6" x-show="logs.length > 0">
+            </div>
+            
+            {{-- Kolom Kanan: Log Aktivitas --}}
+            <div class="lg:col-span-5 xl:col-span-4">
+                <div class="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-gray-100/50 p-6 sticky top-8" x-show="logs.length > 0">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                     <i data-lucide="activity" class="w-4 h-4"></i>
@@ -162,6 +167,8 @@
                         </div>
                     </div>
                 </template>
+            </div>
+                </div>
             </div>
         </div>
     </div>
@@ -212,6 +219,13 @@
                 const map = { done: 'Selesai', running: 'Menganalisis...', failed: 'Gagal', pending: 'Menunggu' };
                 return map[status] || status;
             },
+            
+            updateChunkStatus(index, newStatus) {
+                const i = this.chunks.findIndex(c => c.index === index);
+                if (i !== -1) {
+                    this.chunks[i].status = newStatus;
+                }
+            },
 
             appendLog(level, msg) {
                 const now = new Date().toLocaleTimeString('id-ID', { hour12: false });
@@ -255,17 +269,14 @@
                     }
                 }
 
-                if (this.processedChunks === this.totalChunks) {
-                    this.finalize();
-                } else {
+                if (this.processedChunks !== this.totalChunks) {
                     this.globalStatus = 'partial_failure';
                     this.appendLog('warning', 'Beberapa potongan gagal. Silakan klik Coba Lagi pada potongan yang gagal.');
                 }
             },
 
             async processChunk(index) {
-                const chunk = this.chunks.find(c => c.index === index);
-                chunk.status = 'running';
+                this.updateChunkStatus(index, 'running');
                 this.appendLog('info', `Mengirim potongan ${index}...`);
                 
                 try {
@@ -288,7 +299,7 @@
                     const data = await res.json();
                     
                     if (res.ok && data.status === 'success') {
-                        chunk.status = 'done';
+                        this.updateChunkStatus(index, 'done');
                         this.processedChunks++;
                         this.globalProgress = 20 + Math.floor((this.processedChunks / this.totalChunks) * 70);
                         this.appendLog('success', `Potongan ${index} selesai dianalisis.`);
@@ -300,7 +311,7 @@
                         throw new Error(data.message || 'Gagal dari server.');
                     }
                 } catch (e) {
-                    chunk.status = 'failed';
+                    this.updateChunkStatus(index, 'failed');
                     this.appendLog('error', `Potongan ${index} gagal: ${e.message}`);
                 }
             },

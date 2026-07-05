@@ -159,7 +159,15 @@ class OpenAiMultiModalService implements MultiModalAnalysisInterface
             if (!$parsed) {
                 Log::warning('[OpenAiMultiModal] Attempting premium structural repair on truncated JSON string.');
                 $repairedContent = trim($cleanContent);
-                $quoteCount = preg_match_all('/(?<!\\\\)"/', $repairedContent);
+                
+                $quoteCount = 0;
+                $contentLen = strlen($repairedContent);
+                for ($j = 0; $j < $contentLen; $j++) {
+                    if ($repairedContent[$j] === '"' && ($j === 0 || $repairedContent[$j - 1] !== '\\')) {
+                        $quoteCount++;
+                    }
+                }
+                
                 if ($quoteCount % 2 !== 0) {
                     $repairedContent .= '"';
                 }
