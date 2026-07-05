@@ -20,9 +20,9 @@
             <div class="bg-bima-red h-full rounded-full transition-all duration-700" :style="`width: ${globalProgress}%`"></div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="flex flex-col lg:flex-row gap-8 w-full">
             {{-- Kolom Kiri: Proses Utama --}}
-            <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+            <div class="flex flex-col gap-6 w-full lg:w-2/3 xl:w-3/4">
                 
                 {{-- Processing Card --}}
                 <div class="bg-white border border-gray-100 rounded-[2rem] shadow-xl shadow-gray-100/60 divide-y divide-gray-50 overflow-hidden">
@@ -129,7 +129,7 @@
             </div>
             
             {{-- Kolom Kanan: Log Aktivitas --}}
-            <div class="lg:col-span-5 xl:col-span-4">
+            <div class="w-full lg:w-1/3 xl:w-1/4">
                 <div class="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-gray-100/50 p-6 sticky top-8" x-show="logs.length > 0">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
@@ -223,13 +223,13 @@
             updateChunkStatus(index, newStatus) {
                 const i = this.chunks.findIndex(c => c.index === index);
                 if (i !== -1) {
-                    this.chunks[i].status = newStatus;
+                    this.chunks[i] = { ...this.chunks[i], status: newStatus };
                 }
             },
 
             appendLog(level, msg) {
                 const now = new Date().toLocaleTimeString('id-ID', { hour12: false });
-                this.logs.push({ level, msg, time: now });
+                this.logs = [...this.logs, { level, msg, time: now }];
                 setTimeout(() => {
                     const c = document.getElementById('log-container');
                     if(c) c.scrollTop = c.scrollHeight;

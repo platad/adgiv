@@ -250,7 +250,7 @@
             </div>
 
             <div class="flex flex-wrap md:flex-nowrap items-center gap-3 shrink-0">
-                <a x-show="synthesisStatus === 'completed'" href="{{ route('analysis.print', $analysis->id) }}" target="_blank"
+                <a x-show="synthesisStatus === 'completed'" href="{{ route('analysis.print', $analysis\->slug) }}" target="_blank"
                     class="inline-flex items-center px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-[0.7rem] font-black uppercase tracking-widest transition-colors shadow-sm shadow-purple-500/10 cursor-pointer whitespace-nowrap">
                     <i data-lucide="printer" class="w-3.5 h-3.5 mr-2"></i> 
                     <span class="lang-id">Cetak Laporan</span>
@@ -674,7 +674,7 @@
                                             if (this.loading) return;
                                             this.loading = true;
                                             try {
-                                                let res = await fetch('{{ route('analysis.line-feedback', $analysis->id) }}', {
+                                                let res = await fetch('{{ route('analysis.line-feedback', $analysis\->slug) }}', {
                                                     method: 'POST',
                                                     headers: {
                                                         'Content-Type': 'application/json',
@@ -920,7 +920,7 @@
                 if (this.loading) return;
                 this.loading = true;
                 try {
-                    let res = await fetch('{{ route('analysis.feedback', $analysis->id) }}', {
+                    let res = await fetch('{{ route('analysis.feedback', $analysis\->slug) }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

@@ -23,7 +23,6 @@ class ParseAdviceGivingAction
                 $block['advice_confidence'] = 'high';
             }
 
-            // Process new intonation markers
             $markers = $block['intonation_markers'] ?? [];
             if (is_array($markers)) {
                 foreach ($markers as $marker) {
@@ -43,13 +42,13 @@ class ParseAdviceGivingAction
                         $iconHtml = '<svg class="inline-block w-4 h-4 text-gray-400 mx-1 align-middle hover:scale-125 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14"></path></svg>';
                     }
 
-                    $escapedReason = htmlspecialchars($reason, ENT_QUOTES);
-                    $escapedRelation = htmlspecialchars($marker['relation'] ?? 'Tidak ada relasi khusus dengan baris lain.', ENT_QUOTES);
-                    $markerTitle = 'Intonasi ' . ($type === 'up' ? 'Naik (High pitch)' : ($type === 'down' ? 'Turun (Low pitch)' : 'Netral'));
+                    $jsonTitle = htmlspecialchars(json_encode('Intonasi ' . ($type === 'up' ? 'Naik (High pitch)' : ($type === 'down' ? 'Turun (Low pitch)' : 'Netral'))), ENT_QUOTES);
+                    $jsonType = htmlspecialchars(json_encode($type), ENT_QUOTES);
+                    $jsonReason = htmlspecialchars(json_encode($reason), ENT_QUOTES);
+                    $jsonRelation = htmlspecialchars(json_encode($marker['relation'] ?? 'Tidak ada relasi khusus dengan baris lain.'), ENT_QUOTES);
 
-                    $tooltipHtml = "<button @click=\"openInsight('{$markerTitle}', '{$type}', '{$escapedReason}', '{$escapedRelation}')\" class=\"inline-flex items-center justify-center p-0.5 hover:bg-gray-100 border border-transparent hover:border-gray-200 rounded-lg transition-all focus:outline-none cursor-pointer align-middle\" title=\"Klik untuk melihat detail intonasi & relasi\">{$iconHtml}</button>";
+                    $tooltipHtml = "<button @click=\"openInsight({$jsonTitle}, {$jsonType}, {$jsonReason}, {$jsonRelation})\" class=\"inline-flex items-center justify-center p-0.5 hover:bg-gray-100 border border-transparent hover:border-gray-200 rounded-lg transition-all focus:outline-none cursor-pointer align-middle\" title=\"Klik untuk melihat detail intonasi & relasi\">{$iconHtml}</button>";
 
-                    // Support replacing both bracketed and plain format IDs to prevent UI leakage
                     $cleanId = trim($id, '[]');
                     $idWithBrackets = '[' . $cleanId . ']';
                     $idWithoutBrackets = $cleanId;
@@ -65,14 +64,12 @@ class ParseAdviceGivingAction
                 }
             }
 
-            // Replace standard pause markers
             $block['text_html'] = str_replace(
                 '[PAUSE]', 
                 '<span title="Jeda Pembicaraan"><svg class="inline-block w-4 h-4 text-gray-400 mx-1 align-middle" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>', 
                 $block['text_html'] ?? ''
             );
 
-            // Clean up any remaining unmatched marker tags and empty brackets to prevent format leaks in UI
             if (isset($block['text_html'])) {
                 $block['text_html'] = preg_replace('/\[MARKER_\d+\]/i', '', $block['text_html']);
                 $block['text_html'] = preg_replace('/\[\s*\]/', '', $block['text_html']);
