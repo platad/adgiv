@@ -16,6 +16,11 @@ class OpenAiMultiModalService implements MultiModalAnalysisInterface
         private readonly string $apiKey = ''
     ) {}
 
+    public function getConfig(): LlmConfigurationInterface
+    {
+        return $this->config;
+    }
+
     private function resolvedKey(): string
     {
         return $this->apiKey ?: config('services.openai.key');

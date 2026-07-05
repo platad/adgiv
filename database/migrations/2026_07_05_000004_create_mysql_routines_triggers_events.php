@@ -210,8 +210,6 @@ return new class extends Migration {
             END
         ');
 
-        DB::unprepared('SET GLOBAL event_scheduler = ON');
-
         DB::unprepared('DROP EVENT IF EXISTS evt_cleanup_stale_analyses');
         DB::unprepared('
             CREATE EVENT evt_cleanup_stale_analyses
