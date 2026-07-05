@@ -22,4 +22,39 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+
+    # ── SSE: Matikan output buffering untuk endpoint /stream ──────────────────
+    # Tanpa ini, SSE event tidak langsung terkirim ke browser (di-buffer Apache dulu)
+    <If "%{REQUEST_URI} =~ m|/stream$|">
+        Header set X-Accel-Buffering "no"
+        Header set Cache-Control "no-cache, no-store"
+        Header set Content-Type "text/event-stream"
+    </If>
+
 </IfModule>
+
+# ── PHP Configuration untuk cPanel Shared Hosting ────────────────────────────
+# Dibutuhkan agar SSE stream dan upload besar bisa berjalan normal
+<IfModule mod_php.c>
+    # Izinkan script PHP berjalan tanpa batas waktu (untuk SSE long-running)
+    php_value max_execution_time 0
+
+    # Upload file audio besar (100MB)
+    php_value upload_max_filesize 102400K
+    php_value post_max_size 102400K
+
+    # Memory cukup untuk memproses audio
+    php_value memory_limit 512M
+
+    # Matikan output buffering (krusial untuk SSE agar event langsung terkirim)
+    php_value output_buffering Off
+    php_value zlib.output_compression Off
+</IfModule>
+
+# Alternatif jika server pakai php-fpm (bukan mod_php):
+# Buat file .user.ini di root project dengan isi:
+#   max_execution_time = 0
+#   upload_max_filesize = 100M
+#   post_max_size = 100M
+#   memory_limit = 512M
+#   output_buffering = Off

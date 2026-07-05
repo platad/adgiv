@@ -16,6 +16,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             Localization::class,
         ]);
+
+        $middleware->redirectGuestsTo(function ($request) {
+            $locale = $request->segment(1);
+            if (!in_array($locale, ['id', 'en', 'zh'])) {
+                $locale = $request->cookie('locale') ?: 'id';
+            }
+            return route('login', ['locale' => $locale]);
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

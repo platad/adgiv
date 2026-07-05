@@ -312,11 +312,12 @@ class DashboardController extends Controller
         $items = collect($paginator->items())->map(function ($item) {
             return [
                 'id' => $item->id,
+                'slug' => $item->slug,
                 'title' => $item->title,
                 'status' => $item->status,
                 'created_at_formatted' => $item->created_at->format('d M Y, H:i'),
-                'result_route' => route('analysis.result', $item->id),
-                'processing_route' => route('analysis.processing', $item->id),
+                'result_route' => route('analysis.result', $item->slug),
+                'processing_route' => route('analysis.processing', $item->slug),
             ];
         });
 

@@ -3,22 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\Analysis;
+use App\Models\AnalysisChunk;
+use App\Models\AnalysisLog;
 use App\Models\AnalysisFeedback;
-use App\Services\AudioStorageService;
-use App\Contracts\AI\MultiModalAnalysisInterface;
-use App\Http\Requests\StoreAnalysisRequest;
-use App\Http\Requests\StoreAnalysisFeedbackRequest;
+use App\Services\AI\OpenAiMultiModalService;
 use App\Actions\ParseAdviceGivingAction;
+use App\Contracts\AI\MultiModalAnalysisInterface;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AnalysisController extends Controller
 {
     public function __construct(
-        private readonly AudioStorageService $audioStorage,
         private readonly MultiModalAnalysisInterface $aiService,
-        private readonly ParseAdviceGivingAction $parseAdviceAction
+        private readonly ParseAdviceGivingAction     $parseAdviceAction
     ) {}
 
     public function create()
@@ -28,207 +31,316 @@ class AnalysisController extends Controller
 
     public function initialize(Request $request)
     {
-        $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'locale' => ['nullable', 'string', 'in:id,en,zh'],
+        $validated = $request->validate([
+            'title'            => ['required', 'string', 'max:255'],
+            'locale'           => ['nullable', 'string', 'in:id,en,zh'],
+            'total_chunks'     => ['required', 'integer', 'min:1'],
+            'duration_seconds' => ['required', 'numeric', 'min:0.1'],
         ]);
 
-        $locale = $request->input('locale', 'id');
-
+        $locale = $validated['locale'] ?? 'id';
+        $userId = Auth::id();
+        
         $analysis = Analysis::create([
-            'user_id' => Auth::id(),
-            'title' => $request->title,
-            'audio_path' => 'client-cached',
-            'status' => 'pending',
-            'result_data' => ['chunks' => [], 'language' => $locale],
+            'user_id'                => $userId,
+            'title'                  => $validated['title'],
+            'locale'                 => $locale,
+            'audio_path'             => 'client-side-sliced',
+            'audio_duration_seconds' => $validated['duration_seconds'],
+            'total_chunks'           => $validated['total_chunks'],
+            'processed_chunks'       => 0,
+            'status'                 => 'processing',
+            'model_used'             => config('services.openai.audio_model', 'gpt-audio-1.5'),
+            'synthesis_model'        => config('services.openai.synthesis_model', 'gpt-4o-mini'),
         ]);
+
+        AnalysisLog::success($analysis->id, 'session_created',
+            "Sesi Analisis dibuat. Total potongan: {$validated['total_chunks']}, Durasi: {$validated['duration_seconds']}s",
+            [
+                'total_chunks' => $validated['total_chunks'],
+                'duration_seconds' => $validated['duration_seconds'],
+            ]
+        );
 
         return response()->json([
             'status' => 'success',
-            'analysis_id' => $analysis->id
+            'slug'   => $analysis->slug,
+            'redirect' => route('analysis.processing', $analysis->slug)
         ]);
     }
 
-    public function storeChunk(Request $request, int $id)
+    public function processing(Analysis $analysis)
     {
-        $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
+        abort_if($analysis->user_id !== Auth::id(), 403);
 
-        $request->validate([
-            'audio_chunk' => ['required', 'file'],
-        ]);
-
-        $file = $request->file('audio_chunk');
-        $tempPath = $file->store('temp', 'local');
-        $absolutePath = Storage::disk('local')->path($tempPath);
-
-        try {
-            $locale = $analysis->result_data['language'] ?? 'id';
-            $rawResult = $this->aiService->analyzeAudio($absolutePath, $locale);
-
-            @unlink($absolutePath);
-
-            $resultData = $analysis->result_data ?? [];
-            if (!isset($resultData['chunks'])) {
-                $resultData['chunks'] = [];
-            }
-            $resultData['chunks'][] = $rawResult;
-
-            $analysis->update([
-                'result_data' => $resultData
-            ]);
-
-            return response()->json(['status' => 'success']);
-        } catch (\Exception $e) {
-            @unlink($absolutePath);
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        if ($analysis->isCompleted()) {
+            return redirect()->route('analysis.result', $analysis->slug);
         }
-    }
 
-    public function store(StoreAnalysisRequest $request)
-    {
-        $audioPath = $this->audioStorage->storeAudio($request->file('audio'));
-
-        $analysis = Analysis::create([
-            'user_id' => Auth::id(),
-            'title' => $request->title,
-            'audio_path' => $audioPath,
-            'status' => 'pending',
-            'result_data' => ['chunks' => []]
-        ]);
-
-        return redirect()->route('analysis.result', $analysis->id);
-    }
-
-    public function processing(int $id)
-    {
-        $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
+        $analysis->load('chunks', 'logs');
 
         return view('analysis.processing', compact('analysis'));
     }
 
-    public function processAudio(int $id)
+    public function processChunk(Request $request, Analysis $analysis)
     {
-        $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
+        abort_if($analysis->user_id !== Auth::id(), 403);
+
+        $validated = $request->validate([
+            'audio' => ['required', 'file', 'mimes:wav,mp3,webm,ogg', 'max:51200'], // max 50MB per chunk
+            'chunk_index' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $file = $request->file('audio');
+        $chunkIndex = $validated['chunk_index'];
+        
+        $path = $file->storeAs(
+            "audio/{$analysis->user_id}/{$analysis->slug}",
+            "chunk_{$chunkIndex}.wav",
+            'local'
+        );
+
+        $chunk = AnalysisChunk::updateOrCreate(
+            [
+                'analysis_id' => $analysis->id,
+                'chunk_index' => $chunkIndex,
+            ],
+            [
+                'total_chunks' => $analysis->total_chunks,
+                'chunk_path' => $path,
+                'chunk_size_bytes' => $file->getSize(),
+                'status' => 'running',
+                'model_used' => $analysis->model_used,
+                'started_at' => now(),
+            ]
+        );
+
+        $locale = $analysis->locale ?? 'id';
+        $startTime = microtime(true);
+        $systemPrompt = $this->aiService->getConfig()->getSystemPrompt($locale);
+        $chunk->update(['prompt_used' => $systemPrompt]);
 
         try {
-            $analysis->update(['status' => 'processing']);
+            $result = $this->callOpenAiWithRetry($path, $locale, 3);
+            $durationMs = (int) ((microtime(true) - $startTime) * 1000);
 
-            $resultData = $analysis->result_data ?? [];
-            $chunks = $resultData['chunks'] ?? [];
+            $chunk->update([
+                'status'       => 'done',
+                'result_data'  => $result,
+                'raw_response' => json_encode($result),
+                'duration_ms'  => $durationMs,
+                'completed_at' => now(),
+            ]);
 
-            if (empty($chunks)) {
-                throw new \RuntimeException('Tidak ditemukan data potongan audio untuk diproses.');
-            }
+            // Update processed chunks count
+            $analysis->update([
+                'processed_chunks' => AnalysisChunk::where('analysis_id', $analysis->id)->where('status', 'done')->count(),
+            ]);
 
-            $locale = $analysis->result_data['language'] ?? 'id';
+            return response()->json([
+                'status' => 'success',
+                'chunk_index' => $chunkIndex,
+                'result' => $result
+            ]);
+
+        } catch (\Throwable $e) {
+            $durationMs = (int) ((microtime(true) - $startTime) * 1000);
+            $chunk->update([
+                'status'        => 'failed',
+                'error_message' => $e->getMessage(),
+                'duration_ms'   => $durationMs,
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'chunk_index' => $chunkIndex
+            ], 500);
+        }
+    }
+
+    public function finalize(Analysis $analysis)
+    {
+        abort_if($analysis->user_id !== Auth::id(), 403);
+        
+        $chunks = AnalysisChunk::where('analysis_id', $analysis->id)
+            ->where('status', 'done')
+            ->orderBy('chunk_index')
+            ->pluck('result_data')
+            ->filter()
+            ->values()
+            ->toArray();
+
+        if (empty($chunks)) {
+            return response()->json(['status' => 'error', 'message' => 'Tidak ada chunk yang berhasil.'], 400);
+        }
+
+        $locale = $analysis->locale ?? 'id';
+        
+        try {
             $synthesizedResult = $this->aiService->synthesizeChunks($chunks, $locale);
             $finalResult = $this->parseAdviceAction->execute($synthesizedResult);
             $finalResult['total_chunks'] = count($chunks);
+
             $analysis->update([
-                'status' => 'completed',
-                'result_data' => $finalResult
+                'status'      => 'completed',
+                'result_data' => $finalResult,
             ]);
 
-            return response()->json(['status' => 'success', 'redirect' => route('analysis.result', $analysis->id)]);
-        } catch (\Exception $e) {
-            $analysis->update(['status' => 'failed']);
+            return response()->json([
+                'status' => 'success',
+                'redirect' => route('analysis.result', $analysis->slug)
+            ]);
+        } catch (\Throwable $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
 
-    public function result(int $id)
+    private function callOpenAiWithRetry(string $chunkPath, string $locale, int $maxRetries): array
     {
-        $analysis = Analysis::with('feedback')->where('user_id', Auth::id())->findOrFail($id);
+        $lastException = null;
 
-        if ($analysis->status !== 'completed') {
-            return redirect()->route('analysis.processing', $analysis->id);
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                return $this->aiService->analyzeAudio($chunkPath, $locale);
+            } catch (\Throwable $e) {
+                $lastException = $e;
+                Log::warning("[SSE] OpenAI attempt {$attempt} gagal: " . $e->getMessage());
+                if ($attempt < $maxRetries) {
+                    sleep(2 ** $attempt); // Exponential backoff: 2s, 4s, 8s
+                }
+            }
         }
 
+        throw $lastException;
+    }
+
+
+
+    public function resumeChunk(Analysis $analysis)
+    {
+        abort_if($analysis->user_id !== Auth::id(), 403);
+        abort_unless($analysis->isFailed() || $analysis->isResumable(), 422);
+
+        // Panggil MySQL Stored Procedure (atomik, satu pemanggilan)
+        DB::statement('CALL sp_reset_failed_chunks(?)', [$analysis->id]);
+
+        return redirect()->route('analysis.processing', $analysis->slug)
+            ->with('info', 'Analisis dilanjutkan dari potongan yang gagal.');
+    }
+
+    public function result(Analysis $analysis)
+    {
+        abort_if($analysis->user_id !== Auth::id(), 403);
+
+        if (!$analysis->isCompleted()) {
+            return redirect()->route('analysis.processing', $analysis->slug);
+        }
+
+        $analysis->load('feedback', 'chunks', 'logs');
         return view('analysis.result', compact('analysis'));
     }
 
-    public function feedback(StoreAnalysisFeedbackRequest $request, int $id)
+    public function feedback(Request $request, Analysis $analysis)
     {
-        $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
+        abort_if($analysis->user_id !== Auth::id(), 403);
+
+        $request->validate([
+            'is_accurate' => ['required', 'boolean'],
+            'comments'    => ['nullable', 'string', 'max:2000'],
+        ]);
 
         $feedback = AnalysisFeedback::updateOrCreate(
             ['analysis_id' => $analysis->id],
             [
-                'user_id' => Auth::id(),
+                'user_id'     => Auth::id(),
                 'is_accurate' => $request->is_accurate,
-                'comments' => $request->comments
+                'comments'    => $request->comments,
             ]
         );
 
         if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Terima kasih atas penilaian Anda. Metrik sistem telah diperbarui.',
-                'feedback' => $feedback
-            ]);
+            return response()->json(['status' => 'success', 'feedback' => $feedback]);
         }
-
-        return back()->with('success', 'Terima kasih atas penilaian Anda. Metrik sistem telah diperbarui.');
+        return back()->with('success', 'Terima kasih atas penilaian Anda.');
     }
 
-    public function lineFeedback(Request $request, int $id)
+    public function lineFeedback(Request $request, Analysis $analysis)
     {
+        abort_if($analysis->user_id !== Auth::id(), 403);
+
         $request->validate([
             'index' => 'required|integer',
-            'type' => 'required|in:up,down,none'
+            'type'  => 'required|in:up,down,none',
         ]);
 
-        $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
         $resultData = $analysis->result_data;
-
         if (!isset($resultData['transcription'][$request->index])) {
             return response()->json(['status' => 'error', 'message' => 'Line not found.'], 404);
         }
 
         $currentFeedback = $resultData['transcription'][$request->index]['user_feedback'] ?? 'none';
-
         if ($currentFeedback === $request->type) {
             $resultData['transcription'][$request->index]['user_feedback'] = 'none';
             unset($resultData['transcription'][$request->index]['feedback_at']);
         } else {
             $resultData['transcription'][$request->index]['user_feedback'] = $request->type;
-            $resultData['transcription'][$request->index]['feedback_at'] = now()->toIso8601String();
+            $resultData['transcription'][$request->index]['feedback_at']   = now()->toIso8601String();
         }
 
         $analysis->update(['result_data' => $resultData]);
 
         return response()->json([
-            'status' => 'success',
-            'message' => 'Feedback berhasil disimpan.',
-            'user_feedback' => $resultData['transcription'][$request->index]['user_feedback']
+            'status'        => 'success',
+            'user_feedback' => $resultData['transcription'][$request->index]['user_feedback'],
         ]);
     }
 
-    public function printReport(int $id)
+    public function printReport(Analysis $analysis)
     {
-        $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
+        abort_if($analysis->user_id !== Auth::id(), 403);
 
-        if ($analysis->status !== 'completed') {
-            return redirect()->route('analysis.result', $id)
-                ->with('error', 'Laporan belum siap dicetak. Silakan tunggu hingga analisis selesai.');
+        if (!$analysis->isCompleted()) {
+            return redirect()->route('analysis.result', $analysis->slug)
+                ->with('error', 'Laporan belum siap dicetak.');
         }
 
         return view('analysis.print', compact('analysis'));
     }
 
-    public function destroy(int $id)
+    public function destroy(Analysis $analysis)
     {
-        $analysis = Analysis::where('user_id', Auth::id())->findOrFail($id);
+        abort_if($analysis->user_id !== Auth::id(), 403);
 
-        if ($analysis->audio_path) {
-            Storage::delete($analysis->audio_path);
+        if ($analysis->audio_path && Storage::disk('local')->exists($analysis->audio_path)) {
+            Storage::disk('local')->delete($analysis->audio_path);
         }
 
         $analysis->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Analisis berhasil dihapus.'
-        ]);
+        $this->cleanupPendingFiles();
+
+        return response()->json(['status' => 'success', 'message' => 'Analisis berhasil dihapus.']);
+    }
+
+    private function cleanupPendingFiles(): void
+    {
+        $pendingFiles = DB::table('pending_file_deletions')
+            ->where('is_processed', false)
+            ->limit(50) // Proses batch, jangan semua sekaligus
+            ->get();
+
+        foreach ($pendingFiles as $pending) {
+            try {
+                if (file_exists($pending->file_path)) {
+                    @unlink($pending->file_path);
+                }
+                DB::table('pending_file_deletions')
+                    ->where('id', $pending->id)
+                    ->update(['is_processed' => true, 'processed_at' => now()]);
+            } catch (\Throwable $e) {
+                Log::warning('[Cleanup] Gagal hapus file: ' . $pending->file_path);
+            }
+        }
     }
 }

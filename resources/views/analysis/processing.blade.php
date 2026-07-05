@@ -1,331 +1,346 @@
-<x-layouts.app title="Processing Analysis">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 min-h-screen flex flex-col items-center justify-center animate-fade-in"
-        x-data="processingFlow('{{ route('analysis.process', $analysis->id) }}')">
+<x-layouts.app title="Memproses Analisa — {{ $analysis->title }}">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10" x-data="processingApp()" x-init="init()">
 
-        <div
-            class="bg-white p-10 md:p-16 rounded-[3rem] shadow-2xl shadow-gray-200/50 text-center w-full max-w-2xl border border-gray-100 animate-scale-up">
+        {{-- Header --}}
+        <div class="mb-6">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-2.5 h-2.5 rounded-full animate-pulse" :class="statusDotClass" id="status-dot"></div>
+                <span class="text-xs font-black text-gray-400 uppercase tracking-widest" x-text="statusLabel">Sedang Diproses</span>
+            </div>
+            <h1 class="text-2xl font-black text-gray-900 truncate">{{ $analysis->title }}</h1>
+            <div class="flex flex-wrap gap-4 mt-2 text-xs text-gray-400 font-bold uppercase tracking-widest">
+                <span>Model: <span class="text-gray-700">{{ $analysis->model_used ?? 'gpt-audio-1.5' }}</span></span>
+                <span>Bahasa: <span class="text-gray-700">{{ ['id' => '🇮🇩 Indonesia', 'en' => '🇬🇧 English', 'zh' => '🇨🇳 中文'][$analysis->locale] ?? $analysis->locale }}</span></span>
+                <span>ID Sesi: <span class="text-gray-700 font-mono">{{ $analysis->slug }}</span></span>
+            </div>
+        </div>
 
-            {{-- Dynamic Icon Container --}}
-            <div class="relative w-24 h-24 mx-auto mb-10">
-                <div class="absolute inset-0 bg-bima-red text-white rounded-full flex items-center justify-center shadow-lg shadow-red-500/20 z-10 p-5">
-                    <x-application-logo class="w-full h-full animate-pulse text-white" />
+        {{-- Progress Bar --}}
+        <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-8">
+            <div class="bg-bima-red h-full rounded-full transition-all duration-700" :style="`width: ${globalProgress}%`"></div>
+        </div>
+
+        {{-- Processing Card --}}
+        <div class="bg-white border border-gray-100 rounded-[2rem] shadow-xl shadow-gray-100/60 divide-y divide-gray-50 overflow-hidden">
+
+            {{-- STEP 1: Upload (Slicing) --}}
+            <div class="p-6 flex items-start gap-4">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-green-100 text-green-600">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i>
                 </div>
-                <div class="absolute inset-0 border-4 border-dashed border-bima-red/20 rounded-full animate-spin"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between">
+                        <p class="font-black text-sm text-gray-900 uppercase tracking-wide">Pemotongan Audio (Selesai)</p>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1 font-medium">
+                        {{ $analysis->total_chunks }} potongan <span class="text-gray-400">via Browser (Client-side)</span>
+                    </p>
+                </div>
             </div>
 
-            <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter mb-4">
-                <span class="lang-id">Supervisory AI Sedang Bekerja</span>
-                <span class="lang-en">Supervisory AI is Working</span>
-                <span class="lang-zh">Supervisory AI 正在深度处理中</span>
-            </h1>
-            <p class="text-gray-500 font-medium mb-8">
-                <span class="lang-id">Memproses sesi <span class="font-bold text-gray-900">"{{ $analysis->title }}"</span></span>
-                <span class="lang-en">Processing session <span class="font-bold text-gray-900">"{{ $analysis->title }}"</span></span>
-                <span class="lang-zh">正在计算分析会话：<span class="font-bold text-gray-900">"{{ $analysis->title }}"</span></span>
-            </p>
-
-            {{-- Step Indicators --}}
-            <div class="space-y-4 max-w-md mx-auto text-left">
-                <template x-for="(step, index) in steps" :key="index">
-                    <div class="flex flex-col transition-all duration-500"
-                        :class="{ 'opacity-100 scale-100': currentStep >= index, 'opacity-40 scale-95': currentStep < index }">
-                        <div class="flex items-center gap-4">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300"
-                                :class="{
-                                    'bg-green-100 text-green-600': currentStep > index,
-                                    'bg-bima-red text-white animate-pulse': currentStep === index,
-                                    'bg-gray-100 text-gray-400': currentStep < index
-                                }">
-                                {{-- Check Icon (Completed) --}}
-                                <svg x-show="currentStep > index" class="w-4 h-4" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-
-                                {{-- Spinner Icon (Active) --}}
-                                <svg x-show="currentStep === index" class="w-4 h-4 animate-spin" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                                    </path>
-                                </svg>
-
-                                <span class="text-xs font-bold" x-show="currentStep < index" x-text="index + 1"></span>
-                            </div>
-                            <span class="text-sm font-bold uppercase tracking-wider transition-colors duration-300"
-                                :class="{ 'text-gray-900': currentStep >= index, 'text-gray-400': currentStep < index }"
-                                x-text="step.title"></span>
+            {{-- STEP 2: Analisis AI --}}
+            <div class="p-6">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :class="stepAnalysisClass">
+                        <template x-if="globalStatus === 'completed' || globalStatus === 'synthesizing'">
+                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                        </template>
+                        <template x-if="globalStatus === 'processing' || globalStatus === 'partial_failure'">
+                            <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        </template>
+                        <template x-if="globalStatus === 'pending'">
+                            <i data-lucide="cpu" class="w-5 h-5"></i>
+                        </template>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <p class="font-black text-sm text-gray-900 uppercase tracking-wide">Pengiriman & Analisis AI</p>
+                            <span class="text-xs bg-gray-100 text-gray-600 font-bold px-2.5 py-1 rounded-full">
+                                <span x-text="processedChunks"></span>/{{ $analysis->total_chunks }} selesai
+                            </span>
                         </div>
+                    </div>
+                </div>
 
-                        {{-- Sub steps --}}
-                        <div x-show="currentStep >= index" 
-                             x-transition:enter="transition ease-out duration-300 transform"
-                             x-transition:enter-start="opacity-0 -translate-y-2"
-                             x-transition:enter-end="opacity-100 translate-y-0"
-                             class="mt-3 space-y-2 ml-10 border-l border-gray-100 pl-4 py-1">
-                            <template x-for="(subStep, subIndex) in step.subSteps" :key="subIndex">
-                                <div class="flex items-center gap-2.5 text-xs font-semibold transition-all duration-300"
-                                     :class="{
-                                         'text-gray-400': currentStep > index || (currentStep === index && currentSubStep > subIndex),
-                                         'text-bima-red animate-pulse scale-[1.02] origin-left': currentStep === index && currentSubStep === subIndex,
-                                         'text-gray-300 opacity-60': currentStep === index && currentSubStep < subIndex
-                                     }">
-                                    
-                                    {{-- Sub-step Status Indicator --}}
-                                    <div class="flex-shrink-0 flex items-center justify-center w-4 h-4">
-                                        <!-- Completed Sub-step: Green Check -->
-                                        <svg x-show="currentStep > index || (currentStep === index && currentSubStep > subIndex)" class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        
-                                        <!-- Active Sub-step: Spinner -->
-                                        <svg x-show="currentStep === index && currentSubStep === subIndex" class="w-3.5 h-3.5 text-bima-red animate-spin" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                        </svg>
-                                        
-                                        <!-- Future Sub-step: Small Dot -->
-                                        <div x-show="currentStep === index && currentSubStep < subIndex" class="w-1.5 h-1.5 rounded-full bg-gray-300 mx-1"></div>
-                                    </div>
-                                    
-                                    <span x-text="subStep" class="leading-relaxed"></span>
-                                </div>
+                {{-- Per-chunk rows --}}
+                <div class="space-y-2">
+                    <template x-for="chunk in chunks" :key="chunk.index">
+                        <div class="flex items-center gap-3 p-3 rounded-xl text-xs font-bold border"
+                            :class="{
+                                'bg-green-50 border-green-100': chunk.status === 'done',
+                                'bg-blue-50 border-blue-200': chunk.status === 'running',
+                                'bg-red-50 border-red-200': chunk.status === 'failed',
+                                'bg-gray-50 border-gray-100': chunk.status === 'pending'
+                            }">
+                            
+                            <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                                :class="{
+                                    'bg-green-500 text-white': chunk.status === 'done',
+                                    'bg-blue-500 text-white': chunk.status === 'running',
+                                    'bg-red-500 text-white': chunk.status === 'failed',
+                                    'bg-gray-200 text-gray-400': chunk.status === 'pending'
+                                }">
+                                <template x-if="chunk.status === 'done'"><i data-lucide="check" class="w-3.5 h-3.5"></i></template>
+                                <template x-if="chunk.status === 'running'"><svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg></template>
+                                <template x-if="chunk.status === 'failed'"><i data-lucide="x" class="w-3.5 h-3.5"></i></template>
+                                <template x-if="chunk.status === 'pending'"><span class="text-[0.6rem]" x-text="chunk.index"></span></template>
+                            </div>
+                            
+                            <span :class="{
+                                'text-green-700': chunk.status === 'done',
+                                'text-blue-700': chunk.status === 'running',
+                                'text-red-700': chunk.status === 'failed',
+                                'text-gray-400': chunk.status === 'pending'
+                            }" x-text="`Potongan ${chunk.index}`"></span>
+                            
+                            <span class="text-gray-400 font-medium" x-text="getChunkStatusText(chunk.status)"></span>
+                            
+                            <div class="flex-1"></div>
+                            
+                            <template x-if="chunk.status === 'failed'">
+                                <button @click="processChunk(chunk.index)" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg transition-colors text-[0.65rem] uppercase tracking-wider font-black">
+                                    Coba Lagi
+                                </button>
                             </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            {{-- STEP 3: Sintesis --}}
+            <div class="p-6 flex items-start gap-4">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                    :class="globalStatus === 'completed' ? 'bg-green-100 text-green-600' : (globalStatus === 'synthesizing' ? 'bg-purple-100 text-purple-500' : 'bg-gray-100 text-gray-300')">
+                    <template x-if="globalStatus === 'completed'"><i data-lucide="check-circle" class="w-5 h-5"></i></template>
+                    <template x-if="globalStatus === 'synthesizing'"><svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg></template>
+                    <template x-if="globalStatus !== 'completed' && globalStatus !== 'synthesizing'"><i data-lucide="layers" class="w-5 h-5"></i></template>
+                </div>
+                <div class="flex-1">
+                    <p class="font-black text-sm text-gray-900 uppercase tracking-wide">Sintesis Hasil Akhir</p>
+                    <p class="text-xs mt-1" :class="globalStatus === 'synthesizing' ? 'text-purple-500 font-bold animate-pulse' : 'text-gray-400'" 
+                       x-text="globalStatus === 'synthesizing' ? 'Menyatukan semua hasil analisis...' : (globalStatus === 'completed' ? 'Sintesis selesai.' : 'Menunggu analisis selesai...')">
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        {{-- Aktivitas Sistem (Modern Log) --}}
+        <div class="mt-8 bg-white border border-gray-100 rounded-2xl shadow-sm shadow-gray-100/50 p-6" x-show="logs.length > 0">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                    <i data-lucide="activity" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">Aktivitas Sistem</h3>
+                    <p class="text-xs text-gray-400 mt-0.5">Riwayat proses analisis secara real-time</p>
+                </div>
+            </div>
+            
+            <div class="relative space-y-5 max-h-80 overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent" id="log-container">
+                <template x-for="(log, i) in logs" :key="i">
+                    <div class="relative flex items-start gap-4 group">
+                        {{-- Garis konektor (hanya jika bukan log terakhir) --}}
+                        <template x-if="i !== logs.length - 1">
+                            <div class="absolute top-6 left-[0.31rem] w-px h-full bg-gray-100 group-hover:bg-gray-200 transition-colors -z-10"></div>
+                        </template>
+
+                        {{-- Dot status --}}
+                        <div class="relative mt-1 w-2.5 h-2.5 rounded-full ring-4 ring-white shrink-0" 
+                             :class="{
+                                 'bg-red-500': log.level === 'error',
+                                 'bg-yellow-400': log.level === 'warning',
+                                 'bg-green-500': log.level === 'success',
+                                 'bg-blue-400': log.level === 'info' || !log.level
+                             }"></div>
+
+                        <div class="flex-1 min-w-0 pb-1">
+                            <p class="text-xs text-gray-700 leading-relaxed font-medium break-words" x-text="log.msg"></p>
+                            <p class="text-[0.65rem] text-gray-400 font-bold mt-1.5 uppercase tracking-wider flex items-center gap-1.5">
+                                <i data-lucide="clock" class="w-3 h-3"></i>
+                                <span x-text="log.time"></span>
+                            </p>
                         </div>
                     </div>
                 </template>
             </div>
-
-            {{-- Error Message Box --}}
-            <div x-show="error" style="display: none;"
-                class="mt-8 p-6 bg-red-50 border border-red-100 rounded-3xl text-red-600 text-sm font-semibold animate-shake text-center">
-                <div class="flex items-center justify-center gap-2 mb-3">
-                    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-                    <span class="text-base font-black uppercase tracking-tight text-gray-900">
-                        <span class="lang-id">Gagal Memproses Hasil</span>
-                        <span class="lang-en">Failed to Process Results</span>
-                        <span class="lang-zh">计算融合诊断结果失败</span>
-                    </span>
-                </div>
-                <p class="text-gray-600 mb-6 leading-relaxed" x-text="error"></p>
-                
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    {{-- Retry Synthesis Button --}}
-                    <button type="button" @click="handleRetry" class="w-full sm:w-auto bg-bima-red hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-md shadow-red-500/10 cursor-pointer flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                        <span class="lang-id">Ulangi Proses Sintesis</span>
-                        <span class="lang-en">Retry Synthesis Process</span>
-                        <span class="lang-zh">重试融合计算</span>
-                    </button>
-                    
-                    {{-- Go Back / Upload New File --}}
-                    <a href="{{ route('analysis.create') }}" class="w-full sm:w-auto bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-6 py-3 rounded-xl transition-all text-center">
-                        <span class="lang-id">Upload Ulang File</span>
-                        <span class="lang-en">Re-upload File</span>
-                        <span class="lang-zh">重新上传文件</span>
-                    </a>
-                </div>
-            </div>
-
         </div>
     </div>
 
+    <x-slot name="scripts">
     <script>
-        const activeLang = '{{ app()->getLocale() }}';
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('processingFlow', (processUrl) => ({
-                steps: (activeLang === 'zh') ? [
-                    {
-                        title: '整合分析切片',
-                        subSteps: [
-                            '正在读取所有已分析的音频分段数据...',
-                            '正在按时间线对齐时间戳记录...'
-                        ]
-                    },
-                    {
-                        title: 'GPT-4o 智能体融合计算',
-                        subSteps: [
-                            '正在初始化 GPT-4o 深度融合智能体...',
-                            '正在对重叠区域进行文本去重处理...',
-                            '正在优化和润色学术话语语义转译...'
-                        ]
-                    },
-                    {
-                        title: '同步 C-CDA 语义参数',
-                        subSteps: [
-                            '正在构建 Advice-Giving 建议特征图谱...',
-                            '正在测算学术话语支配性权力指数 (Power Relation)...',
-                            '正在分类学术建议策略维度 (指令性/启发性)...'
-                        ]
-                    },
-                    {
-                        title: '计算系统性能度量',
-                        subSteps: [
-                            '正在测算本会话的主观声学分类置信度...',
-                            '正在计算系统专家标定 Cohen\'s Kappa 一致性系数...'
-                        ]
-                    },
-                    {
-                        title: '构建可视化仪表板',
-                        subSteps: [
-                            '正在归纳整理 Supervisory AI 核心诊断报告...',
-                            '正在初始化交互式多模态分析图表...'
-                        ]
-                    }
-                ] : ((activeLang === 'en') ? [
-                    {
-                        title: 'Compiling Analysis Chunks',
-                        subSteps: [
-                            'Reading analyzed audio segment records...',
-                            'Aligning conversational timestamps chronologically...'
-                        ]
-                    },
-                    {
-                        title: 'GPT-4o Agent Merging Results',
-                        subSteps: [
-                            'Initializing GPT-4o synthesis agent...',
-                            'Performing sequence text deduplication in overlap regions...',
-                            'Polishing and structuring academic discourse transcription...'
-                        ]
-                    },
-                    {
-                        title: 'Synchronizing C-CDA Elements',
-                        subSteps: [
-                            'Structuring advice-giving classification map...',
-                            'Calculating conversational power dynamics index...',
-                            'Extracting academic advice types (Directive/Corrective)...'
-                        ]
-                    },
-                    {
-                        title: 'Evaluating Academic Metrics',
-                        subSteps: [
-                            'Evaluating precision rates and speech confidence levels...',
-                            'Calculating experts annotations Cohen\'s Kappa agreement rate...'
-                        ]
-                    },
-                    {
-                        title: 'Assembling Results Dashboard',
-                        subSteps: [
-                            'Compiling Supervisory AI diagnostic summaries...',
-                            'Preparing dynamic multi-modal data visualizations...'
-                        ]
-                    }
-                ] : [
-                    {
-                        title: 'Mengompilasi Potongan Analisis',
-                        subSteps: [
-                            'Membaca data dari segmen audio teranalisis...',
-                            'Menyelaraskan stempel waktu (timestamps) secara kronologis...'
-                        ]
-                    },
-                    {
-                        title: 'Agen AI GPT-4o Menggabungkan Hasil',
-                        subSteps: [
-                            'Menginisialisasi Agen Sintesis GPT-4o...',
-                            'Menghapus tumpang-tindih teks (deduplication) pada wilayah overlap...',
-                            'Penyuntingan tata bahasa wacana bimbingan akademik...'
-                        ]
-                    },
-                    {
-                        title: 'Sinkronisasi Elemen C-CDA',
-                        subSteps: [
-                            'Menyusun peta klasifikasi Advice-Giving...',
-                            'Menghitung indeks dinamika kuasa (Power Relation)...',
-                            'Mengekstrak tipe saran bimbingan (Direktif/Korektif)...'
-                        ]
-                    },
-                    {
-                        title: 'Evaluasi Metrik Akademik',
-                        subSteps: [
-                            'Menghitung tingkat akurasi model vokal secara presisi...',
-                            'Melakukan kalkulasi nilai kesesuaian Cohen\'s Kappa...'
-                        ]
-                    },
-                    {
-                        title: 'Menyusun Dashboard Hasil',
-                        subSteps: [
-                            'Mengompilasi interpretasi akhir Supervisory AI...',
-                            'Mempersiapkan visualisasi grafik interaktif...'
-                        ]
-                    }
-                ]),
-                currentStep: 0,
-                currentSubStep: 0,
-                error: null,
-                isCompleted: false,
-                visualInterval: null,
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('processingApp', () => ({
+            slug: '{{ $analysis->slug }}',
+            totalChunks: {{ $analysis->total_chunks }},
+            processedChunks: 0,
+            globalStatus: 'pending', // pending, processing, partial_failure, synthesizing, completed, fatal_error
+            globalProgress: 10,
+            chunks: [],
+            logs: [],
 
-                init() {
-                    this.startVisualSteps();
-                    this.triggerAnalysis();
-                },
+            init() {
+                for (let i = 1; i <= this.totalChunks; i++) {
+                    this.chunks.push({ index: i, status: 'pending' }); // pending, running, done, failed
+                }
+                this.appendLog('info', 'Sesi disiapkan. Menunggu pengiriman potongan...');
+                
+                // Cek status dari DB
+                // Jika sudah diproses sebagian, kita harus tahu (di sini dianggap mulai dari awal untuk demo)
+                this.startProcessing();
+            },
 
-                startVisualSteps() {
-                    if (this.visualInterval) clearInterval(this.visualInterval);
-                    this.visualInterval = setInterval(() => {
-                        if (this.error || this.isCompleted) {
-                            clearInterval(this.visualInterval);
-                            return;
-                        }
+            get statusDotClass() {
+                if (this.globalStatus === 'completed') return 'bg-green-500';
+                if (this.globalStatus === 'partial_failure' || this.globalStatus === 'fatal_error') return 'bg-red-600';
+                return 'bg-bima-red';
+            },
 
-                        const activeStep = this.steps[this.currentStep];
-                        if (activeStep && activeStep.subSteps && this.currentSubStep < activeStep.subSteps.length - 1) {
-                            this.currentSubStep++;
-                        } else {
-                            if (this.currentStep < 4) {
-                                this.currentStep++;
-                                this.currentSubStep = 0;
-                            } else {
-                                clearInterval(this.visualInterval);
-                            }
-                        }
-                    }, 1800); // Progress smoothly every 1.8s
-                },
+            get statusLabel() {
+                if (this.globalStatus === 'completed') return 'Selesai';
+                if (this.globalStatus === 'partial_failure') return 'Terdapat Kegagalan Potongan';
+                if (this.globalStatus === 'fatal_error') return 'Terjadi Kegagalan Fatal';
+                return 'Sedang Diproses';
+            },
 
-                handleRetry() {
-                    this.error = null;
-                    this.currentStep = 0;
-                    this.currentSubStep = 0;
-                    this.isCompleted = false;
-                    this.startVisualSteps();
-                    this.triggerAnalysis();
-                },
+            get stepAnalysisClass() {
+                if (this.globalStatus === 'completed' || this.globalStatus === 'synthesizing') return 'bg-green-100 text-green-600';
+                if (this.globalStatus === 'processing' || this.globalStatus === 'partial_failure') return 'bg-blue-100 text-blue-500';
+                return 'bg-gray-100 text-gray-300';
+            },
 
-                async triggerAnalysis() {
-                    try {
-                        const response = await fetch(processUrl, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                'Accept': 'application/json'
-                            }
-                        });
+            getChunkStatusText(status) {
+                const map = { done: 'Selesai', running: 'Menganalisis...', failed: 'Gagal', pending: 'Menunggu' };
+                return map[status] || status;
+            },
 
-                        const data = await response.json();
+            appendLog(level, msg) {
+                const now = new Date().toLocaleTimeString('id-ID', { hour12: false });
+                this.logs.push({ level, msg, time: now });
+                setTimeout(() => {
+                    const c = document.getElementById('log-container');
+                    if(c) c.scrollTop = c.scrollHeight;
+                }, 50);
+            },
 
-                        if (response.ok && data.status === 'success') {
-                            this.isCompleted = true;
-                            // Jump instantly to completed state
-                            this.currentStep = 4;
-                            this.currentSubStep = 1;
-                            
-                            setTimeout(() => {
-                                window.location.href = data.redirect;
-                            }, 800);
-                        } else {
-                            this.error = data.message || (activeLang === 'zh' ? '智能体融合数据时服务器发生错误。' : (activeLang === 'en' ? 'Server error occurred during AI agent synthesis.' : 'Terjadi kesalahan sistem saat penggabungan oleh Agen AI.'));
-                            this.currentStep = -1;
-                        }
-                    } catch (err) {
-                        this.error = (activeLang === 'zh' ? '网络连接已断开，请检查您的服务器链路状态。' : (activeLang === 'en' ? 'Network connection lost. Please check your server status.' : 'Koneksi terputus. Silakan periksa jaringan server Anda.'));
-                        this.currentStep = -1;
+            async getDB() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open('BimaAudioDB', 1);
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            },
+
+            async getChunkFromDB(index) {
+                const db = await this.getDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction('chunks', 'readonly');
+                    const store = tx.objectStore('chunks');
+                    const req = store.get([this.slug, index]);
+                    req.onsuccess = () => {
+                        if (req.result) resolve(req.result.blob);
+                        else reject(new Error('Potongan audio tidak ditemukan di browser.'));
+                    };
+                    req.onerror = () => reject(req.error);
+                });
+            },
+
+            async startProcessing() {
+                this.globalStatus = 'processing';
+                this.globalProgress = 20;
+
+                for (let i = 1; i <= this.totalChunks; i++) {
+                    const chunk = this.chunks.find(c => c.index === i);
+                    if (chunk.status !== 'done') {
+                        await this.processChunk(i);
                     }
                 }
-            }));
-        });
+
+                if (this.processedChunks === this.totalChunks) {
+                    this.finalize();
+                } else {
+                    this.globalStatus = 'partial_failure';
+                    this.appendLog('warning', 'Beberapa potongan gagal. Silakan klik Coba Lagi pada potongan yang gagal.');
+                }
+            },
+
+            async processChunk(index) {
+                const chunk = this.chunks.find(c => c.index === index);
+                chunk.status = 'running';
+                this.appendLog('info', `Mengirim potongan ${index}...`);
+                
+                try {
+                    const blob = await this.getChunkFromDB(index);
+                    const formData = new FormData();
+                    formData.append('audio', blob, `chunk_${index}.wav`);
+                    formData.append('chunk_index', index);
+
+                    const csrf = document.querySelector('meta[name="csrf-token"]').content;
+                    
+                    const res = await fetch(`{{ url('/en/analysis') }}/${this.slug}/chunk`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrf,
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
+
+                    const data = await res.json();
+                    
+                    if (res.ok && data.status === 'success') {
+                        chunk.status = 'done';
+                        this.processedChunks++;
+                        this.globalProgress = 20 + Math.floor((this.processedChunks / this.totalChunks) * 70);
+                        this.appendLog('success', `Potongan ${index} selesai dianalisis.`);
+                        
+                        if (this.processedChunks === this.totalChunks) {
+                            this.finalize();
+                        }
+                    } else {
+                        throw new Error(data.message || 'Gagal dari server.');
+                    }
+                } catch (e) {
+                    chunk.status = 'failed';
+                    this.appendLog('error', `Potongan ${index} gagal: ${e.message}`);
+                }
+            },
+
+            async finalize() {
+                this.globalStatus = 'synthesizing';
+                this.globalProgress = 95;
+                this.appendLog('info', 'Sintesis hasil akhir...');
+
+                try {
+                    const csrf = document.querySelector('meta[name="csrf-token"]').content;
+                    const res = await fetch(`{{ url('/en/analysis') }}/${this.slug}/finalize`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrf,
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const data = await res.json();
+                    if (res.ok && data.status === 'success') {
+                        this.globalStatus = 'completed';
+                        this.globalProgress = 100;
+                        this.appendLog('success', 'Analisis selesai! Mengalihkan...');
+                        setTimeout(() => window.location.href = data.redirect, 1200);
+                    } else {
+                        throw new Error(data.message || 'Gagal sintesis.');
+                    }
+                } catch (e) {
+                    this.globalStatus = 'fatal_error';
+                    this.appendLog('error', `Gagal sintesis: ${e.message}`);
+                }
+            }
+        }));
+    });
     </script>
+    <script>
+    document.addEventListener('alpine:initialized', () => {
+        if(window.lucide) window.lucide.createIcons();
+    })
+    </script>
+    </x-slot>
 </x-layouts.app>

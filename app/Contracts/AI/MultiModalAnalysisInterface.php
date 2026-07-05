@@ -21,4 +21,9 @@ interface MultiModalAnalysisInterface
      * @return array The synthesized final report.
      */
     public function synthesizeChunks(array $chunks, string $locale = 'id'): array;
+
+    /**
+     * Ekspos konfigurasi LLM (untuk logging prompt & model ke DB).
+     */
+    public function getConfig(): LlmConfigurationInterface;
 }

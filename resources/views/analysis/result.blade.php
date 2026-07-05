@@ -203,39 +203,6 @@
             pageSize: {{ $analysis->status === 'completed' ? '10' : '1000' }},
             totalRows: 0,
             appLang: '{{ app()->getLocale() }}',
-            
-            async startBackgroundSynthesis() {
-                if (this.synthesisStatus === 'completed') return;
-                this.synthesisStatus = 'processing';
-                this.synthesisError = null;
-                
-                try {
-                    const response = await fetch('{{ route("analysis.process", $analysis->id) }}', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[\'name=csrf-token\']')?.content || document.querySelector('meta[name=\'csrf-token\']')?.content,
-                            'Accept': 'application/json'
-                        }
-                    });
-                    const data = await response.json();
-                    if (response.ok && data.status === 'success') {
-                        this.synthesisStatus = 'completed';
-                        window.location.reload();
-                    } else {
-                        this.synthesisStatus = 'failed';
-                        this.synthesisError = data.message || (this.appLang === 'zh' ? '构建分析结果失败。' : (this.appLang === 'en' ? 'Failed to compile analysis results.' : 'Gagal menyusun halaman hasil analisa.'));
-                    }
-                } catch (err) {
-                    this.synthesisStatus = 'failed';
-                    this.synthesisError = this.appLang === 'zh' ? '连接丢失，请重试。' : (this.appLang === 'en' ? 'Connection lost. Please try again.' : 'Koneksi terputus. Silakan coba kembali.');
-                }
-            },
-    
-            init() {
-                if (this.synthesisStatus !== 'completed') {
-                    this.startBackgroundSynthesis();
-                }
-            },
         
             openInsight(title, type, explanation, relation) {
                 this.insightTitle = title;
