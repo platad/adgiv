@@ -1,4 +1,18 @@
 <x-layouts.app title="Memproses Analisa — {{ $analysis->title }}">
+    <style>
+        .custom-layout-wrapper { display: flex; flex-direction: column; gap: 2rem; width: 100%; }
+        .custom-layout-left { width: 100%; display: flex; flex-direction: column; gap: 1.5rem; }
+        .custom-layout-right { width: 100%; }
+        @media (min-width: 1024px) {
+            .custom-layout-wrapper { flex-direction: row; align-items: flex-start; }
+            .custom-layout-left { width: 66.666667%; }
+            .custom-layout-right { width: 33.333333%; }
+        }
+        @media (min-width: 1280px) {
+            .custom-layout-left { width: 75%; }
+            .custom-layout-right { width: 25%; }
+        }
+    </style>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" x-data="processingApp()" x-init="init()">
 
         {{-- Header --}}
@@ -20,9 +34,9 @@
             <div class="bg-bima-red h-full rounded-full transition-all duration-700" :style="`width: ${globalProgress}%`"></div>
         </div>
 
-        <div class="flex flex-col lg:flex-row gap-8 w-full">
+        <div class="custom-layout-wrapper">
             {{-- Kolom Kiri: Proses Utama --}}
-            <div class="flex flex-col gap-6 w-full lg:w-2/3 xl:w-3/4">
+            <div class="custom-layout-left">
                 
                 {{-- Processing Card --}}
                 <div class="bg-white border border-gray-100 rounded-[2rem] shadow-xl shadow-gray-100/60 divide-y divide-gray-50 overflow-hidden">
@@ -129,7 +143,7 @@
             </div>
             
             {{-- Kolom Kanan: Log Aktivitas --}}
-            <div class="w-full lg:w-1/3 xl:w-1/4">
+            <div class="custom-layout-right">
                 <div class="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-gray-100/50 p-6 sticky top-8" x-show="logs.length > 0">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
