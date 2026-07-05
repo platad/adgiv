@@ -70,41 +70,41 @@
 
                         {{-- Per-chunk rows --}}
                         <div class="space-y-2 max-h-[400px] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-                            <template x-for="chunk in chunks" :key="chunk.index">
+                            <template x-for="i in totalChunks" :key="i">
                                 <div class="flex items-center gap-3 p-3 rounded-xl text-xs font-bold border"
                                     :class="{
-                                        'bg-green-50 border-green-100': chunk.status === 'done',
-                                        'bg-blue-50 border-blue-200': chunk.status === 'running',
-                                        'bg-red-50 border-red-200': chunk.status === 'failed',
-                                        'bg-gray-50 border-gray-100': chunk.status === 'pending'
+                                        'bg-green-50 border-green-100': chunkStatusMap[i] === 'done',
+                                        'bg-blue-50 border-blue-200': chunkStatusMap[i] === 'running',
+                                        'bg-red-50 border-red-200': chunkStatusMap[i] === 'failed',
+                                        'bg-gray-50 border-gray-100': !chunkStatusMap[i] || chunkStatusMap[i] === 'pending'
                                     }">
                                     
                                     <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
                                         :class="{
-                                            'bg-green-500 text-white': chunk.status === 'done',
-                                            'bg-blue-500 text-white': chunk.status === 'running',
-                                            'bg-red-500 text-white': chunk.status === 'failed',
-                                            'bg-gray-200 text-gray-400': chunk.status === 'pending'
+                                            'bg-green-500 text-white': chunkStatusMap[i] === 'done',
+                                            'bg-blue-500 text-white': chunkStatusMap[i] === 'running',
+                                            'bg-red-500 text-white': chunkStatusMap[i] === 'failed',
+                                            'bg-gray-200 text-gray-400': !chunkStatusMap[i] || chunkStatusMap[i] === 'pending'
                                         }">
-                                        <template x-if="chunk.status === 'done'"><i data-lucide="check" class="w-3.5 h-3.5"></i></template>
-                                        <template x-if="chunk.status === 'running'"><svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg></template>
-                                        <template x-if="chunk.status === 'failed'"><i data-lucide="x" class="w-3.5 h-3.5"></i></template>
-                                        <template x-if="chunk.status === 'pending'"><span class="text-[0.6rem]" x-text="chunk.index"></span></template>
+                                        <template x-if="chunkStatusMap[i] === 'done'"><svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></template>
+                                        <template x-if="chunkStatusMap[i] === 'running'"><svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg></template>
+                                        <template x-if="chunkStatusMap[i] === 'failed'"><svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></template>
+                                        <template x-if="!chunkStatusMap[i] || chunkStatusMap[i] === 'pending'"><span class="text-[0.6rem]" x-text="i"></span></template>
                                     </div>
                                     
                                     <span :class="{
-                                        'text-green-700': chunk.status === 'done',
-                                        'text-blue-700': chunk.status === 'running',
-                                        'text-red-700': chunk.status === 'failed',
-                                        'text-gray-400': chunk.status === 'pending'
-                                    }" x-text="`Potongan ${chunk.index}`"></span>
+                                        'text-green-700': chunkStatusMap[i] === 'done',
+                                        'text-blue-700': chunkStatusMap[i] === 'running',
+                                        'text-red-700': chunkStatusMap[i] === 'failed',
+                                        'text-gray-400': !chunkStatusMap[i] || chunkStatusMap[i] === 'pending'
+                                    }" x-text="`Potongan ${i}`"></span>
                                     
-                                    <span class="text-gray-400 font-medium" x-text="getChunkStatusText(chunk.status)"></span>
+                                    <span class="text-gray-400 font-medium" x-text="getChunkStatusText(chunkStatusMap[i] || 'pending')"></span>
                                     
                                     <div class="flex-1"></div>
                                     
-                                    <template x-if="chunk.status === 'failed'">
-                                        <button @click="processChunk(chunk.index)" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg transition-colors text-[0.65rem] uppercase tracking-wider font-black">
+                                    <template x-if="chunkStatusMap[i] === 'failed'">
+                                        <button @click="processChunk(i)" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg transition-colors text-[0.65rem] uppercase tracking-wider font-black">
                                             Coba Lagi
                                         </button>
                                     </template>
@@ -185,13 +185,16 @@
             processedChunks: 0,
             globalStatus: 'pending', // pending, processing, partial_failure, synthesizing, completed, fatal_error
             globalProgress: 10,
-            chunks: [],
+            chunkStatusMap: {},
             logs: [],
 
             init() {
+                let initialMap = {};
                 for (let i = 1; i <= this.totalChunks; i++) {
-                    this.chunks.push({ index: i, status: 'pending' }); // pending, running, done, failed
+                    initialMap[i] = 'pending';
                 }
+                this.chunkStatusMap = initialMap;
+                
                 this.appendLog('info', 'Sesi disiapkan. Menunggu pengiriman potongan...');
                 
                 this.startProcessing();
@@ -222,9 +225,8 @@
             },
             
             updateChunkStatus(index, newStatus) {
-                this.chunks = this.chunks.map(c => 
-                    c.index === index ? { ...c, status: newStatus } : c
-                );
+                this.chunkStatusMap[index] = newStatus;
+                this.chunkStatusMap = { ...this.chunkStatusMap };
             },
 
             appendLog(level, msg) {
@@ -263,8 +265,8 @@
                 this.globalProgress = 20;
 
                 for (let i = 1; i <= this.totalChunks; i++) {
-                    const chunk = this.chunks.find(c => c.index === i);
-                    if (chunk.status !== 'done') {
+                    const status = this.chunkStatusMap[i];
+                    if (status !== 'done') {
                         await this.processChunk(i);
                     }
                 }
