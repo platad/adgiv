@@ -122,6 +122,7 @@ class AnalysisController extends Controller
         $chunk->update(['prompt_used' => $systemPrompt]);
 
         try {
+            set_time_limit(300); // Mencegah server cPanel mematikan proses jika AI merespons agak lama
             $absolutePath = Storage::disk('local')->path($path);
             Log::info('[DEBUG] Processing absolute path: ' . $absolutePath);
             $result = $this->callOpenAiWithRetry($absolutePath, $locale, 3);
@@ -163,7 +164,7 @@ class AnalysisController extends Controller
 
     public function finalize(Analysis $analysis)
     {
-        abort_if($analysis->user_id !== Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id(), 403);
         
         $chunks = AnalysisChunk::where('analysis_id', $analysis->id)
             ->where('status', 'done')
@@ -180,6 +181,7 @@ class AnalysisController extends Controller
         $locale = $analysis->locale ?? 'id';
         
         try {
+            set_time_limit(300);
             $synthesizedResult = $this->aiService->synthesizeChunks($chunks, $locale);
             $finalResult = $this->parseAdviceAction->execute($synthesizedResult);
             $finalResult['total_chunks'] = count($chunks);
@@ -209,7 +211,7 @@ class AnalysisController extends Controller
                 $lastException = $e;
                 Log::warning("[SSE] OpenAI attempt {$attempt} gagal: " . $e->getMessage());
                 if ($attempt < $maxRetries) {
-                    sleep(2 ** $attempt); // Exponential backoff: 2s, 4s, 8s
+                    sleep(2 ** $attempt);
                 }
             }
         }
@@ -221,10 +223,9 @@ class AnalysisController extends Controller
 
     public function resumeChunk(Analysis $analysis)
     {
-        abort_if($analysis->user_id !== Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id(), 403);
         abort_unless($analysis->isFailed() || $analysis->isResumable(), 422);
 
-        // Panggil MySQL Stored Procedure (atomik, satu pemanggilan)
         DB::statement('CALL sp_reset_failed_chunks(?)', [$analysis->id]);
 
         return redirect()->route('analysis.processing', $analysis->slug)
@@ -233,7 +234,7 @@ class AnalysisController extends Controller
 
     public function result(Analysis $analysis)
     {
-        abort_if($analysis->user_id !== Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id(), 403);
 
         if (!$analysis->isCompleted()) {
             return redirect()->route('analysis.processing', $analysis->slug);
@@ -245,7 +246,7 @@ class AnalysisController extends Controller
 
     public function feedback(Request $request, Analysis $analysis)
     {
-        abort_if($analysis->user_id !== Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id(), 403);
 
         $request->validate([
             'is_accurate' => ['required', 'boolean'],
@@ -269,7 +270,7 @@ class AnalysisController extends Controller
 
     public function lineFeedback(Request $request, Analysis $analysis)
     {
-        abort_if($analysis->user_id !== Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id(), 403);
 
         $request->validate([
             'index' => 'required|integer',
@@ -300,7 +301,7 @@ class AnalysisController extends Controller
 
     public function printReport(Analysis $analysis)
     {
-        abort_if($analysis->user_id !== Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id(), 403);
 
         if (!$analysis->isCompleted()) {
             return redirect()->route('analysis.result', $analysis->slug)
@@ -312,7 +313,7 @@ class AnalysisController extends Controller
 
     public function destroy(Analysis $analysis)
     {
-        abort_if($analysis->user_id !== Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id(), 403);
 
         if ($analysis->audio_path && Storage::disk('local')->exists($analysis->audio_path)) {
             Storage::disk('local')->delete($analysis->audio_path);
@@ -329,7 +330,7 @@ class AnalysisController extends Controller
     {
         $pendingFiles = DB::table('pending_file_deletions')
             ->where('is_processed', false)
-            ->limit(50) // Proses batch, jangan semua sekaligus
+            ->limit(50)
             ->get();
 
         foreach ($pendingFiles as $pending) {
