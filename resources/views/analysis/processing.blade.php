@@ -9,7 +9,7 @@
             </div>
             <h1 class="text-2xl font-black text-gray-900 truncate">{{ $analysis->title }}</h1>
             <div class="flex flex-wrap gap-4 mt-2 text-xs text-gray-400 font-bold uppercase tracking-widest">
-                <span>Model: <span class="text-gray-700">{{ $analysis->model_used ?? 'gpt-audio-1.5' }}</span></span>
+                <span>Model: <span class="text-gray-700">{{ $analysis->model_used ?? 'vps-faster-whisper' }}</span></span>
                 <span>Bahasa: <span class="text-gray-700">{{ ['id' => '🇮🇩 Indonesia', 'en' => '🇬🇧 English', 'zh' => '🇨🇳 中文'][$analysis->locale] ?? $analysis->locale }}</span></span>
                 <span>ID Sesi: <span class="text-gray-700 font-mono">{{ $analysis->slug }}</span></span>
             </div>
@@ -20,118 +20,67 @@
             <div class="bg-bima-red h-full rounded-full transition-all duration-700" :style="`width: ${globalProgress}%`"></div>
         </div>
 
-        {{-- INLINE LAYOUT GRID (Bypass Tailwind JIT & Style Stripping) --}}
+        {{-- INLINE LAYOUT GRID --}}
         <div style="display: flex; flex-wrap: wrap; gap: 2rem; width: 100%;">
             
-            {{-- Kolom Kiri: Proses Utama (min-width: 320px, grows to fill 65% of space) --}}
+            {{-- Kolom Kiri: Proses Utama --}}
             <div style="flex: 1 1 60%; min-width: 320px; display: flex; flex-direction: column; gap: 1.5rem;">
                 
                 {{-- Processing Card --}}
                 <div class="bg-white border border-gray-100 rounded-[2rem] shadow-xl shadow-gray-100/60 divide-y divide-gray-50 overflow-hidden">
 
-                    {{-- STEP 1: Upload (Slicing) --}}
+                    {{-- Status Audio --}}
                     <div class="p-6 flex items-start gap-4">
                         <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-green-100 text-green-600">
                             <i data-lucide="check-circle" class="w-5 h-5"></i>
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center justify-between">
-                                <p class="font-black text-sm text-gray-900 uppercase tracking-wide">Pemotongan Audio (Selesai)</p>
+                                <p class="font-black text-sm text-gray-900 uppercase tracking-wide">Audio Terkirim (Selesai)</p>
                             </div>
                             <p class="text-xs text-gray-500 mt-1 font-medium">
-                                {{ $analysis->total_chunks }} potongan <span class="text-gray-400">via Browser (Client-side)</span>
+                                1 File Utuh <span class="text-gray-400">Tersimpan di server</span>
                             </p>
                         </div>
                     </div>
 
-                    {{-- STEP 2: Analisis AI --}}
+                    {{-- Analisis AI Streaming --}}
                     <div class="p-6">
                         <div class="flex items-start gap-4 mb-4">
                             <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :class="stepAnalysisClass">
-                                <template x-if="globalStatus === 'completed' || globalStatus === 'synthesizing'">
+                                <template x-if="globalStatus === 'completed'">
                                     <i data-lucide="check-circle" class="w-5 h-5"></i>
                                 </template>
-                                <template x-if="globalStatus === 'processing' || globalStatus === 'partial_failure'">
+                                <template x-if="globalStatus === 'processing'">
                                     <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                                 </template>
-                                <template x-if="globalStatus === 'pending'">
-                                    <i data-lucide="cpu" class="w-5 h-5"></i>
+                                <template x-if="globalStatus === 'failed'">
+                                    <i data-lucide="alert-circle" class="w-5 h-5"></i>
                                 </template>
                             </div>
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 flex-wrap">
-                                    <p class="font-black text-sm text-gray-900 uppercase tracking-wide">Pengiriman & Analisis AI</p>
-                                    <span class="text-xs bg-gray-100 text-gray-600 font-bold px-2.5 py-1 rounded-full">
-                                        <span x-text="processedChunks"></span>/{{ $analysis->total_chunks }} selesai
-                                    </span>
+                                    <p class="font-black text-sm text-gray-900 uppercase tracking-wide">Transkripsi AI Real-Time</p>
                                 </div>
+                                <p class="text-xs text-gray-500 mt-1" x-text="transcriptionStatus">Menunggu respon VPS...</p>
                             </div>
                         </div>
 
-                        {{-- Per-chunk rows --}}
-                        <div class="space-y-2 max-h-[400px] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-                            <template x-for="i in totalChunks" :key="i">
-                                <div class="flex items-center gap-3 p-3 rounded-xl text-xs font-bold border"
-                                    :class="{
-                                        'bg-green-50 border-green-100': chunkStatusMap[i] === 'done',
-                                        'bg-blue-50 border-blue-200': chunkStatusMap[i] === 'running',
-                                        'bg-red-50 border-red-200': chunkStatusMap[i] === 'failed',
-                                        'bg-gray-50 border-gray-100': !chunkStatusMap[i] || chunkStatusMap[i] === 'pending'
-                                    }">
-                                    
-                                    <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                                        :class="{
-                                            'bg-green-500 text-white': chunkStatusMap[i] === 'done',
-                                            'bg-blue-500 text-white': chunkStatusMap[i] === 'running',
-                                            'bg-red-500 text-white': chunkStatusMap[i] === 'failed',
-                                            'bg-gray-200 text-gray-400': !chunkStatusMap[i] || chunkStatusMap[i] === 'pending'
-                                        }">
-                                        <template x-if="chunkStatusMap[i] === 'done'"><svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></template>
-                                        <template x-if="chunkStatusMap[i] === 'running'"><svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg></template>
-                                        <template x-if="chunkStatusMap[i] === 'failed'"><svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></template>
-                                        <template x-if="!chunkStatusMap[i] || chunkStatusMap[i] === 'pending'"><span class="text-[0.6rem]" x-text="i"></span></template>
-                                    </div>
-                                    
-                                    <span :class="{
-                                        'text-green-700': chunkStatusMap[i] === 'done',
-                                        'text-blue-700': chunkStatusMap[i] === 'running',
-                                        'text-red-700': chunkStatusMap[i] === 'failed',
-                                        'text-gray-400': !chunkStatusMap[i] || chunkStatusMap[i] === 'pending'
-                                    }" x-text="`Potongan ${i}`"></span>
-                                    
-                                    <span class="text-gray-400 font-medium" x-text="getChunkStatusText(chunkStatusMap[i] || 'pending')"></span>
-                                    
-                                    <div class="flex-1"></div>
-                                    
-                                    <template x-if="chunkStatusMap[i] === 'failed'">
-                                        <button @click="processChunk(i)" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-lg transition-colors text-[0.65rem] uppercase tracking-wider font-black">
-                                            Coba Lagi
-                                        </button>
-                                    </template>
-                                </div>
+                        {{-- Real-time Text Box --}}
+                        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 h-64 overflow-y-auto font-mono text-xs text-gray-700 leading-relaxed" id="realtime-text-box">
+                            <template x-for="(text, idx) in realtimeTexts" :key="idx">
+                                <div class="mb-2" x-html="text"></div>
+                            </template>
+                            <template x-if="realtimeTexts.length === 0">
+                                <span class="text-gray-400 italic">... transkripsi akan muncul di sini ...</span>
                             </template>
                         </div>
                     </div>
 
-                    {{-- STEP 3: Sintesis --}}
-                    <div class="p-6 flex items-start gap-4">
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                            :class="globalStatus === 'completed' ? 'bg-green-100 text-green-600' : (globalStatus === 'synthesizing' ? 'bg-purple-100 text-purple-500' : 'bg-gray-100 text-gray-300')">
-                            <template x-if="globalStatus === 'completed'"><i data-lucide="check-circle" class="w-5 h-5"></i></template>
-                            <template x-if="globalStatus === 'synthesizing'"><svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg></template>
-                            <template x-if="globalStatus !== 'completed' && globalStatus !== 'synthesizing'"><i data-lucide="layers" class="w-5 h-5"></i></template>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-black text-sm text-gray-900 uppercase tracking-wide">Sintesis Hasil Akhir</p>
-                            <p class="text-xs mt-1" :class="globalStatus === 'synthesizing' ? 'text-purple-500 font-bold animate-pulse' : 'text-gray-400'" 
-                               x-text="globalStatus === 'synthesizing' ? 'Menyatukan semua hasil analisis...' : (globalStatus === 'completed' ? 'Sintesis selesai.' : 'Menunggu analisis selesai...')">
-                            </p>
-                        </div>
-                    </div>
                 </div>
             </div>
             
-            {{-- Kolom Kanan: Log Aktivitas (min-width: 250px, grows to fill 30% of space) --}}
+            {{-- Kolom Kanan: Log Aktivitas --}}
             <div style="flex: 1 1 30%; min-width: 280px;">
                 <div class="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-gray-100/50 p-6 sticky top-8" x-show="logs.length > 0">
                     <div class="flex items-center gap-3 mb-6">
@@ -147,12 +96,10 @@
                     <div class="relative space-y-5 max-h-80 overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent" id="log-container">
                         <template x-for="(log, i) in logs" :key="i">
                             <div class="relative flex items-start gap-4 group">
-                                {{-- Garis konektor (hanya jika bukan log terakhir) --}}
                                 <template x-if="i !== logs.length - 1">
                                     <div class="absolute top-6 left-[0.31rem] w-px h-full bg-gray-100 group-hover:bg-gray-200 transition-colors -z-10"></div>
                                 </template>
 
-                                {{-- Dot status --}}
                                 <div class="relative mt-1 w-2.5 h-2.5 rounded-full ring-4 ring-white shrink-0" 
                                      :class="{
                                          'bg-red-500': log.level === 'error',
@@ -181,52 +128,32 @@
     document.addEventListener('alpine:init', () => {
         Alpine.data('processingApp', () => ({
             slug: '{{ $analysis->slug }}',
-            totalChunks: {{ $analysis->total_chunks }},
-            processedChunks: 0,
-            globalStatus: 'pending', // pending, processing, partial_failure, synthesizing, completed, fatal_error
+            globalStatus: 'pending',
             globalProgress: 10,
-            chunkStatusMap: {},
             logs: [],
-
+            realtimeTexts: [],
+            transcriptionStatus: 'Membangun koneksi ke server VPS...',
+            
             init() {
-                let initialMap = {};
-                for (let i = 1; i <= this.totalChunks; i++) {
-                    initialMap[i] = 'pending';
-                }
-                this.chunkStatusMap = initialMap;
-                
-                this.appendLog('info', 'Sesi disiapkan. Menunggu pengiriman potongan...');
-                
                 this.startProcessing();
             },
 
             get statusDotClass() {
                 if (this.globalStatus === 'completed') return 'bg-green-500';
-                if (this.globalStatus === 'partial_failure' || this.globalStatus === 'fatal_error') return 'bg-red-600';
+                if (this.globalStatus === 'failed') return 'bg-red-600';
                 return 'bg-bima-red';
             },
 
             get statusLabel() {
                 if (this.globalStatus === 'completed') return 'Selesai';
-                if (this.globalStatus === 'partial_failure') return 'Terdapat Kegagalan Potongan';
-                if (this.globalStatus === 'fatal_error') return 'Terjadi Kegagalan Fatal';
+                if (this.globalStatus === 'failed') return 'Gagal';
                 return 'Sedang Diproses';
             },
 
             get stepAnalysisClass() {
-                if (this.globalStatus === 'completed' || this.globalStatus === 'synthesizing') return 'bg-green-100 text-green-600';
-                if (this.globalStatus === 'processing' || this.globalStatus === 'partial_failure') return 'bg-blue-100 text-blue-500';
-                return 'bg-gray-100 text-gray-300';
-            },
-
-            getChunkStatusText(status) {
-                const map = { done: 'Selesai', running: 'Menganalisis...', failed: 'Gagal', pending: 'Menunggu' };
-                return map[status] || status;
-            },
-            
-            updateChunkStatus(index, newStatus) {
-                this.chunkStatusMap[index] = newStatus;
-                this.chunkStatusMap = { ...this.chunkStatusMap };
+                if (this.globalStatus === 'completed') return 'bg-green-100 text-green-600';
+                if (this.globalStatus === 'processing') return 'bg-blue-100 text-blue-500';
+                return 'bg-red-100 text-red-600';
             },
 
             appendLog(level, msg) {
@@ -238,121 +165,88 @@
                 }, 50);
             },
 
-            async getDB() {
-                return new Promise((resolve, reject) => {
-                    const req = indexedDB.open('BimaAudioDB', 1);
-                    req.onsuccess = () => resolve(req.result);
-                    req.onerror = () => reject(req.error);
-                });
-            },
-
-            async getChunkFromDB(index) {
-                const db = await this.getDB();
-                return new Promise((resolve, reject) => {
-                    const tx = db.transaction('chunks', 'readonly');
-                    const store = tx.objectStore('chunks');
-                    const req = store.get([this.slug, index]);
-                    req.onsuccess = () => {
-                        if (req.result) resolve(req.result.blob);
-                        else reject(new Error('Potongan audio tidak ditemukan di browser.'));
-                    };
-                    req.onerror = () => reject(req.error);
-                });
-            },
-
-            isProcessing: false,
             async startProcessing() {
-                if (this.isProcessing) return;
-                this.isProcessing = true;
-                
                 this.globalStatus = 'processing';
-                this.globalProgress = 20;
-
-                for (let i = 1; i <= this.totalChunks; i++) {
-                    if (this.chunkStatusMap[i] !== 'done' && this.chunkStatusMap[i] !== 'running') {
-                        await this.processChunk(i);
-                    }
-                }
-
-                const doneCount = Object.values(this.chunkStatusMap).filter(s => s === 'done').length;
-                if (doneCount !== this.totalChunks) {
-                    this.globalStatus = 'partial_failure';
-                    this.appendLog('warning', 'Beberapa potongan gagal. Silakan klik Coba Lagi.');
-                }
-                this.isProcessing = false;
-            },
-
-            async processChunk(index) {
-                if (this.chunkStatusMap[index] === 'running' || this.chunkStatusMap[index] === 'done') return;
-                
-                this.updateChunkStatus(index, 'running');
-                this.appendLog('info', `Mengirim potongan ${index}...`);
+                this.globalProgress = 30;
+                this.appendLog('info', 'Mengirim perintah transkripsi ke VPS...');
                 
                 try {
-                    const blob = await this.getChunkFromDB(index);
-                    const formData = new FormData();
-                    formData.append('audio', blob, `chunk_${index}.wav`);
-                    formData.append('chunk_index', index);
-
                     const csrf = document.querySelector('meta[name="csrf-token"]').content;
                     
-                    const res = await fetch(`{{ url('/en/analysis') }}/${this.slug}/chunk`, {
+                    const response = await fetch(`{{ url('/en/analysis') }}/${this.slug}/processAudio`, {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': csrf,
-                            'Accept': 'application/json'
-                        },
-                        body: formData
+                            'Accept': 'application/x-ndjson'
+                        }
                     });
 
-                    const data = await res.json();
-                    
-                    if (res.ok && data.status === 'success') {
-                        this.updateChunkStatus(index, 'done');
-                        const doneCount = Object.values(this.chunkStatusMap).filter(s => s === 'done').length;
-                        this.processedChunks = doneCount;
-                        this.globalProgress = 20 + Math.floor((doneCount / this.totalChunks) * 70);
-                        this.appendLog('success', `Potongan ${index} selesai dianalisis.`);
+                    if (!response.ok) {
+                        throw new Error('HTTP error ' + response.status);
+                    }
+
+                    this.appendLog('success', 'Koneksi streaming terbuka. Menunggu data...');
+                    this.transcriptionStatus = 'Sedang Menerjemahkan...';
+
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder("utf-8");
+                    let buffer = '';
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+
+                        this.globalProgress = Math.min(90, this.globalProgress + 2); // Animate progress slowly
                         
-                        if (doneCount === this.totalChunks) {
-                            this.finalize();
+                        buffer += decoder.decode(value, { stream: true });
+                        const lines = buffer.split("\n");
+                        
+                        // Keep the last partial line in the buffer
+                        buffer = lines.pop();
+
+                        for (const line of lines) {
+                            if (line.trim() === '') continue;
+                            
+                            try {
+                                const data = JSON.parse(line);
+                                
+                                if (data.status === 'processing' && data.text) {
+                                    const textLine = `[${data.start.toFixed(2)}s -> ${data.end.toFixed(2)}s] <span class="text-gray-900 font-bold">${data.text}</span>`;
+                                    this.realtimeTexts.push(textLine);
+                                    
+                                    setTimeout(() => {
+                                        const c = document.getElementById('realtime-text-box');
+                                        if(c) c.scrollTop = c.scrollHeight;
+                                    }, 50);
+                                    
+                                } else if (data.status === 'success') {
+                                    this.appendLog('success', 'Transkripsi selesai.');
+                                    this.globalStatus = 'completed';
+                                    this.globalProgress = 100;
+                                    this.transcriptionStatus = 'Penyimpanan berhasil, mengalihkan...';
+                                    
+                                    setTimeout(() => {
+                                        window.location.href = `{{ route('analysis.result', $analysis->slug) }}`;
+                                    }, 1500);
+                                    
+                                } else if (data.status === 'error') {
+                                    throw new Error(data.message);
+                                }
+                            } catch (err) {
+                                console.error('Failed to parse NDJSON line:', line, err);
+                            }
                         }
-                    } else {
-                        throw new Error(data.message || 'Gagal dari server.');
                     }
-                } catch (e) {
-                    this.updateChunkStatus(index, 'failed');
-                    this.appendLog('error', `Potongan ${index} gagal: ${e.message}`);
-                }
-            },
 
-            async finalize() {
-                this.globalStatus = 'synthesizing';
-                this.globalProgress = 95;
-                this.appendLog('info', 'Sintesis hasil akhir...');
-
-                try {
-                    const csrf = document.querySelector('meta[name="csrf-token"]').content;
-                    const res = await fetch(`{{ url('/en/analysis') }}/${this.slug}/finalize`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': csrf,
-                            'Accept': 'application/json'
-                        }
-                    });
-
-                    const data = await res.json();
-                    if (res.ok && data.status === 'success') {
-                        this.globalStatus = 'completed';
-                        this.globalProgress = 100;
-                        this.appendLog('success', 'Analisis selesai! Mengalihkan...');
-                        setTimeout(() => window.location.href = data.redirect, 1200);
-                    } else {
-                        throw new Error(data.message || 'Gagal sintesis.');
+                    // Done reading
+                    if (this.globalStatus !== 'completed') {
+                        this.appendLog('info', 'Stream selesai (terputus).');
                     }
+
                 } catch (e) {
-                    this.globalStatus = 'fatal_error';
-                    this.appendLog('error', `Gagal sintesis: ${e.message}`);
+                    this.globalStatus = 'failed';
+                    this.transcriptionStatus = 'Gagal melakukan transkripsi.';
+                    this.appendLog('error', `Error: ${e.message}`);
                 }
             }
         }));

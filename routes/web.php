@@ -49,9 +49,7 @@ Route::prefix('{locale}')->middleware([\App\Http\Middleware\Localization::class]
             Route::post('/initialize', [AnalysisController::class, 'initialize'])->name('initialize');
 
             Route::get('/{analysis}/processing', [AnalysisController::class, 'processing'])->name('processing');
-            Route::post('/{analysis}/chunk', [AnalysisController::class, 'processChunk'])->name('chunk'); // Endpoint Client-Side Slicing
-            Route::post('/{analysis}/finalize', [AnalysisController::class, 'finalize'])->name('finalize'); // Endpoint Akhir
-            Route::post('/{analysis}/resume', [AnalysisController::class, 'resumeChunk'])->name('resume');         // Resume chunk gagal
+            Route::post('/{analysis}/processAudio', [AnalysisController::class, 'processAudio'])->name('processAudio'); // Endpoint Streaming VPS
             Route::get('/{analysis}/result', [AnalysisController::class, 'result'])->name('result');
             Route::get('/{analysis}/print', [AnalysisController::class, 'printReport'])->name('print');
             Route::post('/{analysis}/feedback', [AnalysisController::class, 'feedback'])->name('feedback');

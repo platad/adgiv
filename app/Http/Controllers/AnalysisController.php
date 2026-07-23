@@ -6,9 +6,7 @@ use App\Models\Analysis;
 use App\Models\AnalysisChunk;
 use App\Models\AnalysisLog;
 use App\Models\AnalysisFeedback;
-use App\Services\AI\OpenAiMultiModalService;
-use App\Actions\ParseAdviceGivingAction;
-use App\Contracts\AI\MultiModalAnalysisInterface;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -19,10 +17,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AnalysisController extends Controller
 {
-    public function __construct(
-        private readonly MultiModalAnalysisInterface $aiService,
-        private readonly ParseAdviceGivingAction     $parseAdviceAction
-    ) {}
 
     public function create()
     {
@@ -32,10 +26,9 @@ class AnalysisController extends Controller
     public function initialize(Request $request)
     {
         $validated = $request->validate([
-            'title'            => ['required', 'string', 'max:255'],
-            'locale'           => ['nullable', 'string', 'in:id,en,zh'],
-            'total_chunks'     => ['required', 'integer', 'min:1'],
-            'duration_seconds' => ['required', 'numeric', 'min:0.1'],
+            'title'  => ['required', 'string', 'max:255'],
+            'locale' => ['nullable', 'string', 'in:id,en,zh'],
+            'audio'  => ['required', 'file', 'mimes:wav,mp3,webm,ogg,aac,m4a,flac', 'max:10240'],
         ]);
 
         $locale = $validated['locale'] ?? 'id';
@@ -45,28 +38,41 @@ class AnalysisController extends Controller
             'user_id'                => $userId,
             'title'                  => $validated['title'],
             'locale'                 => $locale,
-            'audio_path'             => 'client-side-sliced',
-            'audio_duration_seconds' => $validated['duration_seconds'],
-            'total_chunks'           => $validated['total_chunks'],
+            'audio_path'             => '', // Akan diupdate setelah simpan
+            'audio_duration_seconds' => 0,
+            'total_chunks'           => 1,
             'processed_chunks'       => 0,
             'status'                 => 'processing',
-            'model_used'             => config('services.openai.audio_model', 'gpt-audio-1.5'),
-            'synthesis_model'        => config('services.openai.synthesis_model', 'gpt-4o-mini'),
+            'model_used'             => 'vps-faster-whisper',
+            'synthesis_model'        => 'none',
         ]);
 
+        $file = $request->file('audio');
+        $path = $file->storeAs(
+            "audio/{$userId}/{$analysis->slug}",
+            "full_audio." . $file->getClientOriginalExtension(),
+            'local'
+        );
+
+        $analysis->update(['audio_path' => $path]);
+
         AnalysisLog::success($analysis->id, 'session_created',
-            "Sesi Analisis dibuat. Total potongan: {$validated['total_chunks']}, Durasi: {$validated['duration_seconds']}s",
+            "Sesi Analisis dibuat. File utuh berhasil diunggah.",
             [
-                'total_chunks' => $validated['total_chunks'],
-                'duration_seconds' => $validated['duration_seconds'],
+                'file_path' => $path,
+                'file_size' => $file->getSize()
             ]
         );
 
-        return response()->json([
-            'status' => 'success',
-            'slug'   => $analysis->slug,
-            'redirect' => route('analysis.processing', $analysis->slug)
-        ]);
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'slug'   => $analysis->slug,
+                'redirect' => route('analysis.processing', $analysis->slug)
+            ]);
+        }
+
+        return redirect()->route('analysis.processing', $analysis->slug);
     }
 
     public function processing(Analysis $analysis)
@@ -82,187 +88,81 @@ class AnalysisController extends Controller
         return view('analysis.processing', compact('analysis'));
     }
 
-    public function processChunk(Request $request, Analysis $analysis)
-    {
-        Log::info('[DEBUG] processChunk reached for slug: ' . $analysis->slug . ' by Auth: ' . Auth::id() . ' Analysis User: ' . $analysis->user_id);
-        abort_if($analysis->user_id != Auth::id(), 403);
-
-        $validated = $request->validate([
-            'audio' => ['required', 'file', 'mimes:wav,mp3,webm,ogg', 'max:51200'], // max 50MB per chunk
-            'chunk_index' => ['required', 'integer', 'min:1'],
-        ]);
-
-        $file = $request->file('audio');
-        $chunkIndex = $validated['chunk_index'];
-        
-        $path = $file->storeAs(
-            "audio/{$analysis->user_id}/{$analysis->slug}",
-            "chunk_{$chunkIndex}.wav",
-            'local'
-        );
-
-        $chunk = AnalysisChunk::updateOrCreate(
-            [
-                'analysis_id' => $analysis->id,
-                'chunk_index' => $chunkIndex,
-            ],
-            [
-                'total_chunks' => $analysis->total_chunks,
-                'chunk_path' => $path,
-                'chunk_size_bytes' => $file->getSize(),
-                'status' => 'running',
-                'model_used' => $analysis->model_used,
-                'started_at' => now(),
-            ]
-        );
-
-        $locale = $analysis->locale ?? 'id';
-        $startTime = microtime(true);
-        $systemPrompt = $this->aiService->getConfig()->getSystemPrompt($locale);
-        $chunk->update(['prompt_used' => $systemPrompt]);
-
-        try {
-            set_time_limit(300); // Mencegah server cPanel mematikan proses jika AI merespons agak lama
-            $absolutePath = Storage::disk('local')->path($path);
-            Log::info('[DEBUG] Processing absolute path: ' . $absolutePath);
-            $result = $this->callOpenAiWithRetry($absolutePath, $locale, 3);
-            $durationMs = (int) ((microtime(true) - $startTime) * 1000);
-
-            $chunk->update([
-                'status'       => 'done',
-                'result_data'  => $result,
-                'raw_response' => json_encode($result),
-                'duration_ms'  => $durationMs,
-                'completed_at' => now(),
-            ]);
-
-            $analysis->update([
-                'processed_chunks' => AnalysisChunk::where('analysis_id', $analysis->id)->where('status', 'done')->count(),
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'chunk_index' => $chunkIndex,
-                'result' => $result
-            ]);
-
-        } catch (\Throwable $e) {
-            $durationMs = (int) ((microtime(true) - $startTime) * 1000);
-            $chunk->update([
-                'status'        => 'failed',
-                'error_message' => $e->getMessage(),
-                'duration_ms'   => $durationMs,
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-                'chunk_index' => $chunkIndex
-            ], 500);
-        }
-    }
-
-    private function shiftTimestamps(array $result, int $chunkIndex, int $chunkDuration = 30): array
-    {
-        $offsetSeconds = ($chunkIndex - 1) * $chunkDuration;
-        
-        if (!isset($result['transcription']) || !is_array($result['transcription'])) {
-            return $result;
-        }
-
-        foreach ($result['transcription'] as &$item) {
-            if (isset($item['timestamp']) && preg_match('/(\d{2}):(\d{2})\s*-\s*(\d{2}):(\d{2})/', $item['timestamp'], $matches)) {
-                $startMin = (int)$matches[1];
-                $startSec = (int)$matches[2];
-                $endMin = (int)$matches[3];
-                $endSec = (int)$matches[4];
-
-                $startTotal = ($startMin * 60) + $startSec + $offsetSeconds;
-                $endTotal = ($endMin * 60) + $endSec + $offsetSeconds;
-
-                $newStart = sprintf('%02d:%02d', floor($startTotal / 60), $startTotal % 60);
-                $newEnd = sprintf('%02d:%02d', floor($endTotal / 60), $endTotal % 60);
-
-                $item['timestamp'] = "$newStart - $newEnd";
-            }
-        }
-
-        return $result;
-    }
-
-    public function finalize(Analysis $analysis)
+    public function processAudio(Request $request, Analysis $analysis)
     {
         abort_if($analysis->user_id != Auth::id(), 403);
-        
-        $chunkModels = AnalysisChunk::where('analysis_id', $analysis->id)
-            ->where('status', 'done')
-            ->orderBy('chunk_index')
-            ->get();
 
-        $chunks = [];
-        foreach ($chunkModels as $cm) {
-            $data = $cm->result_data;
-            if ($data) {
-                $chunks[] = $this->shiftTimestamps($data, $cm->chunk_index, 30);
-            }
-        }
-
-        if (empty($chunks)) {
-            return response()->json(['status' => 'error', 'message' => 'Tidak ada chunk yang berhasil.'], 400);
-        }
-
-        $locale = $analysis->locale ?? 'id';
-        
-        try {
-            set_time_limit(300);
-            $synthesizedResult = $this->aiService->synthesizeChunks($chunks, $locale);
-            $finalResult = $this->parseAdviceAction->execute($synthesizedResult);
-            $finalResult['total_chunks'] = count($chunks);
-
-            $analysis->update([
-                'status'      => 'completed',
-                'result_data' => $finalResult,
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'redirect' => route('analysis.result', $analysis->slug)
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
-        }
-    }
-
-    private function callOpenAiWithRetry(string $chunkPath, string $locale, int $maxRetries): array
-    {
-        $lastException = null;
-
-        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+        return response()->stream(function () use ($analysis) {
+            $client = new Client();
+            $audioPath = Storage::disk('local')->path($analysis->audio_path);
+            
             try {
-                return $this->aiService->analyzeAudio($chunkPath, $locale);
-            } catch (\Throwable $e) {
-                $lastException = $e;
-                Log::warning("[SSE] OpenAI attempt {$attempt} gagal: " . $e->getMessage());
-                if ($attempt < $maxRetries) {
-                    sleep(2 ** $attempt);
+                $response = $client->request('POST', 'http://160.187.143.66:8000/api/transcribe', [
+                    'multipart' => [
+                        [
+                            'name'     => 'file',
+                            'contents' => fopen($audioPath, 'r'),
+                            'filename' => basename($audioPath)
+                        ]
+                    ],
+                    'stream' => true,
+                    'timeout' => 0,
+                ]);
+
+                $body = $response->getBody();
+                $transcription = [];
+                
+                while (!$body->eof()) {
+                    $line = '';
+                    while (!$body->eof()) {
+                        $char = $body->read(1);
+                        $line .= $char;
+                        if ($char === "\n") break;
+                    }
+                    
+                    if (trim($line) === '') continue;
+                    
+                    echo $line;
+                    flush();
+                    
+                    $data = json_decode($line, true);
+                    if ($data && isset($data['status']) && $data['status'] === 'processing') {
+                        $startMin = floor($data['start'] / 60);
+                        $startSec = floor($data['start'] % 60);
+                        $endMin = floor($data['end'] / 60);
+                        $endSec = floor($data['end'] % 60);
+                        
+                        $transcription[] = [
+                            'text_html' => htmlspecialchars($data['text']),
+                            'speaker' => 'Unknown',
+                            'timestamp' => sprintf('%02d:%02d - %02d:%02d', $startMin, $startSec, $endMin, $endSec),
+                        ];
+                    }
                 }
+                
+                // Jika selesai tanpa error, simpan data ke database
+                $analysis->update([
+                    'status' => 'completed',
+                    'result_data' => [
+                        'total_chunks' => 1,
+                        'transcription' => $transcription
+                    ]
+                ]);
+                
+            } catch (\Exception $e) {
+                echo json_encode(['status' => 'error', 'message' => $e->getMessage()]) . "\n";
+                flush();
+                
+                $analysis->update([
+                    'status' => 'failed'
+                ]);
             }
-        }
-
-        throw $lastException;
-    }
-
-
-
-    public function resumeChunk(Analysis $analysis)
-    {
-        abort_if($analysis->user_id != Auth::id(), 403);
-        abort_unless($analysis->isFailed() || $analysis->isResumable(), 422);
-
-        DB::statement('CALL sp_reset_failed_chunks(?)', [$analysis->id]);
-
-        return redirect()->route('analysis.processing', $analysis->slug)
-            ->with('info', 'Analisis dilanjutkan dari potongan yang gagal.');
+        }, 200, [
+            'Content-Type' => 'application/x-ndjson',
+            'Cache-Control' => 'no-cache',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no', // Disable buffering for Nginx
+        ]);
     }
 
     public function result(Analysis $analysis)

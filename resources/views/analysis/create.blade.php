@@ -166,157 +166,33 @@
         hint.textContent = sizeMb + ' MB';
     }
 
-    // --- Audio to WAV Encoding ---
-    function audioBufferToWav(buffer) {
-        let numOfChan = buffer.numberOfChannels,
-            length = buffer.length * numOfChan * 2 + 44,
-            bufferArr = new ArrayBuffer(length),
-            view = new DataView(bufferArr),
-            channels = [], i, sample,
-            offset = 0,
-            pos = 0;
-
-        function setUint16(data) { view.setUint16(offset, data, true); offset += 2; }
-        function setUint32(data) { view.setUint32(offset, data, true); offset += 4; }
-
-        setUint32(0x46464952); // "RIFF"
-        setUint32(length - 8); // file length - 8
-        setUint32(0x45564157); // "WAVE"
-        setUint32(0x20746d66); // "fmt " chunk
-        setUint32(16); // length = 16
-        setUint16(1); // PCM (uncompressed)
-        setUint16(numOfChan);
-        setUint32(buffer.sampleRate);
-        setUint32(buffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
-        setUint16(numOfChan * 2); // block-align
-        setUint16(16); // 16-bit (hardcoded in this impl)
-        setUint32(0x61746164); // "data" - chunk
-        setUint32(length - pos - 4); // chunk length
-
-        for(i = 0; i < buffer.numberOfChannels; i++) channels.push(buffer.getChannelData(i));
-
-        while(pos < buffer.length) {
-            for(i = 0; i < numOfChan; i++) {
-                sample = Math.max(-1, Math.min(1, channels[i][pos]));
-                sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0;
-                view.setInt16(offset, sample, true);
-                offset += 2;
-            }
-            pos++;
-        }
-        return new Blob([bufferArr], {type: "audio/wav"});
-    }
-
-    // --- IndexedDB Helper ---
-    function getDB() {
-        return new Promise((resolve, reject) => {
-            const req = indexedDB.open('BimaAudioDB', 1);
-            req.onupgradeneeded = (e) => {
-                const db = e.target.result;
-                if (!db.objectStoreNames.contains('chunks')) {
-                    db.createObjectStore('chunks', { keyPath: ['slug', 'index'] });
-                }
-            };
-            req.onsuccess = () => resolve(req.result);
-            req.onerror = () => reject(req.error);
-        });
-    }
-
-    async function saveChunkToDB(slug, index, blob) {
-        const db = await getDB();
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction('chunks', 'readwrite');
-            const store = tx.objectStore('chunks');
-            const req = store.put({ slug, index, blob });
-            req.onsuccess = () => resolve();
-            req.onerror = () => reject(req.error);
-        });
-    }
-
-    // --- Form Submit Interceptor ---
-    document.getElementById('analysis-form').addEventListener('submit', async function (e) {
-        e.preventDefault();
-
+    // --- Form Submit ---
+    document.getElementById('analysis-form').addEventListener('submit', function (e) {
         const btn     = document.getElementById('submit-btn');
         const label   = document.getElementById('submit-label');
         const icon    = document.getElementById('submit-icon');
         const spinner = document.getElementById('submit-spinner');
         const fileInput = document.getElementById('audio');
 
-        if (!fileInput.files[0]) return;
+        if (!fileInput.files[0]) {
+            e.preventDefault();
+            return;
+        }
+        
         const file = fileInput.files[0];
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.size > maxSize) {
+            e.preventDefault();
+            alert('Ukuran file maksimal 10MB.');
+            return;
+        }
 
         btn.disabled = true;
-        label.textContent = 'Membaca & Memotong Audio...';
+        label.textContent = 'Mengunggah File...';
         icon.classList.add('hidden');
         spinner.classList.remove('hidden');
-
-        try {
-            const arrayBuffer = await file.arrayBuffer();
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-
-            const CHUNK_DURATION = 30;
-            const totalDuration = audioBuffer.duration;
-            const totalChunks = Math.ceil(totalDuration / CHUNK_DURATION);
-
-            label.textContent = 'Membuat Sesi...';
-            const formData = new FormData(this);
-            formData.delete('audio');
-            formData.append('total_chunks', totalChunks);
-            formData.append('duration_seconds', totalDuration);
-
-            const response = await fetch(this.action, {
-                method: 'POST',
-                headers: { 'Accept': 'application/json' },
-                body: formData
-            });
-
-            if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.message || 'Gagal menginisialisasi sesi.');
-            }
-
-            const data = await response.json();
-            const slug = data.slug;
-
-            label.textContent = 'Menyimpan Potongan Audio (0/' + totalChunks + ')...';
-
-            for (let i = 0; i < totalChunks; i++) {
-                const startOffset = i * CHUNK_DURATION * audioBuffer.sampleRate;
-                const endOffset = Math.min((i + 1) * CHUNK_DURATION * audioBuffer.sampleRate, audioBuffer.length);
-                const chunkLength = endOffset - startOffset;
-
-                const chunkBuffer = audioCtx.createBuffer(
-                    audioBuffer.numberOfChannels,
-                    chunkLength,
-                    audioBuffer.sampleRate
-                );
-
-                for (let c = 0; c < audioBuffer.numberOfChannels; c++) {
-                    const channelData = audioBuffer.getChannelData(c);
-                    const chunkData = chunkBuffer.getChannelData(c);
-                    for (let j = 0; j < chunkLength; j++) {
-                        chunkData[j] = channelData[startOffset + j];
-                    }
-                }
-
-                const wavBlob = audioBufferToWav(chunkBuffer);
-                await saveChunkToDB(slug, i + 1, wavBlob);
-
-                label.textContent = `Menyimpan Potongan Audio (${i + 1}/${totalChunks})...`;
-            }
-
-            window.location.href = data.redirect;
-
-        } catch (error) {
-            console.error(error);
-            alert('Terjadi kesalahan: ' + error.message);
-            btn.disabled = false;
-            label.textContent = 'Unggah & Mulai Proses';
-            icon.classList.remove('hidden');
-            spinner.classList.add('hidden');
-        }
+        
+        // Form akan ter-submit secara natural oleh browser ke route analysis.initialize
     });
     </script>
     </x-slot>
