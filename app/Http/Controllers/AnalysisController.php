@@ -100,7 +100,7 @@ class AnalysisController extends Controller
             $audioPath = Storage::disk('local')->path($analysis->audio_path);
             
             try {
-                $response = $client->request('POST', 'http://160.187.143.66:8000/api/transcribe', [
+                $response = $client->request('POST', 'http://160.187.143.66:80/api/transcribe', [
                     'multipart' => [
                         [
                             'name'     => 'file',
