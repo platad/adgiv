@@ -96,6 +96,11 @@ class AnalysisController extends Controller
         set_time_limit(0); 
 
         return response()->stream(function () use ($analysis) {
+            // Mencegah LiteSpeed/Apache memblokir karena tidak ada output di awal
+            echo str_repeat(" ", 1024) . "\n";
+            @ob_flush();
+            flush();
+
             $client = new Client();
             $audioPath = Storage::disk('local')->path($analysis->audio_path);
             
@@ -109,8 +114,14 @@ class AnalysisController extends Controller
                         ]
                     ],
                     'stream' => true,
-                    'connect_timeout' => 15,
-                    'timeout' => 0,
+                    'connect_timeout' => 15, // 15 seconds to connect
+                    'timeout' => 0, // No timeout for reading stream
+                    'progress' => function ($dl_total_size, $dl_size_so_far, $ul_total_size, $ul_size_so_far) {
+                        // Kirim detak jantung kosong ke browser selama proses upload file yang lama ke VPS
+                        echo " \n";
+                        @ob_flush();
+                        flush();
+                    }
                 ]);
 
                 $body = $response->getBody();
