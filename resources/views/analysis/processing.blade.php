@@ -187,7 +187,7 @@
                     const formData = new FormData();
                     formData.append('file', audioBlob, 'audio.m4a');
                     
-                    const vpsResponse = await fetch('http://vps.temaniskripsi.id/api/transcribe', {
+                    const vpsResponse = await fetch('https://vps.temaniskripsi.id/api/transcribe', {
                         method: 'POST',
                         body: formData
                     });
