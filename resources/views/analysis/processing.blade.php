@@ -207,33 +207,35 @@
                         for (const line of lines) {
                             if (line.trim() === '') continue;
                             
+                            let data = null;
                             try {
-                                const data = JSON.parse(line);
-                                
-                                if (data.status === 'processing' && data.text) {
-                                    const textLine = `[${data.start.toFixed(2)}s -> ${data.end.toFixed(2)}s] <span class="text-gray-900 font-bold">${data.text}</span>`;
-                                    this.realtimeTexts.push(textLine);
-                                    
-                                    setTimeout(() => {
-                                        const c = document.getElementById('realtime-text-box');
-                                        if(c) c.scrollTop = c.scrollHeight;
-                                    }, 50);
-                                    
-                                } else if (data.status === 'success') {
-                                    this.appendLog('success', 'Transkripsi selesai.');
-                                    this.globalStatus = 'completed';
-                                    this.globalProgress = 100;
-                                    this.transcriptionStatus = 'Penyimpanan berhasil, mengalihkan...';
-                                    
-                                    setTimeout(() => {
-                                        window.location.href = `{{ route('analysis.result', $analysis->slug) }}`;
-                                    }, 1500);
-                                    
-                                } else if (data.status === 'error') {
-                                    throw new Error(data.message);
-                                }
+                                data = JSON.parse(line);
                             } catch (err) {
                                 console.error('Failed to parse NDJSON line:', line, err);
+                                continue;
+                            }
+                            
+                            if (data.status === 'processing' && data.text) {
+                                const textLine = `[${data.start.toFixed(2)}s -> ${data.end.toFixed(2)}s] <span class="text-gray-900 font-bold">${data.text}</span>`;
+                                this.realtimeTexts.push(textLine);
+                                
+                                setTimeout(() => {
+                                    const c = document.getElementById('realtime-text-box');
+                                    if(c) c.scrollTop = c.scrollHeight;
+                                }, 50);
+                                
+                            } else if (data.status === 'success') {
+                                this.appendLog('success', 'Transkripsi selesai.');
+                                this.globalStatus = 'completed';
+                                this.globalProgress = 100;
+                                this.transcriptionStatus = 'Penyimpanan berhasil, mengalihkan...';
+                                
+                                setTimeout(() => {
+                                    window.location.href = `{{ route('analysis.result', $analysis->slug) }}`;
+                                }, 1500);
+                                
+                            } else if (data.status === 'error') {
+                                throw new Error(data.message);
                             }
                         }
                     }
