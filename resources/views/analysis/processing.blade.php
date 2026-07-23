@@ -133,9 +133,12 @@
             logs: [],
             realtimeTexts: [],
             transcriptionStatus: 'Membangun koneksi ke server VPS...',
+            isProcessing: false,
             
             init() {
-                this.startProcessing();
+                if (!this.isProcessing) {
+                    this.startProcessing();
+                }
             },
 
             get statusDotClass() {
@@ -166,6 +169,7 @@
             },
 
             async startProcessing() {
+                this.isProcessing = true;
                 this.globalStatus = 'processing';
                 this.globalProgress = 30;
                 this.appendLog('info', 'Mengirim perintah transkripsi ke VPS...');

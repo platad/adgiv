@@ -100,7 +100,7 @@ class AnalysisController extends Controller
             $audioPath = Storage::disk('local')->path($analysis->audio_path);
             
             try {
-                $response = $client->request('POST', 'http://160.187.143.66:80/api/transcribe', [
+                $response = $client->request('POST', 'http://vps.temaniskripsi.id/api/transcribe', [
                     'multipart' => [
                         [
                             'name'     => 'file',
@@ -109,6 +109,7 @@ class AnalysisController extends Controller
                         ]
                     ],
                     'stream' => true,
+                    'connect_timeout' => 15,
                     'timeout' => 0,
                 ]);
 
