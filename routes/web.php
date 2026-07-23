@@ -49,7 +49,8 @@ Route::prefix('{locale}')->middleware([\App\Http\Middleware\Localization::class]
             Route::post('/initialize', [AnalysisController::class, 'initialize'])->name('initialize');
 
             Route::get('/{analysis}/processing', [AnalysisController::class, 'processing'])->name('processing');
-            Route::post('/{analysis}/processAudio', [AnalysisController::class, 'processAudio'])->name('processAudio'); // Endpoint Streaming VPS
+            Route::post('/{analysis}/saveResult', [AnalysisController::class, 'saveResult'])->name('saveResult');
+            Route::get('/{analysis}/audio', [AnalysisController::class, 'getAudio'])->name('audio');
             Route::get('/{analysis}/result', [AnalysisController::class, 'result'])->name('result');
             Route::get('/{analysis}/print', [AnalysisController::class, 'printReport'])->name('print');
             Route::post('/{analysis}/feedback', [AnalysisController::class, 'feedback'])->name('feedback');

@@ -171,57 +171,71 @@
             async startProcessing() {
                 this.isProcessing = true;
                 this.globalStatus = 'processing';
-                this.globalProgress = 30;
-                this.appendLog('info', 'Mengirim perintah transkripsi ke VPS...');
+                this.globalProgress = 10;
                 
                 try {
-                    const csrf = document.querySelector('meta[name="csrf-token"]').content;
+                    // 1. Download file dari Laravel
+                    this.appendLog('info', 'Mengambil file audio dari server...');
+                    const audioResponse = await fetch(`{{ route('analysis.audio', $analysis->slug) }}`);
+                    if (!audioResponse.ok) throw new Error('Gagal mengambil file audio');
+                    const audioBlob = await audioResponse.blob();
                     
-                    const response = await fetch(`{{ url('/en/analysis') }}/${this.slug}/processAudio`, {
+                    // 2. Kirim ke VPS secara langsung
+                    this.globalProgress = 30;
+                    this.appendLog('info', 'Mengirim file ke VPS AI (Bypass PHP Timeout)...');
+                    
+                    const formData = new FormData();
+                    formData.append('file', audioBlob, 'audio.m4a');
+                    
+                    const vpsResponse = await fetch('http://vps.temaniskripsi.id/api/transcribe', {
                         method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': csrf,
-                            'Accept': 'application/x-ndjson'
-                        }
+                        body: formData
                     });
-
-                    if (!response.ok) {
-                        throw new Error('HTTP error ' + response.status);
-                    }
-
-                    this.appendLog('success', 'Koneksi streaming terbuka. Menunggu data...');
-                    this.transcriptionStatus = 'Sedang Menerjemahkan...';
-
-                    const reader = response.body.getReader();
+                    
+                    if (!vpsResponse.ok) throw new Error('Gagal terhubung ke VPS: ' + vpsResponse.statusText);
+                    
+                    this.appendLog('success', 'Koneksi streaming terbuka. Menunggu data AI...');
+                    
+                    const reader = vpsResponse.body.getReader();
                     const decoder = new TextDecoder("utf-8");
                     let buffer = '';
+                    
+                    let finalTranscription = [];
 
                     while (true) {
-                        const { done, value } = await reader.read();
+                        const { value, done } = await reader.read();
                         if (done) break;
-
-                        this.globalProgress = Math.min(90, this.globalProgress + 2); // Animate progress slowly
                         
                         buffer += decoder.decode(value, { stream: true });
                         const lines = buffer.split("\n");
-                        
-                        // Keep the last partial line in the buffer
                         buffer = lines.pop();
 
                         for (const line of lines) {
                             if (line.trim() === '') continue;
                             
                             let data = null;
-                            try {
-                                data = JSON.parse(line);
-                            } catch (err) {
-                                console.error('Failed to parse NDJSON line:', line, err);
-                                continue;
-                            }
+                            try { data = JSON.parse(line); } catch (err) { continue; }
                             
                             if (data.status === 'processing' && data.text) {
-                                const textLine = `[${data.start.toFixed(2)}s -> ${data.end.toFixed(2)}s] <span class="text-gray-900 font-bold">${data.text}</span>`;
+                                const textLine = `[${(data.start || 0).toFixed(2)}s -> ${(data.end || 0).toFixed(2)}s] <span class="text-gray-900 font-bold">${data.text}</span>`;
                                 this.realtimeTexts.push(textLine);
+                                
+                                // Simpan untuk dikirim ke Laravel nanti
+                                if (data.start !== 0 || data.end !== 0) {
+                                    let startMin = Math.floor(data.start / 60);
+                                    let startSec = Math.floor(data.start % 60);
+                                    let endMin = Math.floor(data.end / 60);
+                                    let endSec = Math.floor(data.end % 60);
+                                    
+                                    // Escape html in JS for safety before saving
+                                    const escText = data.text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                                    
+                                    finalTranscription.push({
+                                        text_html: escText,
+                                        speaker: 'Unknown',
+                                        timestamp: `${startMin.toString().padStart(2,'0')}:${startSec.toString().padStart(2,'0')} - ${endMin.toString().padStart(2,'0')}:${endSec.toString().padStart(2,'0')}`
+                                    });
+                                }
                                 
                                 setTimeout(() => {
                                     const c = document.getElementById('realtime-text-box');
@@ -230,6 +244,20 @@
                                 
                             } else if (data.status === 'success') {
                                 this.appendLog('success', 'Transkripsi selesai.');
+                                
+                                // 3. Simpan ke Laravel
+                                this.appendLog('info', 'Menyimpan hasil ke database...');
+                                const saveResponse = await fetch(`{{ route('analysis.saveResult', $analysis->slug) }}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                    },
+                                    body: JSON.stringify({ transcription: finalTranscription })
+                                });
+                                
+                                if (!saveResponse.ok) throw new Error('Gagal menyimpan hasil ke database');
+                                
                                 this.globalStatus = 'completed';
                                 this.globalProgress = 100;
                                 this.transcriptionStatus = 'Penyimpanan berhasil, mengalihkan...';
@@ -243,12 +271,11 @@
                             }
                         }
                     }
-
-                    // Done reading
+                    
                     if (this.globalStatus !== 'completed') {
                         this.appendLog('info', 'Stream selesai (terputus).');
                     }
-
+                    
                 } catch (e) {
                     this.globalStatus = 'failed';
                     this.transcriptionStatus = 'Gagal melakukan transkripsi.';

@@ -88,96 +88,36 @@ class AnalysisController extends Controller
         return view('analysis.processing', compact('analysis'));
     }
 
-    public function processAudio(Request $request, Analysis $analysis)
+    public function getAudio(Analysis $analysis)
     {
         abort_if($analysis->user_id != Auth::id(), 403);
+        $path = Storage::disk('local')->path($analysis->audio_path);
+        
+        if (!file_exists($path)) {
+            abort(404, 'Audio file not found.');
+        }
 
-        // Mencegah PHP timeout saat menunggu proses Whisper yang lama di VPS
-        set_time_limit(0); 
-
-        return response()->stream(function () use ($analysis) {
-            // Mencegah LiteSpeed/Apache memblokir karena tidak ada output di awal
-            echo str_repeat(" ", 1024) . "\n";
-            @ob_flush();
-            flush();
-
-            $client = new Client();
-            $audioPath = Storage::disk('local')->path($analysis->audio_path);
-            
-            try {
-                $response = $client->request('POST', 'http://vps.temaniskripsi.id/api/transcribe', [
-                    'multipart' => [
-                        [
-                            'name'     => 'file',
-                            'contents' => fopen($audioPath, 'r'),
-                            'filename' => basename($audioPath)
-                        ]
-                    ],
-                    'stream' => true,
-                    'connect_timeout' => 15, // 15 seconds to connect
-                    'timeout' => 0, // No timeout for reading stream
-                    'progress' => function ($dl_total_size, $dl_size_so_far, $ul_total_size, $ul_size_so_far) {
-                        // Kirim detak jantung kosong ke browser selama proses upload file yang lama ke VPS
-                        echo " \n";
-                        @ob_flush();
-                        flush();
-                    }
-                ]);
-
-                $body = $response->getBody();
-                $transcription = [];
-                
-                while (!$body->eof()) {
-                    $line = '';
-                    while (!$body->eof()) {
-                        $char = $body->read(1);
-                        $line .= $char;
-                        if ($char === "\n") break;
-                    }
-                    
-                    if (trim($line) === '') continue;
-                    
-                    echo $line;
-                    flush();
-                    
-                    $data = json_decode($line, true);
-                    if ($data && isset($data['status']) && $data['status'] === 'processing') {
-                        $startMin = floor($data['start'] / 60);
-                        $startSec = floor($data['start'] % 60);
-                        $endMin = floor($data['end'] / 60);
-                        $endSec = floor($data['end'] % 60);
-                        
-                        $transcription[] = [
-                            'text_html' => htmlspecialchars($data['text']),
-                            'speaker' => 'Unknown',
-                            'timestamp' => sprintf('%02d:%02d - %02d:%02d', $startMin, $startSec, $endMin, $endSec),
-                        ];
-                    }
-                }
-                
-                // Jika selesai tanpa error, simpan data ke database
-                $analysis->update([
-                    'status' => 'completed',
-                    'result_data' => [
-                        'total_chunks' => 1,
-                        'transcription' => $transcription
-                    ]
-                ]);
-                
-            } catch (\Exception $e) {
-                echo json_encode(['status' => 'error', 'message' => $e->getMessage()]) . "\n";
-                flush();
-                
-                $analysis->update([
-                    'status' => 'failed'
-                ]);
-            }
-        }, 200, [
-            'Content-Type' => 'application/x-ndjson',
-            'Cache-Control' => 'no-cache',
-            'Connection' => 'keep-alive',
-            'X-Accel-Buffering' => 'no', // Disable buffering for Nginx
+        return response()->file($path, [
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'GET, OPTIONS',
         ]);
+    }
+
+    public function saveResult(Request $request, Analysis $analysis)
+    {
+        abort_if($analysis->user_id != Auth::id(), 403);
+        
+        $transcription = $request->input('transcription', []);
+        
+        $analysis->update([
+            'status' => 'completed',
+            'result_data' => [
+                'total_chunks' => 1,
+                'transcription' => $transcription
+            ]
+        ]);
+        
+        return response()->json(['status' => 'success']);
     }
 
     public function result(Analysis $analysis)
