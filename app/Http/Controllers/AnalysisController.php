@@ -92,6 +92,9 @@ class AnalysisController extends Controller
     {
         abort_if($analysis->user_id != Auth::id(), 403);
 
+        // Mencegah PHP timeout saat menunggu proses Whisper yang lama di VPS
+        set_time_limit(0); 
+
         return response()->stream(function () use ($analysis) {
             $client = new Client();
             $audioPath = Storage::disk('local')->path($analysis->audio_path);
