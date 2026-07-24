@@ -38,7 +38,7 @@ class AnalysisController extends Controller
             'user_id'                => $userId,
             'title'                  => $validated['title'],
             'locale'                 => $locale,
-            'audio_path'             => '', // Akan diupdate setelah simpan
+            'audio_path'             => '',
             'audio_duration_seconds' => 0,
             'total_chunks'           => 1,
             'processed_chunks'       => 0,
@@ -63,6 +63,30 @@ class AnalysisController extends Controller
                 'file_size' => $file->getSize()
             ]
         );
+
+        try {
+            $client = new Client(['timeout' => 30]);
+            $vpsUrl = 'https://vps.temaniskripsi.id/api/transcribe';
+            $callbackUrl = route('analysis.webhook', ['locale' => 'en', 'analysis' => $analysis->slug]);
+
+            $response = $client->request('POST', $vpsUrl, [
+                'multipart' => [
+                    [
+                        'name'     => 'file',
+                        'contents' => fopen(Storage::disk('local')->path($path), 'r'),
+                        'filename' => "audio." . $file->getClientOriginalExtension()
+                    ],
+                    [
+                        'name'     => 'callback_url',
+                        'contents' => $callbackUrl
+                    ]
+                ]
+            ]);
+
+            AnalysisLog::info($analysis->id, 'vps_triggered', 'Perintah transkripsi background berhasil dikirim ke VPS.');
+        } catch (\Exception $e) {
+            AnalysisLog::error($analysis->id, 'vps_error', 'Gagal mengirim perintah ke VPS: ' . $e->getMessage());
+        }
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -116,6 +140,37 @@ class AnalysisController extends Controller
                 'transcription' => $transcription
             ]
         ]);
+        
+        return response()->json(['status' => 'success']);
+    }
+
+    public function checkStatus(Analysis $analysis)
+    {
+        return response()->json([
+            'status' => $analysis->status,
+            'is_completed' => $analysis->isCompleted()
+        ]);
+    }
+
+    public function webhookResult(Request $request, Analysis $analysis)
+    {
+        $transcription = $request->input('transcription', []);
+        
+        if (empty($transcription)) {
+            AnalysisLog::error($analysis->id, 'webhook_failed', 'VPS mengirim webhook tanpa data transkripsi atau error.', ['payload' => $request->all()]);
+            $analysis->update(['status' => 'failed']);
+            return response()->json(['status' => 'error', 'message' => 'No transcription data'], 400);
+        }
+
+        $analysis->update([
+            'status' => 'completed',
+            'result_data' => [
+                'total_chunks' => 1,
+                'transcription' => $transcription
+            ]
+        ]);
+        
+        AnalysisLog::success($analysis->id, 'webhook_success', 'Transkripsi berhasil diterima dari VPS via Webhook.');
         
         return response()->json(['status' => 'success']);
     }

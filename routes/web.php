@@ -51,6 +51,8 @@ Route::prefix('{locale}')->middleware([\App\Http\Middleware\Localization::class]
             Route::get('/{analysis}/processing', [AnalysisController::class, 'processing'])->name('processing');
             Route::post('/{analysis}/saveResult', [AnalysisController::class, 'saveResult'])->name('saveResult');
             Route::get('/{analysis}/audio', [AnalysisController::class, 'getAudio'])->name('audio');
+            Route::get('/{analysis}/status', [AnalysisController::class, 'checkStatus'])->name('status');
+            Route::post('/{analysis}/webhook', [AnalysisController::class, 'webhookResult'])->name('webhook')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
             Route::get('/{analysis}/result', [AnalysisController::class, 'result'])->name('result');
             Route::get('/{analysis}/print', [AnalysisController::class, 'printReport'])->name('print');
             Route::post('/{analysis}/feedback', [AnalysisController::class, 'feedback'])->name('feedback');
