@@ -178,11 +178,10 @@ class AnalysisController extends Controller
         $totalSegments = $request->input('total_segments', 0);
         $totalDuration = $request->input('total_duration_sec', 0);
 
-        // === SIMPAN LOGS VPS KE DATABASE (agar tampil di frontend) ===
         if (!empty($logs) && is_array($logs)) {
             $analysisLogs = AnalysisLog::where('analysis_id', $analysis->id)->get();
             $existingKeys = $analysisLogs->map(function ($l) {
-                return md5($l->type . '|' . $l->meta->toJson());
+                return md5($l->type . '|' . json_encode($l->meta));
             })->toArray();
 
             foreach ($logs as $log) {
