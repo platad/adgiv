@@ -58,6 +58,26 @@
                     @enderror
                 </div>
 
+                {{-- Pilihan Bahasa (PENTING: Bahasa rekaman, bukan bahasa browser) --}}
+                <div>
+                    <label for="locale" class="block text-[0.65rem] font-black text-gray-400 uppercase tracking-widest mb-3">
+                        <span class="lang-id">Bahasa Rekaman</span>
+                        <span class="lang-en">Recording Language</span>
+                        <span class="lang-zh">录音语言</span>
+                    </label>
+                    <select name="locale" id="locale"
+                            class="w-full bg-gray-50 border-transparent focus:border-bima-red focus:bg-white focus:ring-0 rounded-2xl px-6 py-4 text-gray-900 font-bold transition-all cursor-pointer">
+                        <option value="id" @selected(old('locale', 'id') === 'id')>🇮🇩 Bahasa Indonesia</option>
+                        <option value="en" @selected(old('locale') === 'en')>🇬🇧 English</option>
+                        <option value="zh" @selected(old('locale') === 'zh')>🇨🇳 中文 (Mandarin)</option>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-2 font-medium">
+                        <span class="lang-id">Pilih bahasa yang digunakan dalam rekaman — bukan bahasa browser Anda.</span>
+                        <span class="lang-en">Select the language spoken in the recording — not your browser language.</span>
+                        <span class="lang-zh">选择录音中使用的语言，而非浏览器语言。</span>
+                    </p>
+                </div>
+
                 {{-- Upload File Audio --}}
                 <div>
                     <label class="block text-[0.65rem] font-black text-gray-400 uppercase tracking-widest mb-3">

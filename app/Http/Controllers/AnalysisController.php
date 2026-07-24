@@ -29,11 +29,12 @@ class AnalysisController extends Controller
     {
         $validated = $request->validate([
             'title'  => ['required', 'string', 'max:255'],
+            'locale' => ['required', 'string', 'in:id,en,zh'],
             'audio'  => ['required', 'file', 'mimes:wav,mp3,webm,ogg,aac,m4a,flac', 'max:10240'],
         ]);
 
-        // Default ke Indonesia — bahasa pemilihan dihapus agar user langsung proses tanpa delay
-        $locale = 'id';
+        // Bahasa yang DIPILIH user — bukan bahasa browser
+        $locale = $validated['locale'];
         $userId = Auth::id();
         
         $analysis = Analysis::create([
