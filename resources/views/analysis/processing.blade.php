@@ -181,6 +181,28 @@
                         const response = await fetch(`{{ route('analysis.status', $analysis->slug) }}`);
                         const data = await response.json();
                         
+                        // Update real-time text if available
+                        if (data.result_data && data.result_data.transcription) {
+                            const newTexts = data.result_data.transcription;
+                            
+                            // Only update if there's new data
+                            if (newTexts.length > this.realtimeTexts.length) {
+                                // Clear existing to prevent duplicates
+                                this.realtimeTexts = [];
+                                
+                                newTexts.forEach(seg => {
+                                    // seg.timestamp is like "00:00 - 00:05", seg.text_html is the text
+                                    this.realtimeTexts.push(`[${seg.timestamp}] <span class="text-gray-900 font-bold">${seg.text_html}</span>`);
+                                });
+                                
+                                // Scroll to bottom
+                                setTimeout(() => {
+                                    const c = document.getElementById('realtime-text-box');
+                                    if(c) c.scrollTop = c.scrollHeight;
+                                }, 50);
+                            }
+                        }
+
                         if (data.status === 'completed' || data.is_completed) {
                             clearInterval(pollInterval);
                             this.globalStatus = 'completed';

@@ -148,20 +148,34 @@ class AnalysisController extends Controller
     {
         return response()->json([
             'status' => $analysis->status,
-            'is_completed' => $analysis->isCompleted()
+            'is_completed' => $analysis->isCompleted(),
+            'result_data' => $analysis->result_data
         ]);
     }
 
     public function webhookResult(Request $request, Analysis $analysis)
     {
+        $status = $request->input('status', 'completed'); // 'progress' or 'completed'
         $transcription = $request->input('transcription', []);
         
-        if (empty($transcription)) {
+        if (empty($transcription) && $status !== 'progress') {
             AnalysisLog::error($analysis->id, 'webhook_failed', 'VPS mengirim webhook tanpa data transkripsi atau error.', ['payload' => $request->all()]);
             $analysis->update(['status' => 'failed']);
             return response()->json(['status' => 'error', 'message' => 'No transcription data'], 400);
         }
 
+        if ($status === 'progress') {
+            // Update result data but keep status processing
+            $analysis->update([
+                'result_data' => [
+                    'total_chunks' => 1,
+                    'transcription' => $transcription
+                ]
+            ]);
+            return response()->json(['status' => 'success_progress']);
+        }
+
+        // Jika completed
         $analysis->update([
             'status' => 'completed',
             'result_data' => [
@@ -170,7 +184,7 @@ class AnalysisController extends Controller
             ]
         ]);
         
-        AnalysisLog::success($analysis->id, 'webhook_success', 'Transkripsi berhasil diterima dari VPS via Webhook.');
+        AnalysisLog::success($analysis->id, 'webhook_success', 'Transkripsi berhasil diterima dari VPS via Webhook secara penuh.');
         
         return response()->json(['status' => 'success']);
     }
