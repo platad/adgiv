@@ -70,7 +70,7 @@ class AnalysisController extends Controller
         try {
             $client = new Client(['timeout' => 30]);
             $vpsUrl = 'https://vps.temaniskripsi.id/api/transcribe';
-            $callbackUrl = env('APP_URL', 'https://temaniskripsi.id') . '/api/webhook/' . $analysis->slug;
+            $callbackUrl = route('api.webhook', ['analysis' => $analysis->slug]);
 
             $response = $client->request('POST', $vpsUrl, [
                 'multipart' => [
