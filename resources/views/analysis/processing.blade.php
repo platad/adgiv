@@ -20,6 +20,23 @@
             <div class="bg-bima-red h-full rounded-full transition-all duration-700" :style="`width: ${globalProgress}%`"></div>
         </div>
 
+        {{-- VPS Status Banner --}}
+        <div class="mb-8 bg-gray-50 border border-gray-200 rounded-[1.5rem] p-6">
+            <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-xl bg-bima-red/10 text-bima-red flex items-center justify-center shrink-0">
+                    <i data-lucide="cpu" class="w-5 h-5"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[0.65rem] font-black text-gray-400 uppercase tracking-widest">Status VPS</p>
+                    <p class="text-sm font-bold text-gray-900 mt-1" x-text="vpsMessage || 'Menunggu respon dari VPS...'"></p>
+                    <div class="flex flex-wrap gap-4 mt-3 text-xs font-medium" x-show="totalSegments > 0">
+                        <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-black">📊 <span x-text="totalSegments"></span> Segmen</span>
+                        <span class="bg-green-50 text-green-700 px-3 py-1 rounded-full font-black">⏱️ <span x-text="totalDuration"></span> detik</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- INLINE LAYOUT GRID --}}
         <div style="display: flex; flex-wrap: wrap; gap: 2rem; width: 100%;">
             
@@ -82,6 +99,33 @@
             
             {{-- Kolom Kanan: Log Aktivitas --}}
             <div style="flex: 1 1 30%; min-width: 280px;">
+                {{-- VPS Log Section --}}
+                <div class="bg-white border border-gray-100 rounded-[1.5rem] shadow-sm shadow-gray-100/50 p-6 mb-6" x-show="vpsLogs.length > 0">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 rounded-xl bg-red-50 text-bima-red flex items-center justify-center shrink-0">
+                            <i data-lucide="server" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">Log VPS</h3>
+                            <p class="text-[0.65rem] text-gray-400 mt-0.5 uppercase tracking-wider">Transkripsi Real-Time</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 h-72 overflow-y-auto font-mono text-[0.7rem] text-gray-700 leading-relaxed scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent" id="vps-log-box">
+                        <template x-for="(log, i) in vpsLogs" :key="i">
+                            <div class="mb-2 flex items-start gap-2">
+                                <span class="text-gray-400 shrink-0" x-text="`[${log.time}]`"></span>
+                                <span x-text="log.msg" :class="{
+                                    'text-green-700 font-bold': log.level === 'success',
+                                    'text-red-700 font-bold': log.level === 'error',
+                                    'text-yellow-700': log.level === 'warning',
+                                    'text-gray-700': log.level === 'info'
+                                }"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
                 <div class="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-gray-100/50 p-6 sticky top-8" x-show="logs.length > 0">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
@@ -134,7 +178,11 @@
             realtimeTexts: [],
             transcriptionStatus: 'Membangun koneksi ke server VPS...',
             isProcessing: false,
-            
+            vpsMessage: '',
+            totalSegments: 0,
+            totalDuration: 0,
+            vpsLogs: [],
+
             init() {
                 if (!this.isProcessing) {
                     this.startProcessing();
@@ -171,47 +219,86 @@
             async startProcessing() {
                 this.isProcessing = true;
                 this.globalStatus = 'processing';
-                this.globalProgress = 30;
-                
+                this.globalProgress = 10;
+
                 this.appendLog('info', 'File berhasil diunggah dan VPS sedang memproses di background...');
-                this.appendLog('info', 'Menunggu hasil dari VPS...');
-                
-                // Polling setiap 1 detik
+
+                // Polling setiap 2 detik
                 const pollInterval = setInterval(async () => {
                     try {
                         const response = await fetch(`{{ route('analysis.status', $analysis->slug) }}`);
                         const data = await response.json();
-                        
-                        // Update real-time text if available
+
+                        // === UPDATE VPS MESSAGE & PROGRESS ===
+                        if (data.vps_message) {
+                            this.vpsMessage = data.vps_message;
+                            this.transcriptionStatus = data.vps_message;
+                        }
+
+                        if (data.total_segments > 0) {
+                            this.totalSegments = data.total_segments;
+                            this.appendLog('success', `VPS selesai transkripsi: ${data.total_segments} segmen ditemukan`);
+                        }
+
+                        if (data.total_duration_sec > 0) {
+                            this.totalDuration = data.total_duration_sec;
+                        }
+
+                        if (data.progress !== undefined) {
+                            this.globalProgress = data.progress;
+                            this.appendLog('info', `Progress: ${data.progress}% — ${data.vps_message || 'Sedang diproses...'}`);
+                        }
+
+                        // === UPDATE VPS LOGS (detail dari VPS) ===
+                        if (data.vps_logs && Array.isArray(data.vps_logs) && data.vps_logs.length > 0) {
+                            const newLogs = data.vps_logs.filter(log => {
+                                return !this.vpsLogs.some(existing => 
+                                    existing.msg === log.msg && existing.time === log.time
+                                );
+                            });
+
+                            newLogs.forEach(log => {
+                                this.vpsLogs.push({
+                                    time: log.time || new Date().toLocaleTimeString('id-ID'),
+                                    msg: log.msg || '',
+                                    level: log.msg.includes('ERROR') ? 'error' : 
+                                           log.msg.includes('✅') || log.msg.includes('success') || log.msg.includes('BERHASIL') ? 'success' :
+                                           log.msg.includes('⚠️') ? 'warning' : 'info'
+                                });
+                            });
+
+                            // Auto-scroll VPS log box
+                            setTimeout(() => {
+                                const vpsLogBox = document.getElementById('vps-log-box');
+                                if(vpsLogBox) vpsLogBox.scrollTop = vpsLogBox.scrollHeight;
+                            }, 50);
+                        }
+
+                        // === UPDATE REAL-TIME TEXT ===
                         if (data.result_data && data.result_data.transcription) {
                             const newTexts = data.result_data.transcription;
-                            
+
                             if (newTexts.length > this.realtimeTexts.length) {
                                 this.realtimeTexts = [];
-                                
                                 newTexts.forEach(seg => {
                                     this.realtimeTexts.push(`[${seg.timestamp}] <span class="text-gray-900 font-bold">${seg.text_html}</span>`);
                                 });
-                                
+
                                 setTimeout(() => {
                                     const c = document.getElementById('realtime-text-box');
                                     if(c) c.scrollTop = c.scrollHeight;
                                 }, 50);
                             }
-                            
-                            // Update progress riil dari VPS
-                            if (data.result_data.progress !== undefined) {
-                                this.globalProgress = data.result_data.progress;
-                            }
                         }
 
+                        // === SELESAI / GAGAL ===
                         if (data.status === 'completed' || data.is_completed) {
                             clearInterval(pollInterval);
                             this.globalStatus = 'completed';
                             this.globalProgress = 100;
                             this.appendLog('success', 'Transkripsi selesai! Mengalihkan...');
                             this.transcriptionStatus = 'Penyimpanan berhasil, mengalihkan...';
-                            
+
                             setTimeout(() => {
                                 window.location.href = `{{ route('analysis.result', $analysis->slug) }}`;
                             }, 1500);
@@ -220,18 +307,11 @@
                             this.globalStatus = 'failed';
                             this.transcriptionStatus = 'Proses dibatalkan atau gagal di VPS.';
                             this.appendLog('error', 'VPS melaporkan kegagalan proses.');
-                        } else {
-                            // Animasi loading kalau progress VPS belum terkirim (kosong)
-                            if (!data.result_data || data.result_data.progress === undefined) {
-                                if (this.globalProgress < 15) {
-                                    this.globalProgress += 1;
-                                }
-                            }
                         }
                     } catch (e) {
                         console.error('Error polling status:', e);
                     }
-                }, 1000);
+                }, 2000);
             }
         }));
     });

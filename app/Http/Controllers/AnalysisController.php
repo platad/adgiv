@@ -154,66 +154,134 @@ class AnalysisController extends Controller
 
     public function checkStatus(Analysis $analysis)
     {
+        $resultData = $analysis->result_data;
         return response()->json([
             'status' => $analysis->status,
             'is_completed' => $analysis->isCompleted(),
-            'result_data' => $analysis->result_data
+            'result_data' => $resultData,
+            'vps_message' => $resultData['vps_message'] ?? '',
+            'total_segments' => $resultData['total_segments'] ?? 0,
+            'total_duration_sec' => $resultData['total_duration_sec'] ?? 0,
+            'progress' => $resultData['progress'] ?? 0,
+            'vps_logs' => $resultData['vps_logs'] ?? [],
         ]);
     }
 
     public function webhookResult(Request $request, Analysis $analysis, MultiModalAnalysisInterface $aiService, ParseAdviceGivingAction $parseAction)
     {
-        $status = $request->input('status', 'completed'); // 'progress' or 'completed'
+        $status = $request->input('status', 'completed');
         $transcription = $request->input('transcription', []);
         $progress = $request->input('progress', 0);
-        
+        $message = $request->input('message', '');
+        $logs = $request->input('logs', []);
+        $error = $request->input('error');
+        $totalSegments = $request->input('total_segments', 0);
+        $totalDuration = $request->input('total_duration_sec', 0);
+
+        // === SIMPAN LOGS VPS KE DATABASE (agar tampil di frontend) ===
+        if (!empty($logs) && is_array($logs)) {
+            $analysisLogs = AnalysisLog::where('analysis_id', $analysis->id)->get();
+            $existingKeys = $analysisLogs->map(function ($l) {
+                return md5($l->type . '|' . $l->meta->toJson());
+            })->toArray();
+
+            foreach ($logs as $log) {
+                $logTime = $log['time'] ?? '';
+                $logMsg = $log['msg'] ?? '';
+                $logKey = md5($logMsg . $logTime);
+
+                if (!in_array($logKey, $existingKeys)) {
+                    AnalysisLog::info(
+                        $analysis->id,
+                        'vps_progress',
+                        $logMsg,
+                        [
+                            'vps_time' => $logTime,
+                            'raw' => $log
+                        ]
+                    );
+                }
+            }
+        }
+
+        // === SIMPAN PROGRESS KE DATABASE ===
+        $analysis->update([
+            'result_data' => [
+                'total_chunks' => 1,
+                'progress' => $progress,
+                'transcription' => $transcription,
+                'vps_message' => $message,
+                'vps_logs' => $logs,
+                'total_segments' => $totalSegments,
+                'total_duration_sec' => $totalDuration,
+            ]
+        ]);
+
         if (empty($transcription) && $status !== 'progress') {
-            AnalysisLog::error($analysis->id, 'webhook_failed', 'VPS mengirim webhook tanpa data transkripsi atau error.', ['payload' => $request->all()]);
+            AnalysisLog::error($analysis->id, 'webhook_failed', 'VPS mengirim webhook tanpa data transkripsi atau error.', [
+                'payload' => $request->all(),
+                'error' => $error
+            ]);
             $analysis->update(['status' => 'failed']);
             return response()->json(['status' => 'error', 'message' => 'No transcription data'], 400);
         }
 
         if ($status === 'progress') {
-            $analysis->update([
-                'result_data' => [
-                    'total_chunks' => 1,
-                    'transcription' => $transcription,
-                    'progress' => $progress
-                ]
-            ]);
+            // Progress update — tetap simpan transcription jika ada (partial results)
+            if (!empty($transcription)) {
+                $analysis->update([
+                    'result_data' => [
+                        'total_chunks' => 1,
+                        'transcription' => $transcription,
+                        'progress' => $progress,
+                        'vps_message' => $message,
+                        'vps_logs' => $logs,
+                        'total_segments' => $totalSegments,
+                        'total_duration_sec' => $totalDuration,
+                    ]
+                ]);
+            }
             return response()->json(['status' => 'success_progress']);
         }
 
         try {
             $rawAiResponse = $aiService->synthesizeChunks($transcription, $analysis->locale);
             $finalData = $parseAction->execute($rawAiResponse);
-            
+
             $analysis->update([
                 'status' => 'completed',
                 'result_data' => [
                     'total_chunks' => 1,
                     'summary' => $finalData['summary'] ?? [],
                     'transcription' => $finalData['transcription'] ?? $transcription,
-                    'progress' => 100
+                    'progress' => 100,
+                    'vps_message' => $message,
+                    'vps_logs' => $logs,
+                    'total_segments' => $totalSegments,
+                    'total_duration_sec' => $totalDuration,
                 ]
             ]);
-            
+
             AnalysisLog::success($analysis->id, 'webhook_success', 'Transkripsi dan Analisis AI berhasil diproses sepenuhnya via Webhook.');
-            
+
         } catch (\Exception $e) {
             Log::error('AI Synthesis Error on Webhook: ' . $e->getMessage());
-            
+
             $analysis->update([
                 'status' => 'completed',
                 'result_data' => [
                     'total_chunks' => 1,
                     'transcription' => $transcription,
-                    'progress' => 100
+                    'progress' => 100,
+                    'vps_message' => $message,
+                    'vps_logs' => $logs,
+                    'total_segments' => $totalSegments,
+                    'total_duration_sec' => $totalDuration,
                 ]
             ]);
             AnalysisLog::error($analysis->id, 'webhook_ai_failed', 'Transkripsi berhasil, namun Analisis AI gagal: ' . $e->getMessage());
         }
-        
+
         return response()->json(['status' => 'success']);
     }
 
