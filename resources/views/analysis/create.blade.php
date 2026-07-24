@@ -58,26 +58,6 @@
                     @enderror
                 </div>
 
-                {{-- Pilihan Bahasa --}}
-                <div>
-                    <label for="locale" class="block text-[0.65rem] font-black text-gray-400 uppercase tracking-widest mb-3">
-                        <span class="lang-id">Bahasa Percakapan</span>
-                        <span class="lang-en">Spoken Language</span>
-                        <span class="lang-zh">会话所用语言</span>
-                    </label>
-                    <select name="locale" id="locale"
-                            class="w-full bg-gray-50 border-transparent focus:border-bima-red focus:bg-white focus:ring-0 rounded-2xl px-6 py-4 text-gray-900 font-bold transition-all cursor-pointer">
-                        <option value="id" @selected(old('locale', 'id') === 'id')>🇮🇩 Bahasa Indonesia</option>
-                        <option value="en" @selected(old('locale') === 'en')>🇬🇧 English</option>
-                        <option value="zh" @selected(old('locale') === 'zh')>🇨🇳 中文 (Mandarin)</option>
-                    </select>
-                    <p class="text-xs text-gray-400 mt-2 font-medium">
-                        <span class="lang-id">Pilih bahasa rekaman. AI akan menyesuaikan prompt analisis sesuai bahasa yang dipilih.</span>
-                        <span class="lang-en">Select the recording language. AI analysis prompts will adapt to the chosen language.</span>
-                        <span class="lang-zh">选择录音中使用的语言，AI分析提示词将自动适应所选语种。</span>
-                    </p>
-                </div>
-
                 {{-- Upload File Audio --}}
                 <div>
                     <label class="block text-[0.65rem] font-black text-gray-400 uppercase tracking-widest mb-3">

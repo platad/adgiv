@@ -176,6 +176,7 @@
                 this.appendLog('info', 'File berhasil diunggah dan VPS sedang memproses di background...');
                 this.appendLog('info', 'Menunggu hasil dari VPS...');
                 
+                // Polling setiap 1 detik
                 const pollInterval = setInterval(async () => {
                     try {
                         const response = await fetch(`{{ route('analysis.status', $analysis->slug) }}`);
@@ -185,21 +186,22 @@
                         if (data.result_data && data.result_data.transcription) {
                             const newTexts = data.result_data.transcription;
                             
-                            // Only update if there's new data
                             if (newTexts.length > this.realtimeTexts.length) {
-                                // Clear existing to prevent duplicates
                                 this.realtimeTexts = [];
                                 
                                 newTexts.forEach(seg => {
-                                    // seg.timestamp is like "00:00 - 00:05", seg.text_html is the text
                                     this.realtimeTexts.push(`[${seg.timestamp}] <span class="text-gray-900 font-bold">${seg.text_html}</span>`);
                                 });
                                 
-                                // Scroll to bottom
                                 setTimeout(() => {
                                     const c = document.getElementById('realtime-text-box');
                                     if(c) c.scrollTop = c.scrollHeight;
                                 }, 50);
+                            }
+                            
+                            // Update progress riil dari VPS
+                            if (data.result_data.progress !== undefined) {
+                                this.globalProgress = data.result_data.progress;
                             }
                         }
 
@@ -219,9 +221,11 @@
                             this.transcriptionStatus = 'Proses dibatalkan atau gagal di VPS.';
                             this.appendLog('error', 'VPS melaporkan kegagalan proses.');
                         } else {
-                            // Animasi loading progress bar
-                            if (this.globalProgress < 90) {
-                                this.globalProgress += 2;
+                            // Animasi loading kalau progress VPS belum terkirim (kosong)
+                            if (!data.result_data || data.result_data.progress === undefined) {
+                                if (this.globalProgress < 15) {
+                                    this.globalProgress += 1;
+                                }
                             }
                         }
                     } catch (e) {

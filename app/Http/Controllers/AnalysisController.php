@@ -6,6 +6,8 @@ use App\Models\Analysis;
 use App\Models\AnalysisChunk;
 use App\Models\AnalysisLog;
 use App\Models\AnalysisFeedback;
+use App\Contracts\AI\MultiModalAnalysisInterface;
+use App\Actions\ParseAdviceGivingAction;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -27,11 +29,11 @@ class AnalysisController extends Controller
     {
         $validated = $request->validate([
             'title'  => ['required', 'string', 'max:255'],
-            'locale' => ['nullable', 'string', 'in:id,en,zh'],
             'audio'  => ['required', 'file', 'mimes:wav,mp3,webm,ogg,aac,m4a,flac', 'max:10240'],
         ]);
 
-        $locale = $validated['locale'] ?? 'id';
+        // Default ke Indonesia — bahasa pemilihan dihapus agar user langsung proses tanpa delay
+        $locale = 'id';
         $userId = Auth::id();
         
         $analysis = Analysis::create([
@@ -67,7 +69,7 @@ class AnalysisController extends Controller
         try {
             $client = new Client(['timeout' => 30]);
             $vpsUrl = 'https://vps.temaniskripsi.id/api/transcribe';
-            $callbackUrl = route('analysis.webhook', ['locale' => 'en', 'analysis' => $analysis->slug]);
+            $callbackUrl = route('analysis.webhook', ['locale' => $locale, 'analysis' => $analysis->slug]);
 
             $response = $client->request('POST', $vpsUrl, [
                 'multipart' => [
@@ -79,6 +81,11 @@ class AnalysisController extends Controller
                     [
                         'name'     => 'callback_url',
                         'contents' => $callbackUrl
+                    ],
+                    [
+                        // Kirim bahasa ke VPS agar Whisper langsung pakai bahasa itu
+                        'name'     => 'language',
+                        'contents' => $locale
                     ]
                 ]
             ]);
@@ -153,10 +160,11 @@ class AnalysisController extends Controller
         ]);
     }
 
-    public function webhookResult(Request $request, Analysis $analysis)
+    public function webhookResult(Request $request, Analysis $analysis, MultiModalAnalysisInterface $aiService, ParseAdviceGivingAction $parseAction)
     {
         $status = $request->input('status', 'completed'); // 'progress' or 'completed'
         $transcription = $request->input('transcription', []);
+        $progress = $request->input('progress', 0);
         
         if (empty($transcription) && $status !== 'progress') {
             AnalysisLog::error($analysis->id, 'webhook_failed', 'VPS mengirim webhook tanpa data transkripsi atau error.', ['payload' => $request->all()]);
@@ -165,26 +173,45 @@ class AnalysisController extends Controller
         }
 
         if ($status === 'progress') {
-            // Update result data but keep status processing
             $analysis->update([
                 'result_data' => [
                     'total_chunks' => 1,
-                    'transcription' => $transcription
+                    'transcription' => $transcription,
+                    'progress' => $progress
                 ]
             ]);
             return response()->json(['status' => 'success_progress']);
         }
 
-        // Jika completed
-        $analysis->update([
-            'status' => 'completed',
-            'result_data' => [
-                'total_chunks' => 1,
-                'transcription' => $transcription
-            ]
-        ]);
-        
-        AnalysisLog::success($analysis->id, 'webhook_success', 'Transkripsi berhasil diterima dari VPS via Webhook secara penuh.');
+        try {
+            $rawAiResponse = $aiService->synthesizeChunks($transcription, $analysis->locale);
+            $finalData = $parseAction->execute($rawAiResponse);
+            
+            $analysis->update([
+                'status' => 'completed',
+                'result_data' => [
+                    'total_chunks' => 1,
+                    'summary' => $finalData['summary'] ?? [],
+                    'transcription' => $finalData['transcription'] ?? $transcription,
+                    'progress' => 100
+                ]
+            ]);
+            
+            AnalysisLog::success($analysis->id, 'webhook_success', 'Transkripsi dan Analisis AI berhasil diproses sepenuhnya via Webhook.');
+            
+        } catch (\Exception $e) {
+            Log::error('AI Synthesis Error on Webhook: ' . $e->getMessage());
+            
+            $analysis->update([
+                'status' => 'completed',
+                'result_data' => [
+                    'total_chunks' => 1,
+                    'transcription' => $transcription,
+                    'progress' => 100
+                ]
+            ]);
+            AnalysisLog::error($analysis->id, 'webhook_ai_failed', 'Transkripsi berhasil, namun Analisis AI gagal: ' . $e->getMessage());
+        }
         
         return response()->json(['status' => 'success']);
     }
