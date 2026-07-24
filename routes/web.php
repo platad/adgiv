@@ -21,24 +21,28 @@ Route::get('/', function (Request $request) {
     return redirect()->route($target, ['locale' => $locale]);
 });
 
-Route::prefix('{locale}')->middleware([\App\Http\Middleware\Localization::class])->group(function () {
+    Route::prefix('{locale}')->middleware([\App\Http\Middleware\Localization::class])->group(function () {
 
-    Route::get('/', function () {
-        $target = auth()->check() ? 'dashboard' : 'login';
-        return redirect()->route($target);
-    });
+        Route::get('/', function () {
+            $target = auth()->check() ? 'dashboard' : 'login';
+            return redirect()->route($target);
+        });
 
-    Route::get('/privacy-consent', function () {
-        return view('auth.privacy-consent');
-    })->name('privacy.consent');
+        Route::get('/privacy-consent', function () {
+            return view('auth.privacy-consent');
+        })->name('privacy.consent');
 
-    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
-    Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register')->middleware('guest');
-    Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
+        Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
+        Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
+        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+        Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register')->middleware('guest');
+        Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
 
-    Route::middleware(['auth'])->group(function () {
+        Route::post('/analysis/{analysis}/webhook', [AnalysisController::class, 'webhookResult'])
+            ->name('analysis.webhook')
+            ->withoutMiddleware([VerifyCsrfToken::class]);
+
+        Route::middleware(['auth'])->group(function () {
         
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/realtime-data', [DashboardController::class, 'getRealtimeChartData'])->name('dashboard.realtime-data');
@@ -53,7 +57,6 @@ Route::prefix('{locale}')->middleware([\App\Http\Middleware\Localization::class]
             Route::post('/{analysis}/saveResult', [AnalysisController::class, 'saveResult'])->name('saveResult');
             Route::get('/{analysis}/audio', [AnalysisController::class, 'getAudio'])->name('audio');
             Route::get('/{analysis}/status', [AnalysisController::class, 'checkStatus'])->name('status');
-            Route::post('/{analysis}/webhook', [AnalysisController::class, 'webhookResult'])->name('webhook')->withoutMiddleware([VerifyCsrfToken::class]);
             Route::get('/{analysis}/result', [AnalysisController::class, 'result'])->name('result');
             Route::get('/{analysis}/print', [AnalysisController::class, 'printReport'])->name('print');
             Route::post('/{analysis}/feedback', [AnalysisController::class, 'feedback'])->name('feedback');
