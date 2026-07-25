@@ -71,20 +71,20 @@ class AnalysisController extends Controller
             $client = new Client(['timeout' => 30]);
             $vpsUrl = 'https://vps.temaniskripsi.id/api/transcribe';
             $callbackUrl = 'https://temaniskripsi.id/api/webhook/' . $analysis->slug;
+            $originalFileName = $request->file('audio')->getClientOriginalName();
 
             $response = $client->request('POST', $vpsUrl, [
                 'multipart' => [
                     [
                         'name'     => 'file',
                         'contents' => fopen(Storage::disk('local')->path($path), 'r'),
-                        'filename' => "audio." . $file->getClientOriginalExtension()
+                        'filename' => $originalFileName
                     ],
                     [
                         'name'     => 'callback_url',
                         'contents' => $callbackUrl
                     ],
                     [
-                        // Kirim bahasa ke VPS agar Whisper langsung pakai bahasa itu
                         'name'     => 'language',
                         'contents' => $locale
                     ]
