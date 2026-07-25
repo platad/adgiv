@@ -6,9 +6,10 @@ DATA POTONGAN CHUNKS:
 
 ATURAN SINTESIS MUTLAK:
 1. JANGAN PERNAH MENYINGKAT ATAU MERANGKUM TRANSKRIPSI: Anda wajib menyertakan SETIAP baris transkripsi dari seluruh potongan chunk yang diberikan secara lengkap dari awal hingga akhir audio. Jangan ada satu kalimat pun yang hilang!
-2. PERTAHANKAN PENANDA INLINE SECARA UTUH: Anda wajib mempertahankan semua tag marker seperti [MARKER_1], [MARKER_2], dst. serta tag [PAUSE] tepat di posisinya di dalam teks transkripsi ('text_html'). Jangan pernah menghapus atau membersihkan tag marker ini dari teks!
-3. KONSISTENSI MARKER: Pastikan setiap tag [MARKER_x] yang tercantum di dalam 'text_html' memiliki objek padanannya di dalam array 'intonation_markers' untuk baris tersebut dengan id yang persis sama.
-4. BUAT DETAIL ANALISIS YANG SANGAT MENDALAM DAN LUAS (COMPREHENSIVE ANALYSIS): Karena sistem didukung oleh arsitektur backend parser yang tangguh dan rendering real-time, Anda WAJIB memberikan penjelasan yang sangat komprehensif, akademis, dan mendalam pada 'agent_insight', 'advice_relation', 'reason', dan 'relation' (1-2 kalimat detail, minimal 20-30 kata per item). Jelaskan secara tajam aspek sosiolinguistik, dinamika relasi kekuasaan (power dynamics), serta implikasi akademik dari ujaran dosen dan mahasiswa tersebut agar hasil analisis bernilai akademis tinggi.
+2. IDENTIFIKASI PEMBICARA: Karena input data berlabel "Unknown", Anda WAJIB menganalisis konteks percakapan untuk menentukan siapa pembicaranya dan ubah label 'speaker' menjadi "Dosen" atau "Mahasiswa" dengan tepat. (Dosen biasanya memberi saran/koreksi/bertanya, Mahasiswa biasanya menjawab/meminta arahan).
+3. SISIPKAN PENANDA INTONASI: Anda WAJIB menyisipkan tag penanda unik seperti [MARKER_1], [MARKER_2], dst., serta tag [PAUSE] ke dalam teks transkripsi ('text_html') tepat di sebelah kata yang memiliki intonasi menonjol atau jeda. Input asli berupa teks mentah tanpa tag, jadi Anda harus membuatnya! Tebalkan (bold) frasa pemberian saran dengan <b>...</b>.
+4. KONSISTENSI MARKER: Pastikan setiap tag [MARKER_x] yang tercantum di dalam 'text_html' memiliki objek padanannya di dalam array 'intonation_markers' untuk baris tersebut dengan id yang persis sama.
+5. BUAT DETAIL ANALISIS MENDALAM (COMPREHENSIVE ANALYSIS): Anda WAJIB memberikan penjelasan yang komprehensif, akademis, dan mendalam pada 'agent_insight', 'advice_relation', 'reason', dan 'relation' (minimal 20-30 kata per item). Jelaskan secara tajam aspek sosiolinguistik, dinamika relasi kekuasaan, serta implikasi akademik dari ujaran dosen dan mahasiswa.
 
 Format output HARUS murni dalam format JSON terstruktur yang valid dengan skema berikut:
 {

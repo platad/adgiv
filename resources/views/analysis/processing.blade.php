@@ -29,9 +29,15 @@
                 <div class="flex-1">
                     <p class="text-[0.65rem] font-black text-gray-400 uppercase tracking-widest">Status VPS</p>
                     <p class="text-sm font-bold text-gray-900 mt-1" x-text="vpsMessage || 'Menunggu respon dari VPS...'"></p>
-                    <div class="flex flex-wrap gap-4 mt-3 text-xs font-medium" x-show="totalSegments > 0">
-                        <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-black">📊 <span x-text="totalSegments"></span> Segmen</span>
-                        <span class="bg-green-50 text-green-700 px-3 py-1 rounded-full font-black">⏱️ <span x-text="totalDuration"></span> detik</span>
+                    <div class="flex flex-wrap gap-4 mt-3 text-xs font-medium" x-show="totalSegments > 0" style="display: none;">
+                        <span class="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full font-black flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                            <span x-text="totalSegments"></span> Segmen
+                        </span>
+                        <span class="bg-green-50 text-green-700 px-3 py-1.5 rounded-full font-black flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="2" x2="14" y2="2"/><line x1="12" y1="14" x2="15" y2="11"/><circle cx="12" cy="14" r="8"/></svg>
+                            <span x-text="totalDuration"></span> detik
+                        </span>
                     </div>
                 </div>
             </div>
@@ -61,25 +67,21 @@
                         </div>
                     </div>
 
-                    {{-- Analisis AI Streaming --}}
+                    {{-- Analisis AI Streaming (Step 2) --}}
                     <div class="p-6">
                         <div class="flex items-start gap-4 mb-4">
-                            <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :class="stepAnalysisClass">
-                                <template x-if="globalStatus === 'completed'">
-                                    <i data-lucide="check-circle" class="w-5 h-5"></i>
-                                </template>
-                                <template x-if="globalStatus === 'processing'">
-                                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                                </template>
-                                <template x-if="globalStatus === 'failed'">
-                                    <i data-lucide="alert-circle" class="w-5 h-5"></i>
-                                </template>
+                            <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :class="step2Class">
+                                <svg x-show="globalProgress >= 80 || globalStatus === 'completed'" style="display: none;" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                                
+                                <svg x-show="globalStatus === 'processing' && globalProgress < 80" style="display: none;" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                
+                                <svg x-show="globalStatus === 'failed'" style="display: none;" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                             </div>
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 flex-wrap">
                                     <p class="font-black text-sm text-gray-900 uppercase tracking-wide">Transkripsi AI Real-Time</p>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1" x-text="transcriptionStatus">Menunggu respon VPS...</p>
+                                <p class="text-xs text-gray-500 mt-1" x-text="(globalProgress >= 80 || globalStatus === 'completed') ? 'Selesai mentranskripsi.' : (vpsMessage || 'Menunggu respon VPS...')"></p>
                             </div>
                         </div>
 
@@ -91,6 +93,27 @@
                             <template x-if="realtimeTexts.length === 0">
                                 <span class="text-gray-400 italic">... transkripsi akan muncul di sini ...</span>
                             </template>
+                        </div>
+                    </div>
+
+                    {{-- Sintesis AI (Step 3) --}}
+                    <div class="p-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors" :class="step3Class">
+                                <svg x-show="globalStatus === 'completed'" style="display: none;" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                                
+                                <svg x-show="globalStatus === 'processing' && globalProgress >= 80" style="display: none;" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                
+                                <svg x-show="globalStatus === 'processing' && globalProgress < 80" style="display: none;" class="w-5 h-5 text-blue-300" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+
+                                <svg x-show="globalStatus === 'failed'" style="display: none;" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 flex-wrap">
+                                    <p class="font-black text-sm text-gray-900 uppercase tracking-wide" :class="{'opacity-50': globalProgress < 80 && globalStatus !== 'failed'}">Analisis & Sintesis AI</p>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1" :class="{'opacity-50': globalProgress < 80 && globalStatus !== 'failed'}" x-text="(globalStatus === 'completed') ? 'Analisis intonasi, relasi, dan advice giving selesai.' : ((globalProgress >= 80 && globalStatus !== 'failed') ? 'Mengolah kembali hasil transkripsi (intonasi, relasi, advice giving)...' : 'Menunggu tahap transkripsi selesai...')"></p>
+                            </div>
                         </div>
                     </div>
 
@@ -155,7 +178,7 @@
                                 <div class="flex-1 min-w-0 pb-1">
                                     <p class="text-xs text-gray-700 leading-relaxed font-medium break-words" x-text="log.msg"></p>
                                     <p class="text-[0.65rem] text-gray-400 font-bold mt-1.5 uppercase tracking-wider flex items-center gap-1.5">
-                                        <i data-lucide="clock" class="w-3 h-3"></i>
+                                        <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                         <span x-text="log.time"></span>
                                     </p>
                                 </div>
@@ -201,10 +224,17 @@
                 return 'Sedang Diproses';
             },
 
-            get stepAnalysisClass() {
+            get step2Class() {
+                if (this.globalProgress >= 80 || this.globalStatus === 'completed') return 'bg-green-100 text-green-600';
+                if (this.globalStatus === 'failed') return 'bg-red-100 text-red-600';
+                return 'bg-blue-100 text-blue-500';
+            },
+
+            get step3Class() {
                 if (this.globalStatus === 'completed') return 'bg-green-100 text-green-600';
-                if (this.globalStatus === 'processing') return 'bg-blue-100 text-blue-500';
-                return 'bg-red-100 text-red-600';
+                if (this.globalStatus === 'failed') return 'bg-red-100 text-red-600';
+                if (this.globalProgress >= 80) return 'bg-blue-100 text-blue-500';
+                return 'bg-gray-100 text-gray-400';
             },
 
             appendLog(level, msg) {

@@ -6,9 +6,10 @@ CHUNK DATA:
 
 ABSOLUTE SYNTHESIS RULES:
 1. NEVER SUMMARIZE OR SHORTEN THE TRANSCRIPTION: You must include EVERY transcription line from all given chunks completely from beginning to end of the audio. Not a single sentence may be missing!
-2. PRESERVE ALL INLINE MARKERS INTACT: You must maintain all marker tags such as [MARKER_1], [MARKER_2], etc., as well as [PAUSE] tags exactly in their positions within the transcription text ('text_html'). Never remove or clean these marker tags from the text!
-3. MARKER CONSISTENCY: Ensure every [MARKER_x] tag listed in 'text_html' has its corresponding object in the 'intonation_markers' array for that line with the exact same id.
-4. PROVIDE EXTREMELY DEEP AND COMPREHENSIVE ANALYSIS: Because the system is supported by a robust backend parser architecture and real-time rendering, you MUST provide very comprehensive, academic, and in-depth explanations for 'agent_insight', 'advice_relation', 'reason', and 'relation' (1-2 detailed sentences, minimum 20-30 words per item). Sharply explain the sociolinguistic aspects, power dynamics, and academic implications of the supervisor's and student's utterances so the analysis has high academic value.
+2. IDENTIFY THE SPEAKER: Because the input data is labeled "Unknown", you MUST analyze the context of the conversation to determine who is speaking and change the 'speaker' label to "Supervisor" or "Student" appropriately. (Supervisors usually give advice/ask questions, Students usually answer/explain).
+3. INSERT INTONATION MARKERS: You MUST insert unique marker tags such as [MARKER_1], [MARKER_2], etc., and [PAUSE] tags into the transcription text ('text_html') exactly next to the word that has a prominent intonation or pause. The original input is raw text without tags, so you must create them! Bold the advice-giving phrases with <b>...</b>.
+4. MARKER CONSISTENCY: Ensure every [MARKER_x] tag listed in 'text_html' has its corresponding object in the 'intonation_markers' array for that line with the exact same id.
+5. PROVIDE EXTREMELY DEEP AND COMPREHENSIVE ANALYSIS: You MUST provide comprehensive, academic, and in-depth explanations for 'agent_insight', 'advice_relation', 'reason', and 'relation' (minimum 20-30 words per item). Sharply explain the sociolinguistic aspects, power dynamics, and academic implications of the supervisor's and student's utterances.
 
 Output format MUST be purely in valid structured JSON with the following schema:
 {
