@@ -244,42 +244,110 @@ class AnalysisController extends Controller
         }
 
         try {
-            $rawAiResponse = $aiService->synthesizeChunks($transcription, $analysis->locale);
-            $finalData = $parseAction->execute($rawAiResponse);
-
             $analysis->update([
-                'status' => 'completed',
+                'status' => 'analyzing', // NEW: We transition to analyzing so frontend knows it's time to process AI chunks
                 'result_data' => [
                     'total_chunks' => 1,
-                    'summary' => $finalData['summary'] ?? [],
-                    'transcription' => $finalData['transcription'] ?? $transcription,
-                    'progress' => 100,
-                    'vps_message' => $message,
+                    'transcription' => $transcription,
+                    'progress' => 80,
+                    'vps_message' => 'VPS Selesai. Memulai Analisis AI...',
                     'vps_logs' => $logs,
                     'total_segments' => $totalSegments,
                     'total_duration_sec' => $totalDuration,
                 ]
             ]);
 
-            AnalysisLog::success($analysis->id, 'webhook_success', 'Transkripsi dan Analisis AI berhasil diproses sepenuhnya via Webhook.');
+            AnalysisLog::success($analysis->id, 'webhook_success', 'Transkripsi berhasil diproses via Webhook. Menunggu frontend memulai chunk AI.');
 
         } catch (\Exception $e) {
             Log::error('AI Synthesis Error on Webhook: ' . $e->getMessage());
 
             $analysis->update([
-                'status' => 'completed',
+                'status' => 'failed',
                 'result_data' => [
                     'total_chunks' => 1,
                     'transcription' => $transcription,
-                    'progress' => 100,
-                    'vps_message' => $message,
+                    'progress' => 80,
+                    'vps_message' => 'Gagal menyimpan transkripsi',
                     'vps_logs' => $logs,
                     'total_segments' => $totalSegments,
                     'total_duration_sec' => $totalDuration,
                 ]
             ]);
-            AnalysisLog::error($analysis->id, 'webhook_ai_failed', 'Transkripsi berhasil, namun Analisis AI gagal: ' . $e->getMessage());
+            AnalysisLog::error($analysis->id, 'webhook_failed', 'Transkripsi berhasil, namun gagal menyimpan: ' . $e->getMessage());
         }
+
+        return response()->json(['status' => 'success']);
+    }
+
+    public function processChunk(Request $request, Analysis $analysis, MultiModalAnalysisInterface $aiService, ParseAdviceGivingAction $parseAction)
+    {
+        abort_if($analysis->user_id != Auth::id(), 403);
+
+        $request->validate([
+            'start_idx' => 'required|integer|min:0',
+            'end_idx' => 'required|integer|min:0',
+        ]);
+
+        $startIdx = (int) $request->input('start_idx');
+        $endIdx = (int) $request->input('end_idx');
+
+        $resultData = $analysis->result_data ?? [];
+        $transcription = $resultData['transcription'] ?? [];
+
+        // Extract chunk
+        $chunk = array_slice($transcription, $startIdx, $endIdx - $startIdx + 1);
+        if (empty($chunk)) {
+            return response()->json(['status' => 'success', 'message' => 'No segments in chunk']);
+        }
+
+        try {
+            // Process chunk with OpenAI
+            $rawAiResponse = $aiService->synthesizeChunks($chunk, $analysis->locale);
+            $finalData = $parseAction->execute($rawAiResponse);
+
+            // Merge parsed data back into the main transcription array
+            $enrichedChunk = $finalData['transcription'] ?? $chunk;
+            
+            // Loop through enriched chunk and replace original elements
+            // We use standard numerical indexing since we sliced
+            foreach ($enrichedChunk as $idx => $enrichedItem) {
+                $originalIdx = $startIdx + $idx;
+                if (isset($transcription[$originalIdx])) {
+                    $transcription[$originalIdx] = array_merge($transcription[$originalIdx], $enrichedItem);
+                }
+            }
+
+            // Update result data
+            $resultData['transcription'] = $transcription;
+            
+            // We can just keep the last chunk's summary
+            if (!empty($finalData['summary'])) {
+                $resultData['summary'] = $finalData['summary'];
+            }
+
+            $analysis->update(['result_data' => $resultData]);
+
+            return response()->json(['status' => 'success', 'processed' => count($enrichedChunk)]);
+        } catch (\Exception $e) {
+            Log::error('AI Synthesis Error on Chunk: ' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function finalizeAnalysis(Request $request, Analysis $analysis)
+    {
+        abort_if($analysis->user_id != Auth::id(), 403);
+
+        $resultData = $analysis->result_data ?? [];
+        $resultData['progress'] = 100;
+        
+        $analysis->update([
+            'status' => 'completed',
+            'result_data' => $resultData
+        ]);
+
+        AnalysisLog::success($analysis->id, 'ai_completed', 'Analisis AI via batch frontend berhasil diselesaikan.');
 
         return response()->json(['status' => 'success']);
     }

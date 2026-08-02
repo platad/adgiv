@@ -256,7 +256,15 @@
                         }
 
                         // === SELESAI / GAGAL ===
-                        if (data.status === 'completed' || data.is_completed) {
+                        if (data.status === 'analyzing') {
+                            clearInterval(pollInterval);
+                            this.globalStatus = 'processing';
+                            this.globalProgress = 80;
+                            this.appendLog('info', 'VPS selesai. Memulai Analisis AI (Batch Processing)...');
+                            this.transcriptionStatus = 'Menganalisis dengan AI...';
+                            
+                            this.startAiBatchProcessing();
+                        } else if (data.status === 'completed' || data.is_completed) {
                             clearInterval(pollInterval);
                             this.globalStatus = 'completed';
                             this.globalProgress = 100;
@@ -276,6 +284,67 @@
                         console.error('Error polling status:', e);
                     }
                 }, 2000);
+            },
+
+            async startAiBatchProcessing() {
+                try {
+                    const batchSize = 10;
+                    const total = this.totalSegments;
+                    let processed = 0;
+                    
+                    for (let startIdx = 0; startIdx < total; startIdx += batchSize) {
+                        let endIdx = Math.min(startIdx + batchSize - 1, total - 1);
+                        this.transcriptionStatus = `Memproses Analisis AI (Baris ${startIdx + 1} - ${endIdx + 1} dari ${total})...`;
+                        this.appendLog('info', `[AI Batch] Mengirim baris ${startIdx + 1} hingga ${endIdx + 1} ke OpenAI...`);
+                        
+                        const response = await fetch(`{{ route('analysis.processChunk', $analysis->slug) }}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': window.BIMA ? window.BIMA.csrfToken : document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({ start_idx: startIdx, end_idx: endIdx })
+                        });
+                        
+                        const data = await response.json();
+                        if (data.status === 'error') {
+                            throw new Error(data.message || 'Gagal memproses batch.');
+                        }
+                        
+                        processed += (endIdx - startIdx + 1);
+                        // Update progress from 80% to 95%
+                        this.globalProgress = 80 + Math.floor((processed / total) * 15);
+                        this.appendLog('success', `[AI Batch] Baris ${startIdx + 1} hingga ${endIdx + 1} berhasil dianalisis.`);
+                    }
+                    
+                    this.transcriptionStatus = 'Finalisasi Analisis...';
+                    this.appendLog('info', 'Semua baris selesai. Menyimpan hasil akhir...');
+                    
+                    await fetch(`{{ route('analysis.finalizeAnalysis', $analysis->slug) }}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': window.BIMA ? window.BIMA.csrfToken : document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    this.globalStatus = 'completed';
+                    this.globalProgress = 100;
+                    this.appendLog('success', 'Analisis komprehensif selesai! Mengalihkan...');
+                    this.transcriptionStatus = 'Penyimpanan berhasil, mengalihkan...';
+
+                    setTimeout(() => {
+                        window.location.href = `{{ route('analysis.result', $analysis->slug) }}`;
+                    }, 1500);
+
+                } catch (e) {
+                    console.error('AI Batch Processing Error:', e);
+                    this.globalStatus = 'failed';
+                    this.transcriptionStatus = 'Gagal memproses AI Batch.';
+                    this.appendLog('error', `AI Error: ${e.message}`);
+                }
             }
         }));
     });

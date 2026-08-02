@@ -54,6 +54,8 @@ Route::get('/', function (Request $request) {
             Route::post('/initialize', [AnalysisController::class, 'initialize'])->name('initialize');
 
             Route::get('/{analysis}/processing', [AnalysisController::class, 'processing'])->name('processing');
+            Route::post('/{analysis}/process-chunk', [AnalysisController::class, 'processChunk'])->name('processChunk');
+            Route::post('/{analysis}/finalize-analysis', [AnalysisController::class, 'finalizeAnalysis'])->name('finalizeAnalysis');
             Route::post('/{analysis}/saveResult', [AnalysisController::class, 'saveResult'])->name('saveResult');
             Route::get('/{analysis}/audio', [AnalysisController::class, 'getAudio'])->name('audio');
             Route::get('/{analysis}/status', [AnalysisController::class, 'checkStatus'])->name('status');
