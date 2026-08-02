@@ -307,7 +307,7 @@
                 {{-- Dynamic Status Badge --}}
                 <span x-show="synthesisStatus === 'completed'" class="inline-flex flex-wrap md:flex-nowrap items-center gap-2 shrink-0">
                     <span class="inline-flex items-center px-4 py-2.5 rounded-xl bg-purple-50 text-purple-700 text-[0.7rem] font-black uppercase tracking-widest border border-purple-100 shadow-sm whitespace-nowrap">
-                        <i data-lucide="music-4" class="w-3.5 h-3.5 mr-1.5 text-purple-500"></i> {{ $totalChunks > 0 ? $totalChunks : '8' }} Chunks
+                        <i data-lucide="music-4" class="w-3.5 h-3.5 mr-1.5 text-purple-500"></i> {{ count($transcription) }} <span class="lang-id">Segmen</span><span class="lang-en" style="display:none;">Segments</span><span class="lang-zh" style="display:none;">段</span>
                     </span>
                     <span class="inline-flex items-center px-4 py-2.5 rounded-xl bg-green-50 text-green-700 text-[0.7rem] font-black uppercase tracking-widest border border-green-100 shadow-sm whitespace-nowrap">
                         <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1.5 text-green-500"></i> 

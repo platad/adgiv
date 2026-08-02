@@ -205,7 +205,7 @@
 
                 <div class="flex justify-between py-1 border-b border-gray-200">
                     <span class="text-xs text-gray-500 uppercase tracking-wider">Jumlah Segmen</span>
-                    <span class="text-xs font-bold text-black text-right">{{ $totalChunks }} Potongan Audio</span>
+                    <span class="text-xs font-bold text-black text-right">{{ count($transBlocks) }} Potongan Dialog</span>
                 </div>
 
                 <div class="flex justify-between py-1 border-b border-gray-200">
@@ -526,7 +526,13 @@
     @php
         $chartPoints = array_map(
             function ($block, $idx) {
-                $type = $block['intonation_type'] ?? ($block['advice_type'] ?? 'neutral');
+                if (!empty($block['intonation_markers']) && is_array($block['intonation_markers']) && count($block['intonation_markers']) > 0) {
+                    $type = $block['intonation_markers'][0]['type'] ?? 'neutral';
+                } else {
+                    $type = $block['intonation_type'] ?? ($block['advice_type'] ?? 'neutral');
+                }
+                $type = strtolower($type);
+
                 $val = 0;
                 if ($type === 'up') $val = 1;
                 if ($type === 'down') $val = -1;
