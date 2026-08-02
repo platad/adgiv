@@ -32,6 +32,36 @@
         $dynamicsSummary = 'Dinamika percakapan berjalan seimbang antara intonasi turun (korektif) dan naik (klarifikasi/tanya). Ini mencerminkan keseimbangan relasi bimbingan yang sangat kondusif, interaktif, dan berorientasi pada pemecahan masalah bersama.';
         $dynamicsStatus = 'Kondusif & Seimbang';
     }
+
+    $getIndobertIconAndColor = function($label) {
+        $label = strtolower(trim($label ?? ''));
+        switch ($label) {
+            // Advice Giving
+            case 'arahan_eksplisit':
+                return ['color' => 'red', 'icon' => '<svg class="w-3.5 h-3.5 text-red-500 mr-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>'];
+            case 'bimbingan_bertahap':
+                return ['color' => 'blue', 'icon' => '<svg class="w-3.5 h-3.5 text-blue-500 mr-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>'];
+            case 'dukungan_keputusan':
+                return ['color' => 'green', 'icon' => '<svg class="w-3.5 h-3.5 text-green-500 mr-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'];
+            case 'jawaban_tegas':
+                return ['color' => 'orange', 'icon' => '<svg class="w-3.5 h-3.5 text-orange-500 mr-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'];
+            case 'petunjuk_kontekstual':
+                return ['color' => 'purple', 'icon' => '<svg class="w-3.5 h-3.5 text-purple-500 mr-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'];
+                
+            // Modes of Interaction
+            case 'otoritas':
+                return ['color' => 'yellow', 'icon' => '<svg class="w-3.5 h-3.5 text-yellow-600 mr-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'];
+            case 'power_gaining':
+                return ['color' => 'teal', 'icon' => '<svg class="w-3.5 h-3.5 text-teal-500 mr-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>'];
+            case 'power_maintaining':
+                return ['color' => 'indigo', 'icon' => '<svg class="w-3.5 h-3.5 text-indigo-500 mr-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 6h18M12 6v12M5 6l-2 9a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l-2-9M15 6l-2 9a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l-2-9"/></svg>'];
+            case 'power_over':
+                return ['color' => 'rose', 'icon' => '<svg class="w-3.5 h-3.5 text-rose-500 mr-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'];
+            
+            default:
+                return ['color' => 'gray', 'icon' => '<svg class="w-3.5 h-3.5 text-gray-500 mr-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14"/></svg>'];
+        }
+    };
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -353,6 +383,30 @@
                                     Advice Giving: {{ $block['advice_category'] ?? 'Pemberian Saran' }}
                                 </span>
                             @endif
+                            
+                            <!-- IndoBERT: Advice Giving Badge -->
+                            @if (!empty($block['advice_giving']))
+                                @php
+                                    $agLabelRaw = $block['advice_giving'];
+                                    $agLabel = ucwords(str_replace('_', ' ', $agLabelRaw));
+                                    $agInfo = $getIndobertIconAndColor($agLabelRaw);
+                                @endphp
+                                <span class="inline-flex items-center px-2 py-0.5 border border-gray-300 bg-gray-50 text-gray-700">
+                                    {!! $agInfo['icon'] !!} Advice Giving: {{ $agLabel }}
+                                </span>
+                            @endif
+
+                            <!-- IndoBERT: Modes of Interaction Badge -->
+                            @if (!empty($block['modes_of_interaction']))
+                                @php
+                                    $moLabelRaw = $block['modes_of_interaction'];
+                                    $moLabel = ucwords(str_replace('_', ' ', $moLabelRaw));
+                                    $moInfo = $getIndobertIconAndColor($moLabelRaw);
+                                @endphp
+                                <span class="inline-flex items-center px-2 py-0.5 border border-gray-300 bg-gray-50 text-gray-700">
+                                    {!! $moInfo['icon'] !!} Modes of Interaction: {{ $moLabel }}
+                                </span>
+                            @endif
                         </div>
 
                         <!-- Agent insight box (Monochrome Details Card) -->
@@ -402,6 +456,16 @@
                                         <span class="block text-[0.55rem] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Kategori Advice Giving (Saran Akademik):</span>
                                         <p class="text-[0.65rem] text-gray-700 leading-relaxed">
                                             Kalimat ini diidentifikasi oleh sistem sebagai saran penting bimbingan dengan kategori: <strong>{{ $block['advice_category'] ?? 'Rekomendasi Akademik' }}</strong>.
+                                        </p>
+                                    </div>
+                                @endif
+                                
+                                <!-- IndoBERT Reasoning Details -->
+                                @if (!empty($block['indobert_reasoning']))
+                                    <div class="mt-2.5 pt-2 border-t border-gray-200">
+                                        <span class="block text-[0.55rem] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Analisis IndoBERT (Super Intelligence):</span>
+                                        <p class="text-[0.65rem] text-gray-700 leading-relaxed">
+                                            {{ $block['indobert_reasoning'] }}
                                         </p>
                                     </div>
                                 @endif

@@ -105,6 +105,45 @@
         }
         return ['id' => $val, 'en' => $val, 'zh' => $val];
     };
+
+    $getIndobertIconAndColor = function($label) {
+        $label = strtolower(trim($label ?? ''));
+        switch ($label) {
+            // Advice Giving
+            case 'arahan_eksplisit':
+                // Merah - Target
+                return ['color' => 'red', 'icon' => '<svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>'];
+            case 'bimbingan_bertahap':
+                // Biru - Steps/List
+                return ['color' => 'blue', 'icon' => '<svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>'];
+            case 'dukungan_keputusan':
+                // Hijau - Handshake / Heart
+                return ['color' => 'green', 'icon' => '<svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'];
+            case 'jawaban_tegas':
+                // Oranye - Check-circle
+                return ['color' => 'orange', 'icon' => '<svg class="w-3.5 h-3.5 text-orange-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'];
+            case 'petunjuk_kontekstual':
+                // Ungu - Map-pin
+                return ['color' => 'purple', 'icon' => '<svg class="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'];
+                
+            // Modes of Interaction
+            case 'otoritas':
+                // Kuning Emas - Crown / Bintang
+                return ['color' => 'yellow', 'icon' => '<svg class="w-3.5 h-3.5 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'];
+            case 'power_gaining':
+                // Teal - Trending-up
+                return ['color' => 'teal', 'icon' => '<svg class="w-3.5 h-3.5 text-teal-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>'];
+            case 'power_maintaining':
+                // Indigo - Timbangan / Scale
+                return ['color' => 'indigo', 'icon' => '<svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 6h18M12 6v12M5 6l-2 9a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l-2-9M15 6l-2 9a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l-2-9"/></svg>'];
+            case 'power_over':
+                // Merah Gelap / Rose - Zap
+                return ['color' => 'rose', 'icon' => '<svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'];
+            
+            default:
+                return ['color' => 'gray', 'icon' => '<svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14"/></svg>'];
+        }
+    };
 @endphp
 <x-slot name="styles">
     <style>
@@ -636,6 +675,54 @@
                                                         <span class="lang-id">Relasi</span>
                                                         <span class="lang-en">Relation</span>
                                                         <span class="lang-zh">关联</span>
+                                                    </button>
+                                                @endif
+
+                                                {{-- IndoBERT: Advice Giving Badge --}}
+                                                @if (!empty($block['advice_giving']))
+                                                    @php
+                                                        $agLabelRaw = $block['advice_giving'];
+                                                        $agLabel = ucwords(str_replace('_', ' ', $agLabelRaw));
+                                                        $agInfo = $getIndobertIconAndColor($agLabelRaw);
+                                                        $agColor = $agInfo['color'];
+                                                        $agIcon = $agInfo['icon'];
+                                                        $agReason = $block['indobert_reasoning'] ?? 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
+                                                    @endphp
+                                                    <button
+                                                        @click="
+                                                            const t = 'Advice Giving: {{ $agLabel }}';
+                                                            const exp = '{{ addslashes($agReason) }}';
+                                                            const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
+                                                            openInsight(t, 'advice', exp, rel);
+                                                        "
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $agColor }}-50 hover:bg-{{ $agColor }}-100 text-{{ $agColor }}-700 border-{{ $agColor }}-200"
+                                                        title="Klik untuk melihat insight analisis IndoBERT">
+                                                        {!! $agIcon !!}
+                                                        <span>{{ $agLabel }}</span>
+                                                    </button>
+                                                @endif
+
+                                                {{-- IndoBERT: Modes of Interaction Badge --}}
+                                                @if (!empty($block['modes_of_interaction']))
+                                                    @php
+                                                        $moLabelRaw = $block['modes_of_interaction'];
+                                                        $moLabel = ucwords(str_replace('_', ' ', $moLabelRaw));
+                                                        $moInfo = $getIndobertIconAndColor($moLabelRaw);
+                                                        $moColor = $moInfo['color'];
+                                                        $moIcon = $moInfo['icon'];
+                                                        $moReason = $block['indobert_reasoning'] ?? 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
+                                                    @endphp
+                                                    <button
+                                                        @click="
+                                                            const t = 'Modes of Interaction: {{ $moLabel }}';
+                                                            const exp = '{{ addslashes($moReason) }}';
+                                                            const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
+                                                            openInsight(t, 'advice', exp, rel);
+                                                        "
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $moColor }}-50 hover:bg-{{ $moColor }}-100 text-{{ $moColor }}-700 border-{{ $moColor }}-200"
+                                                        title="Klik untuk melihat insight analisis IndoBERT">
+                                                        {!! $moIcon !!}
+                                                        <span>{{ $moLabel }}</span>
                                                     </button>
                                                 @endif
                                             </span>
