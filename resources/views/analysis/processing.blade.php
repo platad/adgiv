@@ -46,8 +46,8 @@
         {{-- INLINE LAYOUT GRID --}}
         <div style="display: flex; flex-wrap: wrap; gap: 2rem; width: 100%;">
             
-            {{-- Kolom Kiri: Proses Utama --}}
-            <div style="flex: 1 1 60%; min-width: 320px; display: flex; flex-direction: column; gap: 1.5rem;">
+            {{-- Kolom Kiri: Proses Utama (Dibuat Center & Full Width) --}}
+            <div style="flex: 1 1 100%; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
                 
                 {{-- Processing Card --}}
                 <div class="bg-white border border-gray-100 rounded-[2rem] shadow-xl shadow-gray-100/60 divide-y divide-gray-50 overflow-hidden">
@@ -120,73 +120,7 @@
                 </div>
             </div>
             
-            {{-- Kolom Kanan: Log Aktivitas --}}
-            <div style="flex: 1 1 30%; min-width: 280px;">
-                {{-- VPS Log Section --}}
-                <div class="bg-white border border-gray-100 rounded-[1.5rem] shadow-sm shadow-gray-100/50 p-6 mb-6" x-show="vpsLogs.length > 0">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 rounded-xl bg-red-50 text-bima-red flex items-center justify-center shrink-0">
-                            <i data-lucide="server" class="w-4 h-4"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">Log VPS</h3>
-                            <p class="text-[0.65rem] text-gray-400 mt-0.5 uppercase tracking-wider">Transkripsi Real-Time</p>
-                        </div>
-                    </div>
 
-                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 h-72 overflow-y-auto font-mono text-[0.7rem] text-gray-700 leading-relaxed scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent" id="vps-log-box">
-                        <template x-for="(log, i) in vpsLogs" :key="i">
-                            <div class="mb-2 flex items-start gap-2">
-                                <span class="text-gray-400 shrink-0" x-text="`[${log.time}]`"></span>
-                                <span x-text="log.msg" :class="{
-                                    'text-green-700 font-bold': log.level === 'success',
-                                    'text-red-700 font-bold': log.level === 'error',
-                                    'text-yellow-700': log.level === 'warning',
-                                    'text-gray-700': log.level === 'info'
-                                }"></span>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-
-                <div class="bg-white border border-gray-100 rounded-2xl shadow-sm shadow-gray-100/50 p-6 sticky top-8" x-show="logs.length > 0">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                            <i data-lucide="activity" class="w-4 h-4"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-black text-gray-900 uppercase tracking-wide">Aktivitas Sistem</h3>
-                            <p class="text-xs text-gray-400 mt-0.5">Riwayat proses analisis</p>
-                        </div>
-                    </div>
-                    
-                    <div class="relative space-y-5 max-h-80 overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent" id="log-container">
-                        <template x-for="(log, i) in logs" :key="i">
-                            <div class="relative flex items-start gap-4 group">
-                                <template x-if="i !== logs.length - 1">
-                                    <div class="absolute top-6 left-[0.31rem] w-px h-full bg-gray-100 group-hover:bg-gray-200 transition-colors -z-10"></div>
-                                </template>
-
-                                <div class="relative mt-1 w-2.5 h-2.5 rounded-full ring-4 ring-white shrink-0" 
-                                     :class="{
-                                         'bg-red-500': log.level === 'error',
-                                         'bg-yellow-400': log.level === 'warning',
-                                         'bg-green-500': log.level === 'success',
-                                         'bg-blue-400': log.level === 'info' || !log.level
-                                     }"></div>
-
-                                <div class="flex-1 min-w-0 pb-1">
-                                    <p class="text-xs text-gray-700 leading-relaxed font-medium break-words" x-text="log.msg"></p>
-                                    <p class="text-[0.65rem] text-gray-400 font-bold mt-1.5 uppercase tracking-wider flex items-center gap-1.5">
-                                        <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                        <span x-text="log.time"></span>
-                                    </p>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
