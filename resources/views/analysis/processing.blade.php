@@ -294,28 +294,45 @@
                     
                     for (let startIdx = 0; startIdx < total; startIdx += batchSize) {
                         let endIdx = Math.min(startIdx + batchSize - 1, total - 1);
-                        this.transcriptionStatus = `Memproses Analisis AI (Baris ${startIdx + 1} - ${endIdx + 1} dari ${total})...`;
-                        this.appendLog('info', `[AI Batch] Mengirim baris ${startIdx + 1} hingga ${endIdx + 1} ke OpenAI...`);
-                        
-                        const response = await fetch(`{{ route('analysis.processChunk', $analysis->slug) }}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': window.BIMA ? window.BIMA.csrfToken : document.querySelector('meta[name="csrf-token"]').content,
-                                'Accept': 'application/json'
-                            },
-                            body: JSON.stringify({ start_idx: startIdx, end_idx: endIdx })
-                        });
-                        
-                        const data = await response.json();
-                        if (data.status === 'error') {
-                            throw new Error(data.message || 'Gagal memproses batch.');
+                        let attempt = 0;
+                        const maxRetries = 3;
+                        let success = false;
+
+                        while (attempt < maxRetries && !success) {
+                            try {
+                                attempt++;
+                                this.transcriptionStatus = `Memproses Analisis AI (Baris ${startIdx + 1} - ${endIdx + 1} dari ${total})${attempt > 1 ? ` - Percobaan ${attempt}/3` : ''}...`;
+                                this.appendLog('info', `[AI Batch] Mengirim baris ${startIdx + 1} hingga ${endIdx + 1} ke OpenAI${attempt > 1 ? ` (Percobaan ${attempt})` : ''}...`);
+                                
+                                const response = await fetch(`{{ route('analysis.processChunk', $analysis->slug) }}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': window.BIMA ? window.BIMA.csrfToken : document.querySelector('meta[name="csrf-token"]').content,
+                                        'Accept': 'application/json'
+                                    },
+                                    body: JSON.stringify({ start_idx: startIdx, end_idx: endIdx })
+                                });
+                                
+                                const data = await response.json();
+                                if (data.status === 'error') {
+                                    throw new Error(data.message || 'Gagal memproses batch.');
+                                }
+                                
+                                success = true;
+                                processed += (endIdx - startIdx + 1);
+                                // Update progress from 80% to 95%
+                                this.globalProgress = 80 + Math.floor((processed / total) * 15);
+                                this.appendLog('success', `[AI Batch] Baris ${startIdx + 1} hingga ${endIdx + 1} berhasil dianalisis.`);
+
+                            } catch (err) {
+                                if (attempt >= maxRetries) {
+                                    throw err;
+                                }
+                                this.appendLog('warning', `[AI Batch] Gagal (Percobaan ${attempt}/3): ${err.message}. Mengulang dalam 3 detik...`);
+                                await new Promise(resolve => setTimeout(resolve, 3000));
+                            }
                         }
-                        
-                        processed += (endIdx - startIdx + 1);
-                        // Update progress from 80% to 95%
-                        this.globalProgress = 80 + Math.floor((processed / total) * 15);
-                        this.appendLog('success', `[AI Batch] Baris ${startIdx + 1} hingga ${endIdx + 1} berhasil dianalisis.`);
                     }
                     
                     this.transcriptionStatus = 'Finalisasi Analisis...';
