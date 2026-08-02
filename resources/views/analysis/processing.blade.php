@@ -47,7 +47,7 @@
         <div style="display: flex; flex-wrap: wrap; gap: 2rem; width: 100%;">
             
             {{-- Kolom Kiri: Proses Utama (Dibuat Center & Full Width) --}}
-            <div style="flex: 1 1 100%; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
+            <div style="flex: 1 1 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
                 
                 {{-- Processing Card --}}
                 <div class="bg-white border border-gray-100 rounded-[2rem] shadow-xl shadow-gray-100/60 divide-y divide-gray-50 overflow-hidden">
