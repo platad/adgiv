@@ -114,7 +114,7 @@ class OpenAiMultiModalService implements MultiModalAnalysisInterface
                 ->post('https://api.openai.com/v1/chat/completions', [
                     'model' => $this->config->getSynthesisModelName(),
                     'temperature' => 0.1,
-                    'max_completion_tokens' => 16384,
+                    'max_completion_tokens' => 32000,
                     'response_format' => ['type' => 'json_object'],
                     'messages' => [
                         [
