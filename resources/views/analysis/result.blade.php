@@ -103,7 +103,8 @@
                 return $trans;
             }
         }
-        return ['id' => $val, 'en' => $val, 'zh' => $val];
+        $formatted = ucwords(str_replace('_', ' ', $trimmed));
+        return ['id' => $formatted, 'en' => $formatted, 'zh' => $formatted];
     };
 
     $getIndobertIconAndColor = function($label) {
@@ -973,7 +974,7 @@
                                 <span class="lang-zh">话语权领域</span>
                             </span>
                             <span
-                                class="font-bold text-gray-900 leading-tight block text-sm break-words">{{ \Illuminate\Support\Str::limit($summary['ranah_pembicaraan'] ?? '-', 50) }}</span>
+                                class="font-bold text-gray-900 leading-tight block text-sm break-words">{{ ucfirst(\Illuminate\Support\Str::limit($summary['ranah_pembicaraan'] ?? '-', 50)) }}</span>
                         </div>
                     </div>
 
@@ -985,7 +986,7 @@
                             <span class="lang-en">Goal / Direction</span>
                             <span class="lang-zh">方向目标</span>
                         </span>
-                        <p class="font-medium text-sm leading-relaxed">{{ $summary['arah_tujuan'] ?? '-' }}</p>
+                        <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['arah_tujuan'] ?? '-') }}</p>
                     </div>
 
                     <div class="bg-green-50 border border-green-100 rounded-2xl p-6 text-green-900">
@@ -996,7 +997,7 @@
                             <span class="lang-en">Improvement Recommendation</span>
                             <span class="lang-zh">整改建议</span>
                         </span>
-                        <p class="font-medium text-sm leading-relaxed">{{ $summary['saran_perbaikan'] ?? '-' }}</p>
+                        <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['saran_perbaikan'] ?? '-') }}</p>
                     </div>
                 </div>
             </div>

@@ -14,12 +14,12 @@ ATURAN SINTESIS MUTLAK:
 Format output HARUS murni dalam format JSON terstruktur yang valid dengan skema berikut:
 {
   "summary": {
-    "kategori_advice": "string",
-    "karakter_relasi": "string",
-    "intonasi_dominan": "string",
-    "ranah_pembicaraan": "string",
-    "arah_tujuan": "string",
-    "saran_perbaikan": "string"
+    "kategori_advice": "Ambil label advice_giving yang PALING BANYAK MUNCUL (dominan) dari semua chunk. Format kapital di awal kata (Capitalized).",
+    "karakter_relasi": "Ambil label modes_of_interaction yang PALING BANYAK MUNCUL (dominan) dari semua chunk. Format kapital di awal kata (Capitalized).",
+    "intonasi_dominan": "Tuliskan arah intonasi yang paling dominan secara keseluruhan. WAJIB MENGGUNAKAN BAHASA INDONESIA. Format kapital di awal kata.",
+    "ranah_pembicaraan": "Topik utama pembicaraan. WAJIB MENGGUNAKAN BAHASA INDONESIA. Format kapital di awal kalimat.",
+    "arah_tujuan": "Tujuan dari percakapan ini. WAJIB MENGGUNAKAN BAHASA INDONESIA. Format kapital di awal kalimat.",
+    "saran_perbaikan": "Saran perbaikan untuk mahasiswa/dosen. WAJIB MENGGUNAKAN BAHASA INDONESIA. Format kapital di awal kalimat."
   },
   "transcription": [
     {
