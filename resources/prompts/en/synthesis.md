@@ -10,7 +10,8 @@ ABSOLUTE SYNTHESIS RULES:
 3. PRESERVE INDOBERT LABELS: Each object in the JSON has "advice_giving" and "modes_of_interaction" keys that HAVE BEEN CREATED by our IndoBERT model. You ARE FORBIDDEN to change / hallucinate these labels. You MUST ONLY re-parse them.
 4. PRESERVE INLINE MARKERS AND ADD IF EMPTY: You MUST insert unique marker tags such as [MARKER_1], [MARKER_2], etc., and [PAUSE] tags into the transcription text ('text_html'). You MUST add intonation markers (e.g., at commas or end of sentences) in every sentence and fill the 'intonation_markers' array.
 5. MARKER CONSISTENCY: Ensure every [MARKER_x] tag listed in 'text_html' has its corresponding object in the 'intonation_markers' array for that line with the exact same id. Ensure the 'intonation_markers' array is ALWAYS FILLED with at least 1 marker per conversation line.
-6. PROVIDE EXTREMELY DEEP AND COMPREHENSIVE ANALYSIS: Because the system is supported by a robust backend parser and real-time rendering, you MUST provide extremely comprehensive, academic, and in-depth explanations for 'agent_insight', 'advice_relation', 'reason', and 'relation' (1-2 detailed sentences, minimum 20-30 words per item). Sharply explain the sociolinguistic aspects, power dynamics, and academic implications of the supervisor's and student's utterances so the analysis has high academic value.
+6. CREATE A VERY IN-DEPTH AND COMPREHENSIVE ANALYSIS: Because the system is backed by a robust backend parser and real-time rendering, you MUST provide highly comprehensive, academic, and in-depth explanations for 'agent_insight', 'advice_relation', 'reason', and 'relation' (1-2 detailed sentences, minimum 20-30 words per item). Sharply explain the sociolinguistic aspects, power dynamics, and academic implications of the supervisor and student's utterances so the analysis has high academic value.
+7. NO EMPTY STRINGS ALLOWED: You are STRICTLY FORBIDDEN from leaving the 'advice_type', 'indobert_reasoning', 'agent_insight', or 'advice_relation' fields empty. All these fields MUST be filled with meaningful, lengthy sentences that explicitly analyze the context. No empty strings "" are allowed except for 'is_advice' if the sentence is indeed not an advice.
 
 Output format MUST be purely in valid structured JSON with the following schema:
 {
@@ -31,9 +32,9 @@ Output format MUST be purely in valid structured JSON with the following schema:
       "advice_type": "Copy EXACT STRING from modes_of_interaction (e.g., 'power_over', 'power_gaining', etc.)",
       "advice_giving": "Copy EXACT STRING from input chunk (e.g., 'bimbingan_bertahap')",
       "modes_of_interaction": "Copy EXACT STRING from input chunk (e.g., 'power_over')",
-      "indobert_reasoning": "In-depth analytical explanation from AI on WHY this sentence is predicted into this advice_giving and modes_of_interaction category.",
-      "agent_insight": "string",
-      "advice_relation": "string",
+      "indobert_reasoning": "In-depth analytical explanation from AI regarding WHY this sentence is predicted to fall into the advice_giving and modes_of_interaction categories. MUST BE LENGTHY.",
+      "agent_insight": "Comprehensive and sharp review of the implicit meaning of this sentence academically and pedagogically. MUST BE LENGTHY.",
+      "advice_relation": "Explanation of the relation of this sentence with other sentences in the context of thesis supervision. MUST BE LENGTHY.",
       "intonation_markers": [
         {
           "id": "[MARKER_1]",

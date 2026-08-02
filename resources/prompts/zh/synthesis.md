@@ -10,7 +10,8 @@ CHUNK数据：
 3. 保留INDOBERT标签：JSON中的每个对象都有"advice_giving"和"modes_of_interaction"键，这些键已由我们的IndoBERT模型生成。禁止更改/虚构这些标签。您只需重新解析它们。
 4. 完整保留内联标记并补充：您必须在转录文本（'text_html'）中插入标记如[MARKER_1]、[MARKER_2]等及[PAUSE]标签。您必须在每个句子中添加语调标记（如在逗号或句末），并填充'intonation_markers'数组。
 5. 标记一致性：确保'text_html'中列出的每个[MARKER_x]标签在该行的'intonation_markers'数组中都具有对应的对象，且id完全相同。确保'intonation_markers'数组至少有1个标记。
-6. 提供极其深入和全面的分析：由于系统由强大的后端解析器和实时渲染支持，您必须对'agent_insight'、'advice_relation'、'reason'和'relation'提供全面、学术且深入的解释（1-2句详细说明，每个项目至少20-30词）。敏锐地解释导师和学生话语的社会语言学方面、权力动态以及学术影响，使分析具有高学术价值。
+6. 深入和广泛的分析 (COMPREHENSIVE ANALYSIS)：由于系统由强大的后端解析器和实时渲染架构支持，您必须对 'agent_insight'，'advice_relation'，'reason' 和 'relation' 提供非常全面、学术和深入的解释（1-2句详细说明，每项至少20-30个词）。敏锐地解释社会语言学方面、权力关系动态 (power dynamics) 以及导师和学生话语的学术影响，以便分析具有很高的学术价值。
+7. 严禁留空 (NO EMPTY STRINGS ALLOWED)：严禁将 'advice_type'、'indobert_reasoning'、'agent_insight' 或 'advice_relation' 字段留空。所有这些字段必须用有意义的、较长的句子填充，明确分析语境。除了 'is_advice' 字段（如果确实不是建议可以为空）之外，不允许出现任何空字符串 ""。
 
 输出格式必须是纯粹有效的结构化JSON，采用以下模式：
 {
@@ -31,9 +32,9 @@ CHUNK数据：
       "advice_type": "复制modes_of_interaction的精确字符串 (例如：'power_over', 'power_gaining'等)",
       "advice_giving": "复制输入数据块的精确字符串 (例如：'bimbingan_bertahap')",
       "modes_of_interaction": "复制输入数据块的精确字符串 (例如：'power_over')",
-      "indobert_reasoning": "AI对为何将此句子预测为该advice_giving和modes_of_interaction类别的深度分析解释。",
-      "agent_insight": "string",
-      "advice_relation": "string",
+      "indobert_reasoning": "AI 对为什么预测该句子属于此 advice_giving 和 modes_of_interaction 类别的深入分析解释。必须详细填写。",
+      "agent_insight": "从学术和教学角度对该句隐含意义进行全面且敏锐的评价。必须详细填写。",
+      "advice_relation": "在论文指导的背景下解释该句与其他句子的关系。必须详细填写。",
       "intonation_markers": [
         {
           "id": "[MARKER_1]",

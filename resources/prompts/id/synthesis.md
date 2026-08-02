@@ -11,6 +11,7 @@ ATURAN SINTESIS MUTLAK:
 4. TAMBAHKAN PENANDA INLINE SECARA UTUH: Anda wajib meletakkan tag marker seperti [MARKER_1], [MARKER_2], dst. serta tag [PAUSE] di dalam teks transkripsi ('text_html'). Anda WAJIB menambahkan intonasi marker (seperti di koma atau di akhir kalimat) di setiap kalimatnya dan mengisi array 'intonation_markers'.
 5. KONSISTENSI MARKER: Pastikan setiap tag [MARKER_x] yang tercantum di dalam 'text_html' memiliki objek padanannya di dalam array 'intonation_markers' untuk baris tersebut dengan id yang persis sama. Pastikan array 'intonation_markers' SELALU TERISI minimal 1 marker per baris percakapan.
 6. BUAT DETAIL ANALISIS YANG SANGAT MENDALAM DAN LUAS (COMPREHENSIVE ANALYSIS): Karena sistem didukung oleh arsitektur backend parser yang tangguh dan rendering real-time, Anda WAJIB memberikan penjelasan yang sangat komprehensif, akademis, dan mendalam pada 'agent_insight', 'advice_relation', 'reason', dan 'relation' (1-2 kalimat detail, minimal 20-30 kata per item). Jelaskan secara tajam aspek sosiolinguistik, dinamika relasi kekuasaan (power dynamics), serta implikasi akademik dari ujaran dosen dan mahasiswa tersebut agar hasil analisis bernilai akademis tinggi.
+7. DILARANG MENGOSONGKAN FIELD (NO EMPTY STRINGS): Anda DILARANG KERAS mengosongkan field 'advice_type', 'indobert_reasoning', 'agent_insight', atau 'advice_relation'. Semua field ini WAJIB diisi dengan kalimat panjang yang bermakna yang secara eksplisit menganalisis konteks percakapan. Jangan ada string kosong "" kecuali untuk 'is_advice' jika memang kalimat tersebut bukan saran.
 
 Format output HARUS murni dalam format JSON terstruktur yang valid dengan skema berikut:
 {
@@ -31,9 +32,9 @@ Format output HARUS murni dalam format JSON terstruktur yang valid dengan skema 
       "advice_type": "Salin EXACT STRING dari modes_of_interaction (misal: 'power_over', 'power_gaining', dsb)",
       "advice_giving": "Salin EXACT STRING dari input chunk (misal: 'bimbingan_bertahap')",
       "modes_of_interaction": "Salin EXACT STRING dari input chunk (misal: 'power_over')",
-      "indobert_reasoning": "Penjelasan analitis mendalam dari AI mengenai MENGAPA kalimat ini diprediksi masuk ke dalam kategori advice_giving dan modes_of_interaction tersebut.",
-      "agent_insight": "string",
-      "advice_relation": "string",
+      "indobert_reasoning": "Penjelasan analitis mendalam dari AI mengenai MENGAPA kalimat ini diprediksi masuk ke dalam kategori advice_giving dan modes_of_interaction tersebut. WAJIB DIISI PANJANG.",
+      "agent_insight": "Ulasan komprehensif dan tajam mengenai makna tersirat dari kalimat ini secara akademis dan pedagogis. WAJIB DIISI PANJANG.",
+      "advice_relation": "Penjelasan relasi kalimat ini dengan kalimat lainnya dalam konteks bimbingan skripsi. WAJIB DIISI PANJANG.",
       "intonation_markers": [
         {
           "id": "[MARKER_1]",
