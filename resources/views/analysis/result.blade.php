@@ -565,11 +565,15 @@
 
                                             <span class="inline-flex flex-wrap gap-2 ml-2 align-middle select-none">
                                                 {{-- Advice Badge --}}
-                                                @if (isset($block['is_advice']) && $block['is_advice'])
+                                                @php
+                                                    $isAdviceStr = is_string($block['is_advice'] ?? null) ? $block['is_advice'] : '';
+                                                    $isAdviceTrue = (!empty($block['is_advice']) && $block['is_advice'] !== 'false' && $block['is_advice'] !== false);
+                                                @endphp
+                                                @if ($isAdviceTrue)
                                                     <button
                                                         @click="
                                                             const t = appLang === 'zh' ? '提出建议 (Advice Giving)' : (appLang === 'en' ? 'Advice Giving' : 'Pemberian Saran (Advice Giving)');
-                                                            const exp = '{{ addslashes($block['agent_insight'] ?? 'Dosen memberikan saran akademik bimbingan.') }}';
+                                                            const exp = '{{ addslashes($isAdviceStr ?: ($block['agent_insight'] ?? 'Dosen memberikan saran akademik bimbingan.')) }}';
                                                             const rel = '{{ addslashes($block['advice_relation'] ?? 'Kalimat ini merupakan saran bimbingan akademik yang menanggapi progres mahasiswa di baris ini.') }}';
                                                             openInsight(t, 'advice', exp, rel);
                                                         "

@@ -378,7 +378,10 @@
                             </span>
 
                             <!-- Advice Badge (if advice present) -->
-                            @if (isset($block['is_advice']) && $block['is_advice'])
+                            @php
+                                $isAdviceTrue = (!empty($block['is_advice']) && $block['is_advice'] !== 'false' && $block['is_advice'] !== false);
+                            @endphp
+                            @if ($isAdviceTrue)
                                 <span class="inline-flex items-center px-2 py-0.5 border border-black bg-black text-white">
                                     Advice Giving: {{ $block['advice_category'] ?? 'Pemberian Saran' }}
                                 </span>
@@ -451,7 +454,7 @@
                                 @endif
 
                                 <!-- Advice Category Details -->
-                                @if (isset($block['is_advice']) && $block['is_advice'])
+                                @if ($isAdviceTrue)
                                     <div class="mt-2.5 pt-2 border-t border-gray-200">
                                         <span class="block text-[0.55rem] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Kategori Advice Giving (Saran Akademik):</span>
                                         <p class="text-[0.65rem] text-gray-700 leading-relaxed">
