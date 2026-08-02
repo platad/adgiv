@@ -114,7 +114,7 @@ class OpenAiMultiModalService implements MultiModalAnalysisInterface
                 ->post('https://api.openai.com/v1/chat/completions', [
                     'model' => $this->config->getSynthesisModelName(),
                     'temperature' => 0.1,
-                    'max_completion_tokens' => 8192,
+                    'max_completion_tokens' => 16384,
                     'response_format' => ['type' => 'json_object'],
                     'messages' => [
                         [
@@ -208,12 +208,13 @@ class OpenAiMultiModalService implements MultiModalAnalysisInterface
             }
 
             if (!$parsed) {
+                $jsonError = json_last_error_msg();
                 Log::error('[OpenAiMultiModal] Synthesis JSON Parsing Failure details', [
-                    'json_error' => json_last_error_msg(),
+                    'json_error' => $jsonError,
                     'raw_content' => $content,
                     'clean_content' => $cleanContent
                 ]);
-                throw new \RuntimeException('Gagal mengurai format JSON hasil penggabungan. Error: ' . json_last_error_msg());
+                throw new \RuntimeException('Gagal mengurai format JSON hasil penggabungan. Error: ' . $jsonError);
             }
 
             return $parsed;
