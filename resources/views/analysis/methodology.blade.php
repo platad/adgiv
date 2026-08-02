@@ -20,15 +20,15 @@
                 <h1 class="text-3xl md:text-4xl font-black tracking-tight leading-tight uppercase mb-4">
                     Computational Critical Discourse Analysis <br class="hidden md:inline" />
                     <span class="text-bima-red bg-clip-text">
-                        <span class="lang-id">Berbasis G-MLLM</span>
-                        <span class="lang-en">Powered by G-MLLM</span>
-                        <span class="lang-zh">基于 G-MLLM 的建模</span>
+                        <span class="lang-id">Hibrida (AI Transkripsi, IndoBERT & G-MLLM)</span>
+                        <span class="lang-en">Hybrid Pipeline (AI Transcription, IndoBERT & G-MLLM)</span>
+                        <span class="lang-zh">混合管道 (AI转录, IndoBERT & G-MLLM)</span>
                     </span>
                 </h1>
                 <p class="text-gray-300 text-sm md:text-base font-medium leading-relaxed max-w-3xl">
-                    <span class="lang-id">Digitalisasi dan otomatisasi kajian wacana kritis (AWK) akademis dosen-mahasiswa dengan memanfaatkan kecerdasan buatan multimodal yang terpadu secara langsung (*end-to-end*) dari suara ke ekstraksi makna relasional.</span>
-                    <span class="lang-en">Digitalization and automation of critical discourse analysis (CDA) in supervisor-student academic interactions by utilizing integrated end-to-end multimodal artificial intelligence directly from audio waves to relational semantic extraction.</span>
-                    <span class="lang-zh">利用从语音输入到关系语义提取的端到端一体化多模态人工智能，数字化和自动化导师-学生学术互动的批判性话语分析（CDA）。</span>
+                    <span class="lang-id">Digitalisasi dan otomatisasi kajian wacana kritis (AWK) akademis dosen-mahasiswa dengan memadukan kekuatan kecerdasan buatan (AI) pemrosesan suara, teknik Natural Language Processing (NLP) IndoBERT, dan penalaran kontekstual G-MLLM (Generative Multimodal Large Language Models) secara langsung (*end-to-end*).</span>
+                    <span class="lang-en">Digitalization and automation of critical discourse analysis (CDA) in supervisor-student academic interactions by combining the power of AI speech processing, IndoBERT Natural Language Processing (NLP), and G-MLLM (Generative Multimodal Large Language Models) contextual reasoning directly (end-to-end).</span>
+                    <span class="lang-zh">通过结合人工智能语音处理、IndoBERT自然语言处理（NLP）和G-MLLM（生成式多模态大语言模型）的上下文推理，实现导师-学生学术互动中批判性话语分析（CDA）的数字化和自动化。</span>
                 </p>
             </div>
         </div>
@@ -47,14 +47,14 @@
                         </div>
                         <div>
                             <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">
-                                <span class="lang-id">Analisis Komparasi</span>
-                                <span class="lang-en">Comparative Analysis</span>
-                                <span class="lang-zh">对比分析</span>
+                                <span class="lang-id">Sinergi Teknologi AI Mutakhir</span>
+                                <span class="lang-en">Advanced AI Technology Synergy</span>
+                                <span class="lang-zh">先进的AI技术协同</span>
                             </span>
                             <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">
-                                <span class="lang-id">Mengapa G-MLLM Unggul dari IndoBERT?</span>
-                                <span class="lang-en">Why Does G-MLLM Outperform IndoBERT?</span>
-                                <span class="lang-zh">为什么 G-MLLM 优于 IndoBERT？</span>
+                                <span class="lang-id">Kolaborasi Faster-Whisper, IndoBERT & G-MLLM</span>
+                                <span class="lang-en">Faster-Whisper, IndoBERT & G-MLLM Collaboration</span>
+                                <span class="lang-zh">Faster-Whisper、IndoBERT 和 G-MLLM 协作</span>
                             </h3>
                         </div>
                     </div>
@@ -79,7 +79,7 @@
                                     <a href="https://arxiv.org/abs/2009.05387" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">Kunjungi Paper arXiv: 2009.05387 ➔</a>
                                 </span>
                             </span> 
-                            yang berbasis teks tunggal (<i>single-modality</i>). Riset kali ini bertindak sebagai kelanjutan strategis dengan membandingkan model klasik tersebut dengan arsitektur 
+                            yang berbasis teks tunggal (<i>single-modality</i>). Riset kali ini bertindak sebagai kelanjutan strategis yang sangat revolusioner, dengan merangkai pipeline hybrid cerdas: menggunakan AI akustik (Faster-Whisper) untuk transkripsi akurat, model NLP (IndoBERT) untuk pengenalan leksikal bahasa Indonesia, dan dikombinasikan dengan kemampuan reasoning arsitektur
                             <span class="relative group cursor-pointer border-b-2 border-dashed border-red-500 pb-0.5 font-bold text-gray-900">
                                 G-MLLM
                                 <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-gray-950 text-white text-[0.65rem] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-xl leading-relaxed font-medium pointer-events-auto before:content-[''] before:absolute before:top-full before:left-0 before:right-0 before:h-3">
@@ -88,7 +88,7 @@
                                     <a href="https://openai.com/index/gpt-4o-system-card/" target="_blank" class="text-blue-400 hover:underline block mt-1.5 font-bold z-50">Kunjungi OpenAI Card ➔</a>
                                 </span>
                             </span> 
-                            yang baru, guna menyoroti lompatan performa dan keunggulan pemrosesan multimodal yang revolusioner.
+                            yang mengekstraksi dinamika intonasi dan relasi psikologis bimbingan secara mendalam dan berimbang.
                         </span>
                         <span class="lang-en">
                             In 

@@ -200,7 +200,7 @@
 
                 <div class="flex justify-between py-1 border-b border-gray-200">
                     <span class="text-xs text-gray-500 uppercase tracking-wider">Metode Analisis</span>
-                    <span class="text-xs font-bold text-black text-right">C-CDA Multi-Agent</span>
+                    <span class="text-xs font-bold text-black text-right">Hybrid C-CDA (Whisper + IndoBERT + G-MLLM)</span>
                 </div>
 
                 <div class="flex justify-between py-1 border-b border-gray-200">
