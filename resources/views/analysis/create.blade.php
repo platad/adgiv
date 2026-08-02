@@ -88,7 +88,7 @@
 
                     <div class="relative border-2 border-dashed border-gray-200 rounded-[2rem] p-10 hover:border-bima-red hover:bg-red-50/30 transition-all text-center" id="drop-zone">
                         <input type="file" name="audio" id="audio"
-                               accept=".flac,.mp3,.mp4,.mpeg,.mpga,.m4a,.ogg,.wav,.webm"
+                               accept=".flac,.mp3,.mp4,.mpeg,.mpga,.m4a,.ogg,.wav,.webm,.aac"
                                required
                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                onchange="updateFileName(this)">
