@@ -113,6 +113,42 @@
                                     <p class="font-black text-sm text-gray-900 uppercase tracking-wide" :class="{'opacity-50': globalProgress < 80 && globalStatus !== 'failed'}">Analisis & Sintesis AI</p>
                                 </div>
                                 <p class="text-xs text-gray-500 mt-1" :class="{'opacity-50': globalProgress < 80 && globalStatus !== 'failed'}" x-text="(globalStatus === 'completed') ? 'Analisis intonasi, relasi, dan advice giving selesai.' : ((globalProgress >= 80 && globalStatus !== 'failed') ? transcriptionStatus : 'Menunggu tahap transkripsi selesai...')"></p>
+
+                                <!-- Timeline Batch AI -->
+                                <div x-show="globalProgress >= 80 || batchHistory.length > 0" style="display: none;" class="mt-6 space-y-4">
+                                    <template x-for="(batch, index) in batchHistory" :key="index">
+                                        <div x-data="{ expanded: false }" class="relative pl-6 border-l-2 border-gray-200 py-1">
+                                            <div class="absolute w-3 h-3 bg-blue-500 rounded-full -left-[7px] top-2 shadow"></div>
+                                            <div class="flex items-center justify-between gap-4">
+                                                <div>
+                                                    <span class="text-xs font-bold text-gray-900">Batch <span x-text="index + 1"></span> Selesai</span>
+                                                    <span class="text-[0.65rem] text-gray-500 block">Baris <span x-text="batch.start_idx + 1"></span> - <span x-text="batch.end_idx + 1"></span></span>
+                                                </div>
+                                                <button @click="expanded = !expanded" class="text-[0.65rem] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-2 py-1 rounded border border-blue-100 transition-colors uppercase tracking-wider flex items-center gap-1">
+                                                    <span x-text="expanded ? 'Tutup Detail' : 'Lihat Detail'"></span>
+                                                    <svg x-show="!expanded" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                                    <svg x-show="expanded" style="display:none;" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                                                </button>
+                                            </div>
+                                            
+                                            <!-- Expandable Detail -->
+                                            <div x-show="expanded" x-collapse class="mt-3 space-y-3 bg-gray-900 text-gray-300 p-4 rounded-xl border border-gray-800 text-[0.65rem] overflow-hidden shadow-inner">
+                                                <div>
+                                                    <div class="font-black text-gray-400 uppercase tracking-widest mb-1 border-b border-gray-800 pb-1">System Prompt</div>
+                                                    <pre class="whitespace-pre-wrap font-mono leading-relaxed" x-text="batch.system_prompt"></pre>
+                                                </div>
+                                                <div>
+                                                    <div class="font-black text-blue-400 uppercase tracking-widest mb-1 border-b border-gray-800 pb-1">User Prompt (Chunks Data)</div>
+                                                    <pre class="whitespace-pre-wrap font-mono leading-relaxed text-blue-200" x-text="batch.user_prompt"></pre>
+                                                </div>
+                                                <div>
+                                                    <div class="font-black text-green-400 uppercase tracking-widest mb-1 border-b border-gray-800 pb-1">Raw Response dari AI</div>
+                                                    <pre class="whitespace-pre-wrap font-mono leading-relaxed text-green-200" x-text="batch.raw_response"></pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -139,6 +175,8 @@
             totalSegments: 0,
             totalDuration: 0,
             vpsLogs: [],
+            batchHistory: @json($initialBatchHistory),
+            resumeStartIdx: {{ $resumeStartIdx }},
 
             init() {
                 if (!this.isProcessing) {
@@ -290,9 +328,9 @@
                 try {
                     const batchSize = 10;
                     const total = this.totalSegments;
-                    let processed = 0;
+                    let processed = this.resumeStartIdx;
                     
-                    for (let startIdx = 0; startIdx < total; startIdx += batchSize) {
+                    for (let startIdx = this.resumeStartIdx; startIdx < total; startIdx += batchSize) {
                         let endIdx = Math.min(startIdx + batchSize - 1, total - 1);
                         let attempt = 0;
                         const maxRetries = 3;
@@ -317,6 +355,10 @@
                                 const data = await response.json();
                                 if (data.status === 'error') {
                                     throw new Error(data.message || 'Gagal memproses batch.');
+                                }
+
+                                if (data.batch_history) {
+                                    this.batchHistory = data.batch_history;
                                 }
                                 
                                 success = true;

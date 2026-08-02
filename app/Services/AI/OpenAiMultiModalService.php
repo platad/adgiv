@@ -217,6 +217,12 @@ class OpenAiMultiModalService implements MultiModalAnalysisInterface
                 throw new \RuntimeException('Gagal mengurai format JSON hasil penggabungan. Error: ' . $jsonError);
             }
 
+            $parsed['debug'] = [
+                'system_prompt' => $this->config->getSynthesisSystemPrompt($locale),
+                'user_prompt' => $prompt,
+                'raw_response' => $cleanContent
+            ];
+
             return $parsed;
         } catch (\Throwable $e) {
             Log::error('[OpenAiMultiModal] Synthesis Exception: ' . $e->getMessage());

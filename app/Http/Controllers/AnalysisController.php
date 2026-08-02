@@ -116,8 +116,15 @@ class AnalysisController extends Controller
         }
 
         $analysis->load('chunks', 'logs');
+        
+        $initialBatchHistory = $analysis->result_data['batch_history'] ?? [];
+        $resumeStartIdx = 0;
+        if (!empty($initialBatchHistory)) {
+            $lastBatch = end($initialBatchHistory);
+            $resumeStartIdx = $lastBatch['end_idx'] + 1;
+        }
 
-        return view('analysis.processing', compact('analysis'));
+        return view('analysis.processing', compact('analysis', 'initialBatchHistory', 'resumeStartIdx'));
     }
 
     public function getAudio(Analysis $analysis)
@@ -318,6 +325,18 @@ class AnalysisController extends Controller
                 }
             }
 
+            // Save debug info to batch history
+            $batchHistory = $resultData['batch_history'] ?? [];
+            $batchHistory[] = [
+                'start_idx' => $startIdx,
+                'end_idx' => $endIdx,
+                'timestamp' => now()->toIso8601String(),
+                'system_prompt' => $rawAiResponse['debug']['system_prompt'] ?? '',
+                'user_prompt' => $rawAiResponse['debug']['user_prompt'] ?? '',
+                'raw_response' => $rawAiResponse['debug']['raw_response'] ?? ''
+            ];
+            $resultData['batch_history'] = $batchHistory;
+
             // Update result data
             $resultData['transcription'] = $transcription;
             
@@ -328,7 +347,11 @@ class AnalysisController extends Controller
 
             $analysis->update(['result_data' => $resultData]);
 
-            return response()->json(['status' => 'success', 'processed' => count($enrichedChunk)]);
+            return response()->json([
+                'status' => 'success', 
+                'processed' => count($enrichedChunk),
+                'batch_history' => $batchHistory
+            ]);
         } catch (\Exception $e) {
             Log::error('AI Synthesis Error on Chunk: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
