@@ -593,11 +593,20 @@
                                                 @endif
 
                                                 {{-- Intonasi Badge --}}
-                                                @if (!empty($block['advice_type']) || !empty($block['intonation_type']))
+                                                @php
+                                                    $hasIntonation = !empty($block['intonation_markers']) && is_array($block['intonation_markers']) && count($block['intonation_markers']) > 0;
+                                                    $hasAdviceType = !empty($block['advice_type']);
+                                                @endphp
+                                                @if ($hasIntonation || $hasAdviceType || !empty($block['intonation_type']))
                                                     @php
-                                                        $intType =
-                                                            $block['intonation_type'] ??
-                                                            ($block['advice_type'] ?? 'neutral');
+                                                        $intType = 'neutral';
+                                                        if ($hasIntonation) {
+                                                            $intType = $block['intonation_markers'][0]['type'] ?? 'neutral';
+                                                        } else {
+                                                            $intType = $block['intonation_type'] ?? ($block['advice_type'] ?? 'neutral');
+                                                        }
+                                                        $intType = strtolower($intType);
+                                                        
                                                         $intReason =
                                                             'Tingkat intonasi baris ini adalah ' .
                                                             ($intType === 'up'
@@ -605,12 +614,14 @@
                                                                 : ($intType === 'down'
                                                                     ? 'Turun / Tegas'
                                                                     : 'Netral'));
-                                                        if (!empty($block['intonation_markers'][0]['reason'])) {
+                                                        if ($hasIntonation && !empty($block['intonation_markers'][0]['reason'])) {
                                                             $intReason = $block['intonation_markers'][0]['reason'];
                                                         }
+                                                        
                                                         $intRelation =
-                                                            $block['intonation_markers'][0]['relation'] ??
-                                                            'Karakter intonasi ini merefleksikan dinamika percakapan di baris ini.';
+                                                            ($hasIntonation && !empty($block['intonation_markers'][0]['relation']))
+                                                            ? $block['intonation_markers'][0]['relation']
+                                                            : 'Karakter intonasi ini merefleksikan dinamika percakapan di baris ini.';
                                                     @endphp
                                                     <button
                                                         @click="
@@ -1279,7 +1290,14 @@
             $transBlocks = $analysis->result_data['transcription'] ?? [];
             $chartPoints = array_map(
                 function ($block, $idx) {
-                    $type = $block['intonation_type'] ?? ($block['advice_type'] ?? 'neutral');
+                    $type = 'neutral';
+                    if (!empty($block['intonation_markers']) && is_array($block['intonation_markers']) && count($block['intonation_markers']) > 0) {
+                        $type = $block['intonation_markers'][0]['type'] ?? 'neutral';
+                    } else {
+                        $type = $block['intonation_type'] ?? 'neutral';
+                    }
+                    $type = strtolower($type);
+
                     $val = 0;
                     if ($type === 'up') {
                         $val = 1;
