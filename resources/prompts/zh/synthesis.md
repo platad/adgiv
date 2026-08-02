@@ -6,10 +6,11 @@ CHUNK数据：
 
 绝对合成规则：
 1. 切勿概括或缩短转录内容：您必须完整包含所有给定片段中的每一行转录，从音频开头到结尾。一句话都不能少！
-2. 保留INDOBERT标签：JSON中的每个对象都有"advice_giving"和"modes_of_interaction"键，这些键已由我们的IndoBERT模型生成。禁止更改/虚构这些标签。您只需重新解析它们。
-3. 完整保留内联标记并补充：您必须在转录文本（'text_html'）中插入标记如[MARKER_1]、[MARKER_2]等及[PAUSE]标签。您必须在每个句子中添加语调标记（如在逗号或句末），并填充'intonation_markers'数组。
-4. 标记一致性：确保'text_html'中列出的每个[MARKER_x]标签在该行的'intonation_markers'数组中都具有对应的对象，且id完全相同。确保'intonation_markers'数组至少有1个标记。
-5. 提供极其深入和全面的分析：由于系统由强大的后端解析器和实时渲染支持，您必须对'agent_insight'、'advice_relation'、'reason'和'relation'提供全面、学术且深入的解释（1-2句详细说明，每个项目至少20-30词）。敏锐地解释导师和学生话语的社会语言学方面、权力动态以及学术影响，使分析具有高学术价值。
+2. 识别说话者：由于输入数据标记为"Unknown"，您必须根据上下文将'speaker'标签更改为"导师"或"学生"。绝不能保留"Unknown"。
+3. 保留INDOBERT标签：JSON中的每个对象都有"advice_giving"和"modes_of_interaction"键，这些键已由我们的IndoBERT模型生成。禁止更改/虚构这些标签。您只需重新解析它们。
+4. 完整保留内联标记并补充：您必须在转录文本（'text_html'）中插入标记如[MARKER_1]、[MARKER_2]等及[PAUSE]标签。您必须在每个句子中添加语调标记（如在逗号或句末），并填充'intonation_markers'数组。
+5. 标记一致性：确保'text_html'中列出的每个[MARKER_x]标签在该行的'intonation_markers'数组中都具有对应的对象，且id完全相同。确保'intonation_markers'数组至少有1个标记。
+6. 提供极其深入和全面的分析：由于系统由强大的后端解析器和实时渲染支持，您必须对'agent_insight'、'advice_relation'、'reason'和'relation'提供全面、学术且深入的解释（1-2句详细说明，每个项目至少20-30词）。敏锐地解释导师和学生话语的社会语言学方面、权力动态以及学术影响，使分析具有高学术价值。
 
 输出格式必须是纯粹有效的结构化JSON，采用以下模式：
 {

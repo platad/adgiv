@@ -6,10 +6,11 @@ CHUNK DATA:
 
 ABSOLUTE SYNTHESIS RULES:
 1. NEVER SUMMARIZE OR SHORTEN THE TRANSCRIPTION: You must include EVERY transcription line from all given chunks completely from beginning to end of the audio. Not a single sentence may be missing!
-2. PRESERVE INDOBERT LABELS: Each object in the JSON has "advice_giving" and "modes_of_interaction" keys that HAVE BEEN CREATED by our IndoBERT model. You ARE FORBIDDEN to change / hallucinate these labels. You MUST ONLY re-parse them.
-3. PRESERVE INLINE MARKERS AND ADD IF EMPTY: You MUST insert unique marker tags such as [MARKER_1], [MARKER_2], etc., and [PAUSE] tags into the transcription text ('text_html'). You MUST add intonation markers (e.g., at commas or end of sentences) in every sentence and fill the 'intonation_markers' array.
-4. MARKER CONSISTENCY: Ensure every [MARKER_x] tag listed in 'text_html' has its corresponding object in the 'intonation_markers' array for that line with the exact same id. Ensure the 'intonation_markers' array is ALWAYS FILLED with at least 1 marker per conversation line.
-5. PROVIDE EXTREMELY DEEP AND COMPREHENSIVE ANALYSIS: Because the system is supported by a robust backend parser and real-time rendering, you MUST provide extremely comprehensive, academic, and in-depth explanations for 'agent_insight', 'advice_relation', 'reason', and 'relation' (1-2 detailed sentences, minimum 20-30 words per item). Sharply explain the sociolinguistic aspects, power dynamics, and academic implications of the supervisor's and student's utterances so the analysis has high academic value.
+2. IDENTIFY THE SPEAKER: Because the input data is labeled "Unknown", you MUST change the 'speaker' label to "Supervisor" or "Student" based on the context. NEVER leave it as "Unknown".
+3. PRESERVE INDOBERT LABELS: Each object in the JSON has "advice_giving" and "modes_of_interaction" keys that HAVE BEEN CREATED by our IndoBERT model. You ARE FORBIDDEN to change / hallucinate these labels. You MUST ONLY re-parse them.
+4. PRESERVE INLINE MARKERS AND ADD IF EMPTY: You MUST insert unique marker tags such as [MARKER_1], [MARKER_2], etc., and [PAUSE] tags into the transcription text ('text_html'). You MUST add intonation markers (e.g., at commas or end of sentences) in every sentence and fill the 'intonation_markers' array.
+5. MARKER CONSISTENCY: Ensure every [MARKER_x] tag listed in 'text_html' has its corresponding object in the 'intonation_markers' array for that line with the exact same id. Ensure the 'intonation_markers' array is ALWAYS FILLED with at least 1 marker per conversation line.
+6. PROVIDE EXTREMELY DEEP AND COMPREHENSIVE ANALYSIS: Because the system is supported by a robust backend parser and real-time rendering, you MUST provide extremely comprehensive, academic, and in-depth explanations for 'agent_insight', 'advice_relation', 'reason', and 'relation' (1-2 detailed sentences, minimum 20-30 words per item). Sharply explain the sociolinguistic aspects, power dynamics, and academic implications of the supervisor's and student's utterances so the analysis has high academic value.
 
 Output format MUST be purely in valid structured JSON with the following schema:
 {
