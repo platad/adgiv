@@ -81,14 +81,14 @@
                 {{-- Upload File Audio --}}
                 <div>
                     <label class="block text-[0.65rem] font-black text-gray-400 uppercase tracking-widest mb-3">
-                        <span class="lang-id">File Audio (MP3, WAV, M4A, WEBM, AAC, FLAC)</span>
-                        <span class="lang-en">Audio File (MP3, WAV, M4A, WEBM, AAC, FLAC)</span>
-                        <span class="lang-zh">音频文件 (MP3, WAV, M4A, WEBM, AAC, FLAC)</span>
+                        <span class="lang-id">File Audio/Video (FLAC, MP3, MP4, MPEG, MPGA, M4A, OGG, WAV, WEBM)</span>
+                        <span class="lang-en">Audio/Video File (FLAC, MP3, MP4, MPEG, MPGA, M4A, OGG, WAV, WEBM)</span>
+                        <span class="lang-zh">音频/视频文件 (FLAC, MP3, MP4, MPEG, MPGA, M4A, OGG, WAV, WEBM)</span>
                     </label>
 
                     <div class="relative border-2 border-dashed border-gray-200 rounded-[2rem] p-10 hover:border-bima-red hover:bg-red-50/30 transition-all text-center" id="drop-zone">
                         <input type="file" name="audio" id="audio"
-                               accept="audio/*,.mp3,.wav,.m4a,.webm,.ogg,.aac,.flac"
+                               accept=".flac,.mp3,.mp4,.mpeg,.mpga,.m4a,.ogg,.wav,.webm"
                                required
                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                onchange="updateFileName(this)">
@@ -103,9 +103,9 @@
                                 <span class="lang-zh">点击或拖拽音频文件到这里</span>
                             </h3>
                             <p class="text-xs text-gray-500 mt-2 font-medium" id="upload-hint">
-                                <span class="lang-id">Maks. 100MB — MP3, WAV, M4A, WEBM, AAC, FLAC</span>
-                                <span class="lang-en">Max 100MB — MP3, WAV, M4A, WEBM, AAC, FLAC</span>
-                                <span class="lang-zh">最大100MB — 支持MP3, WAV, M4A, WEBM, AAC, FLAC</span>
+                                <span class="lang-id">Maks. 20MB — FLAC, MP3, MP4, MPEG, MPGA, M4A, OGG, WAV, WEBM</span>
+                                <span class="lang-en">Max 20MB — FLAC, MP3, MP4, MPEG, MPGA, M4A, OGG, WAV, WEBM</span>
+                                <span class="lang-zh">最大20MB — 支持FLAC, MP3, MP4, MPEG, MPGA, M4A, OGG, WAV, WEBM</span>
                             </p>
                         </div>
                     </div>
@@ -180,10 +180,10 @@
         }
         
         const file = fileInput.files[0];
-        const maxSize = 10 * 1024 * 1024; // 10MB
+        const maxSize = 20 * 1024 * 1024; // 20MB
         if (file.size > maxSize) {
             e.preventDefault();
-            alert('Ukuran file maksimal 10MB.');
+            alert('Ukuran file maksimal 20MB.');
             return;
         }
 

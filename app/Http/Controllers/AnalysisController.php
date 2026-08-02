@@ -30,7 +30,7 @@ class AnalysisController extends Controller
         $validated = $request->validate([
             'title'  => ['required', 'string', 'max:255'],
             'locale' => ['required', 'string', 'in:id,en,zh'],
-            'audio'  => ['required', 'file', 'mimes:wav,mp3,webm,ogg,aac,m4a,flac', 'max:10240'],
+            'audio'  => ['required', 'file', 'mimes:wav,mp3,mp4,mpeg,mpga,m4a,webm,ogg,flac', 'max:20480'],
         ]);
 
         // Bahasa yang DIPILIH user — bukan bahasa browser
