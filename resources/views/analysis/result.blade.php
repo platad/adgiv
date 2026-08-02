@@ -574,8 +574,8 @@
                                                     <button
                                                         @click="
                                                             const t = appLang === 'zh' ? '提出建议 (Advice Giving)' : (appLang === 'en' ? 'Advice Giving' : 'Pemberian Saran (Advice Giving)');
-                                                            const exp = '{{ addslashes($isAdviceStr ?: ($block['agent_insight'] ?? 'Dosen memberikan saran akademik bimbingan.')) }}';
-                                                            const rel = '{{ addslashes($block['advice_relation'] ?? 'Kalimat ini merupakan saran bimbingan akademik yang menanggapi progres mahasiswa di baris ini.') }}';
+                                                            const exp = '{{ addslashes($isAdviceStr ?: (!empty($block['agent_insight']) ? $block['agent_insight'] : 'Dosen memberikan saran akademik bimbingan.')) }}';
+                                                            const rel = '{{ addslashes(!empty($block['advice_relation']) ? $block['advice_relation'] : 'Kalimat ini merupakan saran bimbingan akademik yang menanggapi progres mahasiswa di baris ini.') }}';
                                                             openInsight(t, 'advice', exp, rel);
                                                         "
                                                         class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
@@ -702,7 +702,7 @@
                                                         $agInfo = $getIndobertIconAndColor($agLabelRaw);
                                                         $agColor = $agInfo['color'];
                                                         $agIcon = $agInfo['icon'];
-                                                        $agReason = $block['indobert_reasoning'] ?? 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
+                                                        $agReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
                                                     @endphp
                                                     <button
                                                         @click="
@@ -726,7 +726,7 @@
                                                         $moInfo = $getIndobertIconAndColor($moLabelRaw);
                                                         $moColor = $moInfo['color'];
                                                         $moIcon = $moInfo['icon'];
-                                                        $moReason = $block['indobert_reasoning'] ?? 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
+                                                        $moReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
                                                     @endphp
                                                     <button
                                                         @click="
@@ -747,9 +747,13 @@
                                 </div>
 
                                 {{-- Agent Insight Banner --}}
-                                @if (!empty($block['agent_insight']))
+                                @php
+                                    $hasAgentInsight = !empty($block['agent_insight']);
+                                    $agentInsightText = $hasAgentInsight ? $block['agent_insight'] : 'AI belum memberikan ulasan (insight) spesifik untuk baris percakapan ini.';
+                                @endphp
+                                @if (true)
                                     <div
-                                        class="ml-0 md:ml-40 bg-gray-50 border-l-4 border-gray-300 rounded-r-xl p-4 mt-2">
+                                        class="ml-0 md:ml-40 bg-gray-50 border-l-4 border-gray-300 rounded-r-xl p-4 mt-2 {{ !$hasAgentInsight ? 'opacity-70' : '' }}">
                                         <div class="flex items-start gap-3">
                                             <div class="mt-0.5 text-gray-400 w-5 h-5 shrink-0 flex items-center justify-center">
                                                 <x-application-logo class="w-full h-full" />
@@ -761,8 +765,8 @@
                                                     <span class="lang-en">Agent Insight</span>
                                                     <span class="lang-zh">智能体见解</span>
                                                 </span>
-                                                <p class="text-sm font-medium text-gray-600">
-                                                    {{ $block['agent_insight'] }}</p>
+                                                <p class="text-sm font-medium {{ $hasAgentInsight ? 'text-gray-600' : 'text-gray-400 italic' }}">
+                                                    {{ $agentInsightText }}</p>
                                             </div>
                                         </div>
                                     </div>
