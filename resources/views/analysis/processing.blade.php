@@ -112,7 +112,7 @@
                                 <div class="flex items-center gap-3 flex-wrap">
                                     <p class="font-black text-sm text-gray-900 uppercase tracking-wide" :class="{'opacity-50': globalProgress < 80 && globalStatus !== 'failed'}">Analisis & Sintesis AI</p>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1" :class="{'opacity-50': globalProgress < 80 && globalStatus !== 'failed'}" x-text="(globalStatus === 'completed') ? 'Analisis intonasi, relasi, dan advice giving selesai.' : ((globalProgress >= 80 && globalStatus !== 'failed') ? 'Mengolah kembali hasil transkripsi (intonasi, relasi, advice giving)...' : 'Menunggu tahap transkripsi selesai...')"></p>
+                                <p class="text-xs text-gray-500 mt-1" :class="{'opacity-50': globalProgress < 80 && globalStatus !== 'failed'}" x-text="(globalStatus === 'completed') ? 'Analisis intonasi, relasi, dan advice giving selesai.' : ((globalProgress >= 80 && globalStatus !== 'failed') ? transcriptionStatus : 'Menunggu tahap transkripsi selesai...')"></p>
                             </div>
                         </div>
                     </div>
