@@ -208,6 +208,11 @@
                     <span class="text-xs font-bold text-black text-right">{{ $totalChunks }} Potongan Audio</span>
                 </div>
 
+                <div class="flex justify-between py-1 border-b border-gray-200">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider">Total Durasi</span>
+                    <span class="text-xs font-bold text-black text-right">{{ $analysis->result_data['total_duration_sec'] ?? '0' }} detik</span>
+                </div>
+
                 <div class="flex justify-between py-1 border-b border-gray-200 md:col-span-2">
                     <span class="text-xs text-gray-500 uppercase tracking-wider">Status Verifikasi</span>
                     <span class="text-xs font-bold text-black uppercase tracking-wide text-right">
@@ -364,7 +369,19 @@
                     <div class="flex-grow">
                         <!-- Transcription text -->
                         <div class="text-sm font-medium text-gray-900 leading-relaxed font-serif">
-                            {!! $block['text_html'] ?? '' !!}
+                            @php
+                                $printTextHtml = $block['text_html'] ?? '';
+                                // Change tooltip buttons into plain text inside brackets
+                                $printTextHtml = preg_replace_callback('/<button @click="openInsight\(&quot;(.*?)&quot;,\s*&quot;(.*?)&quot;,\s*&quot;(.*?)&quot;.*?<\/button>/is', function($matches) {
+                                    $title = htmlspecialchars_decode($matches[1], ENT_QUOTES);
+                                    $reason = htmlspecialchars_decode($matches[3], ENT_QUOTES);
+                                    return " <strong>[ {$title}: {$reason} ]</strong> ";
+                                }, $printTextHtml);
+                                
+                                // Change pause spans into plain text
+                                $printTextHtml = preg_replace('/<span title="Jeda Pembicaraan">.*?<\/span>/is', ' <strong>[JEDA]</strong> ', $printTextHtml);
+                            @endphp
+                            {!! $printTextHtml !!}
                         </div>
 
                         <!-- Intonation & Advice Metadata Row -->
