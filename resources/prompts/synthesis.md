@@ -6,9 +6,10 @@ DATA POTONGAN CHUNKS:
 
 ATURAN SINTESIS MUTLAK:
 1. JANGAN PERNAH MENYINGKAT ATAU MERANGKUM TRANSKRIPSI: Anda wajib menyertakan SETIAP baris transkripsi dari seluruh potongan chunk yang diberikan secara lengkap dari awal hingga akhir audio. Jangan ada satu kalimat pun yang hilang!
-2. PERTAHANKAN PENANDA INLINE SECARA UTUH: Anda wajib mempertahankan semua tag marker seperti [MARKER_1], [MARKER_2], dst. serta tag [PAUSE] tepat di posisinya di dalam teks transkripsi ('text_html'). Jangan pernah menghapus atau membersihkan tag marker ini dari teks!
-3. KONSISTENSI MARKER: Pastikan setiap tag [MARKER_x] yang tercantum di dalam 'text_html' memiliki objek padanannya di dalam array 'intonation_markers' untuk baris tersebut dengan id yang persis sama.
-4. BUAT DETAIL ANALISIS YANG SANGAT MENDALAM DAN LUAS (COMPREHENSIVE ANALYSIS): Karena sistem didukung oleh arsitektur backend parser yang tangguh dan rendering real-time, Anda WAJIB memberikan penjelasan yang sangat komprehensif, akademis, dan mendalam pada 'agent_insight', 'advice_relation', 'reason', dan 'relation' (1-2 kalimat detail, minimal 20-30 kata per item). Jelaskan secara tajam aspek sosiolinguistik, dinamika relasi kekuasaan (power dynamics), serta implikasi akademik dari ujaran dosen dan mahasiswa tersebut agar hasil analisis bernilai akademis tinggi.
+2. PERTAHANKAN LABEL INDOBERT: Setiap objek dalam JSON memiliki key "advice_giving" dan "modes_of_interaction" yang TELAH DIBUAT oleh model IndoBERT kami. Anda DILARANG MENGUBAH / MENGHALUSINASI label ini. Anda HANYA mem-parsing ulang label tersebut.
+3. PERTAHANKAN PENANDA INLINE SECARA UTUH: Anda wajib mempertahankan semua tag marker seperti [MARKER_1], [MARKER_2], dst. serta tag [PAUSE] tepat di posisinya di dalam teks transkripsi ('text_html'). Jangan pernah menghapus atau membersihkan tag marker ini dari teks!
+4. KONSISTENSI MARKER: Pastikan setiap tag [MARKER_x] yang tercantum di dalam 'text_html' memiliki objek padanannya di dalam array 'intonation_markers' untuk baris tersebut dengan id yang persis sama.
+5. BUAT DETAIL ANALISIS YANG SANGAT MENDALAM DAN LUAS (COMPREHENSIVE ANALYSIS): Karena sistem didukung oleh arsitektur backend parser yang tangguh dan rendering real-time, Anda WAJIB memberikan penjelasan yang sangat komprehensif, akademis, dan mendalam pada 'agent_insight', 'advice_relation', 'reason', dan 'relation' (1-2 kalimat detail, minimal 20-30 kata per item). Jelaskan secara tajam aspek sosiolinguistik, dinamika relasi kekuasaan (power dynamics), serta implikasi akademik dari ujaran dosen dan mahasiswa tersebut agar hasil analisis bernilai akademis tinggi.
 
 Format output HARUS murni dalam format JSON terstruktur yang valid dengan skema berikut:
 {
@@ -26,7 +27,8 @@ Format output HARUS murni dalam format JSON terstruktur yang valid dengan skema 
       "timestamp": "MM:SS - MM:SS",
       "text_html": "string (PASTIKAN mempertahankan tag [MARKER_x] dan [PAUSE] persis di lokasi kata yang diucapkan. Tebalkan kata penting dengan <strong> atau <b>)",
       "is_advice": true|false,
-      "advice_type": "up|down|neutral",
+      "advice_giving": "Salin EXACT STRING dari input chunk (misal: 'bimbingan_bertahap')",
+      "modes_of_interaction": "Salin EXACT STRING dari input chunk (misal: 'power_over')",
       "agent_insight": "string",
       "advice_relation": "string",
       "intonation_markers": [
