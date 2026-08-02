@@ -29,6 +29,7 @@ Format output HARUS murni dalam format JSON terstruktur yang valid dengan skema 
       "is_advice": true|false,
       "advice_giving": "Salin EXACT STRING dari input chunk (misal: 'bimbingan_bertahap')",
       "modes_of_interaction": "Salin EXACT STRING dari input chunk (misal: 'power_over')",
+      "indobert_reasoning": "Penjelasan analitis mendalam dari AI mengenai MENGAPA kalimat ini diprediksi masuk ke dalam kategori advice_giving dan modes_of_interaction tersebut, kaitkan dengan pembeda gaya komunikasi Dosen vs Mahasiswa.",
       "agent_insight": "string",
       "advice_relation": "string",
       "intonation_markers": [
