@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Illuminate\Queue\Console\Concerns\ParsesQueue;
+use Illuminate\Queue\Worker;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:pause')]
@@ -35,10 +36,16 @@ class PauseCommand extends Command
     {
         [$connection, $queue] = $this->parseQueue($this->argument('queue'));
 
+        if (! Worker::$pausable) {
+            $this->components->error('Queue pausing is currently disabled.');
+
+            return self::FAILURE;
+        }
+
         $manager->pause($connection, $queue);
 
         $this->components->info("Job processing on queue [{$connection}:{$queue}] has been paused.");
 
-        return 0;
+        return self::SUCCESS;
     }
 }

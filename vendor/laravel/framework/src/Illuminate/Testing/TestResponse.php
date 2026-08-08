@@ -69,6 +69,13 @@ class TestResponse implements ArrayAccess
     protected $streamedContent;
 
     /**
+     * The decoded response JSON.
+     *
+     * @var \Illuminate\Testing\AssertableJsonString|null
+     */
+    protected $decodedResponseJson;
+
+    /**
      * Create a new test response instance.
      *
      * @param  TResponse  $response
@@ -545,7 +552,7 @@ class TestResponse implements ArrayAccess
         $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime(), date_default_timezone_get());
 
         PHPUnit::withResponse($this)->assertTrue(
-            $cookie->getExpiresTime() !== 0 && $expiresAt->lessThan(Carbon::now()),
+            $cookie->getExpiresTime() !== 0 && $expiresAt->isPast(),
             "Cookie [{$cookieName}] is not expired, it expires at [{$expiresAt}]."
         );
 
@@ -568,7 +575,7 @@ class TestResponse implements ArrayAccess
         $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime(), date_default_timezone_get());
 
         PHPUnit::withResponse($this)->assertTrue(
-            $cookie->getExpiresTime() === 0 || $expiresAt->greaterThan(Carbon::now()),
+            $cookie->getExpiresTime() === 0 || $expiresAt->isFuture(),
             "Cookie [{$cookieName}] is expired, it expired at [{$expiresAt}]."
         );
 
@@ -688,6 +695,8 @@ class TestResponse implements ArrayAccess
      *
      * @param  array  $value
      * @return $this
+     *
+     * @throws \JsonException
      */
     public function assertStreamedJsonContent($value)
     {
@@ -884,6 +893,20 @@ class TestResponse implements ArrayAccess
     {
         foreach ($paths as $path => $expected) {
             $this->assertJsonPath($path, $expected);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given paths in the response contain all of the expected values without looking at the order.
+     *
+     * @return $this
+     */
+    public function assertJsonPathsCanonicalizing(array $paths)
+    {
+        foreach ($paths as $path => $expected) {
+            $this->assertJsonPathCanonicalizing($path, $expected);
         }
 
         return $this;
@@ -1249,6 +1272,10 @@ class TestResponse implements ArrayAccess
      */
     public function decodeResponseJson()
     {
+        if (! is_null($this->decodedResponseJson)) {
+            return $this->decodedResponseJson;
+        }
+
         if ($this->baseResponse instanceof StreamedResponse ||
             $this->baseResponse instanceof StreamedJsonResponse) {
             $testJson = new AssertableJsonString($this->streamedContent());
@@ -1266,7 +1293,7 @@ class TestResponse implements ArrayAccess
             }
         }
 
-        return $testJson;
+        return $this->decodedResponseJson = $testJson;
     }
 
     /**
@@ -1732,6 +1759,8 @@ class TestResponse implements ArrayAccess
      * Assert that the session has no errors.
      *
      * @return $this
+     *
+     * @throws \JsonException
      */
     public function assertSessionHasNoErrors()
     {

@@ -1,0 +1,112 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\AnalysisFeedbackResource\Pages;
+use App\Models\AnalysisFeedback;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
+
+class AnalysisFeedbackResource extends Resource
+{
+    protected static ?string $model = AnalysisFeedback::class;
+
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-star';
+
+    protected static ?string $navigationLabel = 'Penilaian Kesesuaian';
+
+    protected static ?string $modelLabel = 'Penilaian';
+
+    protected static ?string $pluralModelLabel = 'Penilaian Kesesuaian';
+
+    protected static ?int $navigationSort = 3;
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Select::make('analysis_id')
+                    ->label('Analisa')
+                    ->relationship('analysis', 'title')
+                    ->searchable()
+                    ->disabled(),
+
+                Select::make('user_id')
+                    ->label('Pengguna')
+                    ->relationship('user', 'name')
+                    ->searchable()
+                    ->disabled(),
+
+                Toggle::make('is_accurate')
+                    ->label('Dinilai Akurat')
+                    ->disabled(),
+
+                Textarea::make('comments')
+                    ->label('Komentar')
+                    ->disabled(),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->defaultSort('created_at', 'desc')
+            ->columns([
+                Tables\Columns\TextColumn::make('analysis.title')
+                    ->label('Judul Analisa')
+                    ->limit(45)
+                    ->searchable(),
+
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Pengguna')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\IconColumn::make('is_accurate')
+                    ->label('Akurat?')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
+
+                Tables\Columns\TextColumn::make('comments')
+                    ->label('Komentar')
+                    ->limit(60)
+                    ->placeholder('— Tidak ada komentar'),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Dinilai pada')
+                    ->dateTime('d M Y, H:i')
+                    ->sortable(),
+            ])
+            ->filters([
+                Tables\Filters\TernaryFilter::make('is_accurate')
+                    ->label('Kesesuaian')
+                    ->trueLabel('Akurat')
+                    ->falseLabel('Tidak Akurat'),
+            ])
+            ->recordActions([
+                \Filament\Actions\ViewAction::make(),
+            ])
+            ->bulkActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListAnalysisFeedbacks::route('/'),
+        ];
+    }
+}

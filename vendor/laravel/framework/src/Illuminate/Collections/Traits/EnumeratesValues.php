@@ -783,13 +783,7 @@ trait EnumeratesValues
     {
         return $this->filter(function ($value) use ($type) {
             if (is_array($type)) {
-                foreach ($type as $classType) {
-                    if ($value instanceof $classType) {
-                        return true;
-                    }
-                }
-
-                return false;
+                return array_any($type, fn ($classType) => $value instanceof $classType);
             }
 
             return $value instanceof $type;
@@ -844,7 +838,7 @@ trait EnumeratesValues
      *
      * @param  callable(TReduceInitial|TReduceReturnType, TValue, TKey): TReduceReturnType  $callback
      * @param  TReduceInitial  $initial
-     * @return TReduceReturnType
+     * @return TReduceInitial|TReduceReturnType
      */
     public function reduce(callable $callback, $initial = null)
     {
@@ -855,6 +849,24 @@ trait EnumeratesValues
         }
 
         return $result;
+    }
+
+    /**
+     * Reduce the collection to a single value by mutating an initial value.
+     *
+     * @template TReduceIntoInitial
+     *
+     * @param  TReduceIntoInitial  $initial
+     * @param  callable(TReduceIntoInitial, TValue, TKey): void  $callback
+     * @return TReduceIntoInitial
+     */
+    public function reduceInto($initial, callable $callback)
+    {
+        foreach ($this as $key => $value) {
+            $callback($initial, $value, $key);
+        }
+
+        return $initial;
     }
 
     /**
@@ -892,7 +904,7 @@ trait EnumeratesValues
      *
      * @param  callable(TReduceWithKeysInitial|TReduceWithKeysReturnType, TValue, TKey): TReduceWithKeysReturnType  $callback
      * @param  TReduceWithKeysInitial  $initial
-     * @return TReduceWithKeysReturnType
+     * @return TReduceWithKeysInitial|TReduceWithKeysReturnType
      */
     public function reduceWithKeys(callable $callback, $initial = null)
     {

@@ -965,10 +965,10 @@ class Builder implements BuilderContract
      */
     public function getRelation($name)
     {
-        // We want to run a relationship query without any constrains so that we will
+        // We want to do a relationship query without any constraints so that we will
         // not have to remove these where clauses manually which gets really hacky
         // and error prone. We don't want constraints because we add eager ones.
-        $relation = Relation::noConstraints(function () use ($name) {
+        $relation = Relation::noConstraintsForRelation(function () use ($name) {
             try {
                 return $this->getModel()->newInstance()->$name();
             } catch (BadMethodCallException) {
@@ -1108,6 +1108,16 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get an array of primary keys from the query result.
+     *
+     * @return array<int, array-key>
+     */
+    public function modelKeys()
+    {
+        return $this->pluck($this->model->getQualifiedKeyName())->all();
+    }
+
+    /**
      * Paginate the given query.
      *
      * @param  int|null|\Closure  $perPage
@@ -1115,7 +1125,7 @@ class Builder implements BuilderContract
      * @param  string  $pageName
      * @param  int|null  $page
      * @param  \Closure|int|null  $total
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @return \Illuminate\Pagination\LengthAwarePaginator<int, TModel>
      *
      * @throws \InvalidArgumentException
      */
@@ -1144,7 +1154,7 @@ class Builder implements BuilderContract
      * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
-     * @return \Illuminate\Contracts\Pagination\Paginator
+     * @return \Illuminate\Pagination\Paginator<int, TModel>
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
@@ -1170,7 +1180,7 @@ class Builder implements BuilderContract
      * @param  array|string  $columns
      * @param  string  $cursorName
      * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
-     * @return \Illuminate\Contracts\Pagination\CursorPaginator
+     * @return \Illuminate\Pagination\CursorPaginator<int, TModel>
      */
     public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
@@ -2316,6 +2326,8 @@ class Builder implements BuilderContract
      * @param  string  $mixin
      * @param  bool  $replace
      * @return void
+     *
+     * @throws \ReflectionException
      */
     protected static function registerMixin($mixin, $replace)
     {

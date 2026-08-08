@@ -85,6 +85,19 @@ class Str
     }
 
     /**
+     * Translate the given message and get a new stringable object.
+     *
+     * @param  string  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @return \Illuminate\Support\Stringable
+     */
+    public static function trans($key, $replace = [], $locale = null)
+    {
+        return new Stringable(__($key, $replace, $locale));
+    }
+
+    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $subject
@@ -327,13 +340,17 @@ class Str
      */
     public static function containsAll($haystack, $needles, $ignoreCase = false)
     {
+        $any = false;
+
         foreach ($needles as $needle) {
+            $any = true;
+
             if (! static::contains($haystack, $needle, $ignoreCase)) {
                 return false;
             }
         }
 
-        return true;
+        return $any;
     }
 
     /**
@@ -360,6 +377,18 @@ class Str
     public static function convertCase(string $string, int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
     {
         return mb_convert_case($string, $mode, $encoding);
+    }
+
+    /**
+     * Get the plural form of an English word with the count prepended.
+     *
+     * @param  string  $value
+     * @param  int|array|\Countable  $count
+     * @return string
+     */
+    public static function counted($value, $count)
+    {
+        return static::plural($value, $count, prependCount: true);
     }
 
     /**
@@ -441,14 +470,14 @@ class Str
 
         $start = ltrim($matches[1]);
 
-        $start = Str::of(mb_substr($start, max(mb_strlen($start, 'UTF-8') - $radius, 0), $radius, 'UTF-8'))->ltrim()->unless(
+        $start = (new Stringable(mb_substr($start, max(mb_strlen($start, 'UTF-8') - $radius, 0), $radius, 'UTF-8')))->ltrim()->unless(
             fn ($startWithRadius) => $startWithRadius->exactly($start),
             fn ($startWithRadius) => $startWithRadius->prepend($omission),
         );
 
         $end = rtrim($matches[3]);
 
-        $end = Str::of(mb_substr($end, 0, $radius, 'UTF-8'))->rtrim()->unless(
+        $end = (new Stringable(mb_substr($end, 0, $radius, 'UTF-8')))->rtrim()->unless(
             fn ($endWithRadius) => $endWithRadius->exactly($end),
             fn ($endWithRadius) => $endWithRadius->append($omission),
         );
@@ -857,7 +886,7 @@ class Str
 
         $start = mb_substr($string, 0, $startIndex, $encoding);
         $segmentLen = mb_strlen($segment, $encoding);
-        $end = mb_substr($string, $startIndex + $segmentLen);
+        $end = mb_substr($string, $startIndex + $segmentLen, null, $encoding);
 
         return $start.str_repeat(mb_substr($character, 0, 1, $encoding), $segmentLen).$end;
     }
@@ -1257,7 +1286,54 @@ class Str
 
         return $caseSensitive
             ? str_replace($search, $replace, $subject)
-            : str_ireplace($search, $replace, $subject);
+            : static::replaceWhileIgnoringCase($search, $replace, $subject);
+    }
+
+    /**
+     * Replace the given value in the given string regardless of case.
+     *
+     * @param  string|string[]  $search
+     * @param  string|string[]  $replace
+     * @param  string|string[]  $subject
+     * @return string|string[]
+     */
+    protected static function replaceWhileIgnoringCase($search, $replace, $subject)
+    {
+        if (! is_array($search) && is_array($replace)) {
+            return str_ireplace($search, $replace, $subject);
+        }
+
+        $searches = is_array($search) ? array_values($search) : [$search];
+
+        if (array_all($searches, static::isAscii(...))) {
+            return str_ireplace($search, $replace, $subject);
+        }
+
+        $replacements = is_array($replace)
+            ? array_values($replace)
+            : array_fill(0, count($searches), $replace);
+
+        foreach ([...$searches, ...$replacements, ...(array) $subject] as $value) {
+            if (! preg_match('//u', (string) $value)) {
+                return str_ireplace($search, $replace, $subject);
+            }
+        }
+
+        foreach ($searches as $index => $term) {
+            $term = (string) $term;
+
+            if ($term === '') {
+                continue;
+            }
+
+            $replacement = (string) ($replacements[$index] ?? '');
+
+            $subject = static::isAscii($term)
+                ? str_ireplace($term, $replacement, $subject)
+                : preg_replace_callback('/'.preg_quote($term, '/').'/iu', fn () => $replacement, $subject);
+        }
+
+        return $subject;
     }
 
     /**
@@ -1390,7 +1466,7 @@ class Str
 
         return $caseSensitive
             ? str_replace($search, '', $subject)
-            : str_ireplace($search, '', $subject);
+            : static::replaceWhileIgnoringCase($search, '', $subject);
     }
 
     /**
@@ -1401,7 +1477,7 @@ class Str
      */
     public static function reverse(string $value)
     {
-        return implode(array_reverse(mb_str_split($value)));
+        return implode('', array_reverse(mb_str_split($value)));
     }
 
     /**
@@ -1448,7 +1524,7 @@ class Str
      */
     public static function headline($value)
     {
-        $parts = mb_split('\s+', $value);
+        $parts = preg_split('/\s+/u', $value, -1, PREG_SPLIT_NO_EMPTY);
 
         $parts = count($parts) > 1
             ? array_map(static::title(...), $parts)
@@ -1468,7 +1544,7 @@ class Str
      */
     public static function initials($value, $capitalize = false)
     {
-        $parts = mb_split("\s+", $value);
+        $parts = preg_split('/\s+/u', $value, -1, PREG_SPLIT_NO_EMPTY);
 
         $parts = array_map(fn ($part) => mb_substr($part, 0, 1), $parts);
 
@@ -1499,7 +1575,7 @@ class Str
 
         $endPunctuation = ['.', '!', '?', ':', '—', ','];
 
-        $words = mb_split('\s+', $value);
+        $words = preg_split('/\s+/u', $value, -1, PREG_SPLIT_NO_EMPTY);
         $wordCount = count($words);
 
         for ($i = 0; $i < $wordCount; $i++) {
@@ -1709,32 +1785,42 @@ class Str
      * Convert a value to studly caps case.
      *
      * @param  string  $value
+     * @param  bool  $normalize  When true, all-uppercase words (e.g. acronyms) are lowercased before conversion so "CBOR" becomes "Cbor" instead of "CBOR".
      * @return ($value is '' ? '' : string)
      */
-    public static function studly($value)
+    public static function studly($value, bool $normalize = false)
     {
+        if ($normalize) {
+            $value = preg_replace_callback(
+                '/(^|[-_ \s])([A-Z]+)(?=[-_ \s]|$)/u',
+                fn ($m) => $m[1].static::lower($m[2]),
+                $value
+            );
+        }
+
         $key = $value;
 
         if (isset(static::$studlyCache[$key])) {
             return static::$studlyCache[$key];
         }
 
-        $words = mb_split('\s+', static::replace(['-', '_'], ' ', $value));
+        $words = preg_split('/\s+/u', static::replace(['-', '_'], ' ', $value), -1, PREG_SPLIT_NO_EMPTY);
 
         $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
 
-        return static::$studlyCache[$key] = implode($studlyWords);
+        return static::$studlyCache[$key] = implode('', $studlyWords);
     }
 
     /**
      * Convert a value to Pascal case.
      *
      * @param  string  $value
+     * @param  bool  $normalize  When true, all-uppercase words (e.g. acronyms) are lowercased before conversion so "CBOR" becomes "Cbor" instead of "CBOR".
      * @return ($value is '' ? '' : string)
      */
-    public static function pascal($value)
+    public static function pascal($value, bool $normalize = false)
     {
-        return static::studly($value);
+        return static::studly($value, $normalize);
     }
 
     /**
@@ -1848,7 +1934,7 @@ class Str
      */
     public static function lcfirst($string)
     {
-        return static::lower(static::substr($string, 0, 1)).static::substr($string, 1);
+        return mb_lcfirst($string, 'UTF-8');
     }
 
     /**
@@ -1859,7 +1945,7 @@ class Str
      */
     public static function ucfirst($string)
     {
-        return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
+        return mb_ucfirst($string, 'UTF-8');
     }
 
     /**
@@ -1912,7 +1998,35 @@ class Str
      */
     public static function wordWrap($string, $characters = 75, $break = "\n", $cutLongWords = false)
     {
-        return wordwrap($string, $characters, $break, $cutLongWords);
+        if (static::isAscii($string)) {
+            return wordwrap($string, $characters, $break, $cutLongWords);
+        }
+
+        if ($break === '') {
+            return wordwrap($string, $characters, $break, $cutLongWords);
+        }
+
+        $replaced = [];
+
+        $skeleton = preg_replace_callback('/[\x80-\xFF][\x80-\xBF]*|\x1A/', function ($match) use (&$replaced) {
+            $replaced[] = $match[0];
+
+            return "\x1A";
+        }, $string);
+
+        $breakToken = "\0";
+
+        while (str_contains($skeleton, $breakToken)) {
+            $breakToken .= "\0";
+        }
+
+        $index = 0;
+
+        return implode($break, array_map(function ($segment) use (&$replaced, &$index) {
+            return preg_replace_callback('/\x1A/', function () use (&$replaced, &$index) {
+                return $replaced[$index++];
+            }, $segment);
+        }, explode($breakToken, wordwrap($skeleton, $characters, $breakToken, $cutLongWords))));
     }
 
     /**

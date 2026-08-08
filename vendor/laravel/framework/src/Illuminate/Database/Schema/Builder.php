@@ -285,13 +285,7 @@ class Builder
     {
         $tableColumns = array_map(strtolower(...), $this->getColumnListing($table));
 
-        foreach ($columns as $column) {
-            if (! in_array(strtolower($column), $tableColumns)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($columns, fn ($column) => in_array(strtolower($column), $tableColumns));
     }
 
     /**
@@ -458,6 +452,24 @@ class Builder
                 || $type === $value['type'];
 
             if (($value['name'] === $index || $value['columns'] === $index) && $typeMatches) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the table has a given foreign key.
+     *
+     * @param  string  $table
+     * @param  array|string  $foreignKey
+     * @return bool
+     */
+    public function hasForeignKey($table, $foreignKey)
+    {
+        foreach ($this->getForeignKeys($table) as $value) {
+            if ($value['name'] === $foreignKey || $value['columns'] === $foreignKey) {
                 return true;
             }
         }
@@ -705,7 +717,7 @@ class Builder
             return call_user_func($this->resolver, $connection, $table, $callback);
         }
 
-        return Container::getInstance()->make(Blueprint::class, compact('connection', 'table', 'callback'));
+        return Container::getInstance()->make(Blueprint::class, ['connection' => $connection, 'table' => $table, 'callback' => $callback]);
     }
 
     /**
