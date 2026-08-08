@@ -63,6 +63,7 @@ Route::get('/', function (Request $request) {
             Route::get('/{analysis}/result', [AnalysisController::class, 'result'])->name('result');
             Route::get('/{analysis}/print', [AnalysisController::class, 'printReport'])->name('print');
             Route::post('/{analysis}/feedback', [AnalysisController::class, 'feedback'])->name('feedback');
+            Route::post('/{analysis}/line-feedback', [AnalysisController::class, 'lineFeedback'])->name('line-feedback');
 
             Route::delete('/{analysis}', [AnalysisController::class, 'destroy'])->name('destroy');
         });
