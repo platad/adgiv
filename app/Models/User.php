@@ -48,9 +48,4 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(Analysis::class);
     }
-
-    public function lineFeedbacks(): HasMany
-    {
-        return $this->hasMany(TranscriptLineFeedback::class);
-    }
 }

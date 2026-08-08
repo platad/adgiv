@@ -3,7 +3,6 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AnalysisController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\LineFeedbackController;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -63,7 +62,7 @@ Route::get('/', function (Request $request) {
             Route::get('/{analysis}/result', [AnalysisController::class, 'result'])->name('result');
             Route::get('/{analysis}/print', [AnalysisController::class, 'printReport'])->name('print');
             Route::post('/{analysis}/feedback', [AnalysisController::class, 'feedback'])->name('feedback');
-            Route::post('/{analysis}/line-feedback', [LineFeedbackController::class, 'store'])->name('line-feedback');
+
             Route::delete('/{analysis}', [AnalysisController::class, 'destroy'])->name('destroy');
         });
     });

@@ -4,7 +4,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\Analysis;
 use App\Models\AnalysisFeedback;
-use App\Models\TranscriptLineFeedback;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -26,8 +25,7 @@ class StatsOverviewWidget extends BaseWidget
             ? round(($accurateCount / $feedbackCount) * 100, 1)
             : 0;
 
-        $totalLineFeedbacks = TranscriptLineFeedback::count();
-        $likeCount          = TranscriptLineFeedback::where('feedback', 'like')->count();
+
 
         $trend = Analysis::where('status', 'completed')
             ->where('created_at', '>=', now()->subDays(7))
@@ -59,10 +57,6 @@ class StatsOverviewWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-check-badge')
                 ->color($accuracyRate >= 70 ? 'success' : 'warning'),
 
-            Stat::make('Evaluasi Kalimat', $totalLineFeedbacks)
-                ->description($likeCount . ' 👍 dari total evaluasi')
-                ->descriptionIcon('heroicon-m-hand-thumb-up')
-                ->color('warning'),
         ];
     }
 }

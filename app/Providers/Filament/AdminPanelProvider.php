@@ -7,7 +7,6 @@ use App\Filament\Resources\AnalysisResource;
 use App\Filament\Resources\UserResource;
 use App\Filament\Widgets\AccuracyRatingChartWidget;
 use App\Filament\Widgets\AnalysisChartWidget;
-use App\Filament\Widgets\LineFeedbackChartWidget;
 use App\Filament\Widgets\StatsOverviewWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -51,7 +50,6 @@ class AdminPanelProvider extends PanelProvider
                 StatsOverviewWidget::class,
                 AnalysisChartWidget::class,
                 AccuracyRatingChartWidget::class,
-                LineFeedbackChartWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
