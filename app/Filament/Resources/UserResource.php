@@ -4,7 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\Action;
 use Filament\Resources\Resource;
@@ -102,18 +104,18 @@ class UserResource extends Resource
                     ->falseLabel('Non-admin saja'),
             ])
             ->recordActions([
-                \Filament\Actions\EditAction::make(),
-                \Filament\Actions\Action::make('toggleAdmin')
+                EditAction::make(),
+                Action::make('toggleAdmin')
                     ->label(fn (User $record) => $record->is_admin ? 'Cabut Admin' : 'Jadikan Admin')
                     ->icon(fn (User $record) => $record->is_admin ? 'heroicon-o-shield-exclamation' : 'heroicon-o-shield-check')
                     ->color(fn (User $record) => $record->is_admin ? 'danger' : 'success')
                     ->requiresConfirmation()
                     ->action(fn (User $record) => $record->update(['is_admin' => !$record->is_admin])),
-                \Filament\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

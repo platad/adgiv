@@ -4,9 +4,18 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AnalysisFeedbackResource\Pages;
 use App\Models\AnalysisFeedback;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class AnalysisFeedbackResource extends Resource
@@ -54,17 +63,17 @@ class AnalysisFeedbackResource extends Resource
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
-                Tables\Columns\TextColumn::make('analysis.title')
+                TextColumn::make('analysis.title')
                     ->label('Judul Analisa')
                     ->limit(45)
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('user.name')
+                TextColumn::make('user.name')
                     ->label('Pengguna')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\IconColumn::make('is_accurate')
+                IconColumn::make('is_accurate')
                     ->label('Akurat?')
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
@@ -72,28 +81,28 @@ class AnalysisFeedbackResource extends Resource
                     ->trueColor('success')
                     ->falseColor('danger'),
 
-                Tables\Columns\TextColumn::make('comments')
+                TextColumn::make('comments')
                     ->label('Komentar')
                     ->limit(60)
                     ->placeholder('— Tidak ada komentar'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Dinilai pada')
                     ->dateTime('d M Y, H:i')
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('is_accurate')
+                TernaryFilter::make('is_accurate')
                     ->label('Kesesuaian')
                     ->trueLabel('Akurat')
                     ->falseLabel('Tidak Akurat'),
             ])
             ->recordActions([
-                \Filament\Actions\ViewAction::make(),
+                ViewAction::make(),
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
