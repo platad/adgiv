@@ -772,79 +772,7 @@
                                     </div>
                                 @endif
 
-                                {{-- Line Feedback Bar --}}
-                                <div class="ml-0 md:ml-40 flex items-center justify-between gap-4 mt-2 text-xs"
-                                    x-data="{
-                                        feedback: '{{ $block['user_feedback'] ?? 'none' }}',
-                                        loading: false,
-                                        async sendFeedback(type) {
-                                            if (this.loading) return;
-                                            this.loading = true;
-                                            try {
-                                                let res = await fetch('{{ route('analysis.line-feedback', $analysis->slug) }}', {
-                                                    method: 'POST',
-                                                    headers: {
-                                                        'Content-Type': 'application/json',
-                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                                    },
-                                                    body: JSON.stringify({ index: {{ $index }}, type: type })
-                                                });
-                                                let data = await res.json();
-                                                if (data.status === 'success') {
-                                                    this.feedback = data.user_feedback;
-                                                }
-                                            } catch (e) {
-                                                console.error(e);
-                                            } finally {
-                                                this.loading = false;
-                                            }
-                                        }
-                                    }">
-                                    <div
-                                        class="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-full px-3 py-1.5 text-gray-400">
-                                        <span class="text-[0.6rem] font-bold uppercase tracking-widest text-gray-500">
-                                            <span class="lang-id">Evaluasi Kalimat:</span>
-                                            <span class="lang-en">Line Evaluation:</span>
-                                            <span class="lang-zh">单行评估:</span>
-                                        </span>
-                                        <div class="flex items-center gap-2">
-                                            <!-- Thumbs Up -->
-                                            <button @click="sendFeedback('up')"
-                                                class="hover:text-green-600 transition focus:outline-none flex items-center justify-center p-0.5 cursor-pointer"
-                                                :class="feedback === 'up' ? 'text-green-600' : 'text-gray-400'">
-                                                <svg class="w-4 h-4"
-                                                    :fill="feedback === 'up' ? 'currentColor' : 'none'"
-                                                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3" />
-                                                </svg>
-                                            </button>
 
-                                            <!-- Thumbs Down -->
-                                            <button @click="sendFeedback('down')"
-                                                class="hover:text-red-600 transition focus:outline-none flex items-center justify-center p-0.5 cursor-pointer"
-                                                :class="feedback === 'down' ? 'text-red-600' : 'text-gray-400'">
-                                                <svg class="w-4 h-4"
-                                                    :fill="feedback === 'down' ? 'currentColor' : 'none'"
-                                                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3zm7-13h3a2 2 0 012 2v7a2 2 0 01-2 2h-3" />
-                                                </svg>
-                                            </button>
-                                        </div>
-
-                                        <!-- Spinner Loader -->
-                                        <svg x-show="loading" class="animate-spin h-3.5 w-3.5 text-bima-red ml-1"
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            style="display: none;">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10"
-                                                stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor"
-                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                </div>
                             </div>
 
                             @if (!$loop->last)
