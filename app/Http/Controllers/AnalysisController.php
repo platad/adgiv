@@ -109,7 +109,7 @@ class AnalysisController extends Controller
 
     public function processing(Analysis $analysis)
     {
-        abort_if($analysis->user_id != Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
 
         if ($analysis->isCompleted()) {
             return redirect()->route('analysis.result', ['analysis' => $analysis->slug]);
@@ -129,7 +129,7 @@ class AnalysisController extends Controller
 
     public function getAudio(Analysis $analysis)
     {
-        abort_if($analysis->user_id != Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
         $path = Storage::disk('local')->path($analysis->audio_path);
         
         if (!file_exists($path)) {
@@ -144,7 +144,7 @@ class AnalysisController extends Controller
 
     public function saveResult(Request $request, Analysis $analysis)
     {
-        abort_if($analysis->user_id != Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
         
         $transcription = $request->input('transcription', []);
         
@@ -289,7 +289,7 @@ class AnalysisController extends Controller
 
     public function processChunk(Request $request, Analysis $analysis, MultiModalAnalysisInterface $aiService, ParseAdviceGivingAction $parseAction)
     {
-        abort_if($analysis->user_id != Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
 
         $request->validate([
             'start_idx' => 'required|integer|min:0',
@@ -360,7 +360,7 @@ class AnalysisController extends Controller
 
     public function finalizeAnalysis(Request $request, Analysis $analysis)
     {
-        abort_if($analysis->user_id != Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
 
         $resultData = $analysis->result_data ?? [];
         $resultData['progress'] = 100;
@@ -377,7 +377,7 @@ class AnalysisController extends Controller
 
     public function result(Analysis $analysis)
     {
-        abort_if($analysis->user_id != Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
 
         if (!$analysis->isCompleted()) {
             return redirect()->route('analysis.processing', $analysis->slug);
@@ -389,7 +389,7 @@ class AnalysisController extends Controller
 
     public function feedback(Request $request, Analysis $analysis)
     {
-        abort_if($analysis->user_id != Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
 
         $request->validate([
             'is_accurate' => ['required', 'boolean'],
@@ -413,7 +413,7 @@ class AnalysisController extends Controller
 
     public function lineFeedback(Request $request, Analysis $analysis)
     {
-        abort_if($analysis->user_id != Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
 
         $request->validate([
             'index' => 'required|integer',
@@ -444,7 +444,7 @@ class AnalysisController extends Controller
 
     public function printReport(Analysis $analysis)
     {
-        abort_if($analysis->user_id != Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
 
         if (!$analysis->isCompleted()) {
             return redirect()->route('analysis.result', ['analysis' => $analysis->slug])
@@ -456,7 +456,7 @@ class AnalysisController extends Controller
 
     public function destroy(Analysis $analysis)
     {
-        abort_if($analysis->user_id != Auth::id(), 403);
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
 
         if ($analysis->audio_path && Storage::disk('local')->exists($analysis->audio_path)) {
             Storage::disk('local')->delete($analysis->audio_path);
