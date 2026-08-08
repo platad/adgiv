@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AnalysisController;
 use App\Http\Controllers\AuthController;
+use App\Http\Middleware\Localization;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ Route::get('/', function (Request $request) {
     return redirect()->route($target, ['locale' => $locale]);
 });
 
-    Route::prefix('{locale}')->middleware([\App\Http\Middleware\Localization::class])->group(function () {
+    Route::prefix('{locale}')->middleware([Localization::class])->group(function () {
 
         Route::get('/', function () {
             $target = auth()->check() ? 'dashboard' : 'login';

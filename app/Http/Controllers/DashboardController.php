@@ -188,7 +188,7 @@ class DashboardController extends Controller
                         'intonasi_dominan' => $summary['intonasi_dominan'] ?? 'Intonasi Seimbang',
                         'saran_perbaikan' => $saran,
                         'arah_tujuan' => $summary['arah_tujuan'] ?? '-',
-                        'result_route' => route('analysis.result', $analysis->id)
+                        'result_route' => route('analysis.result', ['analysis' => $analysis->slug, 'locale' => app()->getLocale()])
                     ];
                     $insightCount++;
                 }
@@ -316,8 +316,8 @@ class DashboardController extends Controller
                 'title' => $item->title,
                 'status' => $item->status,
                 'created_at_formatted' => $item->created_at->format('d M Y, H:i'),
-                'result_route' => route('analysis.result', $item->slug),
-                'processing_route' => route('analysis.processing', $item->slug),
+                'result_route' => route('analysis.result', ['analysis' => $item->slug, 'locale' => app()->getLocale()]),
+                'processing_route' => route('analysis.processing', ['analysis' => $item->slug, 'locale' => app()->getLocale()]),
             ];
         });
 

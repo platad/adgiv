@@ -131,7 +131,7 @@
     <!-- Floating Navigation Bar (Screen Only - Monochrome styled) -->
     <div class="no-print fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-250 px-6 py-4 flex items-center justify-between shadow-sm">
         <div class="flex items-center gap-3">
-            <a href="{{ route('analysis.result', $analysis->id) }}" class="inline-flex items-center text-xs font-black text-gray-600 hover:text-black transition-colors uppercase tracking-widest gap-1">
+            <a href="{{ route('analysis.result', ['analysis' => $analysis->slug]) }}" class="inline-flex items-center text-xs font-black text-gray-600 hover:text-black transition-colors uppercase tracking-widest gap-1">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Hasil
             </a>
             <span class="h-4 w-px bg-gray-200"></span>

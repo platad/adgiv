@@ -310,7 +310,7 @@
                             this.transcriptionStatus = 'Penyimpanan berhasil, mengalihkan...';
 
                             setTimeout(() => {
-                                window.location.href = `{{ route('analysis.result', $analysis->slug) }}`;
+                                window.location.href = `{{ route('analysis.result', ['analysis' => $analysis->slug]) }}`;
                             }, 1500);
                         } else if (data.status === 'failed') {
                             clearInterval(pollInterval);
@@ -395,7 +395,7 @@
                     this.transcriptionStatus = 'Penyimpanan berhasil, mengalihkan...';
 
                     setTimeout(() => {
-                        window.location.href = `{{ route('analysis.result', $analysis->slug) }}`;
+                        window.location.href = `{{ route('analysis.result', ['analysis' => $analysis->slug]) }}`;
                     }, 1500);
 
                 } catch (e) {

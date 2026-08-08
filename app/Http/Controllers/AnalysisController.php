@@ -112,7 +112,7 @@ class AnalysisController extends Controller
         abort_if($analysis->user_id != Auth::id(), 403);
 
         if ($analysis->isCompleted()) {
-            return redirect()->route('analysis.result', $analysis->slug);
+            return redirect()->route('analysis.result', ['analysis' => $analysis->slug]);
         }
 
         $analysis->load('chunks', 'logs');
@@ -447,7 +447,7 @@ class AnalysisController extends Controller
         abort_if($analysis->user_id != Auth::id(), 403);
 
         if (!$analysis->isCompleted()) {
-            return redirect()->route('analysis.result', $analysis->slug)
+            return redirect()->route('analysis.result', ['analysis' => $analysis->slug])
                 ->with('error', 'Laporan belum siap dicetak.');
         }
 

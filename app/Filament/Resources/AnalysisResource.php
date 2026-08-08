@@ -192,7 +192,7 @@ class AnalysisResource extends Resource
                     ->label('Lihat Hasil')
                     ->icon('heroicon-o-arrow-top-right-on-square')
                     ->color('primary')
-                    ->url(fn (Analysis $record) => route('analysis.result', $record->slug))
+                    ->url(fn (Analysis $record) => route('analysis.result', ['locale' => $record->locale ?? 'id', 'analysis' => $record->slug]))
                     ->openUrlInNewTab()
                     ->visible(fn (Analysis $record) => $record->status === 'completed'),
             ])
