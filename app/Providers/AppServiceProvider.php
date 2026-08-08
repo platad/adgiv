@@ -6,6 +6,7 @@ use App\Contracts\AI\LlmConfigurationInterface;
 use App\Contracts\AI\MultiModalAnalysisInterface;
 use App\Services\AI\BimaAnalysisConfiguration;
 use App\Services\AI\OpenAiMultiModalService;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 
@@ -35,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
         if (env('APP_ENV') === 'production' || env('FORCE_HTTPS', true)) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
+            URL::forceScheme('https');
         }
     }
 }
