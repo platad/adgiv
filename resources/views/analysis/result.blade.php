@@ -565,7 +565,7 @@
                                             {!! $block['text_html'] ?? '' !!}
 
                                             <span class="inline-flex flex-wrap gap-2 ml-2 align-middle select-none">
-                                                <span class="text-[0.65rem] font-black uppercase tracking-wider text-gray-400 self-center mr-0.5">Pola Bimbingan:</span>
+                                                <span class="w-full block text-[0.65rem] font-black uppercase tracking-wider text-gray-400 mt-2 mb-0.5">Pola Bimbingan:</span>
                                                 {{-- Advice Badge --}}
                                                 @php
                                                     $isAdviceStr = is_string($block['is_advice'] ?? null) ? $block['is_advice'] : '';
