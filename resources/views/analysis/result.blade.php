@@ -560,19 +560,12 @@
 
                                     {{-- Text Column --}}
                                     <div class="flex-grow">
-                                        <p class="text-lg md:text-xl font-medium text-gray-800 leading-relaxed tracking-wide font-serif mb-3">
+                                        <p
+                                            class="text-lg md:text-xl font-medium text-gray-800 leading-relaxed tracking-wide font-serif">
                                             {!! $block['text_html'] ?? '' !!}
-                                        </p>
 
-                                        <div class="flex flex-col gap-2 select-none">
-                                            {{-- Pola Bimbingan Section --}}
-                                            <div class="flex flex-wrap items-center gap-2">
-                                                <span class="text-[0.65rem] font-black uppercase tracking-wider text-gray-400 mr-1">
-                                                    <span class="lang-id">Pola Bimbingan:</span>
-                                                    <span class="lang-en">Guidance Pattern:</span>
-                                                    <span class="lang-zh">指导模式:</span>
-                                                </span>
-
+                                            <span class="inline-flex flex-wrap gap-2 ml-2 align-middle select-none">
+                                                <span class="text-[0.65rem] font-black uppercase tracking-wider text-gray-400 self-center mr-0.5">Pola Bimbingan:</span>
                                                 {{-- Advice Badge --}}
                                                 @php
                                                     $isAdviceStr = is_string($block['is_advice'] ?? null) ? $block['is_advice'] : '';
@@ -669,6 +662,39 @@
                                                     </button>
                                                 @endif
 
+                                                {{-- Karakter Relasi Badge --}}
+                                                @if (
+                                                    !empty($block['advice_relation']) ||
+                                                        !empty($block['relation']) ||
+                                                        !empty($block['intonation_markers'][0]['relation']))
+                                                    @php
+                                                        $relExplanation =
+                                                            $block['advice_relation'] ??
+                                                            ($block['relation'] ??
+                                                                ($block['intonation_markers'][0]['relation'] ??
+                                                                    'Kalimat ini memiliki relasi logis dengan baris pembicaraan sebelumnya.'));
+                                                    @endphp
+                                                    <button
+                                                        @click="
+                                                            const t = appLang === 'zh' ? '句子特征与关联' : (appLang === 'en' ? 'Sentence Character & Relation' : 'Karakter & Relasi Kalimat');
+                                                            const exp = appLang === 'zh' ? '人工智能在此行检测到紧密的话语关联。' : (appLang === 'en' ? 'AI detected a close discourse relation on this line.' : 'AI mendeteksi hubungan antar-kalimat yang erat pada baris ini.');
+                                                            const rel = '{{ addslashes($relExplanation) }}';
+                                                            openInsight(t, 'relation', exp, rel);
+                                                        "
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
+                                                        title="{{ app()->getLocale() === 'zh' ? '点击查看特征与话语关联详情' : (app()->getLocale() === 'en' ? 'Click to view character and sentence relation details' : 'Klik untuk melihat karakter & relasi kalimat') }}">
+                                                        <svg class="w-3.5 h-3.5 text-purple-500" fill="none"
+                                                            stroke="currentColor" stroke-width="2.5"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                        </svg>
+                                                        <span class="lang-id">Relasi Kuasa</span>
+                                                        <span class="lang-en">Power Relation</span>
+                                                        <span class="lang-zh">权力关系</span>
+                                                    </button>
+                                                @endif
+
                                                 {{-- IndoBERT: Advice Giving Badge --}}
                                                 @if (!empty($block['advice_giving']))
                                                     @php
@@ -689,7 +715,7 @@
                                                         class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $agColor }}-50 hover:bg-{{ $agColor }}-100 text-{{ $agColor }}-700 border-{{ $agColor }}-200"
                                                         title="Klik untuk melihat insight analisis IndoBERT">
                                                         {!! $agIcon !!}
-                                                        <span>{{ $agLabel }}</span>
+                                                        <span>(A) {{ $agLabel }}</span>
                                                     </button>
                                                 @endif
 
@@ -713,46 +739,11 @@
                                                         class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $moColor }}-50 hover:bg-{{ $moColor }}-100 text-{{ $moColor }}-700 border-{{ $moColor }}-200"
                                                         title="Klik untuk melihat insight analisis IndoBERT">
                                                         {!! $moIcon !!}
-                                                        <span>{{ $moLabel }}</span>
+                                                        <span>(B) {{ $moLabel }}</span>
                                                     </button>
                                                 @endif
-                                            </div>
-
-                                            {{-- Relasi Kuasa Section --}}
-                                            @if (
-                                                !empty($block['advice_relation']) ||
-                                                    !empty($block['relation']) ||
-                                                    !empty($block['intonation_markers'][0]['relation']))
-                                                @php
-                                                    $relExplanation =
-                                                        $block['advice_relation'] ??
-                                                        ($block['relation'] ??
-                                                            ($block['intonation_markers'][0]['relation'] ??
-                                                                'Kalimat ini memiliki relasi logis dengan baris pembicaraan sebelumnya.'));
-                                                @endphp
-                                                <div class="flex flex-wrap items-center gap-2">
-                                                    <button
-                                                        @click="
-                                                            const t = appLang === 'zh' ? '句子特征与关联' : (appLang === 'en' ? 'Sentence Character & Relation' : 'Karakter & Relasi Kalimat');
-                                                            const exp = appLang === 'zh' ? '人工智能在此行检测到紧密的话语关联。' : (appLang === 'en' ? 'AI detected a close discourse relation on this line.' : 'AI mendeteksi hubungan antar-kalimat yang erat pada baris ini.');
-                                                            const rel = '{{ addslashes($relExplanation) }}';
-                                                            openInsight(t, 'relation', exp, rel);
-                                                        "
-                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
-                                                        title="{{ app()->getLocale() === 'zh' ? '点击查看特征与话语关联详情' : (app()->getLocale() === 'en' ? 'Click to view character and sentence relation details' : 'Klik untuk melihat karakter & relasi kalimat') }}">
-                                                        <svg class="w-3.5 h-3.5 text-purple-500" fill="none"
-                                                            stroke="currentColor" stroke-width="2.5"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                                                        </svg>
-                                                        <span class="lang-id">Relasi Kuasa</span>
-                                                        <span class="lang-en">Power Relation</span>
-                                                        <span class="lang-zh">权力关系</span>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                        </div>
+                                            </span>
+                                        </p>
                                     </div>
                                 </div>
 
@@ -771,9 +762,9 @@
                                             <div>
                                                 <span
                                                     class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 block mb-1">
-                                                    <span class="lang-id">Agent Insight</span>
-                                                    <span class="lang-en">Agent Insight</span>
-                                                    <span class="lang-zh">智能体见解</span>
+                                                    <span class="lang-id">(C) Agent Insight</span>
+                                                    <span class="lang-en">(C) Agent Insight</span>
+                                                    <span class="lang-zh">(C) 智能体见解</span>
                                                 </span>
                                                 <p class="text-sm font-medium {{ $hasAgentInsight ? 'text-gray-600' : 'text-gray-400 italic' }}">
                                                     {{ $agentInsightText }}</p>
@@ -1007,9 +998,9 @@
                         <span
                             class="block text-[0.6rem] font-black text-red-200 uppercase tracking-widest mb-2 flex items-center">
                             <i data-lucide="target" class="w-3 h-3 mr-1"></i> 
-                            <span class="lang-id">Arah Tujuan</span>
-                            <span class="lang-en">Goal / Direction</span>
-                            <span class="lang-zh">方向目标</span>
+                            <span class="lang-id">(D) Arah Tujuan</span>
+                            <span class="lang-en">(D) Goal / Direction</span>
+                            <span class="lang-zh">(D) 方向目标</span>
                         </span>
                         <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['arah_tujuan'] ?? '-') }}</p>
                     </div>
@@ -1018,9 +1009,9 @@
                         <span
                             class="block text-[0.6rem] font-black text-green-600 uppercase tracking-widest mb-2 flex items-center">
                             <i data-lucide="sparkles" class="w-3 h-3 mr-1"></i> 
-                            <span class="lang-id">Saran Perbaikan</span>
-                            <span class="lang-en">Improvement Recommendation</span>
-                            <span class="lang-zh">整改建议</span>
+                            <span class="lang-id">(E) Saran Perbaikan</span>
+                            <span class="lang-en">(E) Improvement Recommendation</span>
+                            <span class="lang-zh">(E) 整改建议</span>
                         </span>
                         <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['saran_perbaikan'] ?? '-') }}</p>
                     </div>
@@ -1060,14 +1051,14 @@
             <div x-show="!submitted"
                 class="bg-gray-900 rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden group">
                 <div class="absolute inset-0 bg-gradient-to-r from-bima-red/20 to-transparent opacity-50"></div>
-                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 mt-4 md:mt-0">
+                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div class="flex-grow text-center md:text-left">
                         <h3
                             class="text-lg font-black uppercase tracking-widest mb-2 flex items-center justify-center md:justify-start gap-2">
                             <x-application-logo class="w-5 h-5 text-bima-red" /> 
-                            <span class="lang-id">Penilaian Kesesuaian Hasil</span>
-                            <span class="lang-en">Result Accuracy Evaluation</span>
-                            <span class="lang-zh">结果准确性评估</span>
+                            <span class="lang-id">(F) Penilaian Kesesuaian Hasil</span>
+                            <span class="lang-en">(F) Result Accuracy Evaluation</span>
+                            <span class="lang-zh">(F) 结果准确性评估</span>
                         </h3>
                         <p class="text-gray-300 text-sm font-medium leading-relaxed">
                             <span class="lang-id">Sebagai pakar atau peninjau akademis, penilaian Anda sangat berharga bagi penyempurnaan akurasi kami. Menurut Anda, apakah hasil anotasi intonasi dan saran bimbingan sistem ini sudah sesuai dengan fakta percakapan riil?</span>
