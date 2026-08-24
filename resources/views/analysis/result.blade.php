@@ -1012,9 +1012,9 @@
                         <span
                             class="block text-[0.6rem] font-black text-green-600 uppercase tracking-widest mb-2 flex items-center">
                             <i data-lucide="sparkles" class="w-3 h-3 mr-1"></i> 
-                            <span class="lang-id">Saran Perbaikan</span>
-                            <span class="lang-en">Improvement Recommendation</span>
-                            <span class="lang-zh">整改建议</span>
+                            <span class="lang-id">Rekomendasi</span>
+                            <span class="lang-en">Recommendation</span>
+                            <span class="lang-zh">建议</span>
                         </span>
                         <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['saran_perbaikan'] ?? '-') }}</p>
                     </div>
