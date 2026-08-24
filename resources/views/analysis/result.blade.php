@@ -687,6 +687,16 @@
                                                             <span>{{ $agLabel }}</span>
                                                         </button>
                                                     @endif
+                                                </span>
+
+                                                {{-- Relasi Kuasa Box --}}
+                                                @if (!empty($block['modes_of_interaction']) || !empty($block['advice_relation']) || !empty($block['relation']) || !empty($block['intonation_markers'][0]['relation']))
+                                                <span class="w-full inline-flex flex-wrap items-center gap-2 p-2.5 my-1 border border-dashed border-purple-200 bg-purple-50/30 rounded-2xl">
+                                                    <span class="w-full block text-[0.65rem] font-black uppercase tracking-wider text-purple-400 mb-0.5">
+                                                        <span class="lang-id">Relasi Kuasa:</span>
+                                                        <span class="lang-en">Power Relation:</span>
+                                                        <span class="lang-zh">权力关系:</span>
+                                                    </span>
 
                                                     {{-- IndoBERT: Modes of Interaction Badge --}}
                                                     @if (!empty($block['modes_of_interaction']))
@@ -711,39 +721,40 @@
                                                             <span>{{ $moLabel }}</span>
                                                         </button>
                                                     @endif
-                                                </span>
 
-                                                {{-- Relasi Kuasa Badge (Posisi Paling Akhir) --}}
-                                                @if (
-                                                    !empty($block['advice_relation']) ||
-                                                        !empty($block['relation']) ||
-                                                        !empty($block['intonation_markers'][0]['relation']))
-                                                    @php
-                                                        $relExplanation =
-                                                            $block['advice_relation'] ??
-                                                            ($block['relation'] ??
-                                                                ($block['intonation_markers'][0]['relation'] ??
-                                                                    'Kalimat ini memiliki relasi logis dengan baris pembicaraan sebelumnya.'));
-                                                    @endphp
-                                                    <button
-                                                        @click="
-                                                            const t = appLang === 'zh' ? '句子特征与关联' : (appLang === 'en' ? 'Sentence Character & Relation' : 'Karakter & Relasi Kalimat');
-                                                            const exp = appLang === 'zh' ? '人工智能在此行检测到紧密的话语关联。' : (appLang === 'en' ? 'AI detected a close discourse relation on this line.' : 'AI mendeteksi hubungan antar-kalimat yang erat pada baris ini.');
-                                                            const rel = '{{ addslashes($relExplanation) }}';
-                                                            openInsight(t, 'relation', exp, rel);
-                                                        "
-                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
-                                                        title="{{ app()->getLocale() === 'zh' ? '点击查看特征与话语关联详情' : (app()->getLocale() === 'en' ? 'Click to view character and sentence relation details' : 'Klik untuk melihat karakter & relasi kalimat') }}">
-                                                        <svg class="w-3.5 h-3.5 text-purple-500" fill="none"
-                                                            stroke="currentColor" stroke-width="2.5"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                                                        </svg>
-                                                        <span class="lang-id">Relasi Kuasa</span>
-                                                        <span class="lang-en">Power Relation</span>
-                                                        <span class="lang-zh">权力关系</span>
-                                                    </button>
+                                                    {{-- Karakter Relasi Badge --}}
+                                                    @if (
+                                                        !empty($block['advice_relation']) ||
+                                                            !empty($block['relation']) ||
+                                                            !empty($block['intonation_markers'][0]['relation']))
+                                                        @php
+                                                            $relExplanation =
+                                                                $block['advice_relation'] ??
+                                                                ($block['relation'] ??
+                                                                    ($block['intonation_markers'][0]['relation'] ??
+                                                                        'Kalimat ini memiliki relasi logis dengan baris pembicaraan sebelumnya.'));
+                                                        @endphp
+                                                        <button
+                                                            @click="
+                                                                const t = appLang === 'zh' ? '句子特征与关联' : (appLang === 'en' ? 'Sentence Character & Relation' : 'Karakter & Relasi Kalimat');
+                                                                const exp = appLang === 'zh' ? '人工智能在此行检测到紧密的话语关联。' : (appLang === 'en' ? 'AI detected a close discourse relation on this line.' : 'AI mendeteksi hubungan antar-kalimat yang erat pada baris ini.');
+                                                                const rel = '{{ addslashes($relExplanation) }}';
+                                                                openInsight(t, 'relation', exp, rel);
+                                                            "
+                                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
+                                                            title="{{ app()->getLocale() === 'zh' ? '点击查看特征与话语关联详情' : (app()->getLocale() === 'en' ? 'Click to view character and sentence relation details' : 'Klik untuk melihat karakter & relasi kalimat') }}">
+                                                            <svg class="w-3.5 h-3.5 text-purple-500" fill="none"
+                                                                stroke="currentColor" stroke-width="2.5"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                            </svg>
+                                                            <span class="lang-id">Relasi</span>
+                                                            <span class="lang-en">Relation</span>
+                                                            <span class="lang-zh">关联</span>
+                                                        </button>
+                                                    @endif
+                                                </span>
                                                 @endif
                                             </span>
                                         </p>
