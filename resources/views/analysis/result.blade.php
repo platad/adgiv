@@ -550,8 +550,19 @@
                                             <span class="lang-zh">第 {{ $index + 1 }} 行</span>
                                         </div>
                                         @if (!empty($block['timestamp']))
-                                            <div
-                                                                                       </p>
+                                            <div class="text-[0.65rem] font-medium text-gray-400 mt-1 flex items-center">
+                                                <i data-lucide="clock" class="w-3 h-3 mr-1"></i>
+                                                {{ $block['timestamp'] }}
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    {{-- Text Column --}}
+                                    <div class="flex-grow">
+                                        <p
+                                            class="text-lg md:text-xl font-medium text-gray-800 leading-relaxed tracking-wide font-serif">
+                                            {!! $block['text_html'] ?? '' !!}
+                                        </p>
                                         
                                         <div class="mt-3 space-y-2 select-none">
                                             {{-- Pola Bimbingan Group --}}
