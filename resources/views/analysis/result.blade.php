@@ -550,7 +550,8 @@
                                             <span class="lang-zh">第 {{ $index + 1 }} 行</span>
                                         </div>
                                         @if (!empty($block['timestamp']))
-                                            <div class="text-[0.65rem] font-medium text-gray-400 mt-1 flex items-center">
+                                            <div
+                                                class="text-[0.65rem] font-medium text-gray-400 mt-1 flex items-center">
                                                 <i data-lucide="clock" class="w-3 h-3 mr-1"></i>
                                                 {{ $block['timestamp'] }}
                                             </div>
@@ -563,12 +564,16 @@
                                             class="text-lg md:text-xl font-medium text-gray-800 leading-relaxed tracking-wide font-serif">
                                             {!! $block['text_html'] ?? '' !!}
                                         </p>
-                                        
+
                                         <div class="mt-3 space-y-2 select-none">
-                                            {{-- Pola Bimbingan Group --}}
+                                            {{-- Pola Bimbingan Section --}}
                                             <div class="flex flex-wrap items-center gap-2">
-                                                <span class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-widest">Pola Bimbingan:</span>
-                                                
+                                                <span class="text-[0.65rem] font-black uppercase tracking-wider text-gray-400 mr-1 flex items-center gap-1">
+                                                    <span class="lang-id">Pola Bimbingan:</span>
+                                                    <span class="lang-en">Guidance Pattern:</span>
+                                                    <span class="lang-zh">指导模式:</span>
+                                                </span>
+
                                                 {{-- Advice Badge --}}
                                                 @php
                                                     $isAdviceStr = is_string($block['is_advice'] ?? null) ? $block['is_advice'] : '';
@@ -713,21 +718,20 @@
                                                     </button>
                                                 @endif
                                             </div>
-                                            
-                                            {{-- Karakter Relasi Kuasa Group --}}
+
+                                            {{-- Relasi Kuasa Section --}}
                                             @if (
                                                 !empty($block['advice_relation']) ||
                                                     !empty($block['relation']) ||
                                                     !empty($block['intonation_markers'][0]['relation']))
-                                                <div class="flex flex-wrap items-center gap-2 mt-1">
-                                                    <span class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-widest">Relasi Kuasa:</span>
-                                                    @php
-                                                        $relExplanation =
-                                                            $block['advice_relation'] ??
-                                                            ($block['relation'] ??
-                                                                ($block['intonation_markers'][0]['relation'] ??
-                                                                    'Kalimat ini memiliki relasi logis dengan baris pembicaraan sebelumnya.'));
-                                                    @endphp
+                                                @php
+                                                    $relExplanation =
+                                                        $block['advice_relation'] ??
+                                                        ($block['relation'] ??
+                                                            ($block['intonation_markers'][0]['relation'] ??
+                                                                'Kalimat ini memiliki relasi logis dengan baris pembicaraan sebelumnya.'));
+                                                @endphp
+                                                <div class="flex flex-wrap items-center gap-2 pt-0.5">
                                                     <button
                                                         @click="
                                                             const t = appLang === 'zh' ? '句子特征与关联' : (appLang === 'en' ? 'Sentence Character & Relation' : 'Karakter & Relasi Kalimat');
@@ -1022,7 +1026,6 @@
                         <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['saran_perbaikan'] ?? '-') }}</p>
                     </div>
                 </div>
-
             </div>
         </div>
 
