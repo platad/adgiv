@@ -560,204 +560,207 @@
 
                                     {{-- Text Column --}}
                                     <div class="flex-grow">
-                                        <p
-                                            class="text-lg md:text-xl font-medium text-gray-800 leading-relaxed tracking-wide font-serif">
+                                        <p class="text-lg md:text-xl font-medium text-gray-800 leading-relaxed tracking-wide font-serif mb-2">
                                             {!! $block['text_html'] ?? '' !!}
-
-                                            <span class="inline-flex flex-wrap gap-2 ml-2 align-middle select-none">
-                                                {{-- Pola Bimbingan Box --}}
-                                                <span class="w-full inline-flex flex-wrap items-center gap-2 p-2.5 my-1 border border-dashed border-gray-300 bg-gray-50/60 rounded-2xl">
-                                                    <span class="w-full block text-[0.65rem] font-black uppercase tracking-wider text-gray-400 mb-0.5">Pola Bimbingan:</span>
-                                                    {{-- Advice Badge --}}
-                                                    @php
-                                                        $isAdviceStr = is_string($block['is_advice'] ?? null) ? $block['is_advice'] : '';
-                                                        $isAdviceTrue = (!empty($block['is_advice']) && $block['is_advice'] !== 'false' && $block['is_advice'] !== false);
-                                                    @endphp
-                                                    @if ($isAdviceTrue)
-                                                        <button
-                                                            @click="
-                                                                const t = appLang === 'zh' ? '提出建议 (Advice Giving)' : (appLang === 'en' ? 'Advice Giving' : 'Pemberian Saran (Advice Giving)');
-                                                                const exp = '{{ addslashes($isAdviceStr ?: (!empty($block['agent_insight']) ? $block['agent_insight'] : 'Dosen memberikan saran akademik bimbingan.')) }}';
-                                                                const rel = '{{ addslashes(!empty($block['advice_relation']) ? $block['advice_relation'] : 'Kalimat ini merupakan saran bimbingan akademik yang menanggapi progres mahasiswa di baris ini.') }}';
-                                                                openInsight(t, 'advice', exp, rel);
-                                                            "
-                                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
-                                                            title="{{ app()->getLocale() === 'zh' ? '点击查看建议与话语关联详情' : (app()->getLocale() === 'en' ? 'Click to view advice and sentence relation details' : 'Klik untuk melihat detail advice & relasi kalimat') }}">
-                                                            <svg class="w-3.5 h-3.5 text-amber-500" fill="none"
-                                                                stroke="currentColor" stroke-width="2.5"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    d="M12 18.5a6.5 6.5 0 100-13 6.5 6.5 0 000 13zM12 11.5v3M12 9h.01" />
-                                                            </svg>
-                                                            <span class="lang-id">Advice</span>
-                                                            <span class="lang-en">Advice</span>
-                                                            <span class="lang-zh">建议</span>
-                                                        </button>
-                                                    @endif
-
-                                                    {{-- Intonasi Badge --}}
-                                                    @php
-                                                        $hasIntonation = !empty($block['intonation_markers']) && is_array($block['intonation_markers']) && count($block['intonation_markers']) > 0;
-                                                        $hasAdviceType = !empty($block['advice_type']);
-                                                    @endphp
-                                                    @if ($hasIntonation || $hasAdviceType || !empty($block['intonation_type']))
-                                                        @php
-                                                            $intType = 'neutral';
-                                                            if ($hasIntonation) {
-                                                                $intType = $block['intonation_markers'][0]['type'] ?? 'neutral';
-                                                            } else {
-                                                                $intType = $block['intonation_type'] ?? ($block['advice_type'] ?? 'neutral');
-                                                            }
-                                                            $intType = strtolower($intType);
-                                                            
-                                                            $intReason =
-                                                                'Tingkat intonasi baris ini adalah ' .
-                                                                ($intType === 'up'
-                                                                    ? 'Naik / Tinggi'
-                                                                    : ($intType === 'down'
-                                                                        ? 'Turun / Tegas'
-                                                                        : 'Netral'));
-                                                            if ($hasIntonation && !empty($block['intonation_markers'][0]['reason'])) {
-                                                                $intReason = $block['intonation_markers'][0]['reason'];
-                                                            }
-                                                            
-                                                            $intRelation =
-                                                                ($hasIntonation && !empty($block['intonation_markers'][0]['relation']))
-                                                                ? $block['intonation_markers'][0]['relation']
-                                                                : 'Karakter intonasi ini merefleksikan dinamika percakapan di baris ini.';
-                                                        @endphp
-                                                        <button
-                                                            @click="
-                                                                const t = appLang === 'zh' ? '句子语调' : (appLang === 'en' ? 'Sentence Intonation' : 'Intonasi Kalimat');
-                                                                const exp = '{{ addslashes($intReason) }}';
-                                                                const rel = '{{ addslashes($intRelation) }}';
-                                                                openInsight(t, '{{ $intType }}', exp, rel);
-                                                            "
-                                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border
-                                                                        {{ $intType === 'up' ? 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200' : ($intType === 'down' ? 'bg-red-50 hover:bg-red-100 text-red-700 border-red-200' : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200') }}"
-                                                            title="{{ app()->getLocale() === 'zh' ? '点击查看行语调详情' : (app()->getLocale() === 'en' ? 'Click to view line intonation details' : 'Klik untuk melihat detail intonasi baris') }}">
-                                                            @if ($intType === 'up')
-                                                                <svg class="w-3.5 h-3.5 text-blue-500" fill="none"
-                                                                    stroke="currentColor" stroke-width="2.5"
-                                                                    viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                                                                </svg>
-                                                            @elseif($intType === 'down')
-                                                                <svg class="w-3.5 h-3.5 text-red-500" fill="none"
-                                                                    stroke="currentColor" stroke-width="2.5"
-                                                                    viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" />
-                                                                </svg>
-                                                            @else
-                                                                <svg class="w-3.5 h-3.5 text-gray-500" fill="none"
-                                                                    stroke="currentColor" stroke-width="2.5"
-                                                                    viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        d="M5 12h14" />
-                                                                </svg>
-                                                            @endif
-                                                            <span class="lang-id">Intonasi: {{ $intType === 'up' ? 'Naik' : ($intType === 'down' ? 'Turun' : 'Netral') }}</span>
-                                                            <span class="lang-en">Intonation: {{ $intType === 'up' ? 'Up' : ($intType === 'down' ? 'Down' : 'Neutral') }}</span>
-                                                            <span class="lang-zh">语调: {{ $intType === 'up' ? '升调' : ($intType === 'down' ? '降调' : '平调') }}</span>
-                                                        </button>
-                                                    @endif
-
-                                                    {{-- IndoBERT: Advice Giving Badge --}}
-                                                    @if (!empty($block['advice_giving']))
-                                                        @php
-                                                            $agLabelRaw = $block['advice_giving'];
-                                                            $agLabel = ucwords(str_replace('_', ' ', $agLabelRaw));
-                                                            $agInfo = $getIndobertIconAndColor($agLabelRaw);
-                                                            $agColor = $agInfo['color'];
-                                                            $agIcon = $agInfo['icon'];
-                                                            $agReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
-                                                        @endphp
-                                                        <button
-                                                            @click="
-                                                                const t = 'Advice Giving: {{ $agLabel }}';
-                                                                const exp = '{{ addslashes($agReason) }}';
-                                                                const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
-                                                                openInsight(t, 'advice', exp, rel);
-                                                            "
-                                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $agColor }}-50 hover:bg-{{ $agColor }}-100 text-{{ $agColor }}-700 border-{{ $agColor }}-200"
-                                                            title="Klik untuk melihat insight analisis IndoBERT">
-                                                            {!! $agIcon !!}
-                                                            <span>{{ $agLabel }}</span>
-                                                        </button>
-                                                    @endif
-                                                </span>
-
-                                                {{-- Relasi Kuasa Box --}}
-                                                @if (!empty($block['modes_of_interaction']) || !empty($block['advice_relation']) || !empty($block['relation']) || !empty($block['intonation_markers'][0]['relation']))
-                                                <span class="w-full inline-flex flex-wrap items-center gap-2 p-2.5 my-1 border border-dashed border-purple-200 bg-purple-50/30 rounded-2xl">
-                                                    <span class="w-full block text-[0.65rem] font-black uppercase tracking-wider text-purple-400 mb-0.5">
-                                                        <span class="lang-id">Relasi Kuasa:</span>
-                                                        <span class="lang-en">Power Relation:</span>
-                                                        <span class="lang-zh">权力关系:</span>
-                                                    </span>
-
-                                                    {{-- IndoBERT: Modes of Interaction Badge --}}
-                                                    @if (!empty($block['modes_of_interaction']))
-                                                        @php
-                                                            $moLabelRaw = $block['modes_of_interaction'];
-                                                            $moLabel = ucwords(str_replace('_', ' ', $moLabelRaw));
-                                                            $moInfo = $getIndobertIconAndColor($moLabelRaw);
-                                                            $moColor = $moInfo['color'];
-                                                            $moIcon = $moInfo['icon'];
-                                                            $moReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
-                                                        @endphp
-                                                        <button
-                                                            @click="
-                                                                const t = 'Modes of Interaction: {{ $moLabel }}';
-                                                                const exp = '{{ addslashes($moReason) }}';
-                                                                const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
-                                                                openInsight(t, 'advice', exp, rel);
-                                                            "
-                                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $moColor }}-50 hover:bg-{{ $moColor }}-100 text-{{ $moColor }}-700 border-{{ $moColor }}-200"
-                                                            title="Klik untuk melihat insight analisis IndoBERT">
-                                                            {!! $moIcon !!}
-                                                            <span>{{ $moLabel }}</span>
-                                                        </button>
-                                                    @endif
-
-                                                    {{-- Karakter Relasi Badge --}}
-                                                    @if (
-                                                        !empty($block['advice_relation']) ||
-                                                            !empty($block['relation']) ||
-                                                            !empty($block['intonation_markers'][0]['relation']))
-                                                        @php
-                                                            $relExplanation =
-                                                                $block['advice_relation'] ??
-                                                                ($block['relation'] ??
-                                                                    ($block['intonation_markers'][0]['relation'] ??
-                                                                        'Kalimat ini memiliki relasi logis dengan baris pembicaraan sebelumnya.'));
-                                                        @endphp
-                                                        <button
-                                                            @click="
-                                                                const t = appLang === 'zh' ? '句子特征与关联' : (appLang === 'en' ? 'Sentence Character & Relation' : 'Karakter & Relasi Kalimat');
-                                                                const exp = appLang === 'zh' ? '人工智能在此行检测到紧密的话语关联。' : (appLang === 'en' ? 'AI detected a close discourse relation on this line.' : 'AI mendeteksi hubungan antar-kalimat yang erat pada baris ini.');
-                                                                const rel = '{{ addslashes($relExplanation) }}';
-                                                                openInsight(t, 'relation', exp, rel);
-                                                            "
-                                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
-                                                            title="{{ app()->getLocale() === 'zh' ? '点击查看特征与话语关联详情' : (app()->getLocale() === 'en' ? 'Click to view character and sentence relation details' : 'Klik untuk melihat karakter & relasi kalimat') }}">
-                                                            <svg class="w-3.5 h-3.5 text-purple-500" fill="none"
-                                                                stroke="currentColor" stroke-width="2.5"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                                                            </svg>
-                                                            <span class="lang-id">Relasi</span>
-                                                            <span class="lang-en">Relation</span>
-                                                            <span class="lang-zh">关联</span>
-                                                        </button>
-                                                    @endif
-                                                </span>
-                                                @endif
-                                            </span>
                                         </p>
+
+                                        <div class="flex flex-col gap-2 mt-2 select-none">
+                                            {{-- Pola Bimbingan Box --}}
+                                            <div class="w-full flex flex-wrap items-center gap-2 p-2.5 border border-dashed border-gray-300 bg-gray-50/60 rounded-2xl">
+                                                <span class="w-full block text-[0.65rem] font-black uppercase tracking-wider text-gray-400 mb-0.5">
+                                                    <span class="lang-id">Pola Bimbingan:</span>
+                                                    <span class="lang-en">Guidance Pattern:</span>
+                                                    <span class="lang-zh">指导模式:</span>
+                                                </span>
+                                                {{-- Advice Badge --}}
+                                                @php
+                                                    $isAdviceStr = is_string($block['is_advice'] ?? null) ? $block['is_advice'] : '';
+                                                    $isAdviceTrue = (!empty($block['is_advice']) && $block['is_advice'] !== 'false' && $block['is_advice'] !== false);
+                                                @endphp
+                                                @if ($isAdviceTrue)
+                                                    <button
+                                                        @click="
+                                                            const t = appLang === 'zh' ? '提出建议 (Advice Giving)' : (appLang === 'en' ? 'Advice Giving' : 'Pemberian Saran (Advice Giving)');
+                                                            const exp = '{{ addslashes($isAdviceStr ?: (!empty($block['agent_insight']) ? $block['agent_insight'] : 'Dosen memberikan saran akademik bimbingan.')) }}';
+                                                            const rel = '{{ addslashes(!empty($block['advice_relation']) ? $block['advice_relation'] : 'Kalimat ini merupakan saran bimbingan akademik yang menanggapi progres mahasiswa di baris ini.') }}';
+                                                            openInsight(t, 'advice', exp, rel);
+                                                        "
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
+                                                        title="{{ app()->getLocale() === 'zh' ? '点击查看建议与话语关联详情' : (app()->getLocale() === 'en' ? 'Click to view advice and sentence relation details' : 'Klik untuk melihat detail advice & relasi kalimat') }}">
+                                                        <svg class="w-3.5 h-3.5 text-amber-500" fill="none"
+                                                            stroke="currentColor" stroke-width="2.5"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M12 18.5a6.5 6.5 0 100-13 6.5 6.5 0 000 13zM12 11.5v3M12 9h.01" />
+                                                        </svg>
+                                                        <span class="lang-id">Advice</span>
+                                                        <span class="lang-en">Advice</span>
+                                                        <span class="lang-zh">建议</span>
+                                                    </button>
+                                                @endif
+
+                                                {{-- Intonasi Badge --}}
+                                                @php
+                                                    $hasIntonation = !empty($block['intonation_markers']) && is_array($block['intonation_markers']) && count($block['intonation_markers']) > 0;
+                                                    $hasAdviceType = !empty($block['advice_type']);
+                                                @endphp
+                                                @if ($hasIntonation || $hasAdviceType || !empty($block['intonation_type']))
+                                                    @php
+                                                        $intType = 'neutral';
+                                                        if ($hasIntonation) {
+                                                            $intType = $block['intonation_markers'][0]['type'] ?? 'neutral';
+                                                        } else {
+                                                            $intType = $block['intonation_type'] ?? ($block['advice_type'] ?? 'neutral');
+                                                        }
+                                                        $intType = strtolower($intType);
+                                                        
+                                                        $intReason =
+                                                            'Tingkat intonasi baris ini adalah ' .
+                                                            ($intType === 'up'
+                                                                ? 'Naik / Tinggi'
+                                                                : ($intType === 'down'
+                                                                    ? 'Turun / Tegas'
+                                                                    : 'Netral'));
+                                                        if ($hasIntonation && !empty($block['intonation_markers'][0]['reason'])) {
+                                                            $intReason = $block['intonation_markers'][0]['reason'];
+                                                        }
+                                                        
+                                                        $intRelation =
+                                                            ($hasIntonation && !empty($block['intonation_markers'][0]['relation']))
+                                                            ? $block['intonation_markers'][0]['relation']
+                                                            : 'Karakter intonasi ini merefleksikan dinamika percakapan di baris ini.';
+                                                    @endphp
+                                                    <button
+                                                        @click="
+                                                            const t = appLang === 'zh' ? '句子语调' : (appLang === 'en' ? 'Sentence Intonation' : 'Intonasi Kalimat');
+                                                            const exp = '{{ addslashes($intReason) }}';
+                                                            const rel = '{{ addslashes($intRelation) }}';
+                                                            openInsight(t, '{{ $intType }}', exp, rel);
+                                                        "
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border
+                                                                    {{ $intType === 'up' ? 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200' : ($intType === 'down' ? 'bg-red-50 hover:bg-red-100 text-red-700 border-red-200' : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200') }}"
+                                                        title="{{ app()->getLocale() === 'zh' ? '点击查看行语调详情' : (app()->getLocale() === 'en' ? 'Click to view line intonation details' : 'Klik untuk melihat detail intonasi baris') }}">
+                                                        @if ($intType === 'up')
+                                                            <svg class="w-3.5 h-3.5 text-blue-500" fill="none"
+                                                                stroke="currentColor" stroke-width="2.5"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                                            </svg>
+                                                        @elseif($intType === 'down')
+                                                            <svg class="w-3.5 h-3.5 text-red-500" fill="none"
+                                                                stroke="currentColor" stroke-width="2.5"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" />
+                                                            </svg>
+                                                        @else
+                                                            <svg class="w-3.5 h-3.5 text-gray-500" fill="none"
+                                                                stroke="currentColor" stroke-width="2.5"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="M5 12h14" />
+                                                            </svg>
+                                                        @endif
+                                                        <span class="lang-id">Intonasi: {{ $intType === 'up' ? 'Naik' : ($intType === 'down' ? 'Turun' : 'Netral') }}</span>
+                                                        <span class="lang-en">Intonation: {{ $intType === 'up' ? 'Up' : ($intType === 'down' ? 'Down' : 'Neutral') }}</span>
+                                                        <span class="lang-zh">语调: {{ $intType === 'up' ? '升调' : ($intType === 'down' ? '降调' : '平调') }}</span>
+                                                    </button>
+                                                @endif
+
+                                                {{-- IndoBERT: Advice Giving Badge --}}
+                                                @if (!empty($block['advice_giving']))
+                                                    @php
+                                                        $agLabelRaw = $block['advice_giving'];
+                                                        $agLabel = ucwords(str_replace('_', ' ', $agLabelRaw));
+                                                        $agInfo = $getIndobertIconAndColor($agLabelRaw);
+                                                        $agColor = $agInfo['color'];
+                                                        $agIcon = $agInfo['icon'];
+                                                        $agReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
+                                                    @endphp
+                                                    <button
+                                                        @click="
+                                                            const t = 'Advice Giving: {{ $agLabel }}';
+                                                            const exp = '{{ addslashes($agReason) }}';
+                                                            const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
+                                                            openInsight(t, 'advice', exp, rel);
+                                                        "
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $agColor }}-50 hover:bg-{{ $agColor }}-100 text-{{ $agColor }}-700 border-{{ $agColor }}-200"
+                                                        title="Klik untuk melihat insight analisis IndoBERT">
+                                                        {!! $agIcon !!}
+                                                        <span>{{ $agLabel }}</span>
+                                                    </button>
+                                                @endif
+                                            </div>
+
+                                            {{-- Relasi Kuasa Box --}}
+                                            @if (!empty($block['modes_of_interaction']) || !empty($block['advice_relation']) || !empty($block['relation']) || !empty($block['intonation_markers'][0]['relation']))
+                                            <div class="w-full flex flex-wrap items-center gap-2 p-2.5 border border-dashed border-purple-200 bg-purple-50/30 rounded-2xl">
+                                                <span class="w-full block text-[0.65rem] font-black uppercase tracking-wider text-purple-400 mb-0.5">
+                                                    <span class="lang-id">Relasi Kuasa:</span>
+                                                    <span class="lang-en">Power Relation:</span>
+                                                    <span class="lang-zh">权力关系:</span>
+                                                </span>
+
+                                                {{-- IndoBERT: Modes of Interaction Badge --}}
+                                                @if (!empty($block['modes_of_interaction']))
+                                                    @php
+                                                        $moLabelRaw = $block['modes_of_interaction'];
+                                                        $moLabel = ucwords(str_replace('_', ' ', $moLabelRaw));
+                                                        $moInfo = $getIndobertIconAndColor($moLabelRaw);
+                                                        $moColor = $moInfo['color'];
+                                                        $moIcon = $moInfo['icon'];
+                                                        $moReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
+                                                    @endphp
+                                                    <button
+                                                        @click="
+                                                            const t = 'Modes of Interaction: {{ $moLabel }}';
+                                                            const exp = '{{ addslashes($moReason) }}';
+                                                            const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
+                                                            openInsight(t, 'advice', exp, rel);
+                                                        "
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $moColor }}-50 hover:bg-{{ $moColor }}-100 text-{{ $moColor }}-700 border-{{ $moColor }}-200"
+                                                        title="Klik untuk melihat insight analisis IndoBERT">
+                                                        {!! $moIcon !!}
+                                                        <span>{{ $moLabel }}</span>
+                                                    </button>
+                                                @endif
+
+                                                {{-- Karakter Relasi Badge --}}
+                                                @if (
+                                                    !empty($block['advice_relation']) ||
+                                                        !empty($block['relation']) ||
+                                                        !empty($block['intonation_markers'][0]['relation']))
+                                                    @php
+                                                        $relExplanation =
+                                                            $block['advice_relation'] ??
+                                                            ($block['relation'] ??
+                                                                ($block['intonation_markers'][0]['relation'] ??
+                                                                    'Kalimat ini memiliki relasi logis dengan baris pembicaraan sebelumnya.'));
+                                                    @endphp
+                                                    <button
+                                                        @click="
+                                                            const t = appLang === 'zh' ? '句子特征与关联' : (appLang === 'en' ? 'Sentence Character & Relation' : 'Karakter & Relasi Kalimat');
+                                                            const exp = appLang === 'zh' ? '人工智能在此行检测到紧密的话语关联。' : (appLang === 'en' ? 'AI detected a close discourse relation on this line.' : 'AI mendeteksi hubungan antar-kalimat yang erat pada baris ini.');
+                                                            const rel = '{{ addslashes($relExplanation) }}';
+                                                            openInsight(t, 'relation', exp, rel);
+                                                        "
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
+                                                        title="{{ app()->getLocale() === 'zh' ? '点击查看特征与话语关联详情' : (app()->getLocale() === 'en' ? 'Click to view character and sentence relation details' : 'Klik untuk melihat karakter & relasi kalimat') }}">
+                                                        <svg class="w-3.5 h-3.5 text-purple-500" fill="none"
+                                                            stroke="currentColor" stroke-width="2.5"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                        </svg>
+                                                        <span class="lang-id">Relasi</span>
+                                                        <span class="lang-en">Relation</span>
+                                                        <span class="lang-zh">关联</span>
+                                                    </button>
+                                                @endif
+                                            </div>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
 
