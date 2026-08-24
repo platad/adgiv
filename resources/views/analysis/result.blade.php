@@ -1020,6 +1020,42 @@
                         <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['saran_perbaikan'] ?? '-') }}</p>
                     </div>
                 </div>
+
+                {{-- Legend / Catatan Maksud Huruf --}}
+                <div class="bg-blue-50/50 border border-blue-100 rounded-3xl p-6 shadow-sm">
+                    <span class="block text-[0.65rem] font-black text-blue-600 uppercase tracking-widest mb-4 flex items-center">
+                        <i data-lucide="info" class="w-3.5 h-3.5 mr-1.5"></i>
+                        <span class="lang-id">Legenda Indikator</span>
+                        <span class="lang-en">Indicator Legend</span>
+                        <span class="lang-zh">指标图例</span>
+                    </span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-2.5">
+                        <div class="flex items-center gap-3">
+                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-gray-900 text-white text-[0.6rem] font-bold shadow-sm">A</span>
+                            <span class="text-xs font-semibold text-gray-700">Pola Bimbingan</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-gray-900 text-white text-[0.6rem] font-bold shadow-sm">B</span>
+                            <span class="text-xs font-semibold text-gray-700">Relasi Kuasa</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-gray-900 text-white text-[0.6rem] font-bold shadow-sm">C</span>
+                            <span class="text-xs font-semibold text-gray-700">Substansi Akademik</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-gray-900 text-white text-[0.6rem] font-bold shadow-sm">D</span>
+                            <span class="text-xs font-semibold text-gray-700">Sintesis Klasifikasi</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-gray-900 text-white text-[0.6rem] font-bold shadow-sm">E</span>
+                            <span class="text-xs font-semibold text-gray-700">Umpan Balik</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-bima-red text-white text-[0.6rem] font-bold shadow-sm">F</span>
+                            <span class="text-xs font-semibold text-gray-700">Rekomendasi</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
