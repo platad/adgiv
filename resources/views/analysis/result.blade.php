@@ -715,7 +715,7 @@
                                                         class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $agColor }}-50 hover:bg-{{ $agColor }}-100 text-{{ $agColor }}-700 border-{{ $agColor }}-200"
                                                         title="Klik untuk melihat insight analisis IndoBERT">
                                                         {!! $agIcon !!}
-                                                        <span>(A) {{ $agLabel }}</span>
+                                                        <span>{{ $agLabel }}</span>
                                                     </button>
                                                 @endif
 
@@ -739,7 +739,7 @@
                                                         class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $moColor }}-50 hover:bg-{{ $moColor }}-100 text-{{ $moColor }}-700 border-{{ $moColor }}-200"
                                                         title="Klik untuk melihat insight analisis IndoBERT">
                                                         {!! $moIcon !!}
-                                                        <span>(B) {{ $moLabel }}</span>
+                                                        <span>{{ $moLabel }}</span>
                                                     </button>
                                                 @endif
                                             </span>
