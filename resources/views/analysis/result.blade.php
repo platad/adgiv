@@ -711,10 +711,11 @@
                                                             const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
                                                             openInsight(t, 'advice', exp, rel);
                                                         "
-                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $agColor }}-50 hover:bg-{{ $agColor }}-100 text-{{ $agColor }}-700 border-{{ $agColor }}-200"
+                                                        class="relative inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $agColor }}-50 hover:bg-{{ $agColor }}-100 text-{{ $agColor }}-700 border-{{ $agColor }}-200"
                                                         title="Klik untuk melihat insight analisis IndoBERT">
+                                                        <span class="absolute -top-2.5 -left-2.5 flex items-center justify-center w-6 h-6 rounded-lg bg-gray-900 text-white text-[0.7rem] font-bold shadow-md ring-2 ring-white z-10">A</span>
                                                         {!! $agIcon !!}
-                                                        <span>(A) {{ $agLabel }}</span>
+                                                        <span>{{ $agLabel }}</span>
                                                     </button>
                                                 @endif
 
@@ -735,10 +736,11 @@
                                                             const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
                                                             openInsight(t, 'advice', exp, rel);
                                                         "
-                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $moColor }}-50 hover:bg-{{ $moColor }}-100 text-{{ $moColor }}-700 border-{{ $moColor }}-200"
+                                                        class="relative inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $moColor }}-50 hover:bg-{{ $moColor }}-100 text-{{ $moColor }}-700 border-{{ $moColor }}-200"
                                                         title="Klik untuk melihat insight analisis IndoBERT">
+                                                        <span class="absolute -top-2.5 -left-2.5 flex items-center justify-center w-6 h-6 rounded-lg bg-gray-900 text-white text-[0.7rem] font-bold shadow-md ring-2 ring-white z-10">B</span>
                                                         {!! $moIcon !!}
-                                                        <span>(B) {{ $moLabel }}</span>
+                                                        <span>{{ $moLabel }}</span>
                                                     </button>
                                                 @endif
                                             </span>
@@ -753,7 +755,8 @@
                                 @endphp
                                 @if (true)
                                     <div
-                                        class="ml-0 md:ml-40 bg-gray-50 border-l-4 border-gray-300 rounded-r-xl p-4 mt-2 {{ !$hasAgentInsight ? 'opacity-70' : '' }}">
+                                        class="relative ml-0 md:ml-40 bg-gray-50 border-l-4 border-gray-300 rounded-r-xl p-4 mt-2 {{ !$hasAgentInsight ? 'opacity-70' : '' }}">
+                                        <span class="absolute -top-3 -left-3 flex items-center justify-center w-6 h-6 rounded-lg bg-gray-900 text-white text-[0.7rem] font-bold shadow-md ring-2 ring-white z-10">C</span>
                                         <div class="flex items-start gap-3">
                                             <div class="mt-0.5 text-gray-400 w-5 h-5 shrink-0 flex items-center justify-center">
                                                 <x-application-logo class="w-full h-full" />
@@ -761,9 +764,9 @@
                                             <div>
                                                 <span
                                                     class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 block mb-1">
-                                                    <span class="lang-id">(C) Agent Insight</span>
-                                                    <span class="lang-en">(C) Agent Insight</span>
-                                                    <span class="lang-zh">(C) 智能体见解</span>
+                                                    <span class="lang-id">Agent Insight</span>
+                                                    <span class="lang-en">Agent Insight</span>
+                                                    <span class="lang-zh">智能体见解</span>
                                                 </span>
                                                 <p class="text-sm font-medium {{ $hasAgentInsight ? 'text-gray-600' : 'text-gray-400 italic' }}">
                                                     {{ $agentInsightText }}</p>
@@ -993,24 +996,26 @@
                         </div>
                     </div>
 
-                    <div class="bg-bima-red rounded-2xl p-6 text-white shadow-lg shadow-red-500/20 mb-4">
+                    <div class="relative bg-bima-red rounded-2xl p-6 text-white shadow-lg shadow-red-500/20 mb-4">
+                        <span class="absolute -top-3 -left-3 flex items-center justify-center w-7 h-7 rounded-xl bg-gray-900 text-white text-sm font-bold shadow-md ring-4 ring-white z-10">D</span>
                         <span
                             class="block text-[0.6rem] font-black text-red-200 uppercase tracking-widest mb-2 flex items-center">
                             <i data-lucide="target" class="w-3 h-3 mr-1"></i> 
-                            <span class="lang-id">(D) Arah Tujuan</span>
-                            <span class="lang-en">(D) Goal / Direction</span>
-                            <span class="lang-zh">(D) 方向目标</span>
+                            <span class="lang-id">Arah Tujuan</span>
+                            <span class="lang-en">Goal / Direction</span>
+                            <span class="lang-zh">方向目标</span>
                         </span>
                         <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['arah_tujuan'] ?? '-') }}</p>
                     </div>
 
-                    <div class="bg-green-50 border border-green-100 rounded-2xl p-6 text-green-900">
+                    <div class="relative bg-green-50 border border-green-100 rounded-2xl p-6 text-green-900">
+                        <span class="absolute -top-3 -left-3 flex items-center justify-center w-7 h-7 rounded-xl bg-gray-900 text-white text-sm font-bold shadow-md ring-4 ring-white z-10">E</span>
                         <span
                             class="block text-[0.6rem] font-black text-green-600 uppercase tracking-widest mb-2 flex items-center">
                             <i data-lucide="sparkles" class="w-3 h-3 mr-1"></i> 
-                            <span class="lang-id">(E) Saran Perbaikan</span>
-                            <span class="lang-en">(E) Improvement Recommendation</span>
-                            <span class="lang-zh">(E) 整改建议</span>
+                            <span class="lang-id">Saran Perbaikan</span>
+                            <span class="lang-en">Improvement Recommendation</span>
+                            <span class="lang-zh">整改建议</span>
                         </span>
                         <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['saran_perbaikan'] ?? '-') }}</p>
                     </div>
@@ -1049,15 +1054,16 @@
         }" class="mt-8">
             <div x-show="!submitted"
                 class="bg-gray-900 rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden group">
+                <span class="absolute top-4 left-4 flex items-center justify-center w-8 h-8 rounded-xl bg-bima-red text-white text-sm font-bold shadow-md ring-4 ring-gray-900 z-20">F</span>
                 <div class="absolute inset-0 bg-gradient-to-r from-bima-red/20 to-transparent opacity-50"></div>
-                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 mt-4 md:mt-0">
                     <div class="flex-grow text-center md:text-left">
                         <h3
                             class="text-lg font-black uppercase tracking-widest mb-2 flex items-center justify-center md:justify-start gap-2">
                             <x-application-logo class="w-5 h-5 text-bima-red" /> 
-                            <span class="lang-id">(F) Penilaian Kesesuaian Hasil</span>
-                            <span class="lang-en">(F) Result Accuracy Evaluation</span>
-                            <span class="lang-zh">(F) 结果准确性评估</span>
+                            <span class="lang-id">Penilaian Kesesuaian Hasil</span>
+                            <span class="lang-en">Result Accuracy Evaluation</span>
+                            <span class="lang-zh">结果准确性评估</span>
                         </h3>
                         <p class="text-gray-300 text-sm font-medium leading-relaxed">
                             <span class="lang-id">Sebagai pakar atau peninjau akademis, penilaian Anda sangat berharga bagi penyempurnaan akurasi kami. Menurut Anda, apakah hasil anotasi intonasi dan saran bimbingan sistem ini sudah sesuai dengan fakta percakapan riil?</span>
