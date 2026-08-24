@@ -560,15 +560,14 @@
 
                                     {{-- Text Column --}}
                                     <div class="flex-grow">
-                                        <p
-                                            class="text-lg md:text-xl font-medium text-gray-800 leading-relaxed tracking-wide font-serif">
+                                        <p class="text-lg md:text-xl font-medium text-gray-800 leading-relaxed tracking-wide font-serif mb-3">
                                             {!! $block['text_html'] ?? '' !!}
                                         </p>
 
-                                        <div class="mt-3 space-y-2 select-none">
+                                        <div class="flex flex-col gap-2 select-none">
                                             {{-- Pola Bimbingan Section --}}
                                             <div class="flex flex-wrap items-center gap-2">
-                                                <span class="text-[0.65rem] font-black uppercase tracking-wider text-gray-400 mr-1 flex items-center gap-1">
+                                                <span class="text-[0.65rem] font-black uppercase tracking-wider text-gray-400 mr-1">
                                                     <span class="lang-id">Pola Bimbingan:</span>
                                                     <span class="lang-en">Guidance Pattern:</span>
                                                     <span class="lang-zh">指导模式:</span>
@@ -731,7 +730,7 @@
                                                             ($block['intonation_markers'][0]['relation'] ??
                                                                 'Kalimat ini memiliki relasi logis dengan baris pembicaraan sebelumnya.'));
                                                 @endphp
-                                                <div class="flex flex-wrap items-center gap-2 pt-0.5">
+                                                <div class="flex flex-wrap items-center gap-2">
                                                     <button
                                                         @click="
                                                             const t = appLang === 'zh' ? '句子特征与关联' : (appLang === 'en' ? 'Sentence Character & Relation' : 'Karakter & Relasi Kalimat');
