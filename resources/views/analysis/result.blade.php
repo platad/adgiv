@@ -714,7 +714,7 @@
                                                         class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $agColor }}-50 hover:bg-{{ $agColor }}-100 text-{{ $agColor }}-700 border-{{ $agColor }}-200"
                                                         title="Klik untuk melihat insight analisis IndoBERT">
                                                         {!! $agIcon !!}
-                                                        <span>{{ $agLabel }}</span>
+                                                        <span>(A) {{ $agLabel }}</span>
                                                     </button>
                                                 @endif
 
@@ -738,7 +738,7 @@
                                                         class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $moColor }}-50 hover:bg-{{ $moColor }}-100 text-{{ $moColor }}-700 border-{{ $moColor }}-200"
                                                         title="Klik untuk melihat insight analisis IndoBERT">
                                                         {!! $moIcon !!}
-                                                        <span>{{ $moLabel }}</span>
+                                                        <span>(B) {{ $moLabel }}</span>
                                                     </button>
                                                 @endif
                                             </span>
@@ -761,9 +761,9 @@
                                             <div>
                                                 <span
                                                     class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 block mb-1">
-                                                    <span class="lang-id">Agent Insight</span>
-                                                    <span class="lang-en">Agent Insight</span>
-                                                    <span class="lang-zh">智能体见解</span>
+                                                    <span class="lang-id">(C) Agent Insight</span>
+                                                    <span class="lang-en">(C) Agent Insight</span>
+                                                    <span class="lang-zh">(C) 智能体见解</span>
                                                 </span>
                                                 <p class="text-sm font-medium {{ $hasAgentInsight ? 'text-gray-600' : 'text-gray-400 italic' }}">
                                                     {{ $agentInsightText }}</p>
@@ -997,9 +997,9 @@
                         <span
                             class="block text-[0.6rem] font-black text-red-200 uppercase tracking-widest mb-2 flex items-center">
                             <i data-lucide="target" class="w-3 h-3 mr-1"></i> 
-                            <span class="lang-id">Arah Tujuan</span>
-                            <span class="lang-en">Goal / Direction</span>
-                            <span class="lang-zh">方向目标</span>
+                            <span class="lang-id">(D) Arah Tujuan</span>
+                            <span class="lang-en">(D) Goal / Direction</span>
+                            <span class="lang-zh">(D) 方向目标</span>
                         </span>
                         <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['arah_tujuan'] ?? '-') }}</p>
                     </div>
@@ -1008,9 +1008,9 @@
                         <span
                             class="block text-[0.6rem] font-black text-green-600 uppercase tracking-widest mb-2 flex items-center">
                             <i data-lucide="sparkles" class="w-3 h-3 mr-1"></i> 
-                            <span class="lang-id">Saran Perbaikan</span>
-                            <span class="lang-en">Improvement Recommendation</span>
-                            <span class="lang-zh">整改建议</span>
+                            <span class="lang-id">(E) Saran Perbaikan</span>
+                            <span class="lang-en">(E) Improvement Recommendation</span>
+                            <span class="lang-zh">(E) 整改建议</span>
                         </span>
                         <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['saran_perbaikan'] ?? '-') }}</p>
                     </div>
@@ -1055,9 +1055,9 @@
                         <h3
                             class="text-lg font-black uppercase tracking-widest mb-2 flex items-center justify-center md:justify-start gap-2">
                             <x-application-logo class="w-5 h-5 text-bima-red" /> 
-                            <span class="lang-id">Penilaian Kesesuaian Hasil</span>
-                            <span class="lang-en">Result Accuracy Evaluation</span>
-                            <span class="lang-zh">结果准确性评估</span>
+                            <span class="lang-id">(F) Penilaian Kesesuaian Hasil</span>
+                            <span class="lang-en">(F) Result Accuracy Evaluation</span>
+                            <span class="lang-zh">(F) 结果准确性评估</span>
                         </h3>
                         <p class="text-gray-300 text-sm font-medium leading-relaxed">
                             <span class="lang-id">Sebagai pakar atau peninjau akademis, penilaian Anda sangat berharga bagi penyempurnaan akurasi kami. Menurut Anda, apakah hasil anotasi intonasi dan saran bimbingan sistem ini sudah sesuai dengan fakta percakapan riil?</span>
