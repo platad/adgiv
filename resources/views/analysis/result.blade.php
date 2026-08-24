@@ -1050,14 +1050,10 @@
                         </div>
                         <div class="flex items-center gap-3">
                             <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-gray-900 text-white text-[0.6rem] font-bold shadow-sm">D</span>
-                            <span class="text-xs font-semibold text-gray-700">Sintesis Klasifikasi</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-gray-900 text-white text-[0.6rem] font-bold shadow-sm">E</span>
                             <span class="text-xs font-semibold text-gray-700">Umpan Balik</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-bima-red text-white text-[0.6rem] font-bold shadow-sm">F</span>
+                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-gray-900 text-white text-[0.6rem] font-bold shadow-sm">E</span>
                             <span class="text-xs font-semibold text-gray-700">Rekomendasi</span>
                         </div>
                     </div>
@@ -1096,7 +1092,6 @@
         }" class="mt-8">
             <div x-show="!submitted"
                 class="bg-gray-900 rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden group">
-                <span class="absolute top-4 left-4 flex items-center justify-center w-8 h-8 rounded-xl bg-bima-red text-white text-sm font-bold shadow-md ring-4 ring-gray-900 z-20">F</span>
                 <div class="absolute inset-0 bg-gradient-to-r from-bima-red/20 to-transparent opacity-50"></div>
                 <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 mt-4 md:mt-0">
                     <div class="flex-grow text-center md:text-left">
