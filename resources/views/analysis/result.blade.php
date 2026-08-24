@@ -762,9 +762,9 @@
                                             <div>
                                                 <span
                                                     class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 block mb-1">
-                                                    <span class="lang-id">(C) Agent Insight</span>
-                                                    <span class="lang-en">(C) Agent Insight</span>
-                                                    <span class="lang-zh">(C) 智能体见解</span>
+                                                    <span class="lang-id">Substansi Akademik</span>
+                                                    <span class="lang-en">Academic Substance</span>
+                                                    <span class="lang-zh">学术内容</span>
                                                 </span>
                                                 <p class="text-sm font-medium {{ $hasAgentInsight ? 'text-gray-600' : 'text-gray-400 italic' }}">
                                                     {{ $agentInsightText }}</p>
@@ -998,9 +998,9 @@
                         <span
                             class="block text-[0.6rem] font-black text-red-200 uppercase tracking-widest mb-2 flex items-center">
                             <i data-lucide="target" class="w-3 h-3 mr-1"></i> 
-                            <span class="lang-id">(D) Arah Tujuan</span>
-                            <span class="lang-en">(D) Goal / Direction</span>
-                            <span class="lang-zh">(D) 方向目标</span>
+                            <span class="lang-id">Arah Tujuan</span>
+                            <span class="lang-en">Goal / Direction</span>
+                            <span class="lang-zh">方向目标</span>
                         </span>
                         <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['arah_tujuan'] ?? '-') }}</p>
                     </div>
@@ -1009,9 +1009,9 @@
                         <span
                             class="block text-[0.6rem] font-black text-green-600 uppercase tracking-widest mb-2 flex items-center">
                             <i data-lucide="sparkles" class="w-3 h-3 mr-1"></i> 
-                            <span class="lang-id">(E) Saran Perbaikan</span>
-                            <span class="lang-en">(E) Improvement Recommendation</span>
-                            <span class="lang-zh">(E) 整改建议</span>
+                            <span class="lang-id">Saran Perbaikan</span>
+                            <span class="lang-en">Improvement Recommendation</span>
+                            <span class="lang-zh">整改建议</span>
                         </span>
                         <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['saran_perbaikan'] ?? '-') }}</p>
                     </div>
