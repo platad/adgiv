@@ -680,8 +680,9 @@
                                                             const rel = '{{ addslashes($relExplanation) }}';
                                                             openInsight(t, 'relation', exp, rel);
                                                         "
-                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
+                                                        class="relative inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
                                                         title="{{ app()->getLocale() === 'zh' ? '点击查看特征与话语关联详情' : (app()->getLocale() === 'en' ? 'Click to view character and sentence relation details' : 'Klik untuk melihat karakter & relasi kalimat') }}">
+                                                        <span class="absolute -top-2.5 -left-2.5 flex items-center justify-center w-6 h-6 rounded-lg bg-gray-900 text-white text-[0.7rem] font-bold shadow-md ring-2 ring-white z-10">B</span>
                                                         <svg class="w-3.5 h-3.5 text-purple-500" fill="none"
                                                             stroke="currentColor" stroke-width="2.5"
                                                             viewBox="0 0 24 24">
@@ -694,54 +695,59 @@
                                                     </button>
                                                 @endif
 
-                                                {{-- IndoBERT: Advice Giving Badge --}}
-                                                @if (!empty($block['advice_giving']))
-                                                    @php
-                                                        $agLabelRaw = $block['advice_giving'];
-                                                        $agLabel = ucwords(str_replace('_', ' ', $agLabelRaw));
-                                                        $agInfo = $getIndobertIconAndColor($agLabelRaw);
-                                                        $agColor = $agInfo['color'];
-                                                        $agIcon = $agInfo['icon'];
-                                                        $agReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
-                                                    @endphp
-                                                    <button
-                                                        @click="
-                                                            const t = 'Advice Giving: {{ $agLabel }}';
-                                                            const exp = '{{ addslashes($agReason) }}';
-                                                            const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
-                                                            openInsight(t, 'advice', exp, rel);
-                                                        "
-                                                        class="relative inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $agColor }}-50 hover:bg-{{ $agColor }}-100 text-{{ $agColor }}-700 border-{{ $agColor }}-200"
-                                                        title="Klik untuk melihat insight analisis IndoBERT">
-                                                        <span class="absolute -top-2.5 -left-2.5 flex items-center justify-center w-6 h-6 rounded-lg bg-gray-900 text-white text-[0.7rem] font-bold shadow-md ring-2 ring-white z-10">A</span>
-                                                        {!! $agIcon !!}
-                                                        <span>{{ $agLabel }}</span>
-                                                    </button>
-                                                @endif
+                                                {{-- IndoBERT Grouping Wrapper (A) --}}
+                                                @if (!empty($block['advice_giving']) || !empty($block['modes_of_interaction']))
+                                                <div class="relative inline-flex flex-wrap items-center gap-2 p-1.5 ml-1 border-2 border-dashed border-gray-300 rounded-2xl bg-white/50">
+                                                    <span class="absolute -top-3 -left-3 flex items-center justify-center w-6 h-6 rounded-lg bg-gray-900 text-white text-[0.7rem] font-bold shadow-md ring-2 ring-white z-10">A</span>
+                                                    
+                                                    {{-- IndoBERT: Advice Giving Badge --}}
+                                                    @if (!empty($block['advice_giving']))
+                                                        @php
+                                                            $agLabelRaw = $block['advice_giving'];
+                                                            $agLabel = ucwords(str_replace('_', ' ', $agLabelRaw));
+                                                            $agInfo = $getIndobertIconAndColor($agLabelRaw);
+                                                            $agColor = $agInfo['color'];
+                                                            $agIcon = $agInfo['icon'];
+                                                            $agReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
+                                                        @endphp
+                                                        <button
+                                                            @click="
+                                                                const t = 'Advice Giving: {{ $agLabel }}';
+                                                                const exp = '{{ addslashes($agReason) }}';
+                                                                const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
+                                                                openInsight(t, 'advice', exp, rel);
+                                                            "
+                                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $agColor }}-50 hover:bg-{{ $agColor }}-100 text-{{ $agColor }}-700 border-{{ $agColor }}-200"
+                                                            title="Klik untuk melihat insight analisis IndoBERT">
+                                                            {!! $agIcon !!}
+                                                            <span>{{ $agLabel }}</span>
+                                                        </button>
+                                                    @endif
 
-                                                {{-- IndoBERT: Modes of Interaction Badge --}}
-                                                @if (!empty($block['modes_of_interaction']))
-                                                    @php
-                                                        $moLabelRaw = $block['modes_of_interaction'];
-                                                        $moLabel = ucwords(str_replace('_', ' ', $moLabelRaw));
-                                                        $moInfo = $getIndobertIconAndColor($moLabelRaw);
-                                                        $moColor = $moInfo['color'];
-                                                        $moIcon = $moInfo['icon'];
-                                                        $moReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
-                                                    @endphp
-                                                    <button
-                                                        @click="
-                                                            const t = 'Modes of Interaction: {{ $moLabel }}';
-                                                            const exp = '{{ addslashes($moReason) }}';
-                                                            const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
-                                                            openInsight(t, 'advice', exp, rel);
-                                                        "
-                                                        class="relative inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $moColor }}-50 hover:bg-{{ $moColor }}-100 text-{{ $moColor }}-700 border-{{ $moColor }}-200"
-                                                        title="Klik untuk melihat insight analisis IndoBERT">
-                                                        <span class="absolute -top-2.5 -left-2.5 flex items-center justify-center w-6 h-6 rounded-lg bg-gray-900 text-white text-[0.7rem] font-bold shadow-md ring-2 ring-white z-10">B</span>
-                                                        {!! $moIcon !!}
-                                                        <span>{{ $moLabel }}</span>
-                                                    </button>
+                                                    {{-- IndoBERT: Modes of Interaction Badge --}}
+                                                    @if (!empty($block['modes_of_interaction']))
+                                                        @php
+                                                            $moLabelRaw = $block['modes_of_interaction'];
+                                                            $moLabel = ucwords(str_replace('_', ' ', $moLabelRaw));
+                                                            $moInfo = $getIndobertIconAndColor($moLabelRaw);
+                                                            $moColor = $moInfo['color'];
+                                                            $moIcon = $moInfo['icon'];
+                                                            $moReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
+                                                        @endphp
+                                                        <button
+                                                            @click="
+                                                                const t = 'Modes of Interaction: {{ $moLabel }}';
+                                                                const exp = '{{ addslashes($moReason) }}';
+                                                                const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
+                                                                openInsight(t, 'advice', exp, rel);
+                                                            "
+                                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $moColor }}-50 hover:bg-{{ $moColor }}-100 text-{{ $moColor }}-700 border-{{ $moColor }}-200"
+                                                            title="Klik untuk melihat insight analisis IndoBERT">
+                                                            {!! $moIcon !!}
+                                                            <span>{{ $moLabel }}</span>
+                                                        </button>
+                                                    @endif
+                                                </div>
                                                 @endif
                                             </span>
                                         </p>
