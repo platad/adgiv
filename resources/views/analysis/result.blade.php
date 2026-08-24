@@ -998,9 +998,9 @@
                         <span
                             class="block text-[0.6rem] font-black text-red-200 uppercase tracking-widest mb-2 flex items-center">
                             <i data-lucide="target" class="w-3 h-3 mr-1"></i> 
-                            <span class="lang-id">Arah Tujuan</span>
-                            <span class="lang-en">Goal / Direction</span>
-                            <span class="lang-zh">方向目标</span>
+                            <span class="lang-id">Umpan Balik</span>
+                            <span class="lang-en">Feedback</span>
+                            <span class="lang-zh">反馈</span>
                         </span>
                         <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['arah_tujuan'] ?? '-') }}</p>
                     </div>
