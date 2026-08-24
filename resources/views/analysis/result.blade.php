@@ -551,20 +551,13 @@
                                         </div>
                                         @if (!empty($block['timestamp']))
                                             <div
-                                                class="text-[0.65rem] font-medium text-gray-400 mt-1 flex items-center">
-                                                <i data-lucide="clock" class="w-3 h-3 mr-1"></i>
-                                                {{ $block['timestamp'] }}
-                                            </div>
-                                        @endif
-                                    </div>
-
-                                    {{-- Text Column --}}
-                                    <div class="flex-grow">
-                                        <p
-                                            class="text-lg md:text-xl font-medium text-gray-800 leading-relaxed tracking-wide font-serif">
-                                            {!! $block['text_html'] ?? '' !!}
-
-                                            <span class="inline-flex flex-wrap gap-2 ml-2 align-middle select-none">
+                                                                                       </p>
+                                        
+                                        <div class="mt-3 space-y-2 select-none">
+                                            {{-- Pola Bimbingan Group --}}
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <span class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-widest">Pola Bimbingan:</span>
+                                                
                                                 {{-- Advice Badge --}}
                                                 @php
                                                     $isAdviceStr = is_string($block['is_advice'] ?? null) ? $block['is_advice'] : '';
@@ -661,11 +654,62 @@
                                                     </button>
                                                 @endif
 
-                                                {{-- Karakter Relasi Badge --}}
-                                                @if (
-                                                    !empty($block['advice_relation']) ||
-                                                        !empty($block['relation']) ||
-                                                        !empty($block['intonation_markers'][0]['relation']))
+                                                {{-- IndoBERT: Advice Giving Badge --}}
+                                                @if (!empty($block['advice_giving']))
+                                                    @php
+                                                        $agLabelRaw = $block['advice_giving'];
+                                                        $agLabel = ucwords(str_replace('_', ' ', $agLabelRaw));
+                                                        $agInfo = $getIndobertIconAndColor($agLabelRaw);
+                                                        $agColor = $agInfo['color'];
+                                                        $agIcon = $agInfo['icon'];
+                                                        $agReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
+                                                    @endphp
+                                                    <button
+                                                        @click="
+                                                            const t = 'Advice Giving: {{ $agLabel }}';
+                                                            const exp = '{{ addslashes($agReason) }}';
+                                                            const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
+                                                            openInsight(t, 'advice', exp, rel);
+                                                        "
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $agColor }}-50 hover:bg-{{ $agColor }}-100 text-{{ $agColor }}-700 border-{{ $agColor }}-200"
+                                                        title="Klik untuk melihat insight analisis IndoBERT">
+                                                        {!! $agIcon !!}
+                                                        <span>{{ $agLabel }}</span>
+                                                    </button>
+                                                @endif
+
+                                                {{-- IndoBERT: Modes of Interaction Badge --}}
+                                                @if (!empty($block['modes_of_interaction']))
+                                                    @php
+                                                        $moLabelRaw = $block['modes_of_interaction'];
+                                                        $moLabel = ucwords(str_replace('_', ' ', $moLabelRaw));
+                                                        $moInfo = $getIndobertIconAndColor($moLabelRaw);
+                                                        $moColor = $moInfo['color'];
+                                                        $moIcon = $moInfo['icon'];
+                                                        $moReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
+                                                    @endphp
+                                                    <button
+                                                        @click="
+                                                            const t = 'Modes of Interaction: {{ $moLabel }}';
+                                                            const exp = '{{ addslashes($moReason) }}';
+                                                            const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
+                                                            openInsight(t, 'advice', exp, rel);
+                                                        "
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $moColor }}-50 hover:bg-{{ $moColor }}-100 text-{{ $moColor }}-700 border-{{ $moColor }}-200"
+                                                        title="Klik untuk melihat insight analisis IndoBERT">
+                                                        {!! $moIcon !!}
+                                                        <span>{{ $moLabel }}</span>
+                                                    </button>
+                                                @endif
+                                            </div>
+                                            
+                                            {{-- Karakter Relasi Kuasa Group --}}
+                                            @if (
+                                                !empty($block['advice_relation']) ||
+                                                    !empty($block['relation']) ||
+                                                    !empty($block['intonation_markers'][0]['relation']))
+                                                <div class="flex flex-wrap items-center gap-2 mt-1">
+                                                    <span class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-widest">Relasi Kuasa:</span>
                                                     @php
                                                         $relExplanation =
                                                             $block['advice_relation'] ??
@@ -680,78 +724,31 @@
                                                             const rel = '{{ addslashes($relExplanation) }}';
                                                             openInsight(t, 'relation', exp, rel);
                                                         "
-                                                        class="relative inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
                                                         title="{{ app()->getLocale() === 'zh' ? '点击查看特征与话语关联详情' : (app()->getLocale() === 'en' ? 'Click to view character and sentence relation details' : 'Klik untuk melihat karakter & relasi kalimat') }}">
-                                                        <span class="absolute -top-2.5 -left-2.5 flex items-center justify-center w-6 h-6 rounded-lg bg-gray-900 text-white text-[0.7rem] font-bold shadow-md ring-2 ring-white z-10">B</span>
                                                         <svg class="w-3.5 h-3.5 text-purple-500" fill="none"
                                                             stroke="currentColor" stroke-width="2.5"
                                                             viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                                         </svg>
-                                                        <span class="lang-id">Relasi</span>
-                                                        <span class="lang-en">Relation</span>
-                                                        <span class="lang-zh">关联</span>
+                                                        <span class="lang-id">Relasi Kuasa</span>
+                                                        <span class="lang-en">Power Relation</span>
+                                                        <span class="lang-zh">权力关系</span>
+                                                    </button>
+                                                </div>
+                                            @endif
+                                        </div>4 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                        </svg>
+                                                        <span class="lang-id">Relasi Kuasa</span>
+                                                        <span class="lang-en">Power Relation</span>
+                                                        <span class="lang-zh">权力关系</span>
                                                     </button>
                                                 @endif
-
-                                                {{-- IndoBERT Grouping Wrapper (A) --}}
-                                                @if (!empty($block['advice_giving']) || !empty($block['modes_of_interaction']))
-                                                <div class="relative inline-flex flex-wrap items-center gap-2 p-1.5 ml-1 border-2 border-dashed border-gray-300 rounded-2xl bg-white/50">
-                                                    <span class="absolute -top-3 -left-3 flex items-center justify-center w-6 h-6 rounded-lg bg-gray-900 text-white text-[0.7rem] font-bold shadow-md ring-2 ring-white z-10">A</span>
-                                                    
-                                                    {{-- IndoBERT: Advice Giving Badge --}}
-                                                    @if (!empty($block['advice_giving']))
-                                                        @php
-                                                            $agLabelRaw = $block['advice_giving'];
-                                                            $agLabel = ucwords(str_replace('_', ' ', $agLabelRaw));
-                                                            $agInfo = $getIndobertIconAndColor($agLabelRaw);
-                                                            $agColor = $agInfo['color'];
-                                                            $agIcon = $agInfo['icon'];
-                                                            $agReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
-                                                        @endphp
-                                                        <button
-                                                            @click="
-                                                                const t = 'Advice Giving: {{ $agLabel }}';
-                                                                const exp = '{{ addslashes($agReason) }}';
-                                                                const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
-                                                                openInsight(t, 'advice', exp, rel);
-                                                            "
-                                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $agColor }}-50 hover:bg-{{ $agColor }}-100 text-{{ $agColor }}-700 border-{{ $agColor }}-200"
-                                                            title="Klik untuk melihat insight analisis IndoBERT">
-                                                            {!! $agIcon !!}
-                                                            <span>{{ $agLabel }}</span>
-                                                        </button>
-                                                    @endif
-
-                                                    {{-- IndoBERT: Modes of Interaction Badge --}}
-                                                    @if (!empty($block['modes_of_interaction']))
-                                                        @php
-                                                            $moLabelRaw = $block['modes_of_interaction'];
-                                                            $moLabel = ucwords(str_replace('_', ' ', $moLabelRaw));
-                                                            $moInfo = $getIndobertIconAndColor($moLabelRaw);
-                                                            $moColor = $moInfo['color'];
-                                                            $moIcon = $moInfo['icon'];
-                                                            $moReason = !empty($block['indobert_reasoning']) ? $block['indobert_reasoning'] : 'Tidak ada penjelasan khusus dari AI mengenai prediksi ini.';
-                                                        @endphp
-                                                        <button
-                                                            @click="
-                                                                const t = 'Modes of Interaction: {{ $moLabel }}';
-                                                                const exp = '{{ addslashes($moReason) }}';
-                                                                const rel = 'Prediksi berdasarkan pemodelan IndoBERT-Arc.';
-                                                                openInsight(t, 'advice', exp, rel);
-                                                            "
-                                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border bg-{{ $moColor }}-50 hover:bg-{{ $moColor }}-100 text-{{ $moColor }}-700 border-{{ $moColor }}-200"
-                                                            title="Klik untuk melihat insight analisis IndoBERT">
-                                                            {!! $moIcon !!}
-                                                            <span>{{ $moLabel }}</span>
-                                                        </button>
-                                                    @endif
-                                                </div>
-                                                @endif
-                                            </span>
-                                        </p>
-                                    </div>
+                                            </div>
+                                        </div>
                                 </div>
 
                                 {{-- Agent Insight Banner --}}
@@ -761,8 +758,7 @@
                                 @endphp
                                 @if (true)
                                     <div
-                                        class="relative ml-0 md:ml-40 bg-gray-50 border-l-4 border-gray-300 rounded-r-xl p-4 mt-2 {{ !$hasAgentInsight ? 'opacity-70' : '' }}">
-                                        <span class="absolute -top-3 -left-3 flex items-center justify-center w-6 h-6 rounded-lg bg-gray-900 text-white text-[0.7rem] font-bold shadow-md ring-2 ring-white z-10">C</span>
+                                        class="ml-0 md:ml-40 bg-gray-50 border-l-4 border-gray-300 rounded-r-xl p-4 mt-2 {{ !$hasAgentInsight ? 'opacity-70' : '' }}">
                                         <div class="flex items-start gap-3">
                                             <div class="mt-0.5 text-gray-400 w-5 h-5 shrink-0 flex items-center justify-center">
                                                 <x-application-logo class="w-full h-full" />
@@ -1002,8 +998,7 @@
                         </div>
                     </div>
 
-                    <div class="relative bg-bima-red rounded-2xl p-6 text-white shadow-lg shadow-red-500/20 mb-4">
-                        <span class="absolute -top-3 -left-3 flex items-center justify-center w-7 h-7 rounded-xl bg-gray-900 text-white text-sm font-bold shadow-md ring-4 ring-white z-10">D</span>
+                    <div class="bg-bima-red rounded-2xl p-6 text-white shadow-lg shadow-red-500/20 mb-4">
                         <span
                             class="block text-[0.6rem] font-black text-red-200 uppercase tracking-widest mb-2 flex items-center">
                             <i data-lucide="target" class="w-3 h-3 mr-1"></i> 
@@ -1014,8 +1009,7 @@
                         <p class="font-medium text-sm leading-relaxed">{{ ucfirst($summary['arah_tujuan'] ?? '-') }}</p>
                     </div>
 
-                    <div class="relative bg-green-50 border border-green-100 rounded-2xl p-6 text-green-900">
-                        <span class="absolute -top-3 -left-3 flex items-center justify-center w-7 h-7 rounded-xl bg-gray-900 text-white text-sm font-bold shadow-md ring-4 ring-white z-10">E</span>
+                    <div class="bg-green-50 border border-green-100 rounded-2xl p-6 text-green-900">
                         <span
                             class="block text-[0.6rem] font-black text-green-600 uppercase tracking-widest mb-2 flex items-center">
                             <i data-lucide="sparkles" class="w-3 h-3 mr-1"></i> 
@@ -1027,37 +1021,6 @@
                     </div>
                 </div>
 
-                {{-- Legend / Catatan Maksud Huruf --}}
-                <div class="bg-blue-50/50 border border-blue-100 rounded-3xl p-6 shadow-sm">
-                    <span class="block text-[0.65rem] font-black text-blue-600 uppercase tracking-widest mb-4 flex items-center">
-                        <i data-lucide="info" class="w-3.5 h-3.5 mr-1.5"></i>
-                        <span class="lang-id">Legenda Indikator</span>
-                        <span class="lang-en">Indicator Legend</span>
-                        <span class="lang-zh">指标图例</span>
-                    </span>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-2.5">
-                        <div class="flex items-center gap-3">
-                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-gray-900 text-white text-[0.6rem] font-bold shadow-sm">A</span>
-                            <span class="text-xs font-semibold text-gray-700">Pola Bimbingan</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-gray-900 text-white text-[0.6rem] font-bold shadow-sm">B</span>
-                            <span class="text-xs font-semibold text-gray-700">Relasi Kuasa</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-gray-900 text-white text-[0.6rem] font-bold shadow-sm">C</span>
-                            <span class="text-xs font-semibold text-gray-700">Substansi Akademik</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-gray-900 text-white text-[0.6rem] font-bold shadow-sm">D</span>
-                            <span class="text-xs font-semibold text-gray-700">Umpan Balik</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-gray-900 text-white text-[0.6rem] font-bold shadow-sm">E</span>
-                            <span class="text-xs font-semibold text-gray-700">Rekomendasi</span>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
