@@ -4,7 +4,7 @@
         <div class="bg-gradient-to-r from-purple-900 to-indigo-900 text-white rounded-[2.5rem] p-8 shadow-xl mb-8 flex justify-between items-center relative overflow-hidden">
             <div class="relative z-10">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[0.6rem] font-black uppercase tracking-widest mb-3">
-                    Eksperimen Versi 2 (RoBERTa)
+                    Hasil Analisis Versi 2
                 </span>
                 <h1 class="text-2xl font-black uppercase tracking-tight">{{ $analysis->title }}</h1>
             </div>
@@ -16,7 +16,7 @@
                 <i data-lucide="network" class="w-5 h-5 text-purple-600"></i> Peta Interaksi Wacana (Node & Edge)
             </h2>
             <p class="text-sm text-gray-500 font-medium mb-6">
-                Visualisasi ini di-generate secara real-time oleh RoBERTa Multi-Task. Node mewakili peran pembicara (Dosen/Mahasiswa), Edge mewakili tindak tutur dominan dan relasi kuasa.
+                Visualisasi ini dihasilkan secara real-time oleh Sistem AI Pintar. Titik (Node) mewakili peran pembicara, Garis (Edge) mewakili tindak tutur dominan dan relasi antar pembicara.
             </p>
             
             <div id="graph-container" class="w-full bg-gray-50/50 rounded-2xl border border-gray-100" style="height: 500px;"></div>

@@ -12,7 +12,7 @@
                 Memproses Audio V2
             </h1>
             <p class="text-gray-500 font-medium" id="status-text">
-                Menghubungkan ke VPS via WebSocket...
+                Menghubungkan ke Sistem Cloud AI...
             </p>
         </div>
 
@@ -43,8 +43,7 @@
                 ws = new WebSocket(wsUrl);
 
                 ws.onopen = function() {
-                    document.getElementById('status-text').innerText = "Terhubung ke RoBERTa Engine. Memulai pipeline...";
-                    // Simulate ping to VPS telling it to start if we didn't start it via webhook
+                    document.getElementById('status-text').innerText = "Terhubung ke Mesin Analisis AI. Memulai proses...";
                     ws.send(JSON.stringify({action: "start_processing"}));
                 };
 
@@ -78,7 +77,7 @@
                         document.getElementById('status-text').innerText = `Koneksi terputus. Menghubungkan ulang... (${retryCount}/5)`;
                         setTimeout(connectWS, 2000);
                     } else {
-                        document.getElementById('status-text').innerText = "Gagal terhubung ke VPS secara real-time. Proses mungkin berjalan di latar belakang.";
+                        document.getElementById('status-text').innerText = "Gagal terhubung ke Cloud AI secara real-time. Proses mungkin berjalan di latar belakang.";
                     }
                 };
             }
