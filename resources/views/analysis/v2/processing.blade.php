@@ -32,9 +32,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const slug = "{{ $analysis->slug }}";
-            // Ganti ke URL VPS jika sudah online
-            // const wsUrl = "wss://vps.temaniskripsi.id/api/v2/ws/" + slug;
-            const wsUrl = "ws://localhost:8001/api/v2/ws/" + slug; 
+            const wsUrl = "wss://vps.temaniskripsi.id/api/v2/ws/" + slug;
             
             let ws;
             let retryCount = 0;
