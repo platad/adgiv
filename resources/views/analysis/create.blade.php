@@ -125,8 +125,20 @@
                     </p>
                 </div>
 
+                {{-- Consent Checkbox --}}
+                <div class="flex items-start pt-2">
+                    <div class="flex items-center h-5 mt-0.5">
+                        <input id="consent" name="consent" type="checkbox" required class="w-5 h-5 rounded border-gray-300 text-gray-900 focus:ring-gray-900 cursor-pointer transition-all">
+                    </div>
+                    <label for="consent" class="ml-3 text-xs font-bold text-gray-600 cursor-pointer select-none">
+                        <span class="lang-id">Saya menyetujui bahwa data yang dimasukkan adalah murni untuk keperluan penelitian.</span>
+                        <span class="lang-en">I agree that the data entered is strictly for research purposes.</span>
+                        <span class="lang-zh">我同意所输入的数据完全用于研究目的。</span>
+                    </label>
+                </div>
+
                 {{-- Submit Button --}}
-                <div class="pt-4">
+                <div class="pt-2">
                     <button type="submit" id="submit-btn"
                             class="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white p-5 rounded-2xl shadow-lg transition-all hover:scale-[1.02] group disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100">
                         <span class="font-bold uppercase tracking-wider text-sm" id="submit-label">
@@ -142,6 +154,15 @@
                     </button>
                 </div>
             </form>
+        </div>
+
+        {{-- Disclaimer --}}
+        <div class="mt-6 text-center">
+            <p class="text-xs text-gray-400 font-medium">
+                <span class="lang-id">Temaniskripsi adalah platform berbasis kecerdasan buatan dan kombinasi algoritma lainnya dan dapat membuat kesalahan.</span>
+                <span class="lang-en">Temaniskripsi is a platform based on artificial intelligence and a combination of other algorithms and can make mistakes.</span>
+                <span class="lang-zh">Temaniskripsi 是一个基于人工智能和其他算法组合的平台，可能会犯错。</span>
+            </p>
         </div>
     </div>
 
