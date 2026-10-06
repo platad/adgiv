@@ -316,8 +316,8 @@ class DashboardController extends Controller
                 'title' => $item->title,
                 'status' => $item->status,
                 'created_at_formatted' => $item->created_at->format('d M Y, H:i'),
-                'result_route' => route('analysis.result', ['analysis' => $item->slug, 'locale' => app()->getLocale()]),
-                'processing_route' => route('analysis.processing', ['analysis' => $item->slug, 'locale' => app()->getLocale()]),
+                'result_route' => $item->version == 2 ? route('analysis.v2.result', ['analysis' => $item->slug, 'locale' => app()->getLocale()]) : route('analysis.result', ['analysis' => $item->slug, 'locale' => app()->getLocale()]),
+                'processing_route' => $item->version == 2 ? route('analysis.v2.processing', ['analysis' => $item->slug, 'locale' => app()->getLocale()]) : route('analysis.processing', ['analysis' => $item->slug, 'locale' => app()->getLocale()]),
             ];
         });
 
