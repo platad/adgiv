@@ -76,9 +76,9 @@
         window.BIMA = {
             csrfToken: '{{ csrf_token() }}',
             sessionId: '{{ $activeSessionId ?? '' }}',
-            reverbKey: '{{ config('broadcasting.connections.reverb.key') ?: '' }}',
-            reverbHost: '{{ config('broadcasting.connections.reverb.options.host') ?: 'localhost' }}',
-            reverbPort: {{ (int) (config('broadcasting.connections.reverb.options.port') ?: 8080) }},
+            reverbKey:    '{{ config('broadcasting.connections.reverb.key') ?: '' }}',
+            reverbHost:   '{{ config('broadcasting.connections.reverb.options.host') ?: 'localhost' }}',
+            reverbPort:   {{ (int) (config('broadcasting.connections.reverb.options.port') ?: 8080) }},
             reverbScheme: '{{ config('broadcasting.connections.reverb.options.scheme', 'http') }}',
         };
     </script>
