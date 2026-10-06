@@ -41,7 +41,7 @@
                 </div>
                 
                 <div class="shrink-0 w-full lg:w-auto flex flex-col sm:flex-row gap-3">
-                    <a href="/analysis/v2/create" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-5 rounded-2xl shadow-lg shadow-purple-500/20 transition-all hover:scale-105 hover:shadow-xl hover:shadow-purple-500/30 group cursor-pointer border border-purple-400/30">
+                    <a href="{{ route('analysis.v2.create') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-5 rounded-2xl shadow-lg shadow-purple-500/20 transition-all hover:scale-105 hover:shadow-xl hover:shadow-purple-500/30 group cursor-pointer border border-purple-400/30">
                         <i data-lucide="flask-conical" class="w-5.5 h-5.5 group-hover:rotate-12 transition-transform"></i>
                         <span class="font-bold text-base uppercase tracking-wider">
                             Uji Coba V2

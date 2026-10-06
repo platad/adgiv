@@ -54,6 +54,15 @@ Route::get('/', function (Request $request) {
             Route::get('/create', [AnalysisController::class, 'create'])->name('create');
             Route::post('/initialize', [AnalysisController::class, 'initialize'])->name('initialize');
 
+            // V2 Routes
+            Route::prefix('v2')->name('v2.')->group(function () {
+                Route::get('/create', [\App\Http\Controllers\AnalysisV2Controller::class, 'create'])->name('create');
+                Route::post('/initialize', [\App\Http\Controllers\AnalysisV2Controller::class, 'initialize'])->name('initialize');
+                Route::get('/{analysis}/processing', [\App\Http\Controllers\AnalysisV2Controller::class, 'processing'])->name('processing');
+                Route::post('/{analysis}/webhook', [\App\Http\Controllers\AnalysisV2Controller::class, 'webhookResult'])->name('webhook')->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+                Route::get('/{analysis}/result', [\App\Http\Controllers\AnalysisV2Controller::class, 'result'])->name('result');
+            });
+
             Route::get('/{analysis}/processing', [AnalysisController::class, 'processing'])->name('processing');
             Route::post('/{analysis}/process-chunk', [AnalysisController::class, 'processChunk'])->name('processChunk');
             Route::post('/{analysis}/finalize-analysis', [AnalysisController::class, 'finalizeAnalysis'])->name('finalizeAnalysis');

@@ -63,7 +63,7 @@
                         if (data.status === 'completed') {
                             document.getElementById('status-text').innerText = "Selesai! Menyimpan data...";
                             setTimeout(() => {
-                                window.location.href = "/analysis/v2/" + slug + "/result";
+                                window.location.href = "/{{ app()->getLocale() }}/analysis/v2/" + slug + "/result";
                             }, 1000);
                         }
                     } catch (e) {
