@@ -368,8 +368,10 @@
                             <span class="lang-zh">逐行语调动态</span>
                         </h3>
                     </div>
-                    <div class="relative w-full h-64">
-                        <canvas id="dynamicsChart"></canvas>
+                    <div class="w-full overflow-x-auto pb-4 custom-scrollbar">
+                        <div class="relative min-w-[600px] w-full h-64">
+                            <canvas id="dynamicsChart"></canvas>
+                        </div>
                     </div>
                 </div>
 
