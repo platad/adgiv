@@ -1,6 +1,17 @@
 <x-layouts.app title="Dashboard">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
         
+        {{-- Banner Info V2 --}}
+        <div class="bg-amber-50 border border-amber-200 text-amber-800 px-6 py-4 rounded-2xl mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+            <div class="flex items-center gap-3">
+                <i data-lucide="info" class="w-6 h-6 text-amber-600 shrink-0"></i>
+                <p class="font-bold text-sm leading-relaxed">
+                    <span class="uppercase tracking-widest text-amber-600 mr-1">Pengumuman:</span> 
+                    <span class="font-medium text-amber-900">temaniskripsi.id sedang dalam masa pengembangan untuk Versi 2 nya (WhisperX + RoBERTa Multi-Task). Silakan coba fitur baru ini!</span>
+                </p>
+            </div>
+        </div>
+
         {{-- Welcome Banner Section --}}
         <div class="bg-gradient-to-r from-gray-950 via-gray-900 to-gray-950 text-white rounded-[2.5rem] p-8 md:p-10 shadow-xl border border-gray-800 relative overflow-hidden mb-10 group">
             <!-- Sleek background radial glow -->
@@ -29,7 +40,13 @@
                     </p>
                 </div>
                 
-                <div class="shrink-0 w-full lg:w-auto">
+                <div class="shrink-0 w-full lg:w-auto flex flex-col sm:flex-row gap-3">
+                    <a href="/analysis/v2/create" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-5 rounded-2xl shadow-lg shadow-purple-500/20 transition-all hover:scale-105 hover:shadow-xl hover:shadow-purple-500/30 group cursor-pointer border border-purple-400/30">
+                        <i data-lucide="flask-conical" class="w-5.5 h-5.5 group-hover:rotate-12 transition-transform"></i>
+                        <span class="font-bold text-base uppercase tracking-wider">
+                            Uji Coba V2
+                        </span>
+                    </a>
                     <a href="{{ route('analysis.create') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-bima-red hover:bg-bima-red-dark text-white px-8 py-5 rounded-2xl shadow-lg shadow-red-500/20 transition-all hover:scale-105 hover:shadow-xl hover:shadow-red-500/30 group cursor-pointer border border-bima-red/30">
                         <i data-lucide="mic" class="w-5.5 h-5.5 group-hover:animate-pulse"></i>
                         <span class="font-bold text-base uppercase tracking-wider">
