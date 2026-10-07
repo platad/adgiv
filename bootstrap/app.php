@@ -18,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             Localization::class,
         ]);
 
+        $middleware->validateCsrfTokens(except: [
+            '/*/analysis/*/webhook',
+            '/*/analysis/v2/*/webhook',
+        ]);
+
         $middleware->redirectGuestsTo(function ($request) {
             $locale = $request->segment(1);
             if (!in_array($locale, ['id', 'en', 'zh'])) {
