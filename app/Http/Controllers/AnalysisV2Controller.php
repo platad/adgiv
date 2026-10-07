@@ -40,7 +40,7 @@ class AnalysisV2Controller extends Controller
             $client = new \GuzzleHttp\Client(['timeout' => 30, 'verify' => false]);
             // Pastikan domain VPS ini aktif
             $vpsUrl = 'https://vps.temaniskripsi.id/api/v2/transcribe';
-            $callbackUrl = 'https://temaniskripsi.id/api/analysis/v2/' . $analysis->slug . '/webhook';
+            $callbackUrl = url(app()->getLocale() . '/analysis/v2/' . $analysis->slug . '/webhook');
             $originalFileName = $file->getClientOriginalName();
 
             $response = $client->request('POST', $vpsUrl, [
