@@ -14,7 +14,8 @@
             </p>
         </div>
 
-        <div class="bg-white rounded-[2.5rem] p-8 md:p-10 border border-gray-100 shadow-xl shadow-gray-200/40 max-w-3xl mx-auto relative overflow-hidden">
+        <!-- Card tanpa max-w-3xl agar melebar penuh menyesuaikan max-w-7xl container, sama seperti create.blade.php -->
+        <div class="bg-white rounded-[2.5rem] p-8 md:p-10 border border-gray-100 shadow-xl shadow-gray-200/40 relative overflow-hidden">
             <div class="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">
                 <span>Progress</span>
                 <span id="progress-text" class="text-gray-900">0%</span>
