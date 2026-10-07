@@ -17,6 +17,7 @@ class Analysis extends Model
         'slug',
         'title',
         'locale',
+        'version',
         'audio_path',
         'duration_seconds',
         'audio_duration_seconds',
@@ -26,11 +27,13 @@ class Analysis extends Model
         'model_used',
         'synthesis_model',
         'result_data',
+        'graph_data',
         'metrics',
     ];
 
     protected $casts = [
         'result_data' => 'array',
+        'graph_data' => 'array',
         'metrics'     => 'array',
     ];
 
