@@ -43,6 +43,11 @@ Route::get('/', function (Request $request) {
             ->name('analysis.webhook')
             ->withoutMiddleware([VerifyCsrfToken::class]);
 
+        // V2 Webhook (Harus di luar Auth Middleware agar VPS bisa kirim data)
+        Route::post('/analysis/v2/{analysis}/webhook', [\App\Http\Controllers\AnalysisV2Controller::class, 'webhookResult'])
+            ->name('analysis.v2.webhook')
+            ->withoutMiddleware([VerifyCsrfToken::class]);
+
         Route::middleware(['auth'])->group(function () {
         
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -59,7 +64,6 @@ Route::get('/', function (Request $request) {
                 Route::get('/create', [\App\Http\Controllers\AnalysisV2Controller::class, 'create'])->name('create');
                 Route::post('/initialize', [\App\Http\Controllers\AnalysisV2Controller::class, 'initialize'])->name('initialize');
                 Route::get('/{analysis}/processing', [\App\Http\Controllers\AnalysisV2Controller::class, 'processing'])->name('processing');
-                Route::post('/{analysis}/webhook', [\App\Http\Controllers\AnalysisV2Controller::class, 'webhookResult'])->name('webhook')->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
                 Route::get('/{analysis}/result', [\App\Http\Controllers\AnalysisV2Controller::class, 'result'])->name('result');
             });
 
