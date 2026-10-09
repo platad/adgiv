@@ -15,7 +15,7 @@
     {{-- CDN: Pusher JS (for Laravel Echo) --}}
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 
-    <style>
+    <style>.fab-accessibility{position:fixed;bottom:2rem;right:2rem;width:56px;height:56px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 25px rgba(16,185,129,0.4);cursor:pointer;z-index:99999 !important;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);border:2px solid rgba(255,255,255,0.2)}.fab-accessibility:hover{transform:scale(1.1) translateY(-5px);box-shadow:0 15px 35px rgba(16,185,129,0.6)}.fab-accessibility.active{background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);box-shadow:0 10px 25px rgba(245,158,11,0.4);animation:pulse-ring 2s infinite}@keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(245,158,11,0.6)}70%{box-shadow:0 0 0 15px rgba(245,158,11,0)}100%{box-shadow:0 0 0 0 rgba(245,158,11,0)}}
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
             --bg-base:    #080b18;
