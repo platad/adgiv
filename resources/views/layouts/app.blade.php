@@ -217,6 +217,118 @@
     }
 </script>
 
+<style>
+    /* FAB Accessibility Mode */
+    .fab-accessibility {
+        position: fixed;
+        bottom: 2rem; right: 2rem;
+        width: 56px; height: 56px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+        cursor: pointer; z-index: 9999;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid rgba(255,255,255,0.2);
+    }
+    .fab-accessibility:hover {
+        transform: scale(1.1) translateY(-5px);
+        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.6);
+    }
+    .fab-accessibility.active {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
+        animation: pulse-ring 2s infinite;
+    }
+    @keyframes pulse-ring {
+        0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); }
+        70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+</style>
+
+<!-- Floating Accessibility Button -->
+<button id="accessibility-toggle" class="fab-accessibility" title="Mode Disabilitas (Audio Guidance)">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" x2="12" y1="19" y2="22"></line>
+    </svg>
+</button>
+
+<script>
+    // --- ACCESSIBILITY MODE LOGIC ---
+    let accessibilityMode = localStorage.getItem('accessibilityMode') === 'true';
+    const fabBtn = document.getElementById('accessibility-toggle');
+    const synth = window.speechSynthesis;
+    
+    let welcomeAudioObj = null;
+    const welcomeAudioUrl = '{{ $welcomeAudio ?? "" }}';
+
+    function updateAccessibilityUI() {
+        if (accessibilityMode) {
+            fabBtn.classList.add('active');
+            if (welcomeAudioUrl && !welcomeAudioObj) {
+                welcomeAudioObj = new Audio(welcomeAudioUrl);
+                // Autoplay policy bypass via first interaction
+                document.body.addEventListener('click', () => {
+                    if (welcomeAudioObj.paused) welcomeAudioObj.play().catch(e => console.log('Autoplay blocked:', e));
+                }, {once: true});
+            }
+        } else {
+            fabBtn.classList.remove('active');
+            synth.cancel();
+            if (welcomeAudioObj) {
+                welcomeAudioObj.pause();
+                welcomeAudioObj.currentTime = 0;
+            }
+        }
+    }
+
+    function speakText(text) {
+        if (!accessibilityMode) return;
+        synth.cancel(); // Hentikan ucapan sebelumnya
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'id-ID';
+        utterance.rate = 1.0;
+        synth.speak(utterance);
+    }
+
+    if (fabBtn) {
+        fabBtn.addEventListener('click', () => {
+            accessibilityMode = !accessibilityMode;
+            localStorage.setItem('accessibilityMode', accessibilityMode);
+            updateAccessibilityUI();
+            
+            if (accessibilityMode) {
+                speakText("Mode aksesibilitas diaktifkan. Klik di mana saja untuk memulai sapaan.");
+            } else {
+                // Canceled naturally
+            }
+        });
+    }
+
+    // Event listener untuk Web Speech API pada interaksi statis
+    document.addEventListener('focusin', (e) => {
+        if (accessibilityMode) {
+            let textToSpeak = '';
+            if (e.target.tagName === 'INPUT') {
+                const label = e.target.getAttribute('aria-label') || e.target.placeholder || e.target.name;
+                const typeInfo = e.target.type === 'password' ? 'kolom kata sandi' : 'kolom input';
+                textToSpeak = "Anda berada di " + typeInfo + ". Silakan masukkan " + label;
+            } else if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') {
+                textToSpeak = "Tombol " + (e.target.innerText || e.target.title || "Tautan");
+            }
+            if (textToSpeak) speakText(textToSpeak);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateAccessibilityUI();
+    });
+    // --- END ACCESSIBILITY MODE LOGIC ---
+</script>
+
 {{ $scripts ?? '' }}
 </body>
 </html>

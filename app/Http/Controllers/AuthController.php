@@ -30,9 +30,10 @@ class AuthController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function showLoginForm(): View
+    public function showLoginForm(\App\Contracts\Accessibility\TtsInterface $ttsService): View
     {
-        return view('auth.login');
+        $welcomeAudio = $ttsService->generateAudioUrl('Selamat datang di Prototipe Bima. Silakan ketik email dan password Anda untuk masuk ke dalam sistem.');
+        return view('auth.login', compact('welcomeAudio'));
     }
 
     /**
@@ -87,9 +88,10 @@ class AuthController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function showRegisterForm(): View
+    public function showRegisterForm(\App\Contracts\Accessibility\TtsInterface $ttsService): View
     {
-        return view('auth.register');
+        $welcomeAudio = $ttsService->generateAudioUrl('Halaman Pendaftaran Prototipe Bima. Silakan isi nama lengkap, email, dan password Anda untuk membuat akun baru.');
+        return view('auth.register', compact('welcomeAudio'));
     }
 
     /**

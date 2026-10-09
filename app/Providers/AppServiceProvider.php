@@ -26,6 +26,11 @@ class AppServiceProvider extends ServiceProvider
             LlmConfigurationInterface::class,
             BimaAnalysisConfiguration::class
         );
+
+        $this->app->bind(
+            \App\Contracts\Accessibility\TtsInterface::class,
+            \App\Services\Accessibility\OpenAITtsService::class
+        );
     }
 
     /**

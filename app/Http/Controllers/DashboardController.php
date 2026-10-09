@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(\App\Contracts\Accessibility\TtsInterface $ttsService)
     {
         $user = Auth::user();
         
@@ -16,6 +16,9 @@ class DashboardController extends Controller
         $history = Analysis::where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->get();
+        
+        $totalAnalyses = $history->count();
+        $welcomeAudio = $ttsService->generateAudioUrl("Selamat datang kembali, {$user->name}. Total analisa bimbingan Anda saat ini ada {$totalAnalyses}. Silakan pilih menu di layar untuk melanjutkan.");
 
         // Calculate some basic metrics across all users (as requested)
         $totalFeedbacks = \App\Models\AnalysisFeedback::count();
@@ -224,9 +227,9 @@ class DashboardController extends Controller
         }
 
         return view('dashboard', compact(
-            'history', 
-            'accuracyRate', 
-            'totalFeedbacks', 
+            'history',
+            'welcomeAudio',
+            'totalFeedbacks',
             'sentenceAccuracy', 
             'totalSentencesEvaluated',
             'totalDurationSeconds',

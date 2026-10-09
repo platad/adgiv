@@ -137,5 +137,85 @@
         </div>
         {{ $footer ?? '' }}
     </div>
+
+    <!-- Floating Accessibility Button -->
+    <button id="accessibility-toggle" class="fab-accessibility" title="Mode Disabilitas (Audio Guidance)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" x2="12" y1="19" y2="22"></line>
+        </svg>
+    </button>
+
+    <script>
+        // --- ACCESSIBILITY MODE LOGIC ---
+        let accessibilityMode = localStorage.getItem('accessibilityMode') === 'true';
+        const fabBtn = document.getElementById('accessibility-toggle');
+        const synth = window.speechSynthesis;
+        
+        let welcomeAudioObj = null;
+        const welcomeAudioUrl = '{{ $welcomeAudio ?? "" }}';
+
+        function updateAccessibilityUI() {
+            if (accessibilityMode) {
+                fabBtn.classList.add('active');
+                if (welcomeAudioUrl && !welcomeAudioObj) {
+                    welcomeAudioObj = new Audio(welcomeAudioUrl);
+                    // Gunakan interaksi pertama untuk trigger autoplay policy
+                    document.body.addEventListener('click', () => {
+                        if (welcomeAudioObj.paused) welcomeAudioObj.play().catch(e => console.log('Autoplay blocked:', e));
+                    }, {once: true});
+                }
+            } else {
+                fabBtn.classList.remove('active');
+                synth.cancel();
+                if (welcomeAudioObj) {
+                    welcomeAudioObj.pause();
+                    welcomeAudioObj.currentTime = 0;
+                }
+            }
+        }
+
+        function speakText(text) {
+            if (!accessibilityMode) return;
+            synth.cancel(); // Hentikan ucapan sebelumnya
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'id-ID';
+            utterance.rate = 1.0;
+            synth.speak(utterance);
+        }
+
+        if (fabBtn) {
+            fabBtn.addEventListener('click', () => {
+                accessibilityMode = !accessibilityMode;
+                localStorage.setItem('accessibilityMode', accessibilityMode);
+                updateAccessibilityUI();
+                
+                if (accessibilityMode) {
+                    speakText("Mode aksesibilitas diaktifkan. Klik di mana saja pada halaman untuk memulai panduan audio.");
+                } else {
+                    // Canceled by updateAccessibilityUI
+                }
+            });
+        }
+
+        // Event listener untuk Web Speech API pada input form
+        document.addEventListener('focusin', (e) => {
+            if (accessibilityMode && e.target.tagName === 'INPUT') {
+                const label = e.target.getAttribute('aria-label') || e.target.placeholder || e.target.name;
+                const typeInfo = e.target.type === 'password' ? 'kolom kata sandi' : 'kolom teks';
+                speakText("Anda berada di " + typeInfo + ". Silakan masukkan " + label);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAccessibilityUI();
+            
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        });
+        // --- END ACCESSIBILITY MODE LOGIC ---
+    </script>
 </body>
 </html>
