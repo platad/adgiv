@@ -230,6 +230,7 @@ class DashboardController extends Controller
             'history',
             'welcomeAudio',
             'totalFeedbacks',
+            'accuracyRate',
             'sentenceAccuracy', 
             'totalSentencesEvaluated',
             'totalDurationSeconds',
