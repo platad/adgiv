@@ -74,15 +74,6 @@
         html[lang="id"] .lang-en, html[lang="id"] .lang-zh { display: none !important; }
         html[lang="en"] .lang-id, html[lang="en"] .lang-zh { display: none !important; }
         html[lang="zh"] .lang-id, html[lang="zh"] .lang-en { display: none !important; }
-
-        @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-        }
-        .access-pulse {
-            animation: pulse-ring 2s infinite !important;
-        }
     </style>
 
     {{ $styles ?? '' }}
@@ -181,10 +172,9 @@
                 {{-- Accessibility Button in Desktop Sidebar --}}
                 <button type="button" id="sidebar-accessibility-toggle"
                     onclick="toggleAccessibilityMode()"
-                    class="w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition flex flex-col items-center justify-center group/access relative cursor-pointer"
+                    class="w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition flex items-center justify-center group/access relative cursor-pointer"
                     title="Mode Ramah Disabilitas (Panduan Suara)">
                     <i data-lucide="volume-2" class="w-5 h-5 group-hover/access:scale-110 transition-transform"></i>
-                    <span id="sidebar-access-indicator" class="w-1.5 h-1.5 rounded-full bg-gray-500 mt-1 transition-all"></span>
                     <div
                         class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover/access:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50 shadow-xl">
                         <span id="sidebar-access-label">Aksesibilitas (Suara)</span>
@@ -492,37 +482,30 @@
         function updateAccessibilityUI() {
             const iconWrapper = document.getElementById('access-icon-wrapper');
             const statusText = document.getElementById('access-status-text');
-            const sidebarIndicator = document.getElementById('sidebar-access-indicator');
             const sidebarBtn = document.getElementById('sidebar-accessibility-toggle');
             const activeLang = document.documentElement.getAttribute('lang') || 'id';
 
             if (accessibilityMode) {
                 if (iconWrapper) {
-                    iconWrapper.className = 'w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/30 access-pulse transition-all duration-300';
+                    iconWrapper.className = 'w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center transition-all duration-300';
                 }
                 if (statusText) {
                     statusText.textContent = activeLang === 'zh' ? '语音: 已开启' : (activeLang === 'en' ? 'Voice: Active' : 'Suara: Aktif');
                     statusText.className = 'text-[0.65rem] font-black uppercase tracking-wider text-amber-600';
                 }
-                if (sidebarIndicator) {
-                    sidebarIndicator.className = 'w-1.5 h-1.5 rounded-full bg-amber-500 access-pulse mt-1';
-                }
                 if (sidebarBtn) {
-                    sidebarBtn.className = 'w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 transition flex flex-col items-center justify-center group/access relative cursor-pointer ring-1 ring-amber-500/30';
+                    sidebarBtn.className = 'w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 transition flex items-center justify-center group/access relative cursor-pointer';
                 }
             } else {
                 if (iconWrapper) {
-                    iconWrapper.className = 'w-8 h-8 rounded-xl bg-gray-100 text-gray-700 flex items-center justify-center shadow-sm transition-all duration-300';
+                    iconWrapper.className = 'w-8 h-8 rounded-xl bg-gray-100 text-gray-700 flex items-center justify-center transition-all duration-300';
                 }
                 if (statusText) {
                     statusText.textContent = activeLang === 'zh' ? '语音: 未开启' : (activeLang === 'en' ? 'Voice: Inactive' : 'Suara: Nonaktif');
                     statusText.className = 'text-[0.65rem] font-black uppercase tracking-wider text-gray-800';
                 }
-                if (sidebarIndicator) {
-                    sidebarIndicator.className = 'w-1.5 h-1.5 rounded-full bg-gray-500 mt-1';
-                }
                 if (sidebarBtn) {
-                    sidebarBtn.className = 'w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition flex flex-col items-center justify-center group/access relative cursor-pointer';
+                    sidebarBtn.className = 'w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition flex items-center justify-center group/access relative cursor-pointer';
                 }
                 if (synth) synth.cancel();
                 if (welcomeAudioObj) {

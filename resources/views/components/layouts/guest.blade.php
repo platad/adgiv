@@ -41,15 +41,6 @@
         html[lang="id"] .lang-en, html[lang="id"] .lang-zh { display: none !important; }
         html[lang="en"] .lang-id, html[lang="en"] .lang-zh { display: none !important; }
         html[lang="zh"] .lang-id, html[lang="zh"] .lang-en { display: none !important; }
-
-        @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-        }
-        .access-pulse {
-            animation: pulse-ring 2s infinite !important;
-        }
     </style>
     {{ $styles ?? '' }}
 </head>
@@ -175,7 +166,7 @@
 
             if (accessibilityMode) {
                 if (iconWrapper) {
-                    iconWrapper.className = 'w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/30 access-pulse transition-all duration-300';
+                    iconWrapper.className = 'w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center transition-all duration-300';
                 }
                 if (statusText) {
                     statusText.textContent = activeLang === 'zh' ? '语音: 已开启' : (activeLang === 'en' ? 'Voice: Active' : 'Suara: Aktif');
