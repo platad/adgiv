@@ -1,3 +1,12 @@
+@props([
+    'title' => null,
+    'titleId' => null,
+    'titleEn' => null,
+    'titleZh' => null,
+    'welcomeAudio' => null,
+    'styles' => null,
+    'footer' => null,
+])
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
@@ -32,6 +41,15 @@
         html[lang="id"] .lang-en, html[lang="id"] .lang-zh { display: none !important; }
         html[lang="en"] .lang-id, html[lang="en"] .lang-zh { display: none !important; }
         html[lang="zh"] .lang-id, html[lang="zh"] .lang-en { display: none !important; }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        .access-pulse {
+            animation: pulse-ring 2s infinite !important;
+        }
     </style>
     {{ $styles ?? '' }}
 </head>
@@ -104,8 +122,23 @@
         </div>
     </div>
 
-    {{-- Floating Professional Language & Clock Widget in Bottom-Right Corner --}}
-    <div class="fixed bottom-6 right-6 z-[80] flex flex-col items-end pointer-events-auto">
+    {{-- Floating Professional Accessibility, Language & Clock Widget in Bottom-Right Corner --}}
+    <div class="fixed bottom-6 right-6 z-[80] flex flex-col items-end gap-3 pointer-events-auto">
+        <!-- Floating Accessibility Button -->
+        <button type="button" id="accessibility-toggle" onclick="toggleAccessibilityMode()"
+            class="glass border border-gray-200/80 rounded-2xl px-3.5 py-2.5 shadow-xl flex items-center gap-3 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer group"
+            title="Mode Ramah Disabilitas (Panduan Suara / Voice Guidance)"
+            aria-label="Mode Ramah Disabilitas">
+            <span id="access-icon-wrapper" class="w-8 h-8 rounded-xl bg-gray-200 text-gray-700 flex items-center justify-center shadow-md transition-all duration-300 group-hover:scale-110">
+                <i data-lucide="volume-2" class="w-4 h-4"></i>
+            </span>
+            <div class="text-left flex flex-col pr-1">
+                <span id="access-status-text" class="text-[0.65rem] font-black uppercase tracking-wider text-gray-800">Suara: Nonaktif</span>
+                <span class="text-[0.52rem] font-bold text-gray-400 uppercase tracking-widest">Aksesibilitas</span>
+            </div>
+        </button>
+
+        <!-- Clock & Language Widget -->
         <div class="glass border border-gray-200/80 rounded-2xl p-3 shadow-xl flex items-center gap-4 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
             {{-- Clock --}}
             <div class="flex items-center gap-2">
@@ -127,8 +160,126 @@
         </div>
     </div>
 
-    {{-- Centralized Client-side Clock & Language Scripts --}}
+    {{-- Centralized Client-side Clock, Language & Accessibility Scripts --}}
     <script>
+        // --- ACCESSIBILITY LOGIC ---
+        let accessibilityMode = localStorage.getItem('accessibilityMode') === 'true';
+        const synth = window.speechSynthesis;
+        let welcomeAudioObj = null;
+        const welcomeAudioUrl = @json($welcomeAudio ?? ($__data['welcomeAudio'] ?? ''));
+
+        function updateAccessibilityUI() {
+            const iconWrapper = document.getElementById('access-icon-wrapper');
+            const statusText = document.getElementById('access-status-text');
+            const activeLang = document.documentElement.getAttribute('lang') || 'id';
+
+            if (accessibilityMode) {
+                if (iconWrapper) {
+                    iconWrapper.className = 'w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/30 access-pulse transition-all duration-300';
+                }
+                if (statusText) {
+                    statusText.textContent = activeLang === 'zh' ? '语音: 已开启' : (activeLang === 'en' ? 'Voice: Active' : 'Suara: Aktif');
+                    statusText.className = 'text-[0.65rem] font-black uppercase tracking-wider text-amber-600';
+                }
+            } else {
+                if (iconWrapper) {
+                    iconWrapper.className = 'w-8 h-8 rounded-xl bg-gray-200 text-gray-700 flex items-center justify-center shadow-md transition-all duration-300';
+                }
+                if (statusText) {
+                    statusText.textContent = activeLang === 'zh' ? '语音: 未开启' : (activeLang === 'en' ? 'Voice: Inactive' : 'Suara: Nonaktif');
+                    statusText.className = 'text-[0.65rem] font-black uppercase tracking-wider text-gray-800';
+                }
+                if (synth) synth.cancel();
+                if (welcomeAudioObj) {
+                    welcomeAudioObj.pause();
+                    welcomeAudioObj.currentTime = 0;
+                }
+            }
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function speakText(text) {
+            if (!accessibilityMode || !synth) return;
+            synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            const activeLang = document.documentElement.getAttribute('lang') || 'id';
+            utterance.lang = activeLang === 'zh' ? 'zh-CN' : (activeLang === 'en' ? 'en-US' : 'id-ID');
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            synth.speak(utterance);
+        }
+
+        function playWelcomeAudio() {
+            if (!accessibilityMode) return;
+            if (welcomeAudioUrl) {
+                try {
+                    if (!welcomeAudioObj) {
+                        welcomeAudioObj = new Audio(welcomeAudioUrl);
+                    }
+                    welcomeAudioObj.currentTime = 0;
+                    welcomeAudioObj.play().catch(e => {
+                        console.warn('Autoplay blocked or audio failed, falling back to Web Speech:', e);
+                        speakGreetingFallback();
+                    });
+                } catch (e) {
+                    speakGreetingFallback();
+                }
+            } else {
+                speakGreetingFallback();
+            }
+        }
+
+        function speakGreetingFallback() {
+            const activeLang = document.documentElement.getAttribute('lang') || 'id';
+            let msg = 'Mode ramah disabilitas diaktifkan. Panduan audio siap membantu Anda.';
+            if (activeLang === 'en') {
+                msg = 'Accessibility mode activated. Audio guidance is ready to assist you.';
+            } else if (activeLang === 'zh') {
+                msg = '无障碍模式已激活。语音助手准备就绪。';
+            }
+            speakText(msg);
+        }
+
+        function toggleAccessibilityMode() {
+            accessibilityMode = !accessibilityMode;
+            localStorage.setItem('accessibilityMode', accessibilityMode ? 'true' : 'false');
+            updateAccessibilityUI();
+
+            if (accessibilityMode) {
+                playWelcomeAudio();
+            }
+        }
+
+        // Form elements speech feedback
+        document.addEventListener('focusin', (e) => {
+            if (!accessibilityMode) return;
+            const target = e.target;
+            if (['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName)) {
+                const labelEl = document.querySelector(`label[for="${target.id}"]`);
+                const labelText = labelEl ? labelEl.innerText.trim() : (target.getAttribute('aria-label') || target.placeholder || target.name || '');
+                const typeText = target.type === 'password' ? 'kolom kata sandi' : 'kolom';
+                speakText(`Anda berada di ${typeText} ${labelText}. Silakan masukkan nilai.`);
+            } else if (target.tagName === 'BUTTON' || target.tagName === 'A') {
+                const btnText = target.innerText.trim() || target.getAttribute('title') || target.getAttribute('aria-label');
+                if (btnText) speakText(`Tombol: ${btnText}`);
+            }
+        });
+
+        // Hover speech feedback on action buttons
+        document.addEventListener('mouseover', (e) => {
+            if (!accessibilityMode) return;
+            const btn = e.target.closest('button, .btn-primary, a[href]');
+            if (btn && btn.id !== 'accessibility-toggle' && !btn.dataset.spokenRecently) {
+                btn.dataset.spokenRecently = 'true';
+                setTimeout(() => delete btn.dataset.spokenRecently, 2000);
+                const text = btn.innerText.trim() || btn.getAttribute('title') || btn.getAttribute('aria-label');
+                if (text && text.length < 50) {
+                    speakText(text);
+                }
+            }
+        });
+
+        // --- CLOCK & LANGUAGE ---
         function updateClock() {
             const now = new Date();
             let hours = String(now.getHours()).padStart(2, '0');
@@ -160,16 +311,10 @@
         }
 
         function setLanguage(lang) {
-            // Write to cookie (for backend autoredirect)
             document.cookie = "locale=" + lang + "; path=/; max-age=" + (30 * 24 * 60 * 60);
-            
-            // Save in localStorage (cache browser)
             localStorage.setItem('lang', lang);
-            
-            // Switch lang attribute
             document.documentElement.setAttribute('lang', lang);
             
-            // Update Active Buttons Class
             const btnId = document.getElementById('guest-lang-id');
             const btnEn = document.getElementById('guest-lang-en');
             const btnZh = document.getElementById('guest-lang-zh');
@@ -181,16 +326,11 @@
             if (btnEn) btnEn.className = (lang === 'en') ? activeClass : inactiveClass;
             if (btnZh) btnZh.className = (lang === 'zh') ? activeClass : inactiveClass;
             
-            // Modify placeholders dynamically
             const emailInput = document.getElementById('email');
             if (emailInput) {
-                if (lang === 'zh') {
-                    emailInput.placeholder = 'name@kampus.ac.id';
-                } else if (lang === 'en') {
-                    emailInput.placeholder = 'name@kampus.ac.id';
-                } else {
-                    emailInput.placeholder = 'nama@kampus.ac.id';
-                }
+                if (lang === 'zh') emailInput.placeholder = 'name@kampus.ac.id';
+                else if (lang === 'en') emailInput.placeholder = 'name@kampus.ac.id';
+                else emailInput.placeholder = 'nama@kampus.ac.id';
             }
 
             const nameInput = document.getElementById('name');
@@ -215,10 +355,10 @@
             }
             
             updateClock();
+            updateAccessibilityUI();
 
-            // Synchronize active URL path
-            const currentPath = window.location.pathname; // e.g. "/id/login"
-            const pathParts = currentPath.split('/'); // ["", "id", "login"]
+            const currentPath = window.location.pathname;
+            const pathParts = currentPath.split('/');
             if (pathParts.length > 1 && ['id', 'en', 'zh'].includes(pathParts[1])) {
                 if (pathParts[1] !== lang) {
                     pathParts[1] = lang;
@@ -229,7 +369,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Read language state from active URL segment first
             const pathParts = window.location.pathname.split('/');
             let activeLocale = 'id';
             if (pathParts.length > 1 && ['id', 'en', 'zh'].includes(pathParts[1])) {
@@ -239,9 +378,18 @@
             }
             
             setLanguage(activeLocale);
-            
             updateClock();
             setInterval(updateClock, 1000);
+            updateAccessibilityUI();
+
+            // If accessibility mode was already enabled, play welcome audio on first user click
+            if (accessibilityMode) {
+                document.body.addEventListener('click', () => {
+                    if (welcomeAudioUrl && (!welcomeAudioObj || welcomeAudioObj.paused)) {
+                        playWelcomeAudio();
+                    }
+                }, { once: true });
+            }
             
             if (window.lucide) {
                 window.lucide.createIcons();

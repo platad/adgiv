@@ -1,3 +1,8 @@
+@props([
+    'title' => null,
+    'welcomeAudio' => null,
+    'activeSessionId' => null,
+])
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 
@@ -69,6 +74,15 @@
         html[lang="id"] .lang-en, html[lang="id"] .lang-zh { display: none !important; }
         html[lang="en"] .lang-id, html[lang="en"] .lang-zh { display: none !important; }
         html[lang="zh"] .lang-id, html[lang="zh"] .lang-en { display: none !important; }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        .access-pulse {
+            animation: pulse-ring 2s infinite !important;
+        }
     </style>
 
     {{ $styles ?? '' }}
@@ -164,6 +178,19 @@
 
             {{-- Bottom Actions --}}
             <div class="mt-auto flex flex-col items-center gap-4 shrink-0">
+                {{-- Accessibility Button in Desktop Sidebar --}}
+                <button type="button" id="sidebar-accessibility-toggle"
+                    onclick="toggleAccessibilityMode()"
+                    class="w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition flex flex-col items-center justify-center group/access relative cursor-pointer"
+                    title="Mode Ramah Disabilitas (Panduan Suara)">
+                    <i data-lucide="volume-2" class="w-5 h-5 group-hover/access:scale-110 transition-transform"></i>
+                    <span id="sidebar-access-indicator" class="w-1.5 h-1.5 rounded-full bg-gray-500 mt-1 transition-all"></span>
+                    <div
+                        class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover/access:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50 shadow-xl">
+                        <span id="sidebar-access-label">Aksesibilitas (Suara)</span>
+                    </div>
+                </button>
+
                 {{-- Language Switcher Pill --}}
                 <div class="flex flex-col bg-white/5 p-1 rounded-2xl gap-1 border border-white/5 w-12 items-center">
                     <button type="button" onclick="setGlobalLanguage('id')" id="global-lang-id" class="w-9 h-9 rounded-xl text-[0.6rem] font-black tracking-widest border-none cursor-pointer transition-all duration-300">ID</button>
@@ -215,6 +242,20 @@
             {{ $slot }}
         </main>
     </div>
+
+    {{-- Floating Accessibility Button (Universal Desktop & Mobile) --}}
+    <button type="button" id="accessibility-toggle" onclick="toggleAccessibilityMode()"
+        class="fixed bottom-24 right-5 lg:bottom-8 lg:right-8 z-[75] flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/95 backdrop-blur-xl border border-gray-200 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer group"
+        title="Mode Ramah Disabilitas (Panduan Suara / Voice Guidance)"
+        aria-label="Mode Ramah Disabilitas">
+        <span id="access-icon-wrapper" class="w-8 h-8 rounded-xl bg-gray-100 text-gray-700 flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm">
+            <i data-lucide="volume-2" class="w-4 h-4"></i>
+        </span>
+        <div class="text-left flex flex-col pr-1">
+            <span id="access-status-text" class="text-[0.65rem] font-black uppercase tracking-wider text-gray-800">Suara: Nonaktif</span>
+            <span class="text-[0.52rem] font-bold text-gray-400 uppercase tracking-widest">Aksesibilitas</span>
+        </div>
+    </button>
 
     <script>
         lucide.createIcons();
@@ -442,6 +483,137 @@
     </div>
 
     <script>
+        // --- ACCESSIBILITY LOGIC (DUAL-ENGINE) ---
+        let accessibilityMode = localStorage.getItem('accessibilityMode') === 'true';
+        const synth = window.speechSynthesis;
+        let welcomeAudioObj = null;
+        const welcomeAudioUrl = @json($welcomeAudio ?? ($__data['welcomeAudio'] ?? ''));
+
+        function updateAccessibilityUI() {
+            const iconWrapper = document.getElementById('access-icon-wrapper');
+            const statusText = document.getElementById('access-status-text');
+            const sidebarIndicator = document.getElementById('sidebar-access-indicator');
+            const sidebarBtn = document.getElementById('sidebar-accessibility-toggle');
+            const activeLang = document.documentElement.getAttribute('lang') || 'id';
+
+            if (accessibilityMode) {
+                if (iconWrapper) {
+                    iconWrapper.className = 'w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/30 access-pulse transition-all duration-300';
+                }
+                if (statusText) {
+                    statusText.textContent = activeLang === 'zh' ? '语音: 已开启' : (activeLang === 'en' ? 'Voice: Active' : 'Suara: Aktif');
+                    statusText.className = 'text-[0.65rem] font-black uppercase tracking-wider text-amber-600';
+                }
+                if (sidebarIndicator) {
+                    sidebarIndicator.className = 'w-1.5 h-1.5 rounded-full bg-amber-500 access-pulse mt-1';
+                }
+                if (sidebarBtn) {
+                    sidebarBtn.className = 'w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 transition flex flex-col items-center justify-center group/access relative cursor-pointer ring-1 ring-amber-500/30';
+                }
+            } else {
+                if (iconWrapper) {
+                    iconWrapper.className = 'w-8 h-8 rounded-xl bg-gray-100 text-gray-700 flex items-center justify-center shadow-sm transition-all duration-300';
+                }
+                if (statusText) {
+                    statusText.textContent = activeLang === 'zh' ? '语音: 未开启' : (activeLang === 'en' ? 'Voice: Inactive' : 'Suara: Nonaktif');
+                    statusText.className = 'text-[0.65rem] font-black uppercase tracking-wider text-gray-800';
+                }
+                if (sidebarIndicator) {
+                    sidebarIndicator.className = 'w-1.5 h-1.5 rounded-full bg-gray-500 mt-1';
+                }
+                if (sidebarBtn) {
+                    sidebarBtn.className = 'w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition flex flex-col items-center justify-center group/access relative cursor-pointer';
+                }
+                if (synth) synth.cancel();
+                if (welcomeAudioObj) {
+                    welcomeAudioObj.pause();
+                    welcomeAudioObj.currentTime = 0;
+                }
+            }
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function speakText(text) {
+            if (!accessibilityMode || !synth) return;
+            synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            const activeLang = document.documentElement.getAttribute('lang') || 'id';
+            utterance.lang = activeLang === 'zh' ? 'zh-CN' : (activeLang === 'en' ? 'en-US' : 'id-ID');
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            synth.speak(utterance);
+        }
+
+        function playWelcomeAudio() {
+            if (!accessibilityMode) return;
+            if (welcomeAudioUrl) {
+                try {
+                    if (!welcomeAudioObj) {
+                        welcomeAudioObj = new Audio(welcomeAudioUrl);
+                    }
+                    welcomeAudioObj.currentTime = 0;
+                    welcomeAudioObj.play().catch(e => {
+                        console.warn('Autoplay blocked or audio failed, falling back to Web Speech:', e);
+                        speakGreetingFallback();
+                    });
+                } catch (e) {
+                    speakGreetingFallback();
+                }
+            } else {
+                speakGreetingFallback();
+            }
+        }
+
+        function speakGreetingFallback() {
+            const activeLang = document.documentElement.getAttribute('lang') || 'id';
+            let msg = 'Mode ramah disabilitas diaktifkan. Panduan audio siap membantu navigasi Anda.';
+            if (activeLang === 'en') {
+                msg = 'Accessibility mode activated. Voice guidance is ready.';
+            } else if (activeLang === 'zh') {
+                msg = '无障碍模式已开启。语音助手准备就绪。';
+            }
+            speakText(msg);
+        }
+
+        function toggleAccessibilityMode() {
+            accessibilityMode = !accessibilityMode;
+            localStorage.setItem('accessibilityMode', accessibilityMode ? 'true' : 'false');
+            updateAccessibilityUI();
+
+            if (accessibilityMode) {
+                playWelcomeAudio();
+            }
+        }
+
+        // Form elements speech feedback
+        document.addEventListener('focusin', (e) => {
+            if (!accessibilityMode) return;
+            const target = e.target;
+            if (['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName)) {
+                const labelEl = document.querySelector(`label[for="${target.id}"]`);
+                const labelText = labelEl ? labelEl.innerText.trim() : (target.getAttribute('aria-label') || target.placeholder || target.name || '');
+                const typeText = target.type === 'file' ? 'area unggah berkas audio' : (target.type === 'password' ? 'kolom kata sandi' : 'kolom');
+                speakText(`Anda berada di ${typeText} ${labelText}.`);
+            } else if (target.tagName === 'BUTTON' || target.tagName === 'A') {
+                const btnText = target.innerText.trim() || target.getAttribute('title') || target.getAttribute('aria-label');
+                if (btnText && btnText.length < 60) speakText(`Pilihan: ${btnText}`);
+            }
+        });
+
+        // Hover speech feedback on action buttons
+        document.addEventListener('mouseover', (e) => {
+            if (!accessibilityMode) return;
+            const btn = e.target.closest('button, .btn-primary, a[href]');
+            if (btn && btn.id !== 'accessibility-toggle' && btn.id !== 'sidebar-accessibility-toggle' && !btn.dataset.spokenRecently) {
+                btn.dataset.spokenRecently = 'true';
+                setTimeout(() => delete btn.dataset.spokenRecently, 2000);
+                const text = btn.innerText.trim() || btn.getAttribute('title') || btn.getAttribute('aria-label');
+                if (text && text.length > 1 && text.length < 50) {
+                    speakText(text);
+                }
+            }
+        });
+
         function setGlobalLanguage(lang) {
             // Write to cookie (for backend autoredirect)
             document.cookie = "locale=" + lang + "; path=/; max-age=" + (30 * 24 * 60 * 60);
@@ -478,6 +650,17 @@
                 btnId.className = "w-9 h-9 rounded-xl text-[0.6rem] border-none cursor-pointer transition-all duration-300 flex items-center justify-center " + (activeLang === 'id' ? activeClass : inactiveClass);
                 btnEn.className = "w-9 h-9 rounded-xl text-[0.6rem] border-none cursor-pointer transition-all duration-300 flex items-center justify-center " + (activeLang === 'en' ? activeClass : inactiveClass);
                 btnZh.className = "w-9 h-9 rounded-xl text-[0.6rem] border-none cursor-pointer transition-all duration-300 flex items-center justify-center " + (activeLang === 'zh' ? activeClass : inactiveClass);
+            }
+
+            updateAccessibilityUI();
+
+            // If accessibility mode was already enabled, play welcome audio on first user click
+            if (accessibilityMode) {
+                document.body.addEventListener('click', () => {
+                    if (welcomeAudioUrl && (!welcomeAudioObj || welcomeAudioObj.paused)) {
+                        playWelcomeAudio();
+                    }
+                }, { once: true });
             }
         });
     </script>

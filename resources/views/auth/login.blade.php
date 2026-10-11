@@ -1,4 +1,4 @@
-<x-layouts.guest>
+<x-layouts.guest :welcome-audio="$welcomeAudio ?? null">
     <x-slot:titleId>Masuk</x-slot:titleId>
     <x-slot:titleEn>Sign In</x-slot:titleEn>
     <x-slot:titleZh>登录</x-slot:titleZh>
