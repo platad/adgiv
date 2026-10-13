@@ -26,6 +26,10 @@
             </div>
 
             <div class="flex items-center gap-2.5 shrink-0">
+                <a href="{{ route('document_analysis.history', ['locale' => app()->getLocale()]) }}" class="px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 hover:border-gray-300 text-gray-700 text-xs font-bold uppercase tracking-wider transition flex items-center gap-1.5 shadow-sm" title="Lihat Riwayat Analisis Dokumen">
+                    <i data-lucide="history" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">Riwayat</span>
+                </a>
                 <a href="{{ route('document_analysis.create', ['locale' => app()->getLocale()]) }}" 
                    class="px-4 py-2.5 rounded-xl bg-gray-900 hover:bg-black text-white text-xs font-bold uppercase tracking-wider transition flex items-center gap-2 shadow-md">
                     <i data-lucide="plus" class="w-3.5 h-3.5"></i>
@@ -174,7 +178,7 @@
                            @timeupdate="onTimeUpdate()" 
                            @ended="onEnded()" 
                            @loadedmetadata="onLoadedMetadata()"
-                           @error="onAudioError($event)"
+                           x-on:error="onAudioError($event)"
                            preload="metadata">
                     </audio>
                 </div>

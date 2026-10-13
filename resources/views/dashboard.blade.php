@@ -53,6 +53,17 @@
                         </span>
                     </a>
 
+                    {{-- Riwayat Dokumen PDF --}}
+                    <a href="{{ route('document_analysis.history', ['locale' => app()->getLocale()]) }}" 
+                       class="inline-flex items-center justify-center gap-2 h-12 px-5 rounded-2xl bg-white/10 hover:bg-white/20 text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer border border-white/15">
+                        <i data-lucide="history" class="w-4 h-4 group-hover:rotate-[-20deg] transition-transform shrink-0 text-amber-400"></i>
+                        <span class="font-bold text-xs sm:text-[0.8rem] uppercase tracking-wider whitespace-nowrap">
+                            <span class="lang-id">Riwayat PDF</span>
+                            <span class="lang-en">PDF History</span>
+                            <span class="lang-zh">PDF 历史记录</span>
+                        </span>
+                    </a>
+
                     {{-- Uji Coba V2 --}}
                     <a href="{{ route('analysis.v2.create') }}" 
                        class="inline-flex items-center justify-center gap-2.5 h-12 px-6 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md shadow-purple-500/20 hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer border border-purple-300/30">

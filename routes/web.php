@@ -84,6 +84,8 @@ Route::get('/', function (Request $request) {
 
         // Document PDF Analysis Routes
         Route::prefix('document-analysis')->name('document_analysis.')->group(function () {
+            Route::get('/', [DocumentAnalysisController::class, 'history'])->name('index');
+            Route::get('/history', [DocumentAnalysisController::class, 'history'])->name('history');
             Route::get('/create', [DocumentAnalysisController::class, 'create'])->name('create');
             Route::post('/initialize', [DocumentAnalysisController::class, 'initialize'])->name('initialize');
             Route::get('/{documentAnalysis}/processing', [DocumentAnalysisController::class, 'processing'])->name('processing');

@@ -2,8 +2,9 @@
     <div class="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
 
         {{-- Header Section --}}
-        <div class="mb-8">
-            <div class="flex items-center gap-2 mb-2">
+        <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
                 <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-50 text-bima-red border border-red-100 text-[0.65rem] font-black uppercase tracking-widest">
                     <i data-lucide="sparkles" class="w-3 h-3"></i>
                     OpenAI GPT-4o-mini &bull; Multimodal
@@ -18,11 +19,20 @@
                 <span class="lang-en">PDF Document Analysis</span>
                 <span class="lang-zh">PDF 文档智能分析</span>
             </h1>
-            <p class="text-xs text-gray-500 font-medium mt-1 leading-relaxed">
+            <p class="text-xs text-gray-500 font-medium mt-1 leading-relaxed max-w-2xl">
                 <span class="lang-id">Unggah naskah draf skripsi, proposal, modul, atau artikel ilmiah Anda untuk memperoleh ringkasan eksekutif, kesimpulan kunci, rekomendasi terarah, serta ulasan audio interaktif.</span>
                 <span class="lang-en">Upload your thesis draft, proposal, or article to generate executive summary, key conclusions, actionable recommendations, and interactive voice guidance.</span>
                 <span class="lang-zh">上传您的论文初稿、开题报告或学术文献，获取执行综述、核心结论、针对性修改建议与互动式语音导读。</span>
             </p>
+            </div>
+
+            <div class="shrink-0 flex items-center gap-2">
+                <a href="{{ route('document_analysis.history', ['locale' => app()->getLocale()]) }}"
+                   class="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-2xl bg-white border border-gray-200 hover:border-gray-300 text-gray-700 hover:text-gray-900 font-bold text-xs uppercase tracking-wider shadow-sm transition hover:shadow">
+                    <i data-lucide="history" class="w-4 h-4 text-gray-500"></i>
+                    <span>Riwayat Dokumen</span>
+                </a>
+            </div>
         </div>
 
         {{-- Form Card --}}

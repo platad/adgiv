@@ -18,6 +18,32 @@ class DocumentAnalysisController extends Controller
     /**
      * Tampilkan form upload dokumen PDF.
      */
+    /**
+     * Tampilkan riwayat analisis dokumen PDF milik pengguna saat ini.
+     */
+    public function history(Request $request)
+    {
+        $userId = Auth::id();
+        $search = trim($request->query('search', ''));
+
+        $query = DocumentAnalysis::where('user_id', $userId)->latest();
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('file_name', 'like', "%{$search}%");
+            });
+        }
+
+        $analyses = $query->paginate(10)->withQueryString();
+
+        $totalDocs = DocumentAnalysis::where('user_id', $userId)->count();
+        $completedDocs = DocumentAnalysis::where('user_id', $userId)->where('status', 'completed')->count();
+        $totalPages = (int) DocumentAnalysis::where('user_id', $userId)->where('status', 'completed')->sum('total_pages');
+
+        return view('document_analysis.history', compact('analyses', 'search', 'totalDocs', 'completedDocs', 'totalPages'));
+    }
+
     public function create()
     {
         return view('document_analysis.create');
@@ -310,7 +336,7 @@ class DocumentAnalysisController extends Controller
 
         $documentAnalysis->delete();
 
-        return redirect()->route('dashboard', ['locale' => app()->getLocale()])
-            ->with('status', 'Sesi analisis dokumen berhasil dihapus.');
+        return redirect()->route('document_analysis.history', ['locale' => app()->getLocale()])
+            ->with('status', 'Sesi analisis dokumen PDF berhasil dihapus.');
     }
 }

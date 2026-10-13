@@ -48,4 +48,9 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(Analysis::class);
     }
+
+    public function documentAnalyses(): HasMany
+    {
+        return $this->hasMany(DocumentAnalysis::class);
+    }
 }
