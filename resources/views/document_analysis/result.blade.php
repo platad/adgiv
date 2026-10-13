@@ -110,7 +110,7 @@
 
                     <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="flex items-center gap-3.5">
-                            {{-- Play/Pause Button (Fixed: always renders SVG icons) --}}
+                            {{-- Play/Pause Button (Deterministic Lucide SVG Render) --}}
                             <button type="button" 
                                     @click="toggleAudio()"
                                     class="w-12 h-12 rounded-2xl bg-bima-red hover:bg-red-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-red-600/30 transition-transform active:scale-95 cursor-pointer"
@@ -168,16 +168,15 @@
                         </div>
                     </div>
 
-                    {{-- Audio Element (Hidden) --}}
-                    @if(!empty($documentAnalysis->briefing_audio_path))
-                        <audio x-ref="audioPlayer" 
-                               src="{{ $documentAnalysis->briefing_audio_path }}" 
-                               @timeupdate="onTimeUpdate()" 
-                               @ended="onEnded()" 
-                               @loadedmetadata="onLoadedMetadata()"
-                               preload="metadata">
-                        </audio>
-                    @endif
+                    {{-- Audio Element (Streaming via Dedicated Controller Endpoint) --}}
+                    <audio x-ref="audioPlayer" 
+                           src="{{ route('document_analysis.audio', ['documentAnalysis' => $documentAnalysis->slug, 'locale' => app()->getLocale()]) }}" 
+                           @timeupdate="onTimeUpdate()" 
+                           @ended="onEnded()" 
+                           @loadedmetadata="onLoadedMetadata()"
+                           @error="onAudioError($event)"
+                           preload="metadata">
+                    </audio>
                 </div>
 
                 {{-- 2. Executive Summary Card --}}
@@ -343,34 +342,48 @@
                 playbackRate: 1.0,
                 progressPercent: 0,
                 audioTimeDisplay: '00:00 / 00:00',
-                synth: window.speechSynthesis,
-                audioUrl: '{{ $documentAnalysis->briefing_audio_path }}',
+                audioUrl: '{{ route("document_analysis.audio", ["documentAnalysis" => $documentAnalysis->slug, "locale" => app()->getLocale()]) }}',
 
                 init() {
                     this.$nextTick(() => {
                         if (window.lucide) window.lucide.createIcons();
                     });
+
+                    // Pre-warm Web Speech API jika tersedia
+                    if ('speechSynthesis' in window) {
+                        window.speechSynthesis.onvoiceschanged = () => {
+                            window.speechSynthesis.getVoices();
+                        };
+                    }
                 },
 
                 toggleAudio() {
                     const player = this.$refs.audioPlayer;
-                    if (player && this.audioUrl) {
+                    if (player) {
                         if (this.isPlaying) {
                             player.pause();
                             this.isPlaying = false;
                         } else {
                             player.playbackRate = this.playbackRate;
-                            player.play().catch(e => {
-                                console.warn('Audio play failed, fallback to Web Speech:', e);
-                                this.speakExecutiveSummary();
-                            });
-                            this.isPlaying = true;
+                            const playPromise = player.play();
+                            if (playPromise !== undefined) {
+                                playPromise.then(() => {
+                                    this.isPlaying = true;
+                                }).catch(err => {
+                                    console.warn('Audio streaming playback error, fallback to Web Speech:', err);
+                                    this.isPlaying = false;
+                                    this.speakExecutiveSummary();
+                                });
+                            }
                         }
                     } else {
-                        // Jika audio server tidak tersedia, gunakan Web Speech API
                         this.speakExecutiveSummary();
                     }
                     this.$nextTick(() => { if (window.lucide) window.lucide.createIcons(); });
+                },
+
+                onAudioError(event) {
+                    console.warn('Audio stream error event:', event);
                 },
 
                 cycleSpeed() {
@@ -384,7 +397,7 @@
 
                 onTimeUpdate() {
                     const player = this.$refs.audioPlayer;
-                    if (!player || !player.duration) return;
+                    if (!player || !player.duration || isNaN(player.duration)) return;
                     this.progressPercent = (player.currentTime / player.duration) * 100;
                     this.audioTimeDisplay = this.formatTime(player.currentTime) + ' / ' + this.formatTime(player.duration);
                 },
@@ -397,34 +410,63 @@
 
                 onLoadedMetadata() {
                     const player = this.$refs.audioPlayer;
-                    if (player && player.duration) {
+                    if (player && player.duration && !isNaN(player.duration)) {
                         this.audioTimeDisplay = '00:00 / ' + this.formatTime(player.duration);
                     }
                 },
 
                 seekAudio(e) {
                     const player = this.$refs.audioPlayer;
-                    if (!player || !player.duration) return;
+                    if (!player || !player.duration || isNaN(player.duration)) return;
                     const rect = e.currentTarget.getBoundingClientRect();
                     const clickX = e.clientX - rect.left;
-                    const percent = clickX / rect.width;
+                    const percent = Math.max(0, Math.min(1, clickX / rect.width));
                     player.currentTime = percent * player.duration;
                 },
 
                 formatTime(seconds) {
-                    if (isNaN(seconds)) return '00:00';
+                    if (isNaN(seconds) || seconds < 0) return '00:00';
                     const mins = Math.floor(seconds / 60);
                     const secs = Math.floor(seconds % 60);
                     return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
                 },
 
                 speakText(text) {
-                    if (!this.synth) return;
-                    this.synth.cancel();
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = '{{ $documentAnalysis->locale === "en" ? "en-US" : ($documentAnalysis->locale === "zh" ? "zh-CN" : "id-ID") }}';
-                    utterance.rate = this.playbackRate;
-                    this.synth.speak(utterance);
+                    if (!('speechSynthesis' in window)) {
+                        alert('Browser Anda tidak mendukung Web Speech API.');
+                        return;
+                    }
+
+                    // Hentikan player audio MP3 jika sedang aktif
+                    const player = this.$refs.audioPlayer;
+                    if (player && !player.paused) {
+                        player.pause();
+                        this.isPlaying = false;
+                    }
+
+                    window.speechSynthesis.cancel();
+
+                    setTimeout(() => {
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        const targetLang = '{{ $documentAnalysis->locale === "en" ? "en-US" : ($documentAnalysis->locale === "zh" ? "zh-CN" : "id-ID") }}';
+                        utterance.lang = targetLang;
+                        utterance.rate = this.playbackRate;
+
+                        const voices = window.speechSynthesis.getVoices();
+                        if (voices && voices.length > 0) {
+                            const langPrefix = targetLang.substring(0, 2).toLowerCase();
+                            const matchingVoice = voices.find(v => v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix));
+                            if (matchingVoice) {
+                                utterance.voice = matchingVoice;
+                            }
+                        }
+
+                        utterance.onerror = (e) => {
+                            console.warn('Web Speech error:', e);
+                        };
+
+                        window.speechSynthesis.speak(utterance);
+                    }, 50);
                 },
 
                 speakExecutiveSummary() {

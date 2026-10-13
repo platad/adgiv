@@ -91,6 +91,7 @@ Route::get('/', function (Request $request) {
             Route::get('/{documentAnalysis}/status', [DocumentAnalysisController::class, 'status'])->name('status');
             Route::get('/{documentAnalysis}/result', [DocumentAnalysisController::class, 'result'])->name('result');
             Route::get('/{documentAnalysis}/pdf', [DocumentAnalysisController::class, 'servePdf'])->name('pdf');
+            Route::get('/{documentAnalysis}/audio', [DocumentAnalysisController::class, 'serveAudio'])->name('audio');
             Route::delete('/{documentAnalysis}', [DocumentAnalysisController::class, 'destroy'])->name('destroy');
         });
     });

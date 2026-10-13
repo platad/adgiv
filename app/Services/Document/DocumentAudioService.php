@@ -25,7 +25,7 @@ class DocumentAudioService
      *
      * @param string $audioScript
      * @param string $locale
-     * @return string URL publik file audio atau string kosong jika gagal
+     * @return string Path relatif file audio (contoh: document_audio/hash.mp3) atau string kosong jika gagal
      */
     public function generateBriefingAudio(string $audioScript, string $locale = 'id'): string
     {
@@ -51,7 +51,7 @@ class DocumentAudioService
         // Jika file sudah pernah dibuat, gunakan kembali cache
         if (Storage::disk('public')->exists($relativeFilePath)) {
             Log::info('[DocumentAudioService] Menggunakan audio cache yang sudah ada', ['path' => $relativeFilePath]);
-            return Storage::disk('public')->url($relativeFilePath);
+            return $relativeFilePath;
         }
 
         // Voice profile: alloy untuk bahasa Indonesia & umum, nova untuk Inggris
@@ -82,7 +82,7 @@ class DocumentAudioService
             Storage::disk('public')->put($relativeFilePath, $response->body());
             Log::info('[DocumentAudioService] Audio briefing berhasil dibuat & disimpan', ['path' => $relativeFilePath]);
 
-            return Storage::disk('public')->url($relativeFilePath);
+            return $relativeFilePath;
 
         } catch (\Throwable $e) {
             Log::error("[DocumentAudioService] Exception saat membuat TTS: {$e->getMessage()}");

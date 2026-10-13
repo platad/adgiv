@@ -140,13 +140,13 @@ class DocumentAnalysisController extends Controller
 
             // --- TAHAP 3: SINTESIS BRIEFING AUDIO (OpenAI TTS) ---
             $documentAnalysis->update(['status' => 'synthesizing_audio']);
-            $audioUrl = $audioService->generateBriefingAudio(
+            $audioRelativePath = $audioService->generateBriefingAudio(
                 $aiResult['audio_script'],
                 $documentAnalysis->locale
             );
 
             $documentAnalysis->update([
-                'briefing_audio_path' => $audioUrl,
+                'briefing_audio_path' => $audioRelativePath,
                 'status'              => 'completed',
                 'error_message'       => null,
             ]);
@@ -243,6 +243,57 @@ class DocumentAnalysisController extends Controller
     }
 
     /**
+     * Stream MP3 audio briefing secara langsung (mendukung HTTP Range request untuk seeking).
+     */
+    public function serveAudio(DocumentAnalysis $documentAnalysis, DocumentAudioService $audioService)
+    {
+        abort_if($documentAnalysis->user_id !== Auth::id() && !Auth::user()->is_admin, 403);
+
+        $script = $documentAnalysis->audio_script ?: $documentAnalysis->executive_summary;
+        if (empty($script)) {
+            abort(404, 'Naskah audio tidak tersedia.');
+        }
+
+        $hash = md5(trim($script) . '_' . $documentAnalysis->locale);
+        $relativeFilePath = "document_audio/{$hash}.mp3";
+
+        // Cek apakah briefing_audio_path sudah ada dan valid di disk
+        $audioPath = $documentAnalysis->briefing_audio_path;
+        if ($audioPath) {
+            if (str_contains($audioPath, 'document_audio/')) {
+                $parsedFile = 'document_audio/' . basename(parse_url($audioPath, PHP_URL_PATH));
+                if (Storage::disk('public')->exists($parsedFile)) {
+                    $relativeFilePath = $parsedFile;
+                }
+            }
+        }
+
+        // Cek disk public
+        $existsPublic = Storage::disk('public')->exists($relativeFilePath);
+        $absolutePath = $existsPublic ? Storage::disk('public')->path($relativeFilePath) : null;
+
+        // Jika belum ada di disk, coba generate sekarang via OpenAI TTS
+        if (!$absolutePath || !file_exists($absolutePath)) {
+            $generatedPath = $audioService->generateBriefingAudio($script, $documentAnalysis->locale);
+            if ($generatedPath && Storage::disk('public')->exists($relativeFilePath)) {
+                $absolutePath = Storage::disk('public')->path($relativeFilePath);
+                $documentAnalysis->update(['briefing_audio_path' => $relativeFilePath]);
+            }
+        }
+
+        if (!$absolutePath || !file_exists($absolutePath)) {
+            abort(404, 'Berkas audio briefing belum tersedia.');
+        }
+
+        return response()->file($absolutePath, [
+            'Content-Type' => 'audio/mpeg',
+            'Content-Disposition' => 'inline; filename="briefing_' . $documentAnalysis->slug . '.mp3"',
+            'Accept-Ranges' => 'bytes',
+            'Cache-Control' => 'public, max-age=86400',
+        ]);
+    }
+
+    /**
      * Hapus sesi analisis dokumen dan file terkait.
      */
     public function destroy(DocumentAnalysis $documentAnalysis)
@@ -251,6 +302,10 @@ class DocumentAnalysisController extends Controller
 
         if (Storage::disk('local')->exists($documentAnalysis->pdf_path)) {
             Storage::disk('local')->delete($documentAnalysis->pdf_path);
+        }
+
+        if ($documentAnalysis->briefing_audio_path && Storage::disk('public')->exists($documentAnalysis->briefing_audio_path)) {
+            Storage::disk('public')->delete($documentAnalysis->briefing_audio_path);
         }
 
         $documentAnalysis->delete();
