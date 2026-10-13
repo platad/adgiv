@@ -155,6 +155,16 @@
                             Dashboard</div>
                     </a>
 
+                    {{-- PDF Analysis --}}
+                    <a href="{{ route('document_analysis.create', ['locale' => app()->getLocale()]) }}"
+                        class="w-12 h-12 rounded-2xl {{ request()->routeIs('document_analysis.*') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
+                        title="Analisis PDF">
+                        <i data-lucide="file-text" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                        <div
+                            class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
+                            Analisis PDF</div>
+                    </a>
+
                     {{-- Methodology --}}
                     <a href="{{ route('methodology') }}"
                         class="w-12 h-12 rounded-2xl {{ request()->routeIs('methodology') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
@@ -212,10 +222,16 @@
             <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">Dash</span>
         </a>
 
-        {{-- Analisa Baru --}}
+        {{-- Analisa Baru Suara --}}
         <a href="{{ route('analysis.create') }}" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('analysis.create') ? 'text-bima-red font-black' : 'text-white/60' }} transition">
             <i data-lucide="mic" class="w-5 h-5"></i>
-            <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">Analisa</span>
+            <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">Suara</span>
+        </a>
+
+        {{-- Analisis PDF --}}
+        <a href="{{ route('document_analysis.create', ['locale' => app()->getLocale()]) }}" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('document_analysis.*') ? 'text-bima-red font-black' : 'text-white/60' }} transition">
+            <i data-lucide="file-text" class="w-5 h-5"></i>
+            <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">PDF</span>
         </a>
 
         {{-- Methodology --}}

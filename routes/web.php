@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AnalysisController;
+use App\Http\Controllers\DocumentAnalysisController;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\Localization;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -79,6 +80,18 @@ Route::get('/', function (Request $request) {
             Route::post('/{analysis}/line-feedback', [AnalysisController::class, 'lineFeedback'])->name('line-feedback');
 
             Route::delete('/{analysis}', [AnalysisController::class, 'destroy'])->name('destroy');
+        });
+
+        // Document PDF Analysis Routes
+        Route::prefix('document-analysis')->name('document_analysis.')->group(function () {
+            Route::get('/create', [DocumentAnalysisController::class, 'create'])->name('create');
+            Route::post('/initialize', [DocumentAnalysisController::class, 'initialize'])->name('initialize');
+            Route::get('/{documentAnalysis}/processing', [DocumentAnalysisController::class, 'processing'])->name('processing');
+            Route::post('/{documentAnalysis}/execute', [DocumentAnalysisController::class, 'execute'])->name('execute');
+            Route::get('/{documentAnalysis}/status', [DocumentAnalysisController::class, 'status'])->name('status');
+            Route::get('/{documentAnalysis}/result', [DocumentAnalysisController::class, 'result'])->name('result');
+            Route::get('/{documentAnalysis}/pdf', [DocumentAnalysisController::class, 'servePdf'])->name('pdf');
+            Route::delete('/{documentAnalysis}', [DocumentAnalysisController::class, 'destroy'])->name('destroy');
         });
     });
 });

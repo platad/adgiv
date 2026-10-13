@@ -18,7 +18,7 @@
             <div class="absolute -right-32 -top-32 w-96 h-96 bg-bima-red/[0.15] rounded-full blur-[120px] group-hover:scale-110 transition-transform duration-700 pointer-events-none"></div>
             <div class="absolute -left-32 -bottom-32 w-96 h-96 bg-purple-500/[0.08] rounded-full blur-[120px] pointer-events-none"></div>
             
-            <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
+            <div class="relative z-10 flex flex-col gap-6">
                 <div>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-bima-red/10 text-bima-red border border-bima-red/20 text-[0.6rem] font-black uppercase tracking-widest mb-4">
                         <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
@@ -33,26 +33,45 @@
                         <span class="lang-zh">欢迎您，{{ Auth::user()->name }}</span>
                     </h1>
                     
-                    <p class="text-xs md:text-sm text-gray-300 font-medium max-w-2xl leading-relaxed">
+                    <p class="text-xs md:text-sm text-gray-300 font-medium max-w-3xl leading-relaxed">
                         <span class="lang-id">Selamat datang di <b>Pusat Analisis Komunikasi Bimbingan Akademik</b>. Analisis kualitas komunikasi bimbingan, petakan intonasi percakapan, dan dapatkan anotasi pedagogis untuk meningkatkan kualitas interaksi akademik Anda secara real-time.</span>
                         <span class="lang-en">Welcome to the <b>Academic Supervision Communication Analysis Hub</b>. Analyze the quality of supervision dialogue, map conversation intonations, and extract pedagogical annotations to elevate your academic interactions.</span>
                         <span class="lang-zh">欢迎使用 <b>学术指导沟通分析控制中心</b>。实时解构您的学术沟通质量，映射会话语调流动，并生成专业的教学法注解以持续优化师生互动的学术成效。</span>
                     </p>
                 </div>
                 
-                <div class="shrink-0 w-full lg:w-auto flex flex-col sm:flex-row gap-3">
-                    <a href="{{ route('analysis.v2.create') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-5 rounded-2xl shadow-lg shadow-purple-500/20 transition-all hover:scale-105 hover:shadow-xl hover:shadow-purple-500/30 group cursor-pointer border border-purple-400/30">
-                        <i data-lucide="flask-conical" class="w-5.5 h-5.5 group-hover:rotate-12 transition-transform"></i>
-                        <span class="font-bold text-base uppercase tracking-wider">
-                            Uji Coba V2
+                {{-- Action Buttons Row (Placed at the Bottom) --}}
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                    {{-- Analisis PDF --}}
+                    <a href="{{ route('document_analysis.create', ['locale' => app()->getLocale()]) }}" 
+                       class="inline-flex items-center justify-center gap-2.5 h-12 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer border border-amber-300/30">
+                        <i data-lucide="file-text" class="w-4.5 h-4.5 group-hover:scale-110 transition-transform shrink-0"></i>
+                        <span class="font-bold text-xs sm:text-[0.8rem] uppercase tracking-wider whitespace-nowrap">
+                            <span class="lang-id">Analisis PDF</span>
+                            <span class="lang-en">PDF Analysis</span>
+                            <span class="lang-zh">PDF 分析</span>
                         </span>
                     </a>
-                    <a href="{{ route('analysis.create') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-bima-red hover:bg-bima-red-dark text-white px-8 py-5 rounded-2xl shadow-lg shadow-red-500/20 transition-all hover:scale-105 hover:shadow-xl hover:shadow-red-500/30 group cursor-pointer border border-bima-red/30">
-                        <i data-lucide="mic" class="w-5.5 h-5.5 group-hover:animate-pulse"></i>
-                        <span class="font-bold text-base uppercase tracking-wider">
-                            <span class="lang-id">Mulai Analisa Baru</span>
-                            <span class="lang-en">Start New Analysis</span>
-                            <span class="lang-zh">开始新语音分析</span>
+
+                    {{-- Uji Coba V2 --}}
+                    <a href="{{ route('analysis.v2.create') }}" 
+                       class="inline-flex items-center justify-center gap-2.5 h-12 px-6 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md shadow-purple-500/20 hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer border border-purple-300/30">
+                        <i data-lucide="flask-conical" class="w-4.5 h-4.5 group-hover:rotate-12 transition-transform shrink-0"></i>
+                        <span class="font-bold text-xs sm:text-[0.8rem] uppercase tracking-wider whitespace-nowrap">
+                            <span class="lang-id">Uji Coba V2</span>
+                            <span class="lang-en">Try Model V2</span>
+                            <span class="lang-zh">体验 V2 模型</span>
+                        </span>
+                    </a>
+
+                    {{-- Mulai Analisa Suara (Primary) --}}
+                    <a href="{{ route('analysis.create') }}" 
+                       class="inline-flex items-center justify-center gap-2.5 h-12 px-6 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-md shadow-red-500/20 hover:shadow-lg hover:shadow-red-500/30 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer border border-red-300/30 ring-1 ring-white/10">
+                        <i data-lucide="mic" class="w-4.5 h-4.5 group-hover:scale-110 transition-transform shrink-0"></i>
+                        <span class="font-bold text-xs sm:text-[0.8rem] uppercase tracking-wider whitespace-nowrap">
+                            <span class="lang-id">Analisis Suara</span>
+                            <span class="lang-en">Voice Analysis</span>
+                            <span class="lang-zh">语音分析</span>
                         </span>
                     </a>
                 </div>
