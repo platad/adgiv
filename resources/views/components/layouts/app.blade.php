@@ -70,6 +70,13 @@
             scrollbar-width: none !important;  /* Firefox */
         }
 
+        /* Responsive Sidebar Branding: Hide when screen height is <= 840px (normal 100% zoom or short viewport) */
+        @media (max-height: 840px) {
+            .sidebar-vertical-branding {
+                display: none !important;
+            }
+        }
+
         /* Language visibility class switching */
         html[lang="id"] .lang-en, html[lang="id"] .lang-zh { display: none !important; }
         html[lang="en"] .lang-id, html[lang="en"] .lang-zh { display: none !important; }
@@ -89,30 +96,32 @@
     </script>
 </head>
 
-<body class="min-h-screen bg-gray-50 flex font-sans antialiased">
+<body class="min-h-screen bg-gray-50 flex font-sans antialiased" x-data="{ mobileAnalysisDrawer: false }">
 
     {{-- Mobile Header --}}
     <div
-        class="lg:hidden fixed top-0 left-0 right-0 h-16 bg-gray-900 z-[60] flex items-center justify-between px-6 border-b border-white/10">
+        class="lg:hidden fixed top-0 left-0 right-0 h-16 bg-gray-900 z-[60] flex items-center justify-between px-6 border-b border-white/10 shadow-lg">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-bima-red rounded-lg flex items-center justify-center text-white p-2">
+            <div class="w-10 h-10 bg-bima-red rounded-xl flex items-center justify-center text-white p-2 shadow-md shadow-red-500/20">
                 <x-application-logo class="w-full h-full" />
             </div>
             <span class="text-white font-black tracking-tighter text-lg">Supervisory <span
                     class="text-bima-red">AI</span></span>
         </div>
-        <form method="POST" action="{{ route('logout') }}" class="m-0">
-            @csrf
-            <button type="submit" class="text-white/60 hover:text-white">
-                <i data-lucide="log-out" class="w-5 h-5"></i>
-            </button>
-        </form>
+        <div class="flex items-center gap-2">
+            <form method="POST" action="{{ route('logout') }}" class="m-0">
+                @csrf
+                <button type="submit" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white flex items-center justify-center transition" title="Keluar">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </form>
+        </div>
     </div>
 
     {{-- Sidebar (Desktop) --}}
     <aside
-        class="hidden lg:flex w-24 bg-gray-900 flex-col items-center py-6 shrink-0 border-r border-white/5 z-50 fixed inset-y-0 left-0 overflow-y-auto scrollbar-none">
-        <div class="flex flex-col items-center justify-between min-h-[640px] h-full w-full">
+        class="hidden lg:flex w-24 bg-gray-900 flex-col items-center py-6 shrink-0 border-r border-white/5 z-50 fixed inset-y-0 left-0 overflow-visible">
+        <div class="flex flex-col items-center justify-between h-full w-full">
             {{-- Logo --}}
             <div class="group cursor-pointer shrink-0">
                 <div
@@ -121,93 +130,195 @@
                 </div>
             </div>
 
-            {{-- Vertical Branding & Nav Container --}}
-            <div class="flex flex-col items-center gap-6 my-auto shrink-0">
-                {{-- Vertical Branding --}}
-                <div class="flex flex-col items-center gap-1 py-2">
-                    <span
-                        class="[writing-mode:vertical-lr] rotate-180 text-lg font-black tracking-[0.3em] text-white uppercase opacity-90 select-none">Supervisory
-                        AI</span>
-                    <div class="w-px h-10 bg-white/20 my-2"></div>
-                    <span
-                        class="[writing-mode:vertical-lr] rotate-180 text-[0.6rem] font-bold tracking-widest text-white/60 uppercase select-none">Prototipe</span>
-                </div>
-
-                {{-- Nav --}}
-                <nav class="flex flex-col gap-4">
-                    {{-- New Analysis --}}
-                    <a href="{{ route('analysis.create') }}"
-                        class="w-12 h-12 rounded-2xl {{ request()->routeIs('analysis.create') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
-                        title="Analisa Baru">
-                        <i data-lucide="mic" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
-                        <div
-                            class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
-                            Analisa Baru</div>
-                    </a>
-
-                    {{-- Dashboard/History --}}
-                    <a href="{{ route('dashboard') }}"
-                        class="w-12 h-12 rounded-2xl {{ request()->routeIs('dashboard') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
-                        title="Dashboard">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                        <div
-                            class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
-                            Dashboard</div>
-                    </a>
-
-                    {{-- PDF Analysis --}}
-                    <a href="{{ route('document_analysis.create', ['locale' => app()->getLocale()]) }}"
-                        class="w-12 h-12 rounded-2xl {{ request()->routeIs('document_analysis.*') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
-                        title="Analisis PDF">
-                        <i data-lucide="file-text" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
-                        <div
-                            class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
-                            Analisis PDF</div>
-                    </a>
-
-                    {{-- Methodology --}}
-                    <a href="{{ route('methodology') }}"
-                        class="w-12 h-12 rounded-2xl {{ request()->routeIs('methodology') ? 'bg-bima-red text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/40 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
-                        title="Metodologi C-CDA">
-                        <i data-lucide="book-open" class="w-5 h-5"></i>
-                        <div
-                            class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50">
-                            Metodologi</div>
-                    </a>
-                </nav>
+            {{-- Vertical Branding (Responsive: Visible on tall screen / zoom out, auto-hidden when height <= 840px) --}}
+            <div class="sidebar-vertical-branding flex flex-col items-center gap-1 py-2 my-auto select-none transition-all duration-300 shrink-0">
+                <span
+                    class="[writing-mode:vertical-lr] rotate-180 text-sm font-black tracking-[0.3em] text-white uppercase opacity-80">Supervisory
+                    AI</span>
+                <div class="w-px h-8 bg-white/20 my-2"></div>
+                <span
+                    class="[writing-mode:vertical-lr] rotate-180 text-[0.55rem] font-bold tracking-widest text-white/50 uppercase">Prototipe</span>
             </div>
 
-            {{-- Bottom Actions --}}
-            <div class="mt-auto flex flex-col items-center gap-4 shrink-0">
-                {{-- Accessibility Button in Desktop Sidebar --}}
+            {{-- Nav Container (Dashboard, Group Dropdown Modul Analisis, Metodologi) --}}
+            <nav class="flex flex-col items-center gap-4 my-auto shrink-0">
+                {{-- 1. Dashboard --}}
+                <a href="{{ route('dashboard') }}"
+                    class="w-12 h-12 rounded-2xl {{ request()->routeIs('dashboard') ? 'bg-bima-red text-white shadow-lg shadow-red-500/25 ring-2 ring-red-400/20' : 'bg-white/5 text-white/50 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
+                    title="Dashboard">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                    <div
+                        class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.65rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50 border border-white/10 shadow-xl">
+                        Dashboard</div>
+                </a>
+
+                {{-- 2. Modul Analisis AI (Group Dropdown Flyout) --}}
+                <div class="relative" x-data="{ openAnalysis: false }" @click.away="openAnalysis = false">
+                    {{-- Trigger Button --}}
+                    <button type="button"
+                        @click="openAnalysis = !openAnalysis; $nextTick(() => window.lucide && window.lucide.createIcons())"
+                        class="w-12 h-12 rounded-2xl flex items-center justify-center transition-all group relative cursor-pointer {{ request()->routeIs('analysis.*', 'document_analysis.*') ? 'bg-bima-red text-white shadow-lg shadow-red-500/25 ring-2 ring-red-400/20' : 'bg-white/5 text-white/50 hover:text-white hover:bg-white/10' }}"
+                        title="Modul Analisis AI"
+                        aria-haspopup="true"
+                        :aria-expanded="openAnalysis">
+                        <i data-lucide="layers" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+
+                        {{-- Active Indicator Pulse Dot --}}
+                        @if(request()->routeIs('analysis.*', 'document_analysis.*'))
+                            <span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-white shadow-sm animate-pulse"></span>
+                        @endif
+
+                        {{-- Tooltip when flyout is closed --}}
+                        <div x-show="!openAnalysis"
+                            class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.65rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50 border border-white/10 shadow-xl">
+                            Modul Analisis AI</div>
+                    </button>
+
+                    {{-- Flyout Dropdown Panel --}}
+                    <div x-show="openAnalysis"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 translate-x-2 scale-95"
+                        x-transition:enter-end="opacity-100 translate-x-0 scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 translate-x-0 scale-100"
+                        x-transition:leave-end="opacity-0 translate-x-2 scale-95"
+                        style="display: none;"
+                        class="absolute left-full top-1/2 -translate-y-1/2 ml-4 w-80 bg-gray-900/98 backdrop-blur-2xl border border-white/15 rounded-3xl p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-[80]">
+                        
+                        {{-- Flyout Header --}}
+                        <div class="px-3 py-2 border-b border-white/10 mb-2.5 flex items-center justify-between">
+                            <div>
+                                <span class="text-[0.65rem] font-black uppercase tracking-widest text-bima-red">Modul Analisis AI</span>
+                                <p class="text-[0.68rem] text-white/50 mt-0.5">Pilih instrumen & fitur analisis</p>
+                            </div>
+                            <span class="text-[0.6rem] font-black px-2 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10">4 Modul</span>
+                        </div>
+
+                        {{-- Modules List --}}
+                        <div class="flex flex-col gap-1.5">
+                            {{-- Analisis Suara V1 --}}
+                            <a href="{{ route('analysis.create') }}"
+                                class="flex items-center gap-3 p-2.5 rounded-2xl transition group/item {{ request()->routeIs('analysis.create', 'analysis.processing', 'analysis.result') && !request()->routeIs('analysis.v2.*') ? 'bg-bima-red text-white shadow-md shadow-red-500/20' : 'hover:bg-white/5 text-white/80 hover:text-white' }}">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 {{ request()->routeIs('analysis.create', 'analysis.processing', 'analysis.result') && !request()->routeIs('analysis.v2.*') ? 'bg-white/20 text-white' : 'bg-red-500/10 text-red-400 group-hover/item:scale-105 group-hover/item:bg-red-500/20' }} transition">
+                                    <i data-lucide="mic" class="w-4.5 h-4.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold truncate">Analisis Suara (V1)</div>
+                                    <div class="text-[0.65rem] {{ request()->routeIs('analysis.create') ? 'text-white/80' : 'text-white/40' }} truncate">Audio rekaman bimbingan C-CDA</div>
+                                </div>
+                            </a>
+
+                            {{-- Uji Coba Model V2 --}}
+                            <a href="{{ route('analysis.v2.create') }}"
+                                class="flex items-center gap-3 p-2.5 rounded-2xl transition group/item {{ request()->routeIs('analysis.v2.*') ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20' : 'hover:bg-white/5 text-white/80 hover:text-white' }}">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 {{ request()->routeIs('analysis.v2.*') ? 'bg-white/20 text-white' : 'bg-purple-500/10 text-purple-400 group-hover/item:scale-105 group-hover/item:bg-purple-500/20' }} transition">
+                                    <i data-lucide="flask-conical" class="w-4.5 h-4.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold truncate flex items-center gap-1.5">
+                                        <span>Uji Coba Model V2</span>
+                                        <span class="text-[0.55rem] px-1.5 py-0.2 rounded bg-purple-400/20 text-purple-300 uppercase font-black">Beta</span>
+                                    </div>
+                                    <div class="text-[0.65rem] {{ request()->routeIs('analysis.v2.*') ? 'text-white/80' : 'text-white/40' }} truncate">WhisperX + RoBERTa Multi-Task</div>
+                                </div>
+                            </a>
+
+                            {{-- Analisis PDF --}}
+                            <a href="{{ route('document_analysis.create', ['locale' => app()->getLocale()]) }}"
+                                class="flex items-center gap-3 p-2.5 rounded-2xl transition group/item {{ request()->routeIs('document_analysis.create', 'document_analysis.processing', 'document_analysis.result') ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md shadow-orange-500/20' : 'hover:bg-white/5 text-white/80 hover:text-white' }}">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 {{ request()->routeIs('document_analysis.create', 'document_analysis.processing', 'document_analysis.result') ? 'bg-white/20 text-white' : 'bg-amber-500/10 text-amber-400 group-hover/item:scale-105 group-hover/item:bg-amber-500/20' }} transition">
+                                    <i data-lucide="file-text" class="w-4.5 h-4.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold truncate">Analisis Dokumen PDF</div>
+                                    <div class="text-[0.65rem] {{ request()->routeIs('document_analysis.create') ? 'text-white/80' : 'text-white/40' }} truncate">Materi, ringkasan & briefing suara</div>
+                                </div>
+                            </a>
+
+                            {{-- Riwayat Analisis PDF --}}
+                            <a href="{{ route('document_analysis.history', ['locale' => app()->getLocale()]) }}"
+                                class="flex items-center gap-3 p-2.5 rounded-2xl transition group/item {{ request()->routeIs('document_analysis.history', 'document_analysis.index') ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md shadow-orange-500/20' : 'hover:bg-white/5 text-white/80 hover:text-white' }}">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 {{ request()->routeIs('document_analysis.history', 'document_analysis.index') ? 'bg-white/20 text-white' : 'bg-amber-500/10 text-amber-400 group-hover/item:scale-105 group-hover/item:bg-amber-500/20' }} transition">
+                                    <i data-lucide="history" class="w-4.5 h-4.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold truncate">Riwayat Analisis PDF</div>
+                                    <div class="text-[0.65rem] {{ request()->routeIs('document_analysis.history') ? 'text-white/80' : 'text-white/40' }} truncate">Arsip telaah dokumen Anda</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 3. Methodology --}}
+                <a href="{{ route('methodology') }}"
+                    class="w-12 h-12 rounded-2xl {{ request()->routeIs('methodology') ? 'bg-bima-red text-white shadow-lg shadow-red-500/25 ring-2 ring-red-400/20' : 'bg-white/5 text-white/50 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
+                    title="Metodologi C-CDA">
+                    <i data-lucide="book-open" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                    <div
+                        class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.65rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50 border border-white/10 shadow-xl">
+                        Metodologi</div>
+                </a>
+            </nav>
+
+            {{-- Bottom Actions (Accessibility, Compact Language Switcher, Logout) --}}
+            <div class="mt-auto flex flex-col items-center gap-3 shrink-0">
+                {{-- Accessibility Button --}}
                 <button type="button" id="sidebar-accessibility-toggle"
                     onclick="toggleAccessibilityMode()"
-                    class="w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition flex items-center justify-center group/access relative cursor-pointer"
+                    class="w-11 h-11 rounded-2xl bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition flex items-center justify-center group/access relative cursor-pointer"
                     title="Mode Ramah Disabilitas (Panduan Suara)">
                     <i data-lucide="volume-2" class="w-5 h-5 group-hover/access:scale-110 transition-transform"></i>
                     <div
-                        class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.6rem] font-bold rounded-lg opacity-0 group-hover/access:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50 shadow-xl">
+                        class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.65rem] font-bold rounded-lg opacity-0 group-hover/access:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50 shadow-xl border border-white/10">
                         <span id="sidebar-access-label">Aksesibilitas (Suara)</span>
                     </div>
                 </button>
 
-                {{-- Language Switcher Pill --}}
-                <div class="flex flex-col bg-white/5 p-1 rounded-2xl gap-1 border border-white/5 w-12 items-center">
-                    <button type="button" onclick="setGlobalLanguage('id')" id="global-lang-id" class="w-9 h-9 rounded-xl text-[0.6rem] font-black tracking-widest border-none cursor-pointer transition-all duration-300">ID</button>
-                    <button type="button" onclick="setGlobalLanguage('en')" id="global-lang-en" class="w-9 h-9 rounded-xl text-[0.6rem] font-black tracking-widest border-none cursor-pointer transition-all duration-300">EN</button>
-                    <button type="button" onclick="setGlobalLanguage('zh')" id="global-lang-zh" class="w-9 h-9 rounded-xl text-[0.6rem] font-black tracking-widest border-none cursor-pointer transition-all duration-300">ZH</button>
+                {{-- Compact Language Switcher Dropdown --}}
+                <div class="relative" x-data="{ openLang: false }" @click.away="openLang = false">
+                    <button type="button" @click="openLang = !openLang"
+                        class="w-11 h-11 rounded-2xl bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/5 flex items-center justify-center cursor-pointer transition group"
+                        title="Pilih Bahasa / Language">
+                        <span class="text-[0.65rem] font-black tracking-widest uppercase">
+                            {{ app()->getLocale() }}
+                        </span>
+                    </button>
+                    
+                    <div x-show="openLang"
+                        x-transition:enter="transition ease-out duration-150"
+                        x-transition:enter-start="opacity-0 translate-x-2"
+                        x-transition:enter-end="opacity-100 translate-x-0"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100 translate-x-0"
+                        x-transition:leave-end="opacity-0 translate-x-2"
+                        style="display: none;"
+                        class="absolute left-full bottom-0 ml-4 bg-gray-900/98 backdrop-blur-2xl border border-white/10 rounded-2xl p-1.5 shadow-2xl flex flex-col gap-1 w-24 z-50">
+                        <button type="button" onclick="setGlobalLanguage('id')" id="global-lang-id" class="w-full py-1.5 rounded-xl text-[0.65rem] font-bold tracking-wider text-left px-2.5 transition cursor-pointer {{ app()->getLocale() === 'id' ? 'bg-bima-red text-white' : 'text-white/70 hover:bg-white/10' }}">
+                            ID (Idn)
+                        </button>
+                        <button type="button" onclick="setGlobalLanguage('en')" id="global-lang-en" class="w-full py-1.5 rounded-xl text-[0.65rem] font-bold tracking-wider text-left px-2.5 transition cursor-pointer {{ app()->getLocale() === 'en' ? 'bg-bima-red text-white' : 'text-white/70 hover:bg-white/10' }}">
+                            EN (Eng)
+                        </button>
+                        <button type="button" onclick="setGlobalLanguage('zh')" id="global-lang-zh" class="w-full py-1.5 rounded-xl text-[0.65rem] font-bold tracking-wider text-left px-2.5 transition cursor-pointer {{ app()->getLocale() === 'zh' ? 'bg-bima-red text-white' : 'text-white/70 hover:bg-white/10' }}">
+                            ZH (中文)
+                        </button>
+                    </div>
                 </div>
 
                 {{-- Separator --}}
-                <div class="w-8 h-px bg-white/20"></div>
+                <div class="w-8 h-px bg-white/10"></div>
 
                 {{-- Logout Button --}}
                 <form method="POST" action="{{ route('logout') }}" class="m-0">
                     @csrf
                     <button type="submit"
-                        class="w-12 h-12 rounded-2xl bg-white/5 hover:bg-red-500/20 hover:text-white text-white/60 transition flex items-center justify-center group/logout"
+                        class="w-11 h-11 rounded-2xl bg-white/5 hover:bg-red-500/20 hover:text-white text-white/50 transition flex items-center justify-center group/logout cursor-pointer"
                         title="Keluar">
                         <i data-lucide="log-out" class="w-5 h-5 group-hover/logout:scale-110 transition-transform"></i>
+                        <div
+                            class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.65rem] font-bold rounded-lg opacity-0 group-hover/logout:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50 shadow-xl border border-white/10">
+                            Keluar</div>
                     </button>
                 </form>
             </div>
@@ -217,28 +328,140 @@
     {{-- Mobile Bottom Nav (Action access for mobile) --}}
     <div class="lg:hidden fixed bottom-6 left-6 right-6 h-16 bg-gray-900/95 backdrop-blur-xl rounded-[2rem] border border-white/10 z-[70] flex items-center justify-around px-4 shadow-2xl">
         {{-- Dashboard --}}
-        <a href="{{ route('dashboard') }}" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('dashboard') ? 'text-bima-red font-black' : 'text-white/60' }} transition">
+        <a href="{{ route('dashboard') }}" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('dashboard') ? 'text-bima-red font-black' : 'text-white/60 hover:text-white' }} transition">
             <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
             <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">Dash</span>
         </a>
 
-        {{-- Analisa Baru Suara --}}
-        <a href="{{ route('analysis.create') }}" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('analysis.create') ? 'text-bima-red font-black' : 'text-white/60' }} transition">
-            <i data-lucide="mic" class="w-5 h-5"></i>
-            <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">Suara</span>
-        </a>
-
-        {{-- Analisis PDF --}}
-        <a href="{{ route('document_analysis.create', ['locale' => app()->getLocale()]) }}" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('document_analysis.*') ? 'text-bima-red font-black' : 'text-white/60' }} transition">
-            <i data-lucide="file-text" class="w-5 h-5"></i>
-            <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">PDF</span>
-        </a>
+        {{-- Modul Analisis (Opens Mobile Bottom Sheet Drawer) --}}
+        <button type="button" @click="mobileAnalysisDrawer = true; $nextTick(() => window.lucide && window.lucide.createIcons())" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('analysis.*', 'document_analysis.*') ? 'text-bima-red font-black' : 'text-white/60 hover:text-white' }} transition cursor-pointer">
+            <div class="relative">
+                <i data-lucide="layers" class="w-5 h-5"></i>
+                @if(request()->routeIs('analysis.*', 'document_analysis.*'))
+                    <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-bima-red ring-2 ring-gray-900"></span>
+                @endif
+            </div>
+            <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">Analisis</span>
+        </button>
 
         {{-- Methodology --}}
-        <a href="{{ route('methodology') }}" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('methodology') ? 'text-bima-red font-black' : 'text-white/60' }} transition">
+        <a href="{{ route('methodology') }}" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('methodology') ? 'text-bima-red font-black' : 'text-white/60 hover:text-white' }} transition">
             <i data-lucide="book-open" class="w-5 h-5"></i>
             <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">Metode</span>
         </a>
+
+        {{-- Accessibility / Voice Mode Toggle --}}
+        <button type="button" onclick="toggleAccessibilityMode()" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl text-white/60 hover:text-white transition cursor-pointer">
+            <i data-lucide="volume-2" class="w-5 h-5"></i>
+            <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">Suara</span>
+        </button>
+    </div>
+
+    {{-- Mobile Analysis Modules Bottom Sheet Drawer --}}
+    <div x-show="mobileAnalysisDrawer"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="lg:hidden fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm"
+        style="display: none;"
+        @click="mobileAnalysisDrawer = false"></div>
+
+    <div x-show="mobileAnalysisDrawer"
+        x-transition:enter="transition ease-out duration-300 transform"
+        x-transition:enter-start="translate-y-full"
+        x-transition:enter-end="translate-y-0"
+        x-transition:leave="transition ease-in duration-200 transform"
+        x-transition:leave-start="translate-y-0"
+        x-transition:leave-end="translate-y-full"
+        class="lg:hidden fixed inset-x-0 bottom-0 z-[85] bg-gray-900 border-t border-white/10 rounded-t-[2.5rem] p-6 shadow-2xl max-h-[85vh] overflow-y-auto"
+        style="display: none;">
+        
+        {{-- Drawer Handle --}}
+        <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-5"></div>
+
+        {{-- Drawer Header --}}
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <h3 class="text-lg font-black text-white tracking-tight uppercase">Modul Analisis AI</h3>
+                <p class="text-xs text-white/50">Pilih instrumen & fitur analisis bimbingan</p>
+            </div>
+            <button @click="mobileAnalysisDrawer = false" class="w-10 h-10 rounded-xl bg-white/5 text-white/60 hover:text-white flex items-center justify-center cursor-pointer">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        {{-- Feature Cards Grid --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+            {{-- 1. Analisis Suara V1 --}}
+            <a href="{{ route('analysis.create') }}"
+                class="flex items-center gap-3.5 p-3.5 rounded-2xl border transition {{ request()->routeIs('analysis.create', 'analysis.processing', 'analysis.result') && !request()->routeIs('analysis.v2.*') ? 'bg-bima-red/20 border-bima-red text-white' : 'bg-white/5 border-white/5 text-white/80 hover:bg-white/10' }}">
+                <div class="w-12 h-12 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
+                    <i data-lucide="mic" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-bold text-sm text-white truncate">Analisis Suara (V1)</div>
+                    <div class="text-[0.7rem] text-white/50 truncate">Audio rekaman bimbingan</div>
+                </div>
+            </a>
+
+            {{-- 2. Uji Coba Model V2 --}}
+            <a href="{{ route('analysis.v2.create') }}"
+                class="flex items-center gap-3.5 p-3.5 rounded-2xl border transition {{ request()->routeIs('analysis.v2.*') ? 'bg-purple-600/20 border-purple-500 text-white' : 'bg-white/5 border-white/5 text-white/80 hover:bg-white/10' }}">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
+                    <i data-lucide="flask-conical" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-bold text-sm text-white truncate flex items-center gap-2">
+                        <span>Uji Coba Model V2</span>
+                        <span class="text-[0.6rem] px-1.5 py-0.5 rounded bg-purple-500/30 text-purple-300 uppercase font-black">Beta</span>
+                    </div>
+                    <div class="text-[0.7rem] text-white/50 truncate">WhisperX + RoBERTa Multi-Task</div>
+                </div>
+            </a>
+
+            {{-- 3. Analisis Dokumen PDF --}}
+            <a href="{{ route('document_analysis.create', ['locale' => app()->getLocale()]) }}"
+                class="flex items-center gap-3.5 p-3.5 rounded-2xl border transition {{ request()->routeIs('document_analysis.create', 'document_analysis.processing', 'document_analysis.result') ? 'bg-amber-500/20 border-amber-500 text-white' : 'bg-white/5 border-white/5 text-white/80 hover:bg-white/10' }}">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                    <i data-lucide="file-text" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-bold text-sm text-white truncate">Analisis Dokumen PDF</div>
+                    <div class="text-[0.7rem] text-white/50 truncate">Materi, Ringkasan & Briefing</div>
+                </div>
+            </a>
+
+            {{-- 4. Riwayat Dokumen PDF --}}
+            <a href="{{ route('document_analysis.history', ['locale' => app()->getLocale()]) }}"
+                class="flex items-center gap-3.5 p-3.5 rounded-2xl border transition {{ request()->routeIs('document_analysis.history', 'document_analysis.index') ? 'bg-amber-500/20 border-amber-500 text-white' : 'bg-white/5 border-white/5 text-white/80 hover:bg-white/10' }}">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                    <i data-lucide="history" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-bold text-sm text-white truncate">Riwayat Dokumen PDF</div>
+                    <div class="text-[0.7rem] text-white/50 truncate">Daftar arsip telaah dokumen</div>
+                </div>
+            </a>
+        </div>
+
+        {{-- Mobile Language Switcher --}}
+        <div class="border-t border-white/10 pt-4 flex items-center justify-between">
+            <span class="text-xs font-bold text-white/60 uppercase tracking-wider">Pilihan Bahasa:</span>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="setGlobalLanguage('id')" class="px-3.5 py-2 rounded-xl text-xs font-black transition cursor-pointer {{ app()->getLocale() === 'id' ? 'bg-bima-red text-white shadow-md' : 'bg-white/5 text-white/60 hover:bg-white/10' }}">
+                    ID (Indonesia)
+                </button>
+                <button type="button" onclick="setGlobalLanguage('en')" class="px-3.5 py-2 rounded-xl text-xs font-black transition cursor-pointer {{ app()->getLocale() === 'en' ? 'bg-bima-red text-white shadow-md' : 'bg-white/5 text-white/60 hover:bg-white/10' }}">
+                    EN (English)
+                </button>
+                <button type="button" onclick="setGlobalLanguage('zh')" class="px-3.5 py-2 rounded-xl text-xs font-black transition cursor-pointer {{ app()->getLocale() === 'zh' ? 'bg-bima-red text-white shadow-md' : 'bg-white/5 text-white/60 hover:bg-white/10' }}">
+                    ZH (中文)
+                </button>
+            </div>
+        </div>
     </div>
 
     {{-- Main Content Wrapper --}}
@@ -510,7 +733,7 @@
                     statusText.className = 'text-[0.65rem] font-black uppercase tracking-wider text-amber-600';
                 }
                 if (sidebarBtn) {
-                    sidebarBtn.className = 'w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 transition flex items-center justify-center group/access relative cursor-pointer';
+                    sidebarBtn.className = 'w-11 h-11 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 transition flex items-center justify-center group/access relative cursor-pointer';
                 }
             } else {
                 if (iconWrapper) {
@@ -521,7 +744,7 @@
                     statusText.className = 'text-[0.65rem] font-black uppercase tracking-wider text-gray-800';
                 }
                 if (sidebarBtn) {
-                    sidebarBtn.className = 'w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition flex items-center justify-center group/access relative cursor-pointer';
+                    sidebarBtn.className = 'w-11 h-11 rounded-2xl bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition flex items-center justify-center group/access relative cursor-pointer';
                 }
                 if (synth) synth.cancel();
                 if (welcomeAudioObj) {
@@ -568,7 +791,7 @@
             let msg = 'Mode ramah disabilitas diaktifkan. Panduan audio siap membantu navigasi Anda.';
             if (activeLang === 'en') {
                 msg = 'Accessibility mode activated. Voice guidance is ready.';
-            } else if (activeLang === 'zh') {
+            } if (activeLang === 'zh') {
                 msg = '无障碍模式已开启。语音助手准备就绪。';
             }
             speakText(msg);
@@ -636,21 +859,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const activeLang = '{{ app()->getLocale() }}';
-            
-            const btnId = document.getElementById('global-lang-id');
-            const btnEn = document.getElementById('global-lang-en');
-            const btnZh = document.getElementById('global-lang-zh');
-            
-            const activeClass = "bg-bima-red text-white shadow-sm font-black";
-            const inactiveClass = "text-white/40 hover:text-white hover:bg-white/5 font-semibold";
-            
-            if (btnId && btnEn && btnZh) {
-                btnId.className = "w-9 h-9 rounded-xl text-[0.6rem] border-none cursor-pointer transition-all duration-300 flex items-center justify-center " + (activeLang === 'id' ? activeClass : inactiveClass);
-                btnEn.className = "w-9 h-9 rounded-xl text-[0.6rem] border-none cursor-pointer transition-all duration-300 flex items-center justify-center " + (activeLang === 'en' ? activeClass : inactiveClass);
-                btnZh.className = "w-9 h-9 rounded-xl text-[0.6rem] border-none cursor-pointer transition-all duration-300 flex items-center justify-center " + (activeLang === 'zh' ? activeClass : inactiveClass);
-            }
-
             updateAccessibilityUI();
 
             // If accessibility mode was already enabled, play welcome audio on first user click
