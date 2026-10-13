@@ -1,100 +1,122 @@
 <x-layouts.app title="Memproses Dokumen PDF">
-    <div class="max-w-2xl mx-auto px-4 py-16 animate-fade-in" x-data="documentProcessingEngine()">
-
-        <div class="bg-white rounded-[2.5rem] border border-gray-100 p-8 sm:p-12 shadow-xl shadow-gray-200/50 text-center relative overflow-hidden">
-            
-            {{-- Decorative Ambient Glow --}}
-            <div class="absolute -top-20 -right-20 w-48 h-48 bg-red-50 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-20 -left-20 w-48 h-48 bg-amber-50 rounded-full blur-3xl pointer-events-none"></div>
-
-            {{-- Main Icon / Status Animation --}}
-            <div class="relative z-10 mb-6">
-                <template x-if="!isFailed">
-                    <div class="w-20 h-20 rounded-3xl bg-red-50 text-bima-red mx-auto flex items-center justify-center shadow-lg shadow-red-500/10 relative">
-                        <i data-lucide="sparkles" class="w-9 h-9 animate-pulse"></i>
-                        <div class="absolute inset-0 rounded-3xl border-2 border-bima-red/20 border-t-bima-red animate-spin"></div>
-                    </div>
-                </template>
-                <template x-if="isFailed">
-                    <div class="w-20 h-20 rounded-3xl bg-red-100 text-red-600 mx-auto flex items-center justify-center shadow-lg shadow-red-500/20">
-                        <i data-lucide="alert-triangle" class="w-9 h-9"></i>
-                    </div>
-                </template>
-            </div>
-
-            {{-- Title & Document Metadata --}}
-            <div class="relative z-10 mb-8">
-                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-gray-100 text-gray-600 text-[0.65rem] font-bold uppercase tracking-widest mb-3">
+    <div class="max-w-4xl mx-auto px-4 py-8 animate-fade-in" x-data="documentProcessingEngine()">
+        
+        {{-- Header Section (Consistent with create.blade.php) --}}
+        <div class="mb-8">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-50 text-bima-red border border-red-100 text-[0.65rem] font-black uppercase tracking-widest">
+                    <i data-lucide="sparkles" class="w-3 h-3"></i>
+                    OpenAI GPT-4o-mini &bull; Pipeline Analisis
+                </span>
+                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[0.65rem] font-bold uppercase tracking-wider">
                     <i data-lucide="file-text" class="w-3 h-3"></i>
                     {{ $documentAnalysis->file_name }} &bull; {{ $documentAnalysis->formattedFileSize() }}
                 </span>
+            </div>
+            <h1 class="text-3xl font-black text-gray-900 tracking-tight uppercase">
+                <span class="lang-id">Memproses Analisis Dokumen</span>
+                <span class="lang-en">Processing Document Analysis</span>
+                <span class="lang-zh">正在处理文档智能分析</span>
+            </h1>
+            <p class="text-xs text-gray-500 font-medium mt-1 leading-relaxed">
+                <span class="lang-id">Sistem sedang membaca naskah PDF, mengekstrak struktur teks, dan merumuskan analisis komprehensif.</span>
+                <span class="lang-en">The system is parsing the PDF document, extracting text structures, and synthesizing academic insights.</span>
+                <span class="lang-zh">系统正在解析 PDF 文档结构，提取正文内容并生成综合性学术分析。</span>
+            </p>
+        </div>
+
+        {{-- Processing Status Card (Consistent width & padding with create.blade.php) --}}
+        <div class="bg-white rounded-[2.5rem] border border-gray-100 p-8 lg:p-10 shadow-xl shadow-gray-200/40 relative overflow-hidden">
+            
+            {{-- Status Banner --}}
+            <div class="flex flex-col items-center justify-center text-center py-4 mb-6">
+                {{-- Clean Status Icon --}}
+                <div class="w-16 h-16 rounded-2xl bg-red-50 text-bima-red flex items-center justify-center mb-4 border border-red-100 shadow-sm">
+                    <span x-show="!isFailed" class="flex items-center justify-center">
+                        <i data-lucide="file-search" class="w-8 h-8 text-bima-red"></i>
+                    </span>
+                    <span x-show="isFailed" x-cloak class="flex items-center justify-center">
+                        <i data-lucide="alert-triangle" class="w-8 h-8 text-red-600"></i>
+                    </span>
+                </div>
+
                 <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight" x-text="currentStatusTitle">
-                    Memproses Analisis Dokumen...
+                    Mengekstrak Teks Dokumen...
                 </h2>
-                <p class="text-xs text-gray-400 font-medium mt-1.5 max-w-md mx-auto leading-relaxed" x-text="currentStatusDesc">
-                    AI sedang mengekstrak teks, menelaah metodologi, dan merumuskan rekomendasi akademik.
+                <p class="text-xs text-gray-500 font-medium mt-1.5 max-w-lg mx-auto leading-relaxed" x-text="currentStatusDesc">
+                    Sistem sedang membaca isi halaman naskah PDF...
                 </p>
+
+                {{-- Clean Minimalist Progress Bar --}}
+                <div class="w-full max-w-lg bg-gray-100 h-2 rounded-full overflow-hidden mt-6">
+                    <div class="bg-bima-red h-full rounded-full transition-all duration-700 ease-out"
+                         :style="'width: ' + (step === 1 ? '33%' : (step === 2 ? '66%' : (step === 3 ? '90%' : '100%')))">
+                    </div>
+                </div>
             </div>
 
             {{-- Progress Steps Card --}}
-            <div class="relative z-10 bg-gray-50/70 border border-gray-100 rounded-2xl p-5 mb-8 text-left space-y-3.5">
+            <div class="bg-gray-50/80 border border-gray-100 rounded-2xl p-6 text-left space-y-4 max-w-2xl mx-auto mb-4">
                 {{-- Step 1 --}}
-                <div class="flex items-center gap-3">
-                    <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black shrink-0 transition-colors"
-                         :class="step >= 1 ? (step > 1 ? 'bg-green-500 text-white' : 'bg-bima-red text-white') : 'bg-gray-200 text-gray-400'">
-                        <template x-if="step > 1">
-                            <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                        </template>
-                        <template x-if="step <= 1">
-                            <span>1</span>
-                        </template>
+                <div class="flex items-center gap-4">
+                    <div class="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-colors"
+                         :class="step > 1 ? 'bg-green-600 text-white' : (step === 1 ? 'bg-bima-red text-white' : 'bg-gray-200 text-gray-500')">
+                        <span x-show="step <= 1">1</span>
+                        <span x-show="step > 1" x-cloak class="flex items-center justify-center">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                        </span>
                     </div>
                     <div class="flex-1 min-w-0">
                         <p class="text-xs font-bold text-gray-800" :class="step === 1 ? 'text-bima-red' : ''">Ekstraksi Halaman &amp; Teks PDF</p>
-                        <p class="text-[0.65rem] text-gray-400" x-show="totalWords > 0" x-text="totalWords + ' kata terdeteksi'"></p>
+                        <p class="text-[0.68rem] text-gray-400 mt-0.5" x-show="totalWords > 0" x-text="totalWords + ' kata terdeteksi'"></p>
                     </div>
-                    <span x-show="step === 1" class="w-2 h-2 rounded-full bg-bima-red animate-ping"></span>
+                    <span class="text-[0.65rem] font-bold uppercase tracking-wider shrink-0"
+                          :class="step > 1 ? 'text-green-600' : (step === 1 ? 'text-bima-red' : 'text-gray-400')"
+                          x-text="step > 1 ? 'Selesai' : (step === 1 ? 'Sedang Berjalan' : 'Menunggu')">
+                    </span>
                 </div>
 
                 {{-- Step 2 --}}
-                <div class="flex items-center gap-3">
-                    <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black shrink-0 transition-colors"
-                         :class="step >= 2 ? (step > 2 ? 'bg-green-500 text-white' : 'bg-bima-red text-white') : 'bg-gray-200 text-gray-400'">
-                        <template x-if="step > 2">
-                            <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                        </template>
-                        <template x-if="step <= 2">
-                            <span>2</span>
-                        </template>
+                <div class="flex items-center gap-4">
+                    <div class="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-colors"
+                         :class="step > 2 ? 'bg-green-600 text-white' : (step === 2 ? 'bg-bima-red text-white' : 'bg-gray-200 text-gray-500')">
+                        <span x-show="step <= 2">2</span>
+                        <span x-show="step > 2" x-cloak class="flex items-center justify-center">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                        </span>
                     </div>
                     <div class="flex-1 min-w-0">
                         <p class="text-xs font-bold text-gray-800" :class="step === 2 ? 'text-bima-red' : ''">Analisis Multi-Task OpenAI GPT-4o-mini</p>
-                        <p class="text-[0.65rem] text-gray-400">Merumuskan ringkasan eksekutif, kesimpulan, dan poin rekomendasi</p>
+                        <p class="text-[0.68rem] text-gray-400 mt-0.5">Merumuskan ringkasan eksekutif, kesimpulan, dan poin rekomendasi</p>
                     </div>
-                    <span x-show="step === 2" class="w-2 h-2 rounded-full bg-bima-red animate-ping"></span>
+                    <span class="text-[0.65rem] font-bold uppercase tracking-wider shrink-0"
+                          :class="step > 2 ? 'text-green-600' : (step === 2 ? 'text-bima-red' : 'text-gray-400')"
+                          x-text="step > 2 ? 'Selesai' : (step === 2 ? 'Sedang Berjalan' : 'Menunggu')">
+                    </span>
                 </div>
 
                 {{-- Step 3 --}}
-                <div class="flex items-center gap-3">
-                    <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black shrink-0 transition-colors"
-                         :class="step >= 3 ? (step > 3 ? 'bg-green-500 text-white' : 'bg-bima-red text-white') : 'bg-gray-200 text-gray-400'">
-                        <template x-if="step > 3">
-                            <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                        </template>
-                        <template x-if="step <= 3">
-                            <span>3</span>
-                        </template>
+                <div class="flex items-center gap-4">
+                    <div class="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-colors"
+                         :class="step > 3 ? 'bg-green-600 text-white' : (step === 3 ? 'bg-bima-red text-white' : 'bg-gray-200 text-gray-500')">
+                        <span x-show="step <= 3">3</span>
+                        <span x-show="step > 3" x-cloak class="flex items-center justify-center">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                        </span>
                     </div>
                     <div class="flex-1 min-w-0">
                         <p class="text-xs font-bold text-gray-800" :class="step === 3 ? 'text-bima-red' : ''">Sintesis Narasi Audio (Dual-Engine TTS)</p>
-                        <p class="text-[0.65rem] text-gray-400">Menghasilkan audio briefing eksekutif siap dengar</p>
+                        <p class="text-[0.68rem] text-gray-400 mt-0.5">Menghasilkan audio briefing eksekutif siap dengar</p>
                     </div>
-                    <span x-show="step === 3" class="w-2 h-2 rounded-full bg-bima-red animate-ping"></span>
+                    <span class="text-[0.65rem] font-bold uppercase tracking-wider shrink-0"
+                          :class="step > 3 ? 'text-green-600' : (step === 3 ? 'text-bima-red' : 'text-gray-400')"
+                          x-text="step > 3 ? 'Selesai' : (step === 3 ? 'Sedang Berjalan' : 'Menunggu')">
+                    </span>
                 </div>
             </div>
 
             {{-- Error State Actions --}}
-            <div x-show="isFailed" x-cloak class="relative z-10 bg-red-50 border border-red-200 rounded-2xl p-5 mb-6 text-left">
+            <div x-show="isFailed" x-cloak class="relative z-10 bg-red-50 border border-red-200 rounded-2xl p-5 mb-6 text-left max-w-2xl mx-auto">
                 <div class="flex items-start gap-3">
                     <i data-lucide="alert-circle" class="w-5 h-5 text-red-600 shrink-0 mt-0.5"></i>
                     <div>
@@ -128,6 +150,9 @@
                 slug: '{{ $documentAnalysis->slug }}',
 
                 init() {
+                    this.$nextTick(() => {
+                        if (window.lucide) window.lucide.createIcons();
+                    });
                     this.startExecution();
                 },
 
@@ -138,12 +163,13 @@
                     this.currentStatusTitle = 'Mengekstrak Teks Dokumen...';
                     this.currentStatusDesc = 'Sistem sedang membaca isi halaman naskah PDF...';
 
-                    // Simulasi visual step progression saat async call berjalan
+                    // Visual step progression saat asynchronous execution berlangsung
                     const stepTimer = setTimeout(() => {
                         if (this.step < 2 && !this.isFailed) {
                             this.step = 2;
                             this.currentStatusTitle = 'Analisis Naskah Berjalan...';
                             this.currentStatusDesc = 'OpenAI GPT-4o-mini sedang menelaah substansi dokumen & merumuskan rekomendasi...';
+                            this.$nextTick(() => { if (window.lucide) window.lucide.createIcons(); });
                         }
                     }, 4000);
 
@@ -152,6 +178,7 @@
                             this.step = 3;
                             this.currentStatusTitle = 'Menyiapkan Panduan Audio...';
                             this.currentStatusDesc = 'OpenAI TTS sedang memproses narasi briefing eksekutif suara...';
+                            this.$nextTick(() => { if (window.lucide) window.lucide.createIcons(); });
                         }
                     }, 14000);
 
@@ -174,6 +201,7 @@
                             this.step = 4;
                             this.currentStatusTitle = 'Analisis Selesai!';
                             this.currentStatusDesc = 'Mengarahkan ke halaman hasil telaah dokumen...';
+                            this.$nextTick(() => { if (window.lucide) window.lucide.createIcons(); });
                             setTimeout(() => {
                                 window.location.href = data.redirect_url;
                             }, 1000);

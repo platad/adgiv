@@ -110,29 +110,27 @@
 
                     <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="flex items-center gap-3.5">
-                            {{-- Play/Pause Button --}}
+                            {{-- Play/Pause Button (Fixed: always renders SVG icons) --}}
                             <button type="button" 
                                     @click="toggleAudio()"
-                                    class="w-13 h-13 rounded-2xl bg-bima-red hover:bg-red-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-red-600/30 transition-transform active:scale-95 cursor-pointer"
+                                    class="w-12 h-12 rounded-2xl bg-bima-red hover:bg-red-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-red-600/30 transition-transform active:scale-95 cursor-pointer"
                                     :title="isPlaying ? 'Jeda Audio' : 'Putar Audio Narasi'">
-                                <template x-if="!isPlaying">
-                                    <i data-lucide="play" class="w-6 h-6 fill-current ml-0.5"></i>
-                                </template>
-                                <template x-if="isPlaying">
-                                    <i data-lucide="pause" class="w-6 h-6 fill-current"></i>
-                                </template>
+                                <span x-show="!isPlaying" class="flex items-center justify-center">
+                                    <i data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>
+                                </span>
+                                <span x-show="isPlaying" x-cloak class="flex items-center justify-center">
+                                    <i data-lucide="pause" class="w-5 h-5 fill-current"></i>
+                                </span>
                             </button>
 
                             <div>
                                 <div class="flex items-center gap-2">
                                     <span class="text-[0.62rem] font-black uppercase tracking-widest text-red-400">Audio Briefing Eksekutif</span>
-                                    <template x-if="isPlaying">
-                                        <span class="flex items-center gap-0.5">
-                                            <span class="w-1 h-3 bg-red-500 rounded-full animate-bounce"></span>
-                                            <span class="w-1 h-4 bg-red-400 rounded-full animate-bounce" style="animation-delay: 0.15s"></span>
-                                            <span class="w-1 h-2 bg-red-500 rounded-full animate-bounce" style="animation-delay: 0.3s"></span>
-                                        </span>
-                                    </template>
+                                    <span x-show="isPlaying" x-cloak class="flex items-center gap-0.5">
+                                        <span class="w-1 h-3 bg-red-500 rounded-full animate-bounce"></span>
+                                        <span class="w-1 h-4 bg-red-400 rounded-full animate-bounce" style="animation-delay: 0.15s"></span>
+                                        <span class="w-1 h-2 bg-red-500 rounded-full animate-bounce" style="animation-delay: 0.3s"></span>
+                                    </span>
                                 </div>
                                 <h4 class="text-sm font-black text-white uppercase tracking-tight mt-0.5">
                                     Ulasan Suara AI &bull; BIMA Supervisory
@@ -318,7 +316,7 @@
                                 {{-- Action / Solusi Konkret --}}
                                 <div class="bg-blue-50/50 border border-blue-100/60 rounded-xl p-3.5">
                                     <span class="text-[0.62rem] font-black uppercase tracking-widest text-blue-700 flex items-center gap-1 mb-1">
-                                        <i data-lucide="check" class="w-3 h-3"></i>
+                                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
                                         Rekomendasi Aksi:
                                     </span>
                                     <p class="text-xs text-blue-900 font-medium leading-relaxed">
@@ -347,6 +345,12 @@
                 audioTimeDisplay: '00:00 / 00:00',
                 synth: window.speechSynthesis,
                 audioUrl: '{{ $documentAnalysis->briefing_audio_path }}',
+
+                init() {
+                    this.$nextTick(() => {
+                        if (window.lucide) window.lucide.createIcons();
+                    });
+                },
 
                 toggleAudio() {
                     const player = this.$refs.audioPlayer;
