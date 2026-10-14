@@ -9,62 +9,100 @@
     </x-slot>
 
     <div x-data="{ showStatsModal: false, showDatasetModal: false, appLang: '{{ app()->getLocale() }}' }" class="space-y-10 pb-12">
-        {{-- Header Banner --}}
+        {{-- Header Banner (Balanced 2-Column Layout) --}}
         <div class="relative bg-gray-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl overflow-hidden border border-white/5">
             {{-- Glowing Backdrops --}}
             <div class="absolute -right-10 -top-10 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl opacity-70"></div>
             <div class="absolute -left-10 -bottom-10 w-80 h-80 bg-blue-600/15 rounded-full blur-3xl opacity-50"></div>
 
-            <div class="relative z-10 max-w-4xl">
-                <div class="flex flex-wrap items-center gap-2 mb-6">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/30 text-[0.65rem] font-black uppercase tracking-widest">
-                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                        <span class="lang-id">Metodologi Analisis Cerdas</span>
-                        <span class="lang-en">Smart Analysis Methodology</span>
-                        <span class="lang-zh">智能分析方法论</span>
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/30 text-[0.65rem] font-black uppercase tracking-widest">
-                        <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
-                        Multi-Task Transformer RoBERTa
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[0.65rem] font-black uppercase tracking-widest">
-                        <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-                        Graph Network Topology
-                    </span>
+            <div class="relative z-10 grid grid-cols-1 xl:grid-cols-12 gap-8 items-center">
+                {{-- Left Text Area (7 cols on xl) --}}
+                <div class="xl:col-span-7 space-y-5">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/30 text-[0.65rem] font-black uppercase tracking-widest">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                            <span class="lang-id">Metodologi Analisis Cerdas</span>
+                            <span class="lang-en">Smart Analysis Methodology</span>
+                            <span class="lang-zh">智能分析方法论</span>
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/30 text-[0.65rem] font-black uppercase tracking-widest">
+                            <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                            Multi-Task RoBERTa
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[0.65rem] font-black uppercase tracking-widest">
+                            <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+                            Peta Jaringan Graf
+                        </span>
+                    </div>
+
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight uppercase">
+                        <span class="lang-id">
+                            Analisis Suara Cerdas & <br class="hidden sm:inline" />
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-300">
+                                Peta Hubungan Bimbingan Akademik
+                            </span>
+                        </span>
+                        <span class="lang-en">
+                            Intelligent Voice Analysis & <br class="hidden sm:inline" />
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-300">
+                                Academic Supervision Interaction Mapping
+                            </span>
+                        </span>
+                        <span class="lang-zh">
+                            智能语音分析与 <br class="hidden sm:inline" />
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-300">
+                                学术指导交互关系图谱
+                            </span>
+                        </span>
+                    </h1>
+                    
+                    <p class="text-gray-300 text-sm md:text-base font-medium leading-relaxed">
+                        <span class="lang-id">
+                            Metode ilmiah terbaru untuk menganalisis rekaman bimbingan akademik secara otomatis dan menyeluruh. Sistem ini memisahkan suara dosen dan mahasiswa, membaca tinggi-rendahnya intonasi nada bicara, mengenali pola pemberian saran dosen serta relasi komunikasi (kemitraan vs dominasi), lalu merangkum alur bimbingan dalam bentuk bagan interaktif yang mudah dipahami.
+                        </span>
+                        <span class="lang-en">
+                            The latest scientific methodology to analyze academic thesis supervision audio recordings automatically and comprehensively. The system separates the voices of supervisors and students, tracks pitch intonation dynamics, detects advice-giving patterns and communicative power relations (partnership vs dominance), and summarizes the interaction flow into an intuitive, interactive flowchart.
+                        </span>
+                        <span class="lang-zh">
+                            全面且自动分析学术论文指导录音的最新科学方法。该系统自动分离导师与学生的发言角色，提取语调高低变化，识别建议传达模式与权力沟通关系（平等协作或指导权威），并将指导对话全过程梳理为直观互动的流程图。
+                        </span>
+                    </p>
                 </div>
 
-                <h1 class="text-3xl md:text-5xl font-black tracking-tight leading-tight uppercase mb-5">
-                    <span class="lang-id">
-                        Analisis Suara Cerdas & <br class="hidden md:inline" />
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-300">
-                            Peta Hubungan Bimbingan Akademik
-                        </span>
-                    </span>
-                    <span class="lang-en">
-                        Intelligent Voice Analysis & <br class="hidden md:inline" />
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-300">
-                            Academic Supervision Interaction Mapping
-                        </span>
-                    </span>
-                    <span class="lang-zh">
-                        智能语音分析与 <br class="hidden md:inline" />
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-300">
-                            学术指导交互关系图谱
-                        </span>
-                    </span>
-                </h1>
-                
-                <p class="text-gray-300 text-sm md:text-base font-medium leading-relaxed max-w-3xl">
-                    <span class="lang-id">
-                        Metode ilmiah terbaru untuk menganalisis rekaman bimbingan akademik secara otomatis dan menyeluruh. Sistem ini memisahkan suara dosen dan mahasiswa, membaca tinggi-rendahnya intonasi nada bicara, mengenali pola pemberian saran dosen serta relasi komunikasi (kemitraan vs dominasi), lalu merangkum alur bimbingan dalam bentuk bagan interaktif yang mudah dipahami.
-                    </span>
-                    <span class="lang-en">
-                        The latest scientific methodology to analyze academic thesis supervision audio recordings automatically and comprehensively. The system separates the voices of supervisors and students, tracks pitch intonation dynamics, detects advice-giving patterns and communicative power relations (partnership vs dominance), and summarizes the interaction flow into an intuitive, interactive flowchart.
-                    </span>
-                    <span class="lang-zh">
-                        全面且自动分析学术论文指导录音的最新科学方法。该系统自动分离导师与学生的发言角色，提取语调高低变化，识别建议传达模式与权力沟通关系（平等协作或指导权威），并将指导对话全过程梳理为直观互动的流程图。
-                    </span>
-                </p>
+                {{-- Right Highlight Cards (5 cols on xl - Fills the empty space elegantly) --}}
+                <div class="xl:col-span-5 grid grid-cols-2 gap-3.5">
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 transition">
+                        <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center mb-2.5">
+                            <i data-lucide="mic" class="w-4 h-4"></i>
+                        </div>
+                        <div class="text-xs font-bold text-white mb-0.5">Diarization Otomatis</div>
+                        <div class="text-[0.7rem] text-gray-400 leading-snug">Membedakan suara dosen dan mahasiswa tanpa input manual.</div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 transition">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-2.5">
+                            <i data-lucide="activity" class="w-4 h-4"></i>
+                        </div>
+                        <div class="text-xs font-bold text-white mb-0.5">Intonasi Nada F0</div>
+                        <div class="text-[0.7rem] text-gray-400 leading-snug">Membaca kontur nada naik (tanya), turun (tegas), dan netral.</div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 transition">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-2.5">
+                            <i data-lucide="share-2" class="w-4 h-4"></i>
+                        </div>
+                        <div class="text-xs font-bold text-white mb-0.5">Topologi Jaringan Graf</div>
+                        <div class="text-[0.7rem] text-gray-400 leading-snug">Visualisasi keterhubungan aktor dan topik secara visual.</div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 transition">
+                        <div class="w-8 h-8 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center mb-2.5">
+                            <i data-lucide="git-merge" class="w-4 h-4"></i>
+                        </div>
+                        <div class="text-xs font-bold text-white mb-0.5">Bagan Alur Mermaid</div>
+                        <div class="text-[0.7rem] text-gray-400 leading-snug">Rangkuman alur bimbingan kronologis dari awal hingga simpulan.</div>
+                    </div>
+                </div>
             </div>
         </div>
 
