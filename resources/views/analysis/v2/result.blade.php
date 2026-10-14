@@ -365,10 +365,6 @@
                         <i data-lucide="users" class="w-3.5 h-3.5 text-blue-600"></i>
                         <span>Mahasiswa</span>
                     </span>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold shadow-2xs">
-                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-600"></i>
-                        <span>Sintesis Otomatis AI</span>
-                    </span>
                 </div>
             </div>
             
