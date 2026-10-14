@@ -374,6 +374,11 @@
                                 <span class="lang-zh">会话标题</span>
                             </th>
                             <th class="p-6">
+                                <span class="lang-id">Model / Versi</span>
+                                <span class="lang-en">Model / Version</span>
+                                <span class="lang-zh">模型/版本</span>
+                            </th>
+                            <th class="p-6">
                                 <span class="lang-id">Tanggal Analisis</span>
                                 <span class="lang-en">Analysis Date</span>
                                 <span class="lang-zh">分析日期</span>
@@ -396,7 +401,8 @@
                                 <!-- Judul -->
                                 <td class="p-6">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 flex-shrink-0">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                                             :class="item.version === 2 ? 'bg-purple-50 text-purple-600' : 'bg-gray-100 text-gray-500'">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
                                         </div>
                                         <div>
@@ -404,6 +410,21 @@
                                             <span class="text-[0.65rem] text-gray-400 font-bold uppercase tracking-wider block sm:hidden" x-text="item.created_at_formatted"></span>
                                         </div>
                                     </div>
+                                </td>
+                                <!-- Model / Versi -->
+                                <td class="p-6">
+                                    <template x-if="item.version === 2">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-purple-600"></span>
+                                            Versi 2 (RoBERTa & Graf)
+                                        </span>
+                                    </template>
+                                    <template x-if="item.version !== 2">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                                            Versi 1 (IndoBERT)
+                                        </span>
+                                    </template>
                                 </td>
                                 <!-- Tanggal -->
                                 <td class="p-6 hidden sm:table-cell text-sm font-medium text-gray-500" x-text="item.created_at_formatted"></td>
@@ -458,12 +479,25 @@
                     <div class="p-5 flex flex-col gap-4 hover:bg-gray-50/50 transition-colors">
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 flex-shrink-0">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                                     :class="item.version === 2 ? 'bg-purple-50 text-purple-600' : 'bg-gray-100 text-gray-500'">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
                                 </div>
                                 <div>
                                     <span class="font-bold text-gray-950 block text-sm" x-text="item.title"></span>
-                                    <span class="text-[0.65rem] text-gray-400 font-bold uppercase tracking-wider mt-0.5 block" x-text="item.created_at_formatted"></span>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <template x-if="item.version === 2">
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[0.6rem] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200">
+                                                V2 RoBERTa
+                                            </span>
+                                        </template>
+                                        <template x-if="item.version !== 2">
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[0.6rem] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                                                V1 IndoBERT
+                                            </span>
+                                        </template>
+                                        <span class="text-[0.65rem] text-gray-400 font-bold uppercase tracking-wider" x-text="item.created_at_formatted"></span>
+                                    </div>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full text-[0.6rem] font-black uppercase tracking-wider inline-block border flex-shrink-0"

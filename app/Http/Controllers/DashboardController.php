@@ -314,14 +314,17 @@ class DashboardController extends Controller
             ->paginate(5); // 5 items per page
 
         $items = collect($paginator->items())->map(function ($item) {
+            $version = (int) ($item->version ?? 1);
             return [
                 'id' => $item->id,
                 'slug' => $item->slug,
                 'title' => $item->title,
                 'status' => $item->status,
+                'version' => $version,
+                'version_label' => $version === 2 ? 'Versi 2 (Eksperimen RoBERTa & Graf)' : 'Versi 1 (Stabil IndoBERT)',
                 'created_at_formatted' => $item->created_at->format('d M Y, H:i'),
-                'result_route' => $item->version == 2 ? route('analysis.v2.result', ['analysis' => $item->slug, 'locale' => app()->getLocale()]) : route('analysis.result', ['analysis' => $item->slug, 'locale' => app()->getLocale()]),
-                'processing_route' => $item->version == 2 ? route('analysis.v2.processing', ['analysis' => $item->slug, 'locale' => app()->getLocale()]) : route('analysis.processing', ['analysis' => $item->slug, 'locale' => app()->getLocale()]),
+                'result_route' => $version === 2 ? route('analysis.v2.result', ['analysis' => $item->slug, 'locale' => app()->getLocale()]) : route('analysis.result', ['analysis' => $item->slug, 'locale' => app()->getLocale()]),
+                'processing_route' => $version === 2 ? route('analysis.v2.processing', ['analysis' => $item->slug, 'locale' => app()->getLocale()]) : route('analysis.processing', ['analysis' => $item->slug, 'locale' => app()->getLocale()]),
             ];
         });
 
