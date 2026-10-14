@@ -15,9 +15,9 @@
                 <span class="lang-zh">开始新语音分析</span>
             </h1>
             <p class="text-gray-500 font-medium mt-2">
-                <span class="lang-id">Unggah file audio percakapan bimbingan akademik Anda. Semua pemrosesan dilakukan di server — tidak ada slicing di browser.</span>
-                <span class="lang-en">Upload your academic supervision audio file. All processing is done on the server — no browser-side slicing.</span>
-                <span class="lang-zh">上传您的学术指导录音文件，所有处理均在服务器上完成。</span>
+                <span class="lang-id">Unggah file rekaman audio bimbingan skripsi Anda. Sistem akan memproses dan menganalisis percakapan secara otomatis.</span>
+                <span class="lang-en">Upload your supervision audio recording. The system will process and analyze the conversation automatically.</span>
+                <span class="lang-zh">上传您的学术指导录音文件，系统将自动处理并分析对话。</span>
             </p>
         </div>
 
@@ -72,9 +72,9 @@
                         <option value="zh" @selected(old('locale') === 'zh')>🇨🇳 中文 (Mandarin)</option>
                     </select>
                     <p class="text-xs text-gray-400 mt-2 font-medium">
-                        <span class="lang-id">Pilih bahasa yang digunakan dalam rekaman — bukan bahasa browser Anda.</span>
-                        <span class="lang-en">Select the language spoken in the recording — not your browser language.</span>
-                        <span class="lang-zh">选择录音中使用的语言，而非浏览器语言。</span>
+                        <span class="lang-id">Sesuaikan dengan bahasa percakapan yang diucapkan di dalam rekaman.</span>
+                        <span class="lang-en">Select the language spoken in the audio recording.</span>
+                        <span class="lang-zh">请选择录音中实际使用的对话语言。</span>
                     </p>
                 </div>
 

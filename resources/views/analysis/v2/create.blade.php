@@ -85,9 +85,9 @@
                         <option value="zh" @selected(old('locale') === 'zh')>🇨🇳 中文 (Mandarin)</option>
                     </select>
                     <p class="text-xs text-gray-400 mt-2 font-medium">
-                        <span class="lang-id">Pilih bahasa yang digunakan dalam rekaman — bukan bahasa browser Anda.</span>
-                        <span class="lang-en">Select the language spoken in the recording — not your browser language.</span>
-                        <span class="lang-zh">选择录音中使用的语言，而非浏览器语言。</span>
+                        <span class="lang-id">Sesuaikan dengan bahasa percakapan yang diucapkan di dalam rekaman.</span>
+                        <span class="lang-en">Select the language spoken in the audio recording.</span>
+                        <span class="lang-zh">请选择录音中实际使用的对话语言。</span>
                     </p>
                 </div>
 
