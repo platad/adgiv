@@ -9,6 +9,14 @@
     $adviceCounts = $stats['advice_counts'] ?? [];
     $modeCounts = $stats['mode_counts'] ?? [];
 
+    // Dinamis ekstrak daftar penutur unik beserta jumlah baris tuturannya
+    $speakerCounts = [];
+    foreach ($transcription as $tItem) {
+        $spk = trim($tItem['speaker'] ?? 'Unknown');
+        if ($spk === '') $spk = 'Unknown';
+        $speakerCounts[$spk] = ($speakerCounts[$spk] ?? 0) + 1;
+    }
+
     $getAdviceBadgeStyle = function($label) {
         $l = strtolower(trim($label ?? ''));
         switch ($l) {
@@ -584,30 +592,51 @@
                         </div>
                     </div>
 
-                    {{-- Automatic Speaker Filter Pills --}}
-                    <div class="flex items-center gap-1.5 bg-gray-100/80 p-1 rounded-2xl border border-gray-200 text-xs font-bold shrink-0 self-start sm:self-auto">
+                    {{-- Automatic Responsive Speaker Filter Pills (Wrap gracefully, No dots) --}}
+                    <div class="flex flex-wrap items-center gap-1.5 bg-gray-100/80 p-1.5 rounded-2xl border border-gray-200 text-xs font-bold shrink-0 self-start sm:self-auto max-w-full">
+                        {{-- Tombol Semua --}}
                         <button type="button" @click="setSpeakerFilter('all')"
-                            class="px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
+                            class="px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
                             :class="speakerFilter === 'all' ? 'bg-white text-gray-950 shadow-sm font-black' : 'text-gray-500 hover:text-gray-900'">
                             <span>Semua</span>
-                            <span class="px-1.5 py-0.2 rounded-full text-[0.62rem] bg-gray-100 text-gray-600">{{ $totalSegments }}</span>
+                            <span class="px-1.5 py-0.2 rounded-full text-[0.62rem] bg-gray-200/70 text-gray-700 font-semibold">{{ $totalSegments }}</span>
                         </button>
-                        <button type="button" @click="setSpeakerFilter('Dosen')"
-                            class="px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
-                            :class="speakerFilter === 'Dosen' ? 'bg-purple-700 text-white shadow-sm font-black' : 'text-gray-500 hover:text-purple-700'">
-                            <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
-                            <span>Dosen</span>
-                            <span class="px-1.5 py-0.2 rounded-full text-[0.62rem]"
-                                  :class="speakerFilter === 'Dosen' ? 'bg-purple-800 text-purple-200' : 'bg-gray-200/80 text-gray-600'">{{ $dosenSegments }}</span>
-                        </button>
-                        <button type="button" @click="setSpeakerFilter('Mahasiswa')"
-                            class="px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
-                            :class="speakerFilter === 'Mahasiswa' ? 'bg-blue-600 text-white shadow-sm font-black' : 'text-gray-500 hover:text-blue-600'">
-                            <span class="w-1.5 h-1.5 rounded-full bg-blue-300"></span>
-                            <span>Mahasiswa</span>
-                            <span class="px-1.5 py-0.2 rounded-full text-[0.62rem]"
-                                  :class="speakerFilter === 'Mahasiswa' ? 'bg-blue-700 text-blue-200' : 'bg-gray-200/80 text-gray-600'">{{ $mhsSegments }}</span>
-                        </button>
+
+                        {{-- Dynamic Loop Penutur (Dosen, Mahasiswa, atau Penutur Tambahan) --}}
+                        @foreach ($speakerCounts as $spkName => $count)
+                            @php
+                                $spkLower = strtolower($spkName);
+                                $isDosenSpk = $spkLower === 'dosen' || $spkLower === 'supervisor';
+                                $isMhsSpk = $spkLower === 'mahasiswa' || $spkLower === 'student';
+                                
+                                $activeClass = $isDosenSpk 
+                                    ? 'bg-purple-700 text-white shadow-sm font-black' 
+                                    : ($isMhsSpk 
+                                        ? 'bg-blue-600 text-white shadow-sm font-black' 
+                                        : 'bg-stone-800 text-white shadow-sm font-black');
+                                
+                                $hoverClass = $isDosenSpk 
+                                    ? 'hover:text-purple-700' 
+                                    : ($isMhsSpk 
+                                        ? 'hover:text-blue-600' 
+                                        : 'hover:text-stone-900');
+                                
+                                $badgeClass = $isDosenSpk 
+                                    ? 'bg-purple-800 text-purple-100' 
+                                    : ($isMhsSpk 
+                                        ? 'bg-blue-700 text-blue-100' 
+                                        : 'bg-stone-700 text-stone-100');
+                            @endphp
+                            <button type="button" @click="setSpeakerFilter('{{ addslashes($spkName) }}')"
+                                class="px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
+                                :class="speakerFilter.toLowerCase() === '{{ strtolower($spkName) }}' ? '{{ $activeClass }}' : 'text-gray-500 {{ $hoverClass }}'">
+                                <span>{{ $spkName }}</span>
+                                <span class="px-1.5 py-0.2 rounded-full text-[0.62rem]"
+                                      :class="speakerFilter.toLowerCase() === '{{ strtolower($spkName) }}' ? '{{ $badgeClass }}' : 'bg-gray-200/80 text-gray-700 font-semibold'">
+                                    {{ $count }}
+                                </span>
+                            </button>
+                        @endforeach
                     </div>
                 </div>
 
@@ -1529,16 +1558,17 @@
                     if (this.speakerFilter === 'all') {
                         return Array.from({ length: this.totalRows }, (_, i) => i);
                     }
+                    const targetFilter = this.speakerFilter.toLowerCase();
                     return this.rawRows
-                        .map((item, idx) => ({ speaker: item.speaker, idx }))
+                        .map((item, idx) => ({ speaker: (item.speaker || '').toLowerCase(), idx }))
                         .filter(item => {
-                            if (this.speakerFilter === 'Dosen') {
-                                return item.speaker.toLowerCase() === 'dosen' || item.speaker.toLowerCase() === 'supervisor';
+                            if (targetFilter === 'dosen') {
+                                return item.speaker === 'dosen' || item.speaker === 'supervisor';
                             }
-                            if (this.speakerFilter === 'Mahasiswa') {
-                                return item.speaker.toLowerCase() === 'mahasiswa' || item.speaker.toLowerCase() === 'student';
+                            if (targetFilter === 'mahasiswa') {
+                                return item.speaker === 'mahasiswa' || item.speaker === 'student';
                             }
-                            return true;
+                            return item.speaker === targetFilter;
                         })
                         .map(item => item.idx);
                 },
