@@ -316,13 +316,22 @@
                         </div>
 
                         {{-- Action & Subtext --}}
-                        <div class="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between">
-                            <span class="text-[0.7rem] text-gray-500">Backbone: indobenchmark/indobert-base-p1</span>
-                            <a href="{{ route('analysis.create') }}" 
-                               class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold transition">
-                                <span>Gunakan V1</span>
-                                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-gray-500"></i>
+                        <div class="mt-6 pt-4 border-t border-gray-200 flex flex-wrap items-center justify-between gap-2.5">
+                            <a href="https://colab.research.google.com/drive/1yL3Y-jyT-3orbj-Y8Nt3aMBtNNpKg2WY?usp=sharing" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/80 text-xs font-semibold transition"
+                               title="Buka Notebook Pelatihan IndoBERT di Google Colab">
+                                <i data-lucide="external-link" class="w-3.5 h-3.5 text-amber-700"></i>
+                                <span>Notebook Colab V1</span>
                             </a>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('analysis.create') }}" 
+                                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold transition">
+                                    <span>Gunakan V1</span>
+                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-gray-500"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
 
@@ -375,13 +384,22 @@
                         </div>
 
                         {{-- Action & Subtext --}}
-                        <div class="mt-6 pt-4 border-t border-purple-200/80 flex items-center justify-between">
-                            <span class="text-[0.7rem] text-gray-500">Trained: 4 Epochs • PyTorch 2.x</span>
-                            <a href="{{ route('analysis.v2.create') }}" 
-                               class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-purple-700 text-white hover:bg-purple-800 text-xs font-semibold transition">
-                                <span>Gunakan V2 (Modern)</span>
-                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        <div class="mt-6 pt-4 border-t border-purple-200/80 flex flex-wrap items-center justify-between gap-2.5">
+                            <a href="https://colab.research.google.com/drive/1p2yhLrqD3RlHxt0MQW-w09v3KJ07ae3X?usp=sharing" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/80 text-xs font-semibold transition"
+                               title="Buka Notebook Pelatihan RoBERTa di Google Colab">
+                                <i data-lucide="external-link" class="w-3.5 h-3.5 text-amber-700"></i>
+                                <span>Notebook Colab V2</span>
                             </a>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('analysis.v2.create') }}" 
+                                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-purple-700 text-white hover:bg-purple-800 text-xs font-semibold transition">
+                                    <span>Gunakan V2 (Modern)</span>
+                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -395,7 +413,13 @@
                                 <h4 class="text-sm font-bold text-gray-900">Kurva Evaluasi IndoBERT Base (V1)</h4>
                                 <span class="text-[0.7rem] text-gray-500">Colab Training Loss Profile</span>
                             </div>
-                            <span class="text-xs px-2 py-0.5 rounded bg-gray-200/80 text-gray-700 font-semibold">Baseline</span>
+                            <a href="https://colab.research.google.com/drive/1yL3Y-jyT-3orbj-Y8Nt3aMBtNNpKg2WY?usp=sharing" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1 text-[0.68rem] px-2 py-0.5 rounded bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-semibold transition">
+                                <span>Colab</span>
+                                <i data-lucide="external-link" class="w-3 h-3 text-gray-500"></i>
+                            </a>
                         </div>
                         <div class="rounded-xl overflow-hidden bg-white border border-gray-200 p-2">
                             <img src="{{ asset('assets/images/compare/indobert_cell12_2.png') }}" 
@@ -415,7 +439,13 @@
                                 <h4 class="text-sm font-bold text-purple-950">Kurva Evaluasi RoBERTa Multi-Task (V2)</h4>
                                 <span class="text-[0.7rem] text-gray-500">Multi-Loss Convergence Profile</span>
                             </div>
-                            <span class="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-semibold">Optimasi Tinggi</span>
+                            <a href="https://colab.research.google.com/drive/1p2yhLrqD3RlHxt0MQW-w09v3KJ07ae3X?usp=sharing" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1 text-[0.68rem] px-2 py-0.5 rounded bg-white hover:bg-purple-100 text-purple-900 border border-purple-200 font-semibold transition">
+                                <span>Colab</span>
+                                <i data-lucide="external-link" class="w-3 h-3 text-purple-700"></i>
+                            </a>
                         </div>
                         <div class="rounded-xl overflow-hidden bg-white border border-purple-200/80 p-2">
                             <img src="{{ asset('assets/images/compare/roberta_cell16_1.png') }}" 
@@ -438,7 +468,13 @@
                                 <h4 class="text-sm font-bold text-gray-900">Distribusi Matrix IndoBERT (V1)</h4>
                                 <span class="text-[0.7rem] text-gray-500">Hasil Prediksi Kelas Bimbingan</span>
                             </div>
-                            <span class="text-xs px-2 py-0.5 rounded bg-gray-200/80 text-gray-700 font-semibold">Class Imbalance</span>
+                            <a href="https://colab.research.google.com/drive/1yL3Y-jyT-3orbj-Y8Nt3aMBtNNpKg2WY?usp=sharing" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1 text-[0.68rem] px-2 py-0.5 rounded bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 font-semibold transition">
+                                <span>Colab</span>
+                                <i data-lucide="external-link" class="w-3 h-3 text-gray-500"></i>
+                            </a>
                         </div>
                         <div class="rounded-xl overflow-hidden bg-white border border-gray-200 p-2">
                             <img src="{{ asset('assets/images/compare/indobert_cell15_3.png') }}" 
@@ -458,7 +494,13 @@
                                 <h4 class="text-sm font-bold text-purple-950">Confusion Matrix RoBERTa (V2)</h4>
                                 <span class="text-[0.7rem] text-gray-500">Cross-Discourse Multi-Head</span>
                             </div>
-                            <span class="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-semibold">Presisi Tinggi</span>
+                            <a href="https://colab.research.google.com/drive/1p2yhLrqD3RlHxt0MQW-w09v3KJ07ae3X?usp=sharing" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1 text-[0.68rem] px-2 py-0.5 rounded bg-white hover:bg-purple-100 text-purple-900 border border-purple-200 font-semibold transition">
+                                <span>Colab</span>
+                                <i data-lucide="external-link" class="w-3 h-3 text-purple-700"></i>
+                            </a>
                         </div>
                         <div class="rounded-xl overflow-hidden bg-white border border-purple-200/80 p-2">
                             <img src="{{ asset('assets/images/compare/roberta_cell18_2.png') }}" 
@@ -474,15 +516,21 @@
 
                 {{-- Clean Elegant Footer --}}
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-5 mt-6 border-t border-[#E8E2D7] text-xs text-stone-600">
-                    <div class="flex items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-                        <span class="font-medium text-stone-700">IndoBERT Base (V1 Baseline)</span>
+                        <a href="https://colab.research.google.com/drive/1yL3Y-jyT-3orbj-Y8Nt3aMBtNNpKg2WY?usp=sharing" target="_blank" class="font-medium text-stone-700 hover:text-blue-700 hover:underline inline-flex items-center gap-1">
+                            <span>IndoBERT Base (Colab Notebook)</span>
+                            <i data-lucide="external-link" class="w-3 h-3 text-stone-400"></i>
+                        </a>
                         <span class="mx-1 text-stone-400">•</span>
                         <span class="w-2 h-2 rounded-full bg-purple-600"></span>
-                        <span class="font-medium text-stone-700">RoBERTa Multi-Task (V2 Arsitektur Baru)</span>
+                        <a href="https://colab.research.google.com/drive/1p2yhLrqD3RlHxt0MQW-w09v3KJ07ae3X?usp=sharing" target="_blank" class="font-medium text-stone-700 hover:text-purple-700 hover:underline inline-flex items-center gap-1">
+                            <span>RoBERTa Multi-Task (Colab Notebook)</span>
+                            <i data-lucide="external-link" class="w-3 h-3 text-stone-400"></i>
+                        </a>
                     </div>
                     <span class="text-[0.7rem] text-stone-500 font-medium">
-                        Data validasi diekstraksi langsung dari notebook pelatihan Google Colab BIMA.
+                        Klik tautan di atas untuk menguji atau me-reproduce pelatihan di Google Colab.
                     </span>
                 </div>
             </div>
