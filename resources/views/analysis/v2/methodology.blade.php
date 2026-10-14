@@ -1,6 +1,6 @@
 <x-layouts.app>
     <x-slot name="title">
-        {{ app()->getLocale() === 'zh' ? 'Multi-Task RoBERTa V2 方法论' : (app()->getLocale() === 'en' ? 'Multi-Task RoBERTa V2 Methodology' : 'Metodologi Multi-Task RoBERTa V2') }}
+        {{ app()->getLocale() === 'zh' ? '智能语音分析与交互图谱方法' : (app()->getLocale() === 'en' ? 'Intelligent Voice & Interaction Mapping' : 'Metodologi Analisis Suara & Peta Hubungan') }}
     </x-slot>
 
     {{-- KaTeX Math Renderer Assets --}}
@@ -19,9 +19,9 @@
                 <div class="flex flex-wrap items-center gap-2 mb-6">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/30 text-[0.65rem] font-black uppercase tracking-widest">
                         <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                        <span class="lang-id">Metodologi Riset V2 Terpadu</span>
-                        <span class="lang-en">Integrated V2 Research Methodology</span>
-                        <span class="lang-zh">综合 V2 研究方法论</span>
+                        <span class="lang-id">Metodologi Analisis Cerdas</span>
+                        <span class="lang-en">Smart Analysis Methodology</span>
+                        <span class="lang-zh">智能分析方法论</span>
                     </span>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/30 text-[0.65rem] font-black uppercase tracking-widest">
                         <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
@@ -34,11 +34,23 @@
                 </div>
 
                 <h1 class="text-3xl md:text-5xl font-black tracking-tight leading-tight uppercase mb-5">
-                    Multi-Task RoBERTa & <br class="hidden md:inline" />
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-300">
-                        <span class="lang-id">Topologi Graf Wacana Kritis V2</span>
-                        <span class="lang-en">Critical Discourse Graph Topology V2</span>
-                        <span class="lang-zh">批判性话语图拓扑 V2</span>
+                    <span class="lang-id">
+                        Analisis Suara Cerdas & <br class="hidden md:inline" />
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-300">
+                            Peta Hubungan Bimbingan Skripsi
+                        </span>
+                    </span>
+                    <span class="lang-en">
+                        Intelligent Voice Analysis & <br class="hidden md:inline" />
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-300">
+                            Supervision Interaction Mapping
+                        </span>
+                    </span>
+                    <span class="lang-zh">
+                        智能语音分析与 <br class="hidden md:inline" />
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-300">
+                            论文指导交互关系图谱
+                        </span>
                     </span>
                 </h1>
                 
