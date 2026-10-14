@@ -261,7 +261,7 @@
         @endif
 
         {{-- Graph Network Section (ECharts) --}}
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6 sm:p-8 mb-8 relative overflow-hidden">
+        <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-8 relative overflow-hidden">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
@@ -310,8 +310,8 @@
         {{-- Main Two Columns Layout --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            {{-- Left Column: Paginated Transcript (Rich V1 Layout with Timestamps, Boxes, & Substance) --}}
-            <div class="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6 sm:p-8"
+            {{-- Left Column: Paginated Transcript (Clean V1 Document View without Inner Cards) --}}
+            <div class="lg:col-span-2 bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8"
                 :class="activeMobileTab === 'transkrip' ? 'block' : 'hidden lg:block'">
                 
                 <div class="flex items-center justify-between pb-6 border-b border-gray-100 mb-6">
@@ -328,7 +328,7 @@
                 </div>
 
                 {{-- Dialog Rows --}}
-                <div class="space-y-8">
+                <div class="space-y-10 md:space-y-12">
                     @forelse ($transcription as $index => $item)
                         @php
                             $speaker = $item['speaker'] ?? 'Unknown';
@@ -355,7 +355,7 @@
                         @endphp
 
                         <div id="baris-{{ $index }}"
-                            class="flex flex-col gap-3 group rounded-3xl p-5 transition-all duration-500 border {{ $isDosen ? 'bg-purple-50/20 border-purple-100 hover:border-purple-200' : 'bg-gray-50/30 border-gray-100 hover:border-gray-200' }}"
+                            class="flex flex-col gap-4 group rounded-2xl p-3 sm:p-4 transition-all duration-300 border border-transparent hover:bg-gray-50/50"
                             x-show="{{ $index }} >= (currentPage - 1) * pageSize && {{ $index }} < (currentPage) * pageSize">
                             
                             <div class="flex flex-col md:flex-row gap-4 md:gap-8">
@@ -584,7 +584,7 @@
                 :class="activeMobileTab === 'ringkasan' ? 'block' : 'hidden lg:block'">
                 
                 {{-- Hasil Analisis Akhir (V1 Parity Card) --}}
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6 relative overflow-hidden">
+                <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 relative overflow-hidden">
                     <div class="absolute -right-6 -top-6 text-purple-50 pointer-events-none">
                         <i data-lucide="brain-circuit" class="w-40 h-40"></i>
                     </div>
@@ -660,7 +660,7 @@
                 </div>
 
                 {{-- Advice Distribution Card --}}
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6">
+                <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6">
                     <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-2">
                         <i data-lucide="pie-chart" class="w-4 h-4 text-purple-600"></i> Distribusi Tindak Tutur (Advice)
                     </h3>
@@ -689,7 +689,7 @@
                 </div>
 
                 {{-- Power Relation Mode Distribution Card --}}
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6">
+                <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6">
                     <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-2">
                         <i data-lucide="shield" class="w-4 h-4 text-indigo-600"></i> Relasi Kuasa (Modes of Interaction)
                     </h3>
@@ -718,7 +718,7 @@
                 </div>
 
                 {{-- Model Architecture Info Card --}}
-                <div class="bg-gradient-to-br from-purple-900 to-indigo-900 rounded-[2.5rem] p-6 text-white shadow-xl shadow-purple-900/20">
+                <div class="bg-gradient-to-br from-purple-900 to-indigo-900 rounded-2xl md:rounded-3xl p-6 text-white shadow-xl shadow-purple-900/20">
                     <span class="px-2.5 py-1 rounded-full bg-white/10 text-[0.6rem] font-black uppercase tracking-widest border border-white/20 inline-block mb-3">
                         Arsitektur Sistem
                     </span>
