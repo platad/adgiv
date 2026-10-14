@@ -141,6 +141,14 @@
 
             {{-- Action Buttons --}}
             <div class="flex flex-wrap items-center gap-3 shrink-0">
+                {{-- Tombol Cetak Laporan (Modal Fitur Dalam Pengembangan) --}}
+                <button type="button"
+                    @click="showPrintModal = true"
+                    class="inline-flex items-center px-4 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-purple-600/20 active:scale-95 cursor-pointer">
+                    <i data-lucide="printer" class="w-4 h-4 mr-2"></i>
+                    <span>Cetak Laporan</span>
+                </button>
+
                 {{-- Tombol Tukar Peran Pembicara --}}
                 <button type="button"
                     @click="showSwapModal = true"
@@ -149,6 +157,7 @@
                     <span>Tukar Peran Pembicara</span>
                 </button>
 
+                {{-- Tombol Lihat / Tutup Raw --}}
                 <button type="button"
                     @click="showRaw = !showRaw"
                     class="inline-flex items-center px-4 py-2.5 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-black uppercase tracking-wider transition-colors cursor-pointer">
@@ -158,16 +167,22 @@
             </div>
         </div>
 
-        {{-- Raw JSON Viewer --}}
-        <div x-show="showRaw" style="display: none;" class="bg-gray-900 rounded-3xl shadow-xl mb-8 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-800 flex justify-between items-center">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Raw JSON Output</h3>
-                <span class="text-xs text-gray-500">Versi 2 RoBERTa + Graph</span>
+        {{-- Raw JSON Viewer (Responsif & Rapi Tanpa Overflow) --}}
+        <div x-show="showRaw" x-collapse style="display: none;" class="bg-gray-950 rounded-3xl shadow-2xl mb-8 overflow-hidden border border-gray-800">
+            <div class="px-6 py-4 border-b border-gray-800 flex justify-between items-center text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    <h3 class="font-bold text-gray-300 uppercase tracking-widest">Raw JSON Output (Versi 2)</h3>
+                </div>
+                <span class="text-gray-500 font-mono">Multi-Task RoBERTa & Graph Topology</span>
             </div>
-            <div class="p-6 overflow-x-auto max-h-96">
-                <pre class="text-xs font-mono text-emerald-400"><code>{{ json_encode($analysis->result_data, JSON_PRETTY_PRINT) }}</code></pre>
+            <div class="p-6 overflow-x-auto max-h-[32rem] scrollbar-thin scrollbar-thumb-gray-800">
+                <pre class="text-xs font-mono text-emerald-400 leading-relaxed"><code>{{ json_encode($analysis->result_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }}</code></pre>
             </div>
         </div>
+
+        {{-- Wrapper Seluruh Konten Hasil Analisis (Disembunyikan saat showRaw aktif agar responsive seperti V1) --}}
+        <div x-show="!showRaw">
 
         {{-- Executive Stat Cards (V1 Style) --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
@@ -800,6 +815,8 @@
             </div>
         </div>
 
+        </div> {{-- End of x-show="!showRaw" wrapper --}}
+
         {{-- Supervisory AI Insight Modal (Identik dengan Gambar 3) --}}
         <div x-show="showInsightModal"
             class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none"
@@ -922,6 +939,57 @@
             </div>
         </div>
 
+        {{-- Modal Fitur Cetak Laporan V2 Dalam Pengembangan --}}
+        <div x-show="showPrintModal"
+            class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none"
+            style="display: none;">
+            <div x-show="showPrintModal" @click="showPrintModal = false"
+                x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-black/60 backdrop-blur-md"></div>
+
+            <div x-show="showPrintModal"
+                x-transition:enter="transition ease-out duration-300 transform"
+                x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-200 transform"
+                x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                class="relative bg-white rounded-[2.5rem] max-w-md w-full mx-4 p-8 shadow-2xl z-10 border border-gray-100 text-center">
+                
+                <div class="w-16 h-16 rounded-3xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4 border border-amber-100 shadow-sm">
+                    <i data-lucide="printer" class="w-8 h-8 text-amber-500"></i>
+                </div>
+
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100/70 text-amber-800 text-[0.65rem] font-black uppercase tracking-widest mb-3">
+                    <i data-lucide="wrench" class="w-3.5 h-3.5"></i>
+                    <span>Fitur Eksperimental V2</span>
+                </div>
+
+                <h3 class="text-lg font-black text-gray-900 uppercase tracking-tight mb-2">Cetak Laporan Dalam Pengembangan</h3>
+                <p class="text-xs text-gray-500 font-medium leading-relaxed mb-6">
+                    Fitur cetak laporan analitis komprehensif untuk <strong class="text-purple-700">Model Versi 2 (Multi-Task RoBERTa & Topologi Graf)</strong> saat ini sedang dalam proses pengembangan & optimasi layout visual. Untuk hasil cetak laporan formal yang stabil saat ini tersedia penuh pada <strong>Model Versi 1 (IndoBERT)</strong>.
+                </p>
+
+                <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 text-left mb-6 text-xs space-y-2.5">
+                    <div class="flex items-center gap-2 text-gray-700 font-bold">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-purple-600"></i>
+                        <span>Ekspor Graf Interaktif (Node & Edges)</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-gray-700 font-bold">
+                        <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
+                        <span>Tabulasi Matriks Relasi Kuasa Multi-Turn</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-center">
+                    <button type="button" @click="showPrintModal = false"
+                        class="w-full py-3 rounded-xl bg-gray-900 hover:bg-black text-white text-xs font-black uppercase tracking-wider transition shadow-md cursor-pointer">
+                        Mengerti & Kembali
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <x-slot name="scripts">
@@ -931,6 +999,7 @@
             return {
                 showRaw: false,
                 showSwapModal: false,
+                showPrintModal: false,
                 isSwapping: false,
                 showInsightModal: false,
                 insightTitle: '',
