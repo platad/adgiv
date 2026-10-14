@@ -108,145 +108,208 @@
             </div>
         </div>
 
-        {{-- Metrics Grid Section --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        {{-- Metrics Grid Section (Glassmorphism & Neo-Tech Glow) --}}
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6 mb-8">
             {{-- Total Analisa --}}
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-4 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-                <div class="w-14 h-14 rounded-2xl bg-bima-red/10 text-bima-red flex items-center justify-center flex-shrink-0">
-                    <i data-lucide="activity" class="w-7 h-7"></i>
-                </div>
-                <div>
-                    <p class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400">
-                        <span class="lang-id">Total Analisa Anda</span>
-                        <span class="lang-en">Your Total Analyses</span>
-                        <span class="lang-zh">您的分析总计</span>
-                    </p>
-                    <p class="text-2xl font-black text-gray-900">{{ $history->count() }}</p>
+            <div class="group relative bg-white p-4 sm:p-6 rounded-[1.75rem] sm:rounded-3xl border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-xl hover:shadow-red-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-bima-red/5 rounded-full blur-2xl group-hover:scale-150 transition-transform pointer-events-none"></div>
+                <div class="flex items-center gap-3 sm:gap-4 relative z-10">
+                    <div class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-red-50 to-red-100 text-bima-red flex items-center justify-center flex-shrink-0 shadow-sm border border-red-200/50 group-hover:scale-105 transition-transform">
+                        <i data-lucide="activity" class="w-5 h-5 sm:w-7 sm:h-7"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[0.6rem] sm:text-[0.65rem] font-black uppercase tracking-widest text-gray-400 truncate">
+                            <span class="lang-id">Total Analisa</span>
+                            <span class="lang-en">Total Analyses</span>
+                            <span class="lang-zh">分析总计</span>
+                        </p>
+                        <div class="flex items-baseline gap-1.5 mt-0.5">
+                            <p class="text-xl sm:text-3xl font-black text-gray-900 tracking-tight">{{ $history->count() }}</p>
+                            <span class="text-[0.62rem] font-bold text-gray-400 hidden sm:inline">Sesi</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {{-- Akurasi Global --}}
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-4 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-                <div class="w-14 h-14 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center flex-shrink-0">
-                    <i data-lucide="check-circle" class="w-7 h-7"></i>
-                </div>
-                <div>
-                    <p class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400">
-                        <span class="lang-id">Akurasi Sistem Global</span>
-                        <span class="lang-en">Global System Accuracy</span>
-                        <span class="lang-zh">全局系统精确度</span>
-                    </p>
-                    <p class="text-2xl font-black text-gray-900">{{ $accuracyRate }}%</p>
-                    <p class="text-[0.6rem] text-gray-400 font-medium leading-tight mt-0.5">
-                        <span class="lang-id">Dari {{ $totalFeedbacks }} feedback pakar</span>
-                        <span class="lang-en">From {{ $totalFeedbacks }} expert feedbacks</span>
-                        <span class="lang-zh">基于 {{ $totalFeedbacks }} 位专家的评估反馈</span>
-                    </p>
+            <div class="group relative bg-white p-4 sm:p-6 rounded-[1.75rem] sm:rounded-3xl border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:scale-150 transition-transform pointer-events-none"></div>
+                <div class="flex items-center gap-3 sm:gap-4 relative z-10">
+                    <div class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0 shadow-sm border border-emerald-200/50 group-hover:scale-105 transition-transform">
+                        <i data-lucide="check-circle" class="w-5 h-5 sm:w-7 sm:h-7"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[0.6rem] sm:text-[0.65rem] font-black uppercase tracking-widest text-gray-400 truncate">
+                            <span class="lang-id">Akurasi Sistem</span>
+                            <span class="lang-en">Global Accuracy</span>
+                            <span class="lang-zh">系统精确度</span>
+                        </p>
+                        <div class="flex items-baseline gap-1.5 mt-0.5">
+                            <p class="text-xl sm:text-3xl font-black text-gray-900 tracking-tight">{{ $accuracyRate }}%</p>
+                        </div>
+                        <p class="text-[0.55rem] sm:text-[0.62rem] text-emerald-600 font-bold leading-tight mt-0.5 truncate hidden sm:block">
+                            <span class="lang-id">{{ $totalFeedbacks }} validasi pakar</span>
+                            <span class="lang-en">{{ $totalFeedbacks }} expert reviews</span>
+                            <span class="lang-zh">{{ $totalFeedbacks }} 位专家评估</span>
+                        </p>
+                    </div>
                 </div>
             </div>
 
             {{-- Durasi Bimbingan --}}
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-4 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-                <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
-                    <i data-lucide="clock" class="w-7 h-7"></i>
-                </div>
-                <div>
-                    <p class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400">
-                        <span class="lang-id">Durasi Bimbingan</span>
-                        <span class="lang-en">Supervision Time</span>
-                        <span class="lang-zh">辅导总时长</span>
-                    </p>
-                    <p class="text-2xl font-black text-gray-900">
-                        <span class="lang-id">{{ $totalDurationFormatted['id'] }}</span>
-                        <span class="lang-en">{{ $totalDurationFormatted['en'] }}</span>
-                        <span class="lang-zh">{{ $totalDurationFormatted['zh'] }}</span>
-                    </p>
+            <div class="group relative bg-white p-4 sm:p-6 rounded-[1.75rem] sm:rounded-3xl border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:scale-150 transition-transform pointer-events-none"></div>
+                <div class="flex items-center gap-3 sm:gap-4 relative z-10">
+                    <div class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0 shadow-sm border border-indigo-200/50 group-hover:scale-105 transition-transform">
+                        <i data-lucide="clock" class="w-5 h-5 sm:w-7 sm:h-7"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[0.6rem] sm:text-[0.65rem] font-black uppercase tracking-widest text-gray-400 truncate">
+                            <span class="lang-id">Durasi Suara</span>
+                            <span class="lang-en">Supervision Time</span>
+                            <span class="lang-zh">辅导总时长</span>
+                        </p>
+                        <p class="text-base sm:text-2xl font-black text-gray-900 mt-0.5 truncate">
+                            <span class="lang-id">{{ $totalDurationFormatted['id'] }}</span>
+                            <span class="lang-en">{{ $totalDurationFormatted['en'] }}</span>
+                            <span class="lang-zh">{{ $totalDurationFormatted['zh'] }}</span>
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            {{-- Pola Dominan --}}
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-4 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-                <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
-                    <i data-lucide="brain" class="w-7 h-7"></i>
-                </div>
-                <div>
-                    <p class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400">
-                        <span class="lang-id">Karakter Bimbingan AI</span>
-                        <span class="lang-en">Dominant Style</span>
-                        <span class="lang-zh">主导学术风格</span>
-                    </p>
-                    <p class="text-[0.95rem] font-black text-gray-900 leading-tight mt-1">
-                        @if ($topCategory)
-                            @php
-                                $topCatClean = trim($topCategory);
-                                $topCatMap = [
-                                    'Saran Bimbingan Akademik' => ['id' => 'Saran Bimbingan', 'en' => 'Supervision Advice', 'zh' => '学术建议'],
-                                    'Instruksi Direktif Dosen' => ['id' => 'Instruksi Direktif', 'en' => 'Directive Instr.', 'zh' => '指令性指示'],
-                                    'Saran Akademik Terarah' => ['id' => 'Saran Terarah', 'en' => 'Structured Advice', 'zh' => '定向建议'],
-                                    'Bimbingan Bertahap' => ['id' => 'Bimbingan Bertahap', 'en' => 'Step-by-step', 'zh' => '渐进式指导']
-                                ];
-                                $trans = $topCatMap[$topCatClean] ?? ['id' => $topCatClean, 'en' => $topCatClean, 'zh' => $topCatClean];
-                            @endphp
-                            <span class="lang-id">{{ $trans['id'] }}</span>
-                            <span class="lang-en">{{ $trans['en'] }}</span>
-                            <span class="lang-zh">{{ $trans['zh'] }}</span>
-                        @else
-                            -
-                        @endif
-                    </p>
+            {{-- Karakter Dominan AI --}}
+            <div class="group relative bg-white p-4 sm:p-6 rounded-[1.75rem] sm:rounded-3xl border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl group-hover:scale-150 transition-transform pointer-events-none"></div>
+                <div class="flex items-center gap-3 sm:gap-4 relative z-10">
+                    <div class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0 shadow-sm border border-purple-200/50 group-hover:scale-105 transition-transform">
+                        <i data-lucide="brain" class="w-5 h-5 sm:w-7 sm:h-7"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[0.6rem] sm:text-[0.65rem] font-black uppercase tracking-widest text-gray-400 truncate">
+                            <span class="lang-id">Karakter Dominan</span>
+                            <span class="lang-en">Dominant Style</span>
+                            <span class="lang-zh">主导风格</span>
+                        </p>
+                        <p class="text-xs sm:text-[0.95rem] font-black text-gray-900 leading-tight mt-1 truncate">
+                            @if ($topCategory)
+                                @php
+                                    $topCatClean = trim($topCategory);
+                                    $topCatMap = [
+                                        'Saran Bimbingan Akademik' => ['id' => 'Saran Bimbingan', 'en' => 'Supervision Advice', 'zh' => '学术建议'],
+                                        'Instruksi Direktif Dosen' => ['id' => 'Instruksi Direktif', 'en' => 'Directive Instr.', 'zh' => '指令性指示'],
+                                        'Saran Akademik Terarah' => ['id' => 'Saran Terarah', 'en' => 'Structured Advice', 'zh' => '定向建议'],
+                                        'Bimbingan Bertahap' => ['id' => 'Bimbingan Bertahap', 'en' => 'Step-by-step', 'zh' => '渐进式指导']
+                                    ];
+                                    $trans = $topCatMap[$topCatClean] ?? ['id' => $topCatClean, 'en' => $topCatClean, 'zh' => $topCatClean];
+                                @endphp
+                                <span class="lang-id">{{ $trans['id'] }}</span>
+                                <span class="lang-en">{{ $trans['en'] }}</span>
+                                <span class="lang-zh">{{ $trans['zh'] }}</span>
+                            @else
+                                -
+                            @endif
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
 
+        {{-- NEW: Executive AI Copilot Insight Widget --}}
+        @if(count($recentInsights) > 0)
+            @php $primaryInsight = $recentInsights[0]; @endphp
+            <div class="bg-gradient-to-br from-purple-900 via-indigo-950 to-gray-950 text-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 mb-8 shadow-xl border border-purple-500/20 relative overflow-hidden group">
+                <div class="absolute -right-20 -top-20 w-80 h-80 bg-purple-500/20 rounded-full blur-[100px] pointer-events-none group-hover:scale-110 transition-transform duration-700"></div>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md text-purple-300 border border-white/10 flex items-center justify-center shrink-0 shadow-inner">
+                            <i data-lucide="sparkles" class="w-6 h-6 animate-pulse"></i>
+                        </div>
+                        <div>
+                            <div class="flex flex-wrap items-center gap-2 mb-2">
+                                <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30 text-[0.62rem] font-black uppercase tracking-wider">
+                                    AI Executive Insight
+                                </span>
+                                <span class="text-xs text-gray-400 font-medium">Sesi: <span class="text-white font-bold">{{ $primaryInsight['title'] }}</span></span>
+                            </div>
+                            <h3 class="text-sm sm:text-base font-bold text-gray-100 leading-relaxed mb-2">
+                                "{{ $primaryInsight['saran_perbaikan'] }}"
+                            </h3>
+                            <div class="flex flex-wrap items-center gap-3 text-[0.68rem] text-gray-300 font-medium">
+                                <span class="flex items-center gap-1 text-purple-200">
+                                    <i data-lucide="target" class="w-3.5 h-3.5 text-purple-400"></i>
+                                    Arah Fokus: <b>{{ $primaryInsight['arah_tujuan'] }}</b>
+                                </span>
+                                <span class="hidden sm:inline text-white/30">•</span>
+                                <span class="flex items-center gap-1 text-indigo-200">
+                                    <i data-lucide="git-commit" class="w-3.5 h-3.5 text-indigo-400"></i>
+                                    Relasi: <b>{{ $primaryInsight['karakter_relasi'] }}</b>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    @if(!empty($primaryInsight['result_route']) && $primaryInsight['result_route'] !== '#')
+                        <a href="{{ $primaryInsight['result_route'] }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white text-gray-950 font-black text-xs uppercase tracking-wider shadow-lg hover:bg-gray-100 transition shrink-0 group/btn">
+                            <span>Buka Hasil Sesi</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover/btn:translate-x-1 transition-transform"></i>
+                        </a>
+                    @endif
+                </div>
+            </div>
+        @endif
+
         {{-- Realtime Chart Section --}}
-        <div class="grid grid-cols-1 gap-8 mb-10">
-            <div class="bg-white rounded-[2.5rem] p-6 md:p-8 text-gray-900 border border-gray-100 shadow-sm relative overflow-hidden">
+        <div class="grid grid-cols-1 gap-8 mb-8">
+            <div class="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 text-gray-900 border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.03)] relative overflow-hidden">
                 <div class="absolute -top-40 -right-40 w-96 h-96 bg-bima-red/[0.03] rounded-full blur-[120px] pointer-events-none"></div>
                 
                 <div class="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
-                        <h2 class="text-base font-black uppercase tracking-widest flex items-center gap-2">
-                            <span class="lang-id">Monitor Evaluasi Kalimat (Realtime)</span>
-                            <span class="lang-en">Sentence Evaluation Monitor (Real-time)</span>
-                            <span class="lang-zh">句子级实时评估监控面板</span>
-                        </h2>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                            <h2 class="text-sm sm:text-base font-black uppercase tracking-widest flex items-center gap-2 text-gray-900">
+                                <span class="lang-id">Monitor Evaluasi Kalimat (Realtime)</span>
+                                <span class="lang-en">Sentence Evaluation Monitor (Real-time)</span>
+                                <span class="lang-zh">句子级实时评估监控面板</span>
+                            </h2>
+                        </div>
                         <p class="text-xs text-gray-500 mt-1 font-medium">
-                            <span class="lang-id">Metrik tingkat akurasi klasifikasi bimbingan Supervisory AI per kalimat percakapan secara global.</span>
-                            <span class="lang-en">Global classification accuracy metric of Supervisory AI per conversational sentence.</span>
-                            <span class="lang-zh">Supervisory AI 核心算法在单句会话分类中的全局系统精确度度量标准。</span>
+                            <span class="lang-id">Metrik akurasi deteksi bimbingan Supervisory AI per kalimat percakapan.</span>
+                            <span class="lang-en">Supervisory AI classification accuracy metric per conversational sentence.</span>
+                            <span class="lang-zh">Supervisory AI 会话语句级实时精确度度量标准。</span>
                         </p>
                     </div>
                     
-                    <div class="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-2xl px-4 py-2.5">
+                    <div class="flex items-center gap-3 bg-gradient-to-br from-gray-50 to-gray-100/80 border border-gray-200/80 rounded-2xl px-4 py-2.5 shadow-sm">
                         <div class="text-right">
                             <span class="block text-[0.55rem] font-bold text-gray-500 uppercase tracking-widest">
                                 <span class="lang-id">Rata-rata Akurasi</span>
                                 <span class="lang-en">Average Accuracy</span>
                                 <span class="lang-zh">平均精确度</span>
                             </span>
-                            <span class="text-xl font-black text-gray-900" id="accuracyPercentageText">{{ $sentenceAccuracy }}%</span>
+                            <span class="text-xl sm:text-2xl font-black text-gray-900" id="accuracyPercentageText">{{ $sentenceAccuracy }}%</span>
                         </div>
-                        <div class="w-10 h-10 rounded-xl bg-bima-red/10 text-bima-red flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-xl bg-bima-red text-white flex items-center justify-center shadow-md shadow-red-500/20">
                             <i data-lucide="trending-up" class="w-5 h-5"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="h-64 md:h-80 w-full relative">
+                <div class="h-64 sm:h-80 w-full relative">
                     <canvas id="realtimeAccuracyChart"></canvas>
                 </div>
             </div>
         </div>
 
         {{-- Communication Distribution & Relationship Dynamics --}}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-10">
             <!-- Doughnut Chart: Advice Category -->
-            <div class="bg-white p-6 md:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden">
+            <div class="bg-white p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.03)] relative overflow-hidden">
                 <div class="absolute -top-40 -left-40 w-96 h-96 bg-bima-red/[0.02] rounded-full blur-[120px] pointer-events-none"></div>
                 
                 <div class="relative z-10 mb-6 flex justify-between items-start gap-4">
                     <div>
-                        <h3 class="text-base font-black uppercase tracking-widest flex items-center gap-2">
+                        <h3 class="text-sm sm:text-base font-black uppercase tracking-widest flex items-center gap-2 text-gray-900">
                             <i data-lucide="pie-chart" class="w-5 h-5 text-bima-red"></i>
                             <span class="lang-id">Distribusi Kategori Bimbingan</span>
                             <span class="lang-en">Guidance Category Distribution</span>
@@ -549,68 +612,77 @@
                 </table>
             </div>
 
-            <!-- Mobile Card View (Mobile Only) -->
-            <div x-show="total > 0" class="block sm:hidden divide-y divide-gray-100" style="display: none;">
+            <!-- Mobile Card View (Mobile Feed Style - Thumb Friendly & Modern) -->
+            <div x-show="total > 0" class="block sm:hidden divide-y divide-gray-100/80" style="display: none;">
                 <template x-for="item in items" :key="item.id">
-                    <div class="p-5 flex flex-col gap-4 hover:bg-gray-50/50 transition-colors">
+                    <div class="p-4 sm:p-5 flex flex-col gap-3.5 hover:bg-gray-50/70 transition-colors">
                         <div class="flex items-start justify-between gap-3">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                                     :class="item.version === 2 ? 'bg-purple-50 text-purple-600' : 'bg-gray-100 text-gray-500'">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                            <div class="flex items-start gap-3 min-w-0">
+                                <div class="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border"
+                                     :class="item.version === 2 ? 'bg-gradient-to-br from-purple-50 to-purple-100 text-purple-600 border-purple-200/50' : 'bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200/50'">
+                                    <template x-if="item.version === 2">
+                                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                                    </template>
+                                    <template x-if="item.version !== 2">
+                                        <i data-lucide="mic" class="w-5 h-5"></i>
+                                    </template>
                                 </div>
-                                <div>
-                                    <span class="font-bold text-gray-950 block text-sm" x-text="item.title"></span>
-                                    <div class="flex items-center gap-2 mt-1">
+                                <div class="min-w-0 flex-1">
+                                    <span class="font-extrabold text-gray-900 block text-sm leading-snug line-clamp-2" x-text="item.title"></span>
+                                    <div class="flex flex-wrap items-center gap-1.5 mt-1.5">
                                         <template x-if="item.version === 2">
                                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[0.6rem] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200">
-                                                V2 RoBERTa
+                                                RoBERTa V2
                                             </span>
                                         </template>
                                         <template x-if="item.version !== 2">
                                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[0.6rem] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
-                                                V1 IndoBERT
+                                                IndoBERT V1
                                             </span>
                                         </template>
-                                        <span class="text-[0.65rem] text-gray-400 font-bold uppercase tracking-wider" x-text="item.created_at_formatted"></span>
+                                        <span class="text-[0.62rem] text-gray-400 font-bold" x-text="item.created_at_formatted"></span>
                                     </div>
                                 </div>
                             </div>
-                            <span class="px-2.5 py-1 rounded-full text-[0.6rem] font-black uppercase tracking-wider inline-block border flex-shrink-0"
+                            
+                            <!-- Status Badge -->
+                            <span class="px-2.5 py-1 rounded-full text-[0.58rem] font-black uppercase tracking-wider inline-flex items-center gap-1 border shrink-0 shadow-xs"
                                   :class="{
-                                      'bg-green-50 text-green-700 border-green-100': item.status === 'completed',
-                                      'bg-amber-50 text-amber-700 border-amber-100': item.status === 'pending' || item.status === 'processing',
-                                      'bg-red-50 text-red-700 border-red-100': item.status === 'failed'
+                                      'bg-emerald-50 text-emerald-700 border-emerald-200': item.status === 'completed',
+                                      'bg-amber-50 text-amber-700 border-amber-200': item.status === 'pending' || item.status === 'processing',
+                                      'bg-red-50 text-red-700 border-red-200': item.status === 'failed'
                                   }">
+                                <span class="w-1.5 h-1.5 rounded-full" :class="{
+                                    'bg-emerald-500': item.status === 'completed',
+                                    'bg-amber-500 animate-pulse': item.status === 'pending' || item.status === 'processing',
+                                    'bg-red-500': item.status === 'failed'
+                                }"></span>
                                 <span class="lang-id" x-text="item.status === 'completed' ? 'Selesai' : (item.status === 'processing' ? 'Memproses' : (item.status === 'failed' ? 'Gagal' : 'Menunggu'))"></span>
                                 <span class="lang-en" x-text="item.status === 'completed' ? 'Completed' : (item.status === 'processing' ? 'Processing' : (item.status === 'failed' ? 'Failed' : 'Pending'))"></span>
                                 <span class="lang-zh" x-text="item.status === 'completed' ? '已完成' : (item.status === 'processing' ? '处理中' : (item.status === 'failed' ? '分析失败' : '排队中'))"></span>
                             </span>
                         </div>
                         
-                        <div class="flex items-center justify-between border-t border-gray-50 pt-3">
-                            <button @click="confirmDelete(item.slug, item.title)" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-all flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider cursor-pointer">
+                        <!-- Mobile Actions Row -->
+                        <div class="flex items-center justify-between border-t border-gray-100 pt-3 gap-2">
+                            <button @click="confirmDelete(item.slug, item.title)" class="h-9 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-all flex items-center gap-1 text-[0.68rem] font-bold uppercase tracking-wider cursor-pointer">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                <span class="lang-id">Hapus</span>
-                                <span class="lang-en">Delete</span>
-                                <span class="lang-zh">删除</span>
+                                <span>Hapus</span>
                             </button>
                             
                             <div class="flex items-center gap-2">
                                 <!-- Lihat Hasil -->
                                 <template x-if="item.status === 'completed'">
-                                    <a :href="item.result_route" class="px-4 py-2 bg-gray-950 hover:bg-gray-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer">
-                                        <span class="lang-id">Hasil</span>
-                                        <span class="lang-en">Result</span>
-                                        <span class="lang-zh">查看结果</span>
+                                    <a :href="item.result_route" class="h-9 px-4.5 bg-gradient-to-r from-gray-900 to-gray-800 text-white text-[0.68rem] font-extrabold uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer">
+                                        <span>Buka Hasil</span>
+                                        <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                                     </a>
                                 </template>
                                 <!-- Lanjutkan -->
                                 <template x-if="item.status === 'pending' || item.status === 'processing'">
-                                    <a :href="item.processing_route" class="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer">
-                                        <span class="lang-id">Lanjutkan</span>
-                                        <span class="lang-en">Resume</span>
-                                        <span class="lang-zh">继续分析</span>
+                                    <a :href="item.processing_route" class="h-9 px-4 bg-amber-500 hover:bg-amber-600 text-white text-[0.68rem] font-extrabold uppercase tracking-wider rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
+                                        <span>Lanjutkan</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                                     </a>
                                 </template>
                             </div>
@@ -713,6 +785,65 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Mobile Quick Floating Action Hub (Visible only on mobile devices) --}}
+            <div class="sm:hidden fixed bottom-24 right-5 z-[80]" x-data="{ openQuickFab: false }" @click.away="openQuickFab = false">
+                {{-- Expanded Menu Options --}}
+                <div x-show="openQuickFab"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave-end="opacity-0 translate-y-4 scale-95"
+                     style="display: none;"
+                     class="absolute bottom-16 right-0 mb-2 w-64 bg-gray-900/98 backdrop-blur-2xl border border-white/15 rounded-3xl p-3 shadow-2xl flex flex-col gap-2">
+                    
+                    <div class="px-3 py-1.5 border-b border-white/10 text-[0.62rem] font-black uppercase tracking-widest text-white/50">
+                        Mulai Analisis Cepat
+                    </div>
+
+                    {{-- Analisis RoBERTa --}}
+                    <a href="{{ route('analysis.v2.create') }}" class="flex items-center gap-3 p-2.5 rounded-2xl bg-purple-600/20 text-purple-200 border border-purple-500/30 hover:bg-purple-600 hover:text-white transition">
+                        <div class="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="text-xs font-bold truncate">Suara (RoBERTa)</div>
+                            <div class="text-[0.6rem] text-purple-300/70 truncate">Model V2 + Topologi Graf</div>
+                        </div>
+                    </a>
+
+                    {{-- Analisis IndoBERT --}}
+                    <a href="{{ route('analysis.create') }}" class="flex items-center gap-3 p-2.5 rounded-2xl bg-red-600/20 text-red-200 border border-red-500/30 hover:bg-red-600 hover:text-white transition">
+                        <div class="w-8 h-8 rounded-xl bg-bima-red text-white flex items-center justify-center shrink-0">
+                            <i data-lucide="mic" class="w-4 h-4"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="text-xs font-bold truncate">Suara (IndoBERT)</div>
+                            <div class="text-[0.6rem] text-red-300/70 truncate">Model V1 + G-MLLM</div>
+                        </div>
+                    </a>
+
+                    {{-- Analisis PDF --}}
+                    <a href="{{ route('document_analysis.create', ['locale' => app()->getLocale()]) }}" class="flex items-center gap-3 p-2.5 rounded-2xl bg-orange-600/20 text-orange-200 border border-orange-500/30 hover:bg-orange-600 hover:text-white transition">
+                        <div class="w-8 h-8 rounded-xl bg-orange-600 text-white flex items-center justify-center shrink-0">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="text-xs font-bold truncate">Analisis PDF</div>
+                            <div class="text-[0.6rem] text-orange-300/70 truncate">Materi & telaah dokumen</div>
+                        </div>
+                    </a>
+                </div>
+
+                {{-- Main FAB Button --}}
+                <button type="button" 
+                        @click="openQuickFab = !openQuickFab; $nextTick(() => window.lucide && window.lucide.createIcons())"
+                        class="w-13 h-13 rounded-2xl bg-gradient-to-tr from-bima-red via-red-600 to-rose-500 text-white shadow-xl shadow-red-600/40 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer border border-white/20">
+                    <i data-lucide="plus" class="w-6 h-6 transition-transform duration-300" :class="{ 'rotate-45': openQuickFab }"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -790,9 +921,12 @@
                                 borderColor: 'transparent'
                             },
                             ticks: {
-                                color: '#6b7280',
+                                color: '#9ca3af',
+                                maxTicksLimit: window.innerWidth < 640 ? 5 : 8,
+                                maxRotation: 0,
+                                autoSkip: true,
                                 font: {
-                                    size: 10,
+                                    size: window.innerWidth < 640 ? 9 : 10,
                                     weight: 'bold'
                                 }
                             }
