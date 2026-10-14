@@ -490,8 +490,16 @@
                         </p>
                     </div>
 
-                    {{-- Actions: Zoom toggle / Status --}}
+                    {{-- Actions: Zoom toggle / Status / Try Again Button --}}
                     <div class="flex items-center gap-2">
+                        <button type="button" 
+                            x-show="mermaidError"
+                            @click="retryMermaid()"
+                            style="display: none;"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition shadow-sm active:scale-95 cursor-pointer">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5" :class="isRetryingMermaid ? 'animate-spin' : ''"></i>
+                            <span x-text="isRetryingMermaid ? 'Mencoba lagi...' : 'Coba Lagi (Try Again)'"></span>
+                        </button>
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[0.65rem] font-bold">
                             <i data-lucide="layers" class="w-3 h-3 text-indigo-600"></i>
                             <span>Diagram Wacana Bertahap</span>
@@ -503,13 +511,13 @@
                 <div class="bg-gradient-to-b from-gray-50/70 to-white rounded-2xl border border-gray-200/80 p-6 overflow-x-auto custom-scrollbar relative min-h-[180px] flex items-center justify-center">
                     
                     {{-- Loading State --}}
-                    <div x-show="isInterpretingGraph" class="py-8 text-center" style="display: none;">
+                    <div x-show="isInterpretingGraph || isRetryingMermaid" class="py-8 text-center" style="display: none;">
                         <i data-lucide="loader-2" class="w-6 h-6 animate-spin text-purple-600 mx-auto mb-2"></i>
                         <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Menyintesis Alur Pembahasan Mermaid...</span>
                     </div>
 
                     {{-- Rendered Mermaid SVG Container --}}
-                    <div x-show="!isInterpretingGraph" id="mermaid-flowchart-container" class="w-full flex justify-center py-2 select-none">
+                    <div x-show="!isInterpretingGraph && !isRetryingMermaid" id="mermaid-flowchart-container" class="w-full flex flex-col items-center justify-center py-2 select-none">
                         {{-- SVG will be inserted here via mermaid.render --}}
                     </div>
                 </div>
@@ -1265,7 +1273,13 @@
     </div>
 
     <x-slot name="scripts">
-    <script src="{{ asset('assets/vendor/mermaid/mermaid.min.js') }}"></script>
+    {{-- Pustaka Mermaid CDN dengan Fallback Lokal --}}
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+    <script>
+        if (typeof window.mermaid === 'undefined') {
+            document.write('<script src="{{ asset("assets/vendor/mermaid/mermaid.min.js") }}"><\/script>');
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     @php
@@ -1433,6 +1447,10 @@
                 graphInterpretationData: @json($graphInterpretation['data'] ?? null),
                 graphAnalyzedAt: '{{ isset($graphInterpretation['analyzed_at']) ? \Carbon\Carbon::parse($graphInterpretation['analyzed_at'])->translatedFormat("d M Y, H:i") : "" }}',
 
+                // Mermaid state
+                mermaidError: false,
+                isRetryingMermaid: false,
+
                 // Error Modal State
                 showErrorModal: false,
                 errorModalTitle: '',
@@ -1445,6 +1463,22 @@
                             window.renderMermaidChart();
                         }
                     });
+                },
+
+                async retryMermaid() {
+                    this.isRetryingMermaid = true;
+                    this.mermaidError = false;
+                    try {
+                        await window.ensureMermaidLoaded();
+                        if (window.renderMermaidChart) {
+                            await window.renderMermaidChart();
+                        }
+                    } catch (e) {
+                        console.error('Retry Mermaid failed:', e);
+                        this.mermaidError = true;
+                    } finally {
+                        this.isRetryingMermaid = false;
+                    }
                 },
 
                 showError(title, message) {
@@ -1843,35 +1877,86 @@
                 window.lucide.createIcons();
             }
 
-            // Inisialisasi pustaka Mermaid secara lokal
-            if (window.mermaid) {
-                try {
-                    window.mermaid.initialize({
-                        startOnLoad: false,
-                        securityLevel: 'loose',
-                        theme: 'base',
-                        themeVariables: {
-                            primaryColor: '#ede9fe',
-                            primaryTextColor: '#4c1d95',
-                            primaryBorderColor: '#8b5cf6',
-                            lineColor: '#6366f1',
-                            secondaryColor: '#eff6ff',
-                            tertiaryColor: '#f0fdf4',
-                            fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
-                            fontSize: '12px'
-                        },
-                        flowchart: {
-                            curve: 'basis',
-                            padding: 16,
-                            nodeSpacing: 40,
-                            rankSpacing: 45,
-                            useMaxWidth: true
-                        }
-                    });
-                } catch (e) {
-                    console.warn('Mermaid initialize warning:', e);
-                }
-            }
+            // Dynamic Loader untuk memastikan Mermaid dimuat dari CDN atau Fallback
+            window.ensureMermaidLoaded = function() {
+                return new Promise((resolve, reject) => {
+                    if (window.mermaid) {
+                        try {
+                            window.mermaid.initialize({
+                                startOnLoad: false,
+                                securityLevel: 'loose',
+                                theme: 'base',
+                                themeVariables: {
+                                    primaryColor: '#ede9fe',
+                                    primaryTextColor: '#4c1d95',
+                                    primaryBorderColor: '#8b5cf6',
+                                    lineColor: '#6366f1',
+                                    secondaryColor: '#eff6ff',
+                                    tertiaryColor: '#f0fdf4',
+                                    fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+                                    fontSize: '12px'
+                                },
+                                flowchart: {
+                                    curve: 'basis',
+                                    padding: 16,
+                                    nodeSpacing: 40,
+                                    rankSpacing: 45,
+                                    useMaxWidth: true
+                                }
+                            });
+                        } catch(e) {}
+                        return resolve(window.mermaid);
+                    }
+
+                    // Buat elemen script secara dinamis
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js';
+                    script.onload = () => {
+                        try {
+                            window.mermaid.initialize({
+                                startOnLoad: false,
+                                securityLevel: 'loose',
+                                theme: 'base',
+                                themeVariables: {
+                                    primaryColor: '#ede9fe',
+                                    primaryTextColor: '#4c1d95',
+                                    primaryBorderColor: '#8b5cf6',
+                                    lineColor: '#6366f1',
+                                    secondaryColor: '#eff6ff',
+                                    tertiaryColor: '#f0fdf4',
+                                    fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+                                    fontSize: '12px'
+                                },
+                                flowchart: {
+                                    curve: 'basis',
+                                    padding: 16,
+                                    nodeSpacing: 40,
+                                    rankSpacing: 45,
+                                    useMaxWidth: true
+                                }
+                            });
+                        } catch(e) {}
+                        resolve(window.mermaid);
+                    };
+                    script.onerror = () => {
+                        // Coba sumber CDN kedua (cdnjs)
+                        const script2 = document.createElement('script');
+                        script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js';
+                        script2.onload = () => {
+                            try {
+                                window.mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
+                            } catch(e) {}
+                            resolve(window.mermaid);
+                        };
+                        script2.onerror = (err) => reject(err);
+                        document.head.appendChild(script2);
+                    };
+                    document.head.appendChild(script);
+                });
+            };
+
+            // Inisialisasi awal
+            window.ensureMermaidLoaded().catch(() => {});
 
             // Render awal diagram alur Mermaid & Sintesis Otomatis Graf jika belum ada data
             setTimeout(function() {
@@ -1884,7 +1969,7 @@
                 if (alpineData && !alpineData.graphInterpretationData && !alpineData.isInterpretingGraph) {
                     alpineData.analyzeGraphWithAI();
                 }
-            }, 500);
+            }, 600);
         });
 
         // Global helper untuk merender diagram Mermaid ke DOM
@@ -1892,8 +1977,26 @@
             const container = document.getElementById('mermaid-flowchart-container');
             if (!container) return;
 
-            if (!window.mermaid) {
-                console.warn('Pustaka Mermaid belum siap.');
+            const alpineData = getAlpineData();
+
+            // Pastikan library Mermaid telah termuat
+            try {
+                await window.ensureMermaidLoaded();
+            } catch (loadErr) {
+                console.error('Pustaka Mermaid gagal dimuat dari CDN:', loadErr);
+                if (alpineData) alpineData.mermaidError = true;
+                container.innerHTML = `
+                    <div class="py-8 text-center flex flex-col items-center justify-center space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
+                        <p class="text-xs text-gray-600 font-medium">Gagal memuat pustaka visualisasi diagram Mermaid dari server.</p>
+                        <button type="button" onclick="if(window.v2App) window.v2App.retryMermaid();" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition shadow-sm active:scale-95 cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            <span>Coba Lagi (Try Again)</span>
+                        </button>
+                    </div>
+                `;
                 return;
             }
 
@@ -1943,9 +2046,11 @@
                         svgEl.style.height = 'auto';
                         svgEl.style.display = 'block';
                     }
+                    if (alpineData) alpineData.mermaidError = false;
                 }
             } catch (err) {
                 console.error('Error rendering Mermaid diagram:', err);
+                if (alpineData) alpineData.mermaidError = true;
                 // Jika syntax kustom dari AI gagal, coba render diagram default yang teruji aman
                 try {
                     const safeId = 'mermaidFallback' + Date.now();
@@ -1960,7 +2065,15 @@
                         container.innerHTML = fallbackSvg;
                     }
                 } catch (fallbackErr) {
-                    container.innerHTML = '<div class="text-xs text-gray-400 py-4 italic text-center">Diagram alur percakapan siap ditampilkan. Klik "Analisis Ulang Graf (AI)" untuk memperbarui alur topik secara otomatis.</div>';
+                    container.innerHTML = `
+                        <div class="py-6 text-center flex flex-col items-center justify-center space-y-2">
+                            <p class="text-xs text-gray-500 font-medium italic">Alur diagram wacana belum dapat dirender.</p>
+                            <button type="button" onclick="if(window.v2App) window.v2App.retryMermaid();" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition shadow-sm active:scale-95 cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                <span>Coba Lagi (Try Again)</span>
+                            </button>
+                        </div>
+                    `;
                 }
             }
         };
