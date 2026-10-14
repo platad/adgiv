@@ -354,9 +354,10 @@
                                          alt="RoBERTa Training Curve" 
                                          class="w-full h-44 sm:h-52 object-contain hover:scale-105 transition-transform duration-500">
                                 </div>
-                                <p class="text-[0.62rem] text-gray-300 font-medium mt-2">
-                                    💡 <i>Loss menurun stabil dari 2.12 ke 0.48 dengan akurasi validasi konvergen sempurna pada data tes bimbingan akademik.</i>
-                                </p>
+                                <div class="flex items-start gap-1.5 text-[0.62rem] text-gray-300 font-medium mt-2">
+                                    <i data-lucide="info" class="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5"></i>
+                                    <span>Loss menurun stabil dari 2.12 ke 0.48 dengan akurasi validasi konvergen sempurna pada data tes bimbingan akademik.</span>
+                                </div>
                             </div>
 
                             {{-- TAB 3: CONFUSION MATRIX --}}
@@ -371,9 +372,10 @@
                                          alt="RoBERTa Confusion Matrix" 
                                          class="w-full h-44 sm:h-52 object-contain hover:scale-105 transition-transform duration-500">
                                 </div>
-                                <p class="text-[0.62rem] text-gray-300 font-medium mt-2">
-                                    🎯 <i>Diagonal dominan membuktikan pemisahan tegas antara Arahan Eksplisit vs Bimbingan Bertahap.</i>
-                                </p>
+                                <div class="flex items-start gap-1.5 text-[0.62rem] text-gray-300 font-medium mt-2">
+                                    <i data-lucide="crosshair" class="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5"></i>
+                                    <span>Diagonal dominan membuktikan pemisahan tegas antara Arahan Eksplisit vs Bimbingan Bertahap.</span>
+                                </div>
                             </div>
 
                         </div>
@@ -388,8 +390,8 @@
                     <div class="absolute inset-y-0 left-0 bg-gradient-to-br from-blue-950 via-slate-950 to-gray-950 text-white p-5 sm:p-8 flex flex-col justify-between overflow-hidden pointer-events-none"
                          :style="`width: ${sliderPos}%;`">
                         
-                        {{-- Top Meta Info --}}
-                        <div class="flex items-center justify-start gap-3 w-[calc(100vw-4rem)] max-w-7xl z-10">
+                        {{-- Top Meta Info with Fixed Minimum Content Width matching Parent --}}
+                        <div class="flex items-center justify-start gap-3 z-10 w-[1100px] max-w-none">
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/40 text-[0.62rem] font-black uppercase tracking-widest shadow-md">
                                 <i data-lucide="mic" class="w-3.5 h-3.5 text-blue-300"></i>
                                 <span>MODEL SEBELUMNYA: INDOBERT BASE</span>
@@ -399,11 +401,11 @@
                             </span>
                         </div>
 
-                        {{-- Main Content Area: Matches Tabs --}}
-                        <div class="my-auto z-10 max-w-xl text-left w-[calc(100vw-4rem)] max-w-7xl">
+                        {{-- Main Content Area: Matches Tabs with Fixed Minimum Width matching Container --}}
+                        <div class="my-auto z-10 max-w-xl text-left w-[1100px] max-w-none">
                             
                             {{-- TAB 1: OVERVIEW --}}
-                            <div x-show="activeTab === 'overview'" class="space-y-4">
+                            <div x-show="activeTab === 'overview'" class="space-y-4 max-w-xl">
                                 <div class="inline-block text-left bg-blue-950/60 backdrop-blur-xl border border-blue-400/30 rounded-3xl p-5 sm:p-6 shadow-2xl">
                                     <div class="flex items-center justify-between gap-4 mb-3 border-b border-blue-400/20 pb-3">
                                         <div>
@@ -453,9 +455,10 @@
                                          alt="IndoBERT Training Loss" 
                                          class="w-full h-44 sm:h-52 object-contain">
                                 </div>
-                                <p class="text-[0.62rem] text-gray-300 font-medium mt-2">
-                                    📊 <i>Kurva training loss IndoBERT menunjukkan konvergensi awal, namun mengalami fluktuasi pada epoch lanjutan.</i>
-                                </p>
+                                <div class="flex items-start gap-1.5 text-[0.62rem] text-gray-300 font-medium mt-2">
+                                    <i data-lucide="trending-down" class="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5"></i>
+                                    <span>Kurva training loss IndoBERT menunjukkan konvergensi awal, namun mengalami fluktuasi pada epoch lanjutan.</span>
+                                </div>
                             </div>
 
                             {{-- TAB 3: CONFUSION MATRIX --}}
@@ -470,15 +473,16 @@
                                          alt="IndoBERT Matrix Sample" 
                                          class="w-full h-44 sm:h-52 object-contain">
                                 </div>
-                                <p class="text-[0.62rem] text-gray-300 font-medium mt-2">
-                                    ⚠️ <i>Terjadi bias klasifikasi pada kategori minoritas seperti 'Otoritas' akibat ketiadaan weighted cross-entropy.</i>
-                                </p>
+                                <div class="flex items-start gap-1.5 text-[0.62rem] text-gray-300 font-medium mt-2">
+                                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"></i>
+                                    <span>Terjadi bias klasifikasi pada kategori minoritas seperti 'Otoritas' akibat ketiadaan weighted cross-entropy.</span>
+                                </div>
                             </div>
 
                         </div>
 
                         {{-- Footer Badge --}}
-                        <div class="flex items-center justify-start text-[0.65rem] text-blue-300/70 font-semibold w-[calc(100vw-4rem)] max-w-7xl z-10">
+                        <div class="flex items-center justify-start text-[0.65rem] text-blue-300/70 font-semibold w-[1100px] max-w-none z-10">
                             <span>Base: indobenchmark/indobert-base-p1 • Standard Tokenizer</span>
                         </div>
                     </div>
@@ -506,8 +510,9 @@
                         </span>
                     </div>
 
-                    <div class="flex items-center gap-2 text-[0.7rem] text-gray-400 italic">
-                        <span>💡 Sentuh / klik & geser garis pembatas untuk mengintip perbedaan fitur & grafik pelatihan</span>
+                    <div class="flex items-center gap-1.5 text-[0.7rem] text-gray-400 font-medium">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+                        <span>Sentuh / klik & geser garis pembatas untuk mengintip perbedaan fitur & grafik pelatihan</span>
                     </div>
                 </div>
             </div>
