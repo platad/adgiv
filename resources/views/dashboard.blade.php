@@ -280,15 +280,25 @@
                  lastPage: 1, 
                  total: 0, 
                  loading: false,
+                 searchQuery: '',
+                 selectedVersion: 'all', // 'all', '1', '2'
+                 searchTimeout: null,
                  showDeleteModal: false,
                  deleteTargetId: null,
                  deleteTargetTitle: '',
                  deleting: false,
                  
-                  async fetchHistory(page = 1) {
+                 async fetchHistory(page = 1) {
                      this.loading = true;
                      try {
-                         let res = await fetch(`/{{ app()->getLocale() }}/dashboard/history-data?page=${page}`);
+                         let url = `/{{ app()->getLocale() }}/dashboard/history-data?page=${page}`;
+                         if (this.searchQuery && this.searchQuery.trim() !== '') {
+                             url += `&search=${encodeURIComponent(this.searchQuery.trim())}`;
+                         }
+                         if (this.selectedVersion && this.selectedVersion !== 'all') {
+                             url += `&version=${this.selectedVersion}`;
+                         }
+                         let res = await fetch(url);
                          let data = await res.json();
                          this.items = data.items;
                          this.currentPage = data.current_page;
@@ -299,6 +309,18 @@
                      } finally {
                          this.loading = false;
                      }
+                 },
+
+                 onSearchInput() {
+                     clearTimeout(this.searchTimeout);
+                     this.searchTimeout = setTimeout(() => {
+                         this.fetchHistory(1);
+                     }, 300);
+                 },
+
+                 setVersionFilter(ver) {
+                     this.selectedVersion = ver;
+                     this.fetchHistory(1);
                  },
 
                  confirmDelete(id, title) {
@@ -336,12 +358,48 @@
              }"
              x-init="fetchHistory(1)">
             
-            <div class="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                <h2 class="text-sm font-black uppercase tracking-widest text-gray-800">
-                    <span class="lang-id">Riwayat Analisa</span>
-                    <span class="lang-en">Analysis History</span>
-                    <span class="lang-zh">语音分析历史记录</span>
-                </h2>
+            {{-- Header with Search & Filter Bar --}}
+            <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/50">
+                <div>
+                    <h2 class="text-sm font-black uppercase tracking-widest text-gray-800">
+                        <span class="lang-id">Riwayat Analisa</span>
+                        <span class="lang-en">Analysis History</span>
+                        <span class="lang-zh">语音分析历史记录</span>
+                    </h2>
+                    <p class="text-xs text-gray-400 font-medium mt-0.5">Kelola dan telusuri seluruh riwayat sesi percakapan Anda</p>
+                </div>
+
+                {{-- Filter Controls --}}
+                <div class="flex flex-wrap items-center gap-3">
+                    {{-- Search Input --}}
+                    <div class="relative w-full sm:w-56">
+                        <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                        <input type="text"
+                            x-model="searchQuery"
+                            @input="onSearchInput()"
+                            placeholder="Cari judul sesi..."
+                            class="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-medium text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition shadow-sm">
+                    </div>
+
+                    {{-- Model Version Tabs --}}
+                    <div class="flex items-center bg-gray-200/70 p-1 rounded-xl text-[0.65rem] font-black uppercase tracking-wider">
+                        <button type="button" @click="setVersionFilter('all')"
+                            class="px-2.5 py-1.5 rounded-lg transition-all cursor-pointer"
+                            :class="selectedVersion === 'all' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'">
+                            Semua
+                        </button>
+                        <button type="button" @click="setVersionFilter('1')"
+                            class="px-2.5 py-1.5 rounded-lg transition-all cursor-pointer"
+                            :class="selectedVersion === '1' ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'">
+                            Versi 1
+                        </button>
+                        <button type="button" @click="setVersionFilter('2')"
+                            class="px-2.5 py-1.5 rounded-lg transition-all cursor-pointer"
+                            :class="selectedVersion === '2' ? 'bg-white text-purple-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'">
+                            Versi 2
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <!-- Skeleton Loader -->
@@ -353,14 +411,15 @@
 
             <!-- Empty State -->
             <div x-show="!loading && total === 0" class="p-12 text-center" style="display: none;">
-                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5M9 5h6"/></svg>
+                <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-300">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5M9 5h6"/></svg>
                 </div>
-                <p class="text-gray-500 font-medium">
-                    <span class="lang-id">Belum ada riwayat analisa.</span>
+                <p class="text-sm font-bold text-gray-700 mb-1">
+                    <span class="lang-id">Tidak ada riwayat ditemukan.</span>
                     <span class="lang-en">No analysis history found.</span>
                     <span class="lang-zh">暂无学术分析历史记录。</span>
                 </p>
+                <p class="text-xs text-gray-400 font-medium">Coba gunakan kata kunci pencarian lain atau ubah filter versi model.</p>
             </div>
 
             <!-- Table View (Desktop Only) -->
@@ -411,18 +470,16 @@
                                         </div>
                                     </div>
                                 </td>
-                                <!-- Model / Versi -->
+                                <!-- Model / Versi (No Bullets) -->
                                 <td class="p-6">
                                     <template x-if="item.version === 2">
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-purple-600"></span>
-                                            Versi 2 (RoBERTa & Graf)
+                                        <span class="inline-flex items-center px-3 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200">
+                                            VERSI 2 (ROBERTA & GRAF)
                                         </span>
                                     </template>
                                     <template x-if="item.version !== 2">
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                                            Versi 1 (IndoBERT)
+                                        <span class="inline-flex items-center px-3 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                                            VERSI 1 (INDOBERT)
                                         </span>
                                     </template>
                                 </td>

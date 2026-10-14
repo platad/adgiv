@@ -309,8 +309,27 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        $paginator = Analysis::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
+        $query = Analysis::where('user_id', $user->id);
+
+        // Filter pencarian judul
+        if ($request->filled('search')) {
+            $search = trim($request->input('search'));
+            $query->where('title', 'like', "%{$search}%");
+        }
+
+        // Filter versi model (all, 1, 2)
+        if ($request->filled('version') && in_array($request->input('version'), ['1', '2'])) {
+            $ver = (int) $request->input('version');
+            if ($ver === 2) {
+                $query->where('version', 2);
+            } else {
+                $query->where(function($q) {
+                    $q->where('version', 1)->orWhereNull('version');
+                });
+            }
+        }
+
+        $paginator = $query->orderBy('created_at', 'desc')
             ->paginate(5); // 5 items per page
 
         $items = collect($paginator->items())->map(function ($item) {
