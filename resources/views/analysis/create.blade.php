@@ -15,10 +15,49 @@
                 <span class="lang-zh">开始新语音分析</span>
             </h1>
             <p class="text-gray-500 font-medium mt-2">
-                <span class="lang-id">Unggah file rekaman audio bimbingan skripsi Anda. Sistem akan memproses dan menganalisis percakapan secara otomatis.</span>
-                <span class="lang-en">Upload your supervision audio recording. The system will process and analyze the conversation automatically.</span>
-                <span class="lang-zh">上传您的学术指导录音文件，系统将自动处理并分析对话。</span>
+                <span class="lang-id">Unggah file rekaman audio bimbingan akademik Anda. Sistem akan memproses dan menganalisis percakapan secara otomatis menggunakan model IndoBERT (Standar).</span>
+                <span class="lang-en">Upload your supervision audio recording. The system will process and analyze the conversation automatically using IndoBERT (Standard) model.</span>
+                <span class="lang-zh">上传您的学术指导录音文件，系统将使用 IndoBERT 标准模型自动处理并分析对话。</span>
             </p>
+        </div>
+
+        {{-- NEW: High-Impact Upgrade Offer Banner (Try Modern RoBERTa Multi-Task) --}}
+        <div class="mb-8 relative overflow-hidden bg-gradient-to-r from-purple-950 via-indigo-900 to-gray-950 text-white rounded-[2rem] p-6 sm:p-8 border border-purple-500/30 shadow-xl shadow-purple-950/20 group">
+            <!-- Background Glow & Particle Accent -->
+            <div class="absolute -right-24 -top-24 w-72 h-72 bg-purple-500/25 rounded-full blur-[90px] pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
+            <div class="absolute -left-24 -bottom-24 w-72 h-72 bg-indigo-500/20 rounded-full blur-[90px] pointer-events-none"></div>
+
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="flex items-start gap-4 sm:gap-5">
+                    <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/30 group-hover:scale-105 transition-transform">
+                        <i data-lucide="sparkles" class="w-7 h-7 text-white animate-pulse"></i>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full bg-purple-500/30 text-purple-300 border border-purple-400/40 text-[0.62rem] font-black uppercase tracking-wider">
+                                Rekomendasi Mesin AI Terbaru
+                            </span>
+                            <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[0.6rem] font-bold">
+                                Akurasi 94% + Topologi Graf
+                            </span>
+                        </div>
+                        <h2 class="text-lg sm:text-xl font-black text-white uppercase tracking-wide">
+                            Ingin Analisis Percakapan Lebih Presisi & Multi-Dimensi?
+                        </h2>
+                        <p class="text-xs sm:text-sm text-gray-300 font-medium leading-relaxed mt-1.5 max-w-2xl">
+                            Saat ini Anda berada di modul analisis standar <b>(IndoBERT)</b>. Coba arsitektur terbaru <b>Multi-Task RoBERTa</b> dengan visualisasi dinamika relasi kuasa, pemetaan topologi graf wacana, dan akurasi kontekstual yang jauh lebih kaya.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                    <a href="{{ route('analysis.v2.create') }}" 
+                       class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs uppercase tracking-wider shadow-xl shadow-purple-600/40 hover:shadow-purple-600/60 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 text-center border border-purple-400/30">
+                        <span>Coba Versi RoBERTa</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
         </div>
 
         {{-- Form Card --}}
