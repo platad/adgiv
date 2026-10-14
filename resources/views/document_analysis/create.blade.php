@@ -1,5 +1,5 @@
 <x-layouts.app title="Analisis Dokumen PDF">
-    <div class="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
 
         {{-- Header Section --}}
         <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">

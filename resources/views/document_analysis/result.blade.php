@@ -1,5 +1,5 @@
 <x-layouts.app :title="$documentAnalysis->title . ' — Hasil Analisis PDF'">
-    <div class="w-full max-w-7xl mx-auto px-2 sm:px-4 py-4 animate-fade-in" x-data="documentResultApp()">
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 animate-fade-in" x-data="documentResultApp()">
 
         {{-- Top Navigation & Action Header --}}
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
