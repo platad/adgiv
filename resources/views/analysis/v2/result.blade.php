@@ -433,26 +433,14 @@
 
                     {{-- 3. Tampilan Konten Hasil Interpretasi AI --}}
                     <div x-show="!isInterpretingGraph && graphInterpretationData" style="display: none;" class="space-y-4 max-h-[540px] overflow-y-auto pr-1 scrollbar-thin">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-purple-50/60 border border-purple-100 rounded-2xl p-3.5 sticky top-0 z-10 backdrop-blur-md">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-                                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-xs font-black uppercase tracking-widest text-purple-900 leading-tight">
-                                        Interpretasi Multimodal Peta Wacana
-                                    </h3>
-                                    <p class="text-[0.65rem] font-medium text-purple-700">
-                                        Model OpenAI Vision (Topologi Graf + Dinamika Intonasi + Hasil Analisis)
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-1.5 shrink-0">
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white text-purple-700 border border-purple-200 text-[0.6rem] font-bold">
-                                    <i data-lucide="check-circle" class="w-2.5 h-2.5 text-emerald-500"></i>
-                                    <span>Tersintesis</span>
-                                </span>
-                                <span class="text-[0.65rem] text-gray-400 font-medium" x-text="graphAnalyzedAt"></span>
+                        <div class="bg-purple-50/60 border border-purple-100 rounded-2xl p-4 sticky top-0 z-10 backdrop-blur-md">
+                            <div>
+                                <h3 class="text-xs font-black uppercase tracking-widest text-purple-950 leading-tight">
+                                    Interpretasi Multimodal Peta Wacana
+                                </h3>
+                                <p class="text-[0.68rem] font-medium text-purple-700/90 mt-0.5">
+                                    Model OpenAI Vision (Topologi Graf + Dinamika Intonasi + Hasil Analisis)
+                                </p>
                             </div>
                         </div>
 
@@ -1624,14 +1612,113 @@
                 }));
             }
 
+            // Definisi kamus makna akademis untuk Node & Edge
+            var academicMeanings = {
+                // Nodes
+                'dosen': {
+                    role: 'Peran Pembimbing (Supervisor)',
+                    desc: 'Aktor utama yang mengendalikan alur bimbingan, memberikan umpan balik substantive, serta menetapkan standar dan arah metodologi skripsi.',
+                    category: 'Peran Utama'
+                },
+                'mahasiswa': {
+                    role: 'Peran Terbimbing (Supervisee)',
+                    desc: 'Aktor pembelajar yang menyampaikan progres riset, mengklarifikasi kebingungan, dan mengonfirmasi masukan dosen untuk revisi.',
+                    category: 'Peran Utama'
+                },
+                'mhs': {
+                    role: 'Peran Terbimbing (Supervisee)',
+                    desc: 'Aktor pembelajar yang menyampaikan progres riset, mengklarifikasi kebingungan, dan mengonfirmasi masukan dosen untuk revisi.',
+                    category: 'Peran Utama'
+                },
+                'arahan eksplisit': {
+                    role: 'Tindak Tutur (Explicit Advice)',
+                    desc: 'Pemberian instruksi dan koreksi yang jelas dan tegas mengenai revisi bab atau perbaikan instrumen penelitian.',
+                    category: 'Pola Bimbingan'
+                },
+                'bimbingan bertahap': {
+                    role: 'Tindak Tutur (Scaffolded Advice)',
+                    desc: 'Pembimbingan bertahap melalui dialog probing dan pemecahan masalah bersama agar mahasiswa mencapai pemahaman mendalam.',
+                    category: 'Pola Bimbingan'
+                },
+                'dukungan keputusan': {
+                    role: 'Tindak Tutur (Decision Support)',
+                    desc: 'Persetujuan, validasi, dan penegasan terhadap pilihan metodologi atau argumentasi ilmiah yang diajukan mahasiswa.',
+                    category: 'Pola Bimbingan'
+                },
+                'power gaining': {
+                    role: 'Relasi Kuasa (Power Gaining)',
+                    desc: 'Upaya mahasiswa mengambil inisiatif dialog, mengajukan pertanyaan kritis, atau menguji pemikiran metodologis.',
+                    category: 'Relasi Kuasa'
+                },
+                'power maintaining': {
+                    role: 'Relasi Kuasa (Power Maintaining)',
+                    desc: 'Pola relasi seimbang dan stabil di mana dosen dan mahasiswa menjaga ritme diskusi akademik secara kondusif.',
+                    category: 'Relasi Kuasa'
+                },
+                'power over': {
+                    role: 'Relasi Kuasa (Power Over)',
+                    desc: 'Manifestasi otoritas akademis dosen dalam menegaskan batasan, standar kelayakan, atau instruksi mutlak revisi.',
+                    category: 'Relasi Kuasa'
+                }
+            };
+
+            function getMeaning(key) {
+                var clean = (key || '').toString().toLowerCase().trim().replace(/_/g, ' ');
+                return academicMeanings[clean] || null;
+            }
+
             var option = {
                 tooltip: {
                     trigger: 'item',
+                    backgroundColor: '#111827',
+                    borderColor: '#374151',
+                    borderWidth: 1,
+                    padding: [10, 14],
+                    extraCssText: 'box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4); border-radius: 14px; max-width: 320px; white-space: normal;',
                     formatter: function(params) {
                         if (params.dataType === 'node') {
-                            return '<strong>Peran/Label:</strong> ' + params.name;
+                            var info = getMeaning(params.name);
+                            var color = params.color || '#9333ea';
+                            var html = '<div style="font-family: Inter, sans-serif;">';
+                            html += '<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">';
+                            html += '<span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: ' + color + ';"></span>';
+                            html += '<strong style="color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">' + params.name + '</strong>';
+                            if (info && info.category) {
+                                html += '<span style="font-size: 10px; padding: 2px 6px; background: rgba(255,255,255,0.15); border-radius: 6px; color: #d8b4fe; font-weight: bold; margin-left: auto;">' + info.category + '</span>';
+                            }
+                            html += '</div>';
+                            if (info) {
+                                html += '<div style="font-size: 11px; font-weight: bold; color: #a5b4fc; margin-bottom: 4px;">' + info.role + '</div>';
+                                html += '<div style="font-size: 11px; color: #d1d5db; line-height: 1.45;">' + info.desc + '</div>';
+                            } else {
+                                html += '<div style="font-size: 11px; color: #9ca3af; line-height: 1.4;">Simpul entitas interaksi dalam korpus bimbingan akademik.</div>';
+                            }
+                            html += '</div>';
+                            return html;
                         } else if (params.dataType === 'edge') {
-                            return params.data.source + ' ➔ ' + params.data.target + (params.data.value ? '<br>Relasi: ' + params.data.value : '');
+                            var edgeVal = params.data.value || '';
+                            var freq = edgeVal ? (edgeVal.toString().match(/\d+/) ? edgeVal : edgeVal) : 'Terhubung';
+                            var info = getMeaning(params.data.target) || getMeaning(edgeVal);
+                            
+                            var html = '<div style="font-family: Inter, sans-serif;">';
+                            html += '<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">';
+                            html += '<strong style="color: #ffffff; font-size: 12px;">' + params.data.source + ' <span style="color: #c084fc;">➔</span> ' + params.data.target + '</strong>';
+                            html += '<span style="font-size: 10px; padding: 2px 6px; background: rgba(147, 51, 234, 0.25); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 6px; color: #f3e8ff; font-weight: bold; margin-left: auto;">Frekuensi: ' + freq + '</span>';
+                            html += '</div>';
+                            
+                            html += '<div style="font-size: 11px; color: #e5e7eb; line-height: 1.45;">';
+                            if (params.data.source === 'Dosen' && params.data.target === 'Mahasiswa') {
+                                html += 'Interaksi dialogis dua arah dan arahan akademik langsung dari Dosen kepada Mahasiswa.';
+                            } else if (params.data.source === 'Mahasiswa' && params.data.target === 'Dosen') {
+                                html += 'Respons, klarifikasi, atau inisiatif pertanyaan dari Mahasiswa kepada Dosen.';
+                            } else if (info) {
+                                html += 'Korelasi aliran percakapan menuju ' + (info.role || params.data.target) + ': ' + info.desc;
+                            } else {
+                                html += 'Hubungan wacana antara ' + params.data.source + ' dan ' + params.data.target + ' dengan intensitas interaksi ' + freq + '.';
+                            }
+                            html += '</div>';
+                            html += '</div>';
+                            return html;
                         }
                     }
                 },
