@@ -1,172 +1,6 @@
 <x-layouts.app title="Dashboard" :welcome-audio="$welcomeAudio ?? null">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
         
-        {{-- Interactive Before & After Model Comparison Slider (IndoBERT vs RoBERTa) --}}
-        <div class="mb-8" 
-             x-data="{ 
-                 sliderPos: 50,
-                 isDragging: false,
-                 setPos(e) {
-                     const rect = $refs.compareContainer.getBoundingClientRect();
-                     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                     let pos = ((clientX - rect.left) / rect.width) * 100;
-                     if (pos < 5) pos = 5;
-                     if (pos > 95) pos = 95;
-                     this.sliderPos = Math.round(pos);
-                 }
-             }">
-            
-            <div class="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-7 border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.03)] relative overflow-hidden">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-[0.6rem] font-black uppercase tracking-wider shadow-xs">
-                                Fitur Interaktif
-                            </span>
-                            <h2 class="text-sm sm:text-base font-black uppercase tracking-widest text-gray-900 flex items-center gap-2">
-                                <span>Komparasi Model: IndoBERT vs RoBERTa</span>
-                            </h2>
-                        </div>
-                        <p class="text-xs text-gray-500 font-medium mt-1">
-                            Geser garis pembatas di bawah untuk membandingkan kemampuan arsitektur IndoBERT (Sebelumnya) dan RoBERTa + Graf (Terbaru).
-                        </p>
-                    </div>
-
-                    {{-- Quick Switch Pills --}}
-                    <div class="flex items-center gap-2 bg-gray-100/80 p-1 rounded-2xl text-[0.65rem] font-black uppercase tracking-wider self-start sm:self-auto">
-                        <button type="button" @click="sliderPos = 10" 
-                                class="px-3 py-1.5 rounded-xl transition-all cursor-pointer"
-                                :class="sliderPos < 30 ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'">
-                            IndoBERT
-                        </button>
-                        <button type="button" @click="sliderPos = 50" 
-                                class="px-3 py-1.5 rounded-xl transition-all cursor-pointer"
-                                :class="sliderPos >= 30 && sliderPos <= 70 ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'">
-                            50 : 50
-                        </button>
-                        <button type="button" @click="sliderPos = 90" 
-                                class="px-3 py-1.5 rounded-xl transition-all cursor-pointer"
-                                :class="sliderPos > 70 ? 'bg-purple-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'">
-                            RoBERTa
-                        </button>
-                    </div>
-                </div>
-
-                {{-- The Split Slider Container --}}
-                <div x-ref="compareContainer" 
-                     @mousedown="isDragging = true; setPos($event)"
-                     @mousemove="if (isDragging) setPos($event)"
-                     @mouseup="isDragging = false"
-                     @mouseleave="isDragging = false"
-                     @touchstart="isDragging = true; setPos($event)"
-                     @touchmove="if (isDragging) setPos($event)"
-                     @touchend="isDragging = false"
-                     class="relative w-full h-[360px] sm:h-[300px] rounded-[1.75rem] overflow-hidden select-none cursor-ew-resize border border-gray-200/80 shadow-inner group">
-
-                    {{-- RIGHT SIDE (LAYER DASAR): RoBERTa (AFTER / VERSI 2) --}}
-                    <div class="absolute inset-0 bg-gradient-to-br from-purple-950 via-indigo-950 to-gray-950 text-white p-6 sm:p-8 flex flex-col justify-between">
-                        <div class="flex items-start justify-end">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30 text-[0.62rem] font-black uppercase tracking-widest shadow-sm">
-                                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-300"></i>
-                                <span>MODEL TERBARU (RoBERTa + Graf)</span>
-                            </span>
-                        </div>
-
-                        <div class="max-w-md ml-auto text-right">
-                            <div class="inline-block text-left bg-purple-900/40 backdrop-blur-md border border-purple-400/20 rounded-2xl p-4 sm:p-5 shadow-xl">
-                                <h3 class="text-sm sm:text-base font-black text-purple-200 flex items-center justify-end gap-2 uppercase tracking-wide mb-2">
-                                    <span>Multi-Task RoBERTa</span>
-                                    <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
-                                </h3>
-                                <ul class="space-y-2 text-xs text-gray-200 font-medium">
-                                    <li class="flex items-center justify-end gap-2">
-                                        <span>Klasifikasi 3 Dimensi Sekaligus (Multi-Task)</span>
-                                        <i data-lucide="check" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
-                                    </li>
-                                    <li class="flex items-center justify-end gap-2">
-                                        <span>Pemetaan Dinamika Kuasa & Topologi Graf</span>
-                                        <i data-lucide="check" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
-                                    </li>
-                                    <li class="flex items-center justify-end gap-2">
-                                        <span>Akurasi Kontekstual Percakapan Tinggi (92.4%)</span>
-                                        <i data-lucide="check" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
-                                    </li>
-                                </ul>
-                                <div class="mt-4 pt-3 border-t border-purple-400/20 flex justify-end">
-                                    <a href="{{ route('analysis.v2.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider transition shadow-md shadow-purple-600/30">
-                                        <span>Coba RoBERTa</span>
-                                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- LEFT SIDE (CLIPPED OVERLAY): IndoBERT (BEFORE / VERSI 1) --}}
-                    <div class="absolute inset-y-0 left-0 bg-gradient-to-br from-blue-950 via-slate-900 to-gray-950 text-white p-6 sm:p-8 flex flex-col justify-between overflow-hidden pointer-events-none"
-                         :style="`width: ${sliderPos}%;`">
-                        
-                        <div class="flex items-start justify-start w-[calc(100vw-4rem)] max-w-7xl">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[0.62rem] font-black uppercase tracking-widest shadow-sm">
-                                <i data-lucide="mic" class="w-3.5 h-3.5 text-blue-300"></i>
-                                <span>MODEL STANDAR (IndoBERT)</span>
-                            </span>
-                        </div>
-
-                        <div class="max-w-md text-left w-[calc(100vw-4rem)] max-w-7xl">
-                            <div class="inline-block bg-blue-900/40 backdrop-blur-md border border-blue-400/20 rounded-2xl p-4 sm:p-5 shadow-xl">
-                                <h3 class="text-sm sm:text-base font-black text-blue-200 flex items-center gap-2 uppercase tracking-wide mb-2">
-                                    <span class="w-2 h-2 rounded-full bg-blue-400"></span>
-                                    <span>IndoBERT Base</span>
-                                </h3>
-                                <ul class="space-y-2 text-xs text-gray-200 font-medium">
-                                    <li class="flex items-center gap-2">
-                                        <i data-lucide="check" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
-                                        <span>Klasifikasi Kalimat Tunggal (Single-Task)</span>
-                                    </li>
-                                    <li class="flex items-center gap-2">
-                                        <i data-lucide="check" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
-                                        <span>Analisis Wacana Kritis Linier Tradisional</span>
-                                    </li>
-                                    <li class="flex items-center gap-2">
-                                        <i data-lucide="check" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
-                                        <span>Ringan & Cepat untuk Rekaman Pendek</span>
-                                    </li>
-                                </ul>
-                                <div class="mt-4 pt-3 border-t border-blue-400/20 flex justify-start pointer-events-auto">
-                                    <a href="{{ route('analysis.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase tracking-wider transition shadow-md shadow-blue-600/30">
-                                        <span>Coba IndoBERT</span>
-                                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- SLIDER DIVIDER LINE & DRAG HANDLE --}}
-                    <div class="absolute inset-y-0 w-1 bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] pointer-events-none"
-                         :style="`left: ${sliderPos}%;`">
-                        <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-gray-900 shadow-2xl flex items-center justify-center border-2 border-purple-500/30 cursor-ew-resize group-hover:scale-110 transition-transform">
-                            <i data-lucide="chevrons-left-right" class="w-5 h-5 text-purple-700"></i>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Hint Footer --}}
-                <div class="flex items-center justify-between text-[0.68rem] text-gray-400 font-medium mt-3 px-1">
-                    <span class="flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
-                        Sisi Kiri: IndoBERT (V1)
-                    </span>
-                    <span class="hidden sm:inline italic text-gray-400">💡 Tip: Klik dan geser tombol bulat di tengah ke kanan / kiri</span>
-                    <span class="flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full bg-purple-500 inline-block"></span>
-                        Sisi Kanan: RoBERTa Multi-Task (V2)
-                    </span>
-                </div>
-            </div>
-        </div>
-
         {{-- Welcome Banner Section --}}
         <div class="bg-gradient-to-r from-gray-950 via-gray-900 to-gray-950 text-white rounded-[2.5rem] p-8 md:p-10 shadow-xl border border-gray-800 relative overflow-hidden mb-10 group">
             <!-- Sleek background radial glow -->
@@ -364,48 +198,171 @@
             </div>
         </div>
 
-        {{-- NEW: Executive AI Copilot Insight Widget --}}
-        @if(count($recentInsights) > 0)
-            @php $primaryInsight = $recentInsights[0]; @endphp
-            <div class="bg-gradient-to-br from-purple-900 via-indigo-950 to-gray-950 text-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 mb-8 shadow-xl border border-purple-500/20 relative overflow-hidden group">
-                <div class="absolute -right-20 -top-20 w-80 h-80 bg-purple-500/20 rounded-full blur-[100px] pointer-events-none group-hover:scale-110 transition-transform duration-700"></div>
-                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md text-purple-300 border border-white/10 flex items-center justify-center shrink-0 shadow-inner">
-                            <i data-lucide="sparkles" class="w-6 h-6 animate-pulse"></i>
+        {{-- Interactive Before & After Model Comparison Slider (IndoBERT vs RoBERTa) - DI BAWAH CARD STATS --}}
+        <div class="mb-10" 
+             x-data="{ 
+                 sliderPos: 50,
+                 isDragging: false,
+                 setPos(e) {
+                     const rect = $refs.compareContainer.getBoundingClientRect();
+                     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                     let pos = ((clientX - rect.left) / rect.width) * 100;
+                     if (pos < 5) pos = 5;
+                     if (pos > 95) pos = 95;
+                     this.sliderPos = Math.round(pos);
+                 }
+             }">
+            
+            <div class="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-7 border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.03)] relative overflow-hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-[0.6rem] font-black uppercase tracking-wider shadow-xs">
+                                Fitur Interaktif
+                            </span>
+                            <h2 class="text-sm sm:text-base font-black uppercase tracking-widest text-gray-900 flex items-center gap-2">
+                                <span>Komparasi Model: IndoBERT vs RoBERTa</span>
+                            </h2>
                         </div>
-                        <div>
-                            <div class="flex flex-wrap items-center gap-2 mb-2">
-                                <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30 text-[0.62rem] font-black uppercase tracking-wider">
-                                    AI Executive Insight
-                                </span>
-                                <span class="text-xs text-gray-400 font-medium">Sesi: <span class="text-white font-bold">{{ $primaryInsight['title'] }}</span></span>
-                            </div>
-                            <h3 class="text-sm sm:text-base font-bold text-gray-100 leading-relaxed mb-2">
-                                "{{ $primaryInsight['saran_perbaikan'] }}"
-                            </h3>
-                            <div class="flex flex-wrap items-center gap-3 text-[0.68rem] text-gray-300 font-medium">
-                                <span class="flex items-center gap-1 text-purple-200">
-                                    <i data-lucide="target" class="w-3.5 h-3.5 text-purple-400"></i>
-                                    Arah Fokus: <b>{{ $primaryInsight['arah_tujuan'] }}</b>
-                                </span>
-                                <span class="hidden sm:inline text-white/30">•</span>
-                                <span class="flex items-center gap-1 text-indigo-200">
-                                    <i data-lucide="git-commit" class="w-3.5 h-3.5 text-indigo-400"></i>
-                                    Relasi: <b>{{ $primaryInsight['karakter_relasi'] }}</b>
-                                </span>
+                        <p class="text-xs text-gray-500 font-medium mt-1">
+                            Geser garis pembatas di bawah untuk membandingkan kemampuan arsitektur IndoBERT (Sebelumnya) dan RoBERTa + Graf (Terbaru).
+                        </p>
+                    </div>
+
+                    {{-- Quick Switch Pills --}}
+                    <div class="flex items-center gap-2 bg-gray-100/80 p-1 rounded-2xl text-[0.65rem] font-black uppercase tracking-wider self-start sm:self-auto">
+                        <button type="button" @click="sliderPos = 10" 
+                                class="px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+                                :class="sliderPos < 30 ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'">
+                            IndoBERT
+                        </button>
+                        <button type="button" @click="sliderPos = 50" 
+                                class="px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+                                :class="sliderPos >= 30 && sliderPos <= 70 ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'">
+                            50 : 50
+                        </button>
+                        <button type="button" @click="sliderPos = 90" 
+                                class="px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+                                :class="sliderPos > 70 ? 'bg-purple-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'">
+                            RoBERTa
+                        </button>
+                    </div>
+                </div>
+
+                {{-- The Split Slider Container --}}
+                <div x-ref="compareContainer" 
+                     @mousedown="isDragging = true; setPos($event)"
+                     @mousemove="if (isDragging) setPos($event)"
+                     @mouseup="isDragging = false"
+                     @mouseleave="isDragging = false"
+                     @touchstart="isDragging = true; setPos($event)"
+                     @touchmove="if (isDragging) setPos($event)"
+                     @touchend="isDragging = false"
+                     class="relative w-full h-[360px] sm:h-[300px] rounded-[1.75rem] overflow-hidden select-none cursor-ew-resize border border-gray-200/80 shadow-inner group">
+
+                    {{-- RIGHT SIDE (LAYER DASAR): RoBERTa (AFTER / VERSI 2) --}}
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-950 via-indigo-950 to-gray-950 text-white p-6 sm:p-8 flex flex-col justify-between">
+                        <div class="flex items-start justify-end">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30 text-[0.62rem] font-black uppercase tracking-widest shadow-sm">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-300"></i>
+                                <span>MODEL TERBARU (RoBERTa + Graf)</span>
+                            </span>
+                        </div>
+
+                        <div class="max-w-md ml-auto text-right">
+                            <div class="inline-block text-left bg-purple-900/40 backdrop-blur-md border border-purple-400/20 rounded-2xl p-4 sm:p-5 shadow-xl">
+                                <h3 class="text-sm sm:text-base font-black text-purple-200 flex items-center justify-end gap-2 uppercase tracking-wide mb-2">
+                                    <span>Multi-Task RoBERTa</span>
+                                    <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                                </h3>
+                                <ul class="space-y-2 text-xs text-gray-200 font-medium">
+                                    <li class="flex items-center justify-end gap-2">
+                                        <span>Klasifikasi 3 Dimensi Sekaligus (Multi-Task)</span>
+                                        <i data-lucide="check" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
+                                    </li>
+                                    <li class="flex items-center justify-end gap-2">
+                                        <span>Pemetaan Dinamika Kuasa & Topologi Graf</span>
+                                        <i data-lucide="check" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
+                                    </li>
+                                    <li class="flex items-center justify-end gap-2">
+                                        <span>Akurasi Kontekstual Percakapan Tinggi (92.4%)</span>
+                                        <i data-lucide="check" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
+                                    </li>
+                                </ul>
+                                <div class="mt-4 pt-3 border-t border-purple-400/20 flex justify-end">
+                                    <a href="{{ route('analysis.v2.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider transition shadow-md shadow-purple-600/30">
+                                        <span>Coba RoBERTa</span>
+                                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    @if(!empty($primaryInsight['result_route']) && $primaryInsight['result_route'] !== '#')
-                        <a href="{{ $primaryInsight['result_route'] }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white text-gray-950 font-black text-xs uppercase tracking-wider shadow-lg hover:bg-gray-100 transition shrink-0 group/btn">
-                            <span>Buka Hasil Sesi</span>
-                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover/btn:translate-x-1 transition-transform"></i>
-                        </a>
-                    @endif
+
+                    {{-- LEFT SIDE (CLIPPED OVERLAY): IndoBERT (BEFORE / VERSI 1) --}}
+                    <div class="absolute inset-y-0 left-0 bg-gradient-to-br from-blue-950 via-slate-900 to-gray-950 text-white p-6 sm:p-8 flex flex-col justify-between overflow-hidden pointer-events-none"
+                         :style="`width: ${sliderPos}%;`">
+                        
+                        <div class="flex items-start justify-start w-[calc(100vw-4rem)] max-w-7xl">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[0.62rem] font-black uppercase tracking-widest shadow-sm">
+                                <i data-lucide="mic" class="w-3.5 h-3.5 text-blue-300"></i>
+                                <span>MODEL STANDAR (IndoBERT)</span>
+                            </span>
+                        </div>
+
+                        <div class="max-w-md text-left w-[calc(100vw-4rem)] max-w-7xl">
+                            <div class="inline-block bg-blue-900/40 backdrop-blur-md border border-blue-400/20 rounded-2xl p-4 sm:p-5 shadow-xl">
+                                <h3 class="text-sm sm:text-base font-black text-blue-200 flex items-center gap-2 uppercase tracking-wide mb-2">
+                                    <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                                    <span>IndoBERT Base</span>
+                                </h3>
+                                <ul class="space-y-2 text-xs text-gray-200 font-medium">
+                                    <li class="flex items-center gap-2">
+                                        <i data-lucide="check" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+                                        <span>Klasifikasi Kalimat Tunggal (Single-Task)</span>
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <i data-lucide="check" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+                                        <span>Analisis Wacana Kritis Linier Tradisional</span>
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <i data-lucide="check" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+                                        <span>Ringan & Cepat untuk Rekaman Pendek</span>
+                                    </li>
+                                </ul>
+                                <div class="mt-4 pt-3 border-t border-blue-400/20 flex justify-start pointer-events-auto">
+                                    <a href="{{ route('analysis.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase tracking-wider transition shadow-md shadow-blue-600/30">
+                                        <span>Coba IndoBERT</span>
+                                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- SLIDER DIVIDER LINE & DRAG HANDLE --}}
+                    <div class="absolute inset-y-0 w-1 bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] pointer-events-none"
+                         :style="`left: ${sliderPos}%;`">
+                        <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-gray-900 shadow-2xl flex items-center justify-center border-2 border-purple-500/30 cursor-ew-resize group-hover:scale-110 transition-transform">
+                            <i data-lucide="chevrons-left-right" class="w-5 h-5 text-purple-700"></i>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Hint Footer --}}
+                <div class="flex items-center justify-between text-[0.68rem] text-gray-400 font-medium mt-3 px-1">
+                    <span class="flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
+                        Sisi Kiri: IndoBERT (V1)
+                    </span>
+                    <span class="hidden sm:inline italic text-gray-400">💡 Tip: Klik dan geser tombol bulat di tengah ke kanan / kiri</span>
+                    <span class="flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-purple-500 inline-block"></span>
+                        Sisi Kanan: RoBERTa Multi-Task (V2)
+                    </span>
                 </div>
             </div>
-        @endif
+        </div>
 
         {{-- Realtime Chart Section --}}
         <div class="grid grid-cols-1 gap-8 mb-8">
@@ -414,13 +371,15 @@
                 
                 <div class="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                            <h2 class="text-sm sm:text-base font-black uppercase tracking-widest flex items-center gap-2 text-gray-900">
+                        <div class="flex items-center gap-2.5">
+                            <h2 class="text-sm sm:text-base font-black uppercase tracking-widest text-gray-900">
                                 <span class="lang-id">Monitor Evaluasi Kalimat (Realtime)</span>
                                 <span class="lang-en">Sentence Evaluation Monitor (Real-time)</span>
                                 <span class="lang-zh">句子级实时评估监控面板</span>
                             </h2>
+                            <span class="px-2 py-0.5 rounded-lg bg-gray-100 text-gray-600 text-[0.6rem] font-black uppercase tracking-wider border border-gray-200">
+                                Live
+                            </span>
                         </div>
                         <p class="text-xs text-gray-500 mt-1 font-medium">
                             <span class="lang-id">Metrik akurasi deteksi bimbingan Supervisory AI per kalimat percakapan.</span>
@@ -1002,10 +961,11 @@
         document.addEventListener('DOMContentLoaded', () => {
             const ctx = document.getElementById('realtimeAccuracyChart').getContext('2d');
             
-            // Create gradient fill
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, 'rgba(204, 0, 0, 0.25)');
-            gradient.addColorStop(0.5, 'rgba(204, 0, 0, 0.05)');
+            // Create premium futuristic gradient fill (Red glow wave)
+            const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+            gradient.addColorStop(0, 'rgba(204, 0, 0, 0.22)');
+            gradient.addColorStop(0.4, 'rgba(204, 0, 0, 0.08)');
+            gradient.addColorStop(0.8, 'rgba(204, 0, 0, 0.02)');
             gradient.addColorStop(1, 'rgba(204, 0, 0, 0.0)');
 
             const activeLang = '{{ app()->getLocale() }}';
@@ -1024,14 +984,11 @@
                         label: datasetLabel,
                         data: [],
                         borderColor: '#cc0000',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#cc0000',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 0, // Remove bullet points on line
-                        pointHoverRadius: 6,
-                        pointHitRadius: 10,
-                        tension: 0.4,
+                        borderWidth: 2.5,
+                        pointRadius: 0, // No bullet points as requested
+                        pointHoverRadius: 0, // Clean without hover dots
+                        pointHitRadius: 15,
+                        tension: 0.45, // Super smooth bezier curves
                         fill: true,
                         backgroundColor: gradient,
                     }]
