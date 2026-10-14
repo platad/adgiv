@@ -21,39 +21,35 @@
             </p>
         </div>
 
-        {{-- NEW: High-Impact Upgrade Offer Banner (Try Modern RoBERTa Multi-Task) --}}
-        <div class="mb-8 relative overflow-hidden bg-gradient-to-r from-purple-950 via-indigo-900 to-gray-950 text-white rounded-[2rem] p-6 sm:p-8 border border-purple-500/30 shadow-xl shadow-purple-950/20 group">
-            <!-- Background Glow & Particle Accent -->
-            <div class="absolute -right-24 -top-24 w-72 h-72 bg-purple-500/25 rounded-full blur-[90px] pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
-            <div class="absolute -left-24 -bottom-24 w-72 h-72 bg-indigo-500/20 rounded-full blur-[90px] pointer-events-none"></div>
-
-            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div class="flex items-start gap-4 sm:gap-5">
-                    <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/30 group-hover:scale-105 transition-transform">
-                        <i data-lucide="sparkles" class="w-7 h-7 text-white animate-pulse"></i>
+        {{-- Classic & Elegant Info Banner (Try Modern RoBERTa Multi-Task) --}}
+        <div class="mb-8 bg-purple-50/70 border border-purple-200/80 rounded-2xl p-5 sm:p-6 text-gray-800">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 border border-purple-200">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <div class="flex flex-wrap items-center gap-2 mb-2">
-                            <span class="px-2.5 py-0.5 rounded-full bg-purple-500/30 text-purple-300 border border-purple-400/40 text-[0.62rem] font-black uppercase tracking-wider">
-                                Rekomendasi Mesin AI Terbaru
+                        <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                            <span class="text-[0.62rem] font-black uppercase tracking-wider text-purple-900 bg-purple-200/60 px-2 py-0.5 rounded-md">
+                                Model Generasi Terbaru
                             </span>
-                            <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[0.6rem] font-bold">
-                                Akurasi 94% + Topologi Graf
+                            <span class="text-[0.62rem] font-bold text-gray-500">
+                                RoBERTa Multi-Task + Topologi Graf
                             </span>
                         </div>
-                        <h2 class="text-lg sm:text-xl font-black text-white uppercase tracking-wide">
-                            Ingin Analisis Percakapan Lebih Presisi & Multi-Dimensi?
+                        <h2 class="text-sm sm:text-base font-bold text-gray-950">
+                            Tersedia Mesin Analisis Suara dengan Akurasi Kontekstual Lebih Tinggi
                         </h2>
-                        <p class="text-xs sm:text-sm text-gray-300 font-medium leading-relaxed mt-1.5 max-w-2xl">
-                            Saat ini Anda berada di modul analisis standar <b>(IndoBERT)</b>. Coba arsitektur terbaru <b>Multi-Task RoBERTa</b> dengan visualisasi dinamika relasi kuasa, pemetaan topologi graf wacana, dan akurasi kontekstual yang jauh lebih kaya.
+                        <p class="text-xs sm:text-[0.82rem] text-gray-600 font-medium leading-relaxed mt-1 max-w-2xl">
+                            Halaman ini menggunakan model <b>IndoBERT (Standar)</b>. Jika Anda memerlukan klasifikasi multi-dimensi sekaligus pemetaan relasi kuasa akademik dalam bentuk topologi graf, Anda dapat menggunakan modul RoBERTa terbaru.
                         </p>
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                <div class="flex items-center shrink-0 self-start md:self-auto">
                     <a href="{{ route('analysis.v2.create') }}" 
-                       class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs uppercase tracking-wider shadow-xl shadow-purple-600/40 hover:shadow-purple-600/60 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 text-center border border-purple-400/30">
-                        <span>Coba Versi RoBERTa</span>
+                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs transition-colors">
+                        <span>Beralih ke Versi RoBERTa</span>
                         <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </a>
                 </div>
