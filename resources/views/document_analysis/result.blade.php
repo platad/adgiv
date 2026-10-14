@@ -242,7 +242,7 @@
                                     </div>
 
                                     <button type="button" 
-                                            @click="speakText({!! json_encode(($conclusion['title'] ?? '') . '. ' . ($conclusion['detail'] ?? '')) !!})"
+                                            @click="speakConclusion({{ $idx }})"
                                             class="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition shrink-0 cursor-pointer"
                                             title="Dengarkan kesimpulan ini">
                                         <i data-lucide="volume-2" class="w-4 h-4"></i>
@@ -296,7 +296,7 @@
                                     </div>
 
                                     <button type="button" 
-                                            @click="speakText({!! json_encode('Temuan: ' . ($rec['finding'] ?? '') . '. Rekomendasi Aksi: ' . ($rec['action'] ?? '')) !!})"
+                                            @click="speakRecommendation({{ $index }})"
                                             class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition shrink-0 cursor-pointer"
                                             title="Dengarkan butir rekomendasi ini">
                                         <i data-lucide="volume-2" class="w-4 h-4"></i>
@@ -468,9 +468,28 @@
                     }, 50);
                 },
 
+                conclusions: {!! json_encode($documentAnalysis->key_conclusions ?? []) !!},
+                recommendations: {!! json_encode($documentAnalysis->recommendations ?? []) !!},
+
                 speakExecutiveSummary() {
                     const summary = {!! json_encode($documentAnalysis->executive_summary) !!};
                     this.speakText(summary);
+                },
+
+                speakConclusion(index) {
+                    const item = this.conclusions[index];
+                    if (item) {
+                        const text = (item.title || '') + '. ' + (item.detail || '');
+                        this.speakText(text);
+                    }
+                },
+
+                speakRecommendation(index) {
+                    const item = this.recommendations[index];
+                    if (item) {
+                        const text = 'Temuan: ' + (item.finding || '') + '. Rekomendasi Aksi: ' + (item.action || '');
+                        this.speakText(text);
+                    }
                 }
             }
         }
