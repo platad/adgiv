@@ -139,29 +139,29 @@
                 </p>
             </div>
 
-            {{-- Action Buttons --}}
-            <div class="flex flex-wrap items-center gap-3 shrink-0">
+            {{-- Action Buttons (Mobile-first Wrap & Responsive Full/Auto width) --}}
+            <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 w-full sm:w-auto shrink-0">
                 {{-- Tombol Cetak Laporan (Modal Fitur Dalam Pengembangan) --}}
                 <button type="button"
                     @click="showPrintModal = true"
-                    class="inline-flex items-center px-4 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-purple-600/20 active:scale-95 cursor-pointer">
-                    <i data-lucide="printer" class="w-4 h-4 mr-2"></i>
+                    class="inline-flex items-center justify-center px-4 py-3 sm:py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-purple-600/20 active:scale-95 cursor-pointer">
+                    <i data-lucide="printer" class="w-4 h-4 mr-2 shrink-0"></i>
                     <span>Cetak Laporan</span>
                 </button>
 
                 {{-- Tombol Tukar Peran Pembicara --}}
                 <button type="button"
                     @click="showSwapModal = true"
-                    class="inline-flex items-center px-4 py-2.5 rounded-2xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer">
-                    <i data-lucide="arrow-left-right" class="w-4 h-4 mr-2 text-purple-600"></i>
+                    class="inline-flex items-center justify-center px-4 py-3 sm:py-2.5 rounded-2xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer">
+                    <i data-lucide="arrow-left-right" class="w-4 h-4 mr-2 text-purple-600 shrink-0"></i>
                     <span>Tukar Peran Pembicara</span>
                 </button>
 
                 {{-- Tombol Lihat / Tutup Raw --}}
                 <button type="button"
                     @click="showRaw = !showRaw"
-                    class="inline-flex items-center px-4 py-2.5 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-black uppercase tracking-wider transition-colors cursor-pointer">
-                    <i data-lucide="code" class="w-4 h-4 mr-2"></i>
+                    class="inline-flex items-center justify-center px-4 py-3 sm:py-2.5 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-black uppercase tracking-wider transition-colors cursor-pointer">
+                    <i data-lucide="code" class="w-4 h-4 mr-2 shrink-0"></i>
                     <span x-text="showRaw ? 'Tutup Raw' : 'Lihat Raw'"></span>
                 </button>
             </div>
@@ -345,7 +345,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
-                        <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
                             <i data-lucide="network" class="w-4 h-4"></i>
                         </div>
                         <h2 class="text-base sm:text-lg font-black uppercase tracking-tight text-gray-900">
@@ -356,13 +356,13 @@
                         Visualisasi topologi wacana interaktif dipadukan dengan interpretasi mendalam kecerdasan buatan.
                     </p>
                 </div>
-                <div class="flex flex-wrap items-center gap-2.5">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold shadow-2xs">
-                        <i data-lucide="user-check" class="w-3.5 h-3.5 text-purple-600"></i>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 text-[0.7rem] font-bold shadow-2xs">
+                        <i data-lucide="user-check" class="w-3 h-3 text-purple-600"></i>
                         <span>Dosen</span>
                     </span>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold shadow-2xs">
-                        <i data-lucide="users" class="w-3.5 h-3.5 text-blue-600"></i>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 text-[0.7rem] font-bold shadow-2xs">
+                        <i data-lucide="users" class="w-3 h-3 text-blue-600"></i>
                         <span>Mahasiswa</span>
                     </span>
 
@@ -370,7 +370,7 @@
                     <button type="button" 
                         @click="analyzeGraphWithAI()"
                         :disabled="isInterpretingGraph"
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider shadow-md shadow-purple-600/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 cursor-pointer">
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider shadow-md shadow-purple-600/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 cursor-pointer">
                         <template x-if="!isInterpretingGraph">
                             <span class="flex items-center gap-1.5">
                                 <i data-lucide="sparkles" class="w-4 h-4 text-purple-200"></i>
@@ -390,9 +390,9 @@
             {{-- Grid Kontainer Card: Kiri Graf (lg:col-span-6), Kanan Hasil Analisis Teks / Skeleton (lg:col-span-6) --}}
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 
-                {{-- Kolom Kiri: Peta Graf ECharts (Tetap 6 Kolom di Desktop agar stabil dan tidak geser/mengecil) --}}
+                {{-- Kolom Kiri: Peta Graf ECharts (Responsive height: 380px on mobile, 540px on desktop) --}}
                 <div class="lg:col-span-6 w-full">
-                    <div id="graph-container" class="w-full bg-gray-50/50 rounded-2xl border border-gray-100" style="height: 540px;"></div>
+                    <div id="graph-container" class="w-full bg-gray-50/50 rounded-2xl border border-gray-100 h-[380px] sm:h-[460px] md:h-[540px]"></div>
                 </div>
 
                 {{-- Kolom Kanan: Hasil Generate Teks Analisis AI / Loading Skeleton / Placeholder Awal --}}
@@ -1713,6 +1713,7 @@
                 return academicMeanings[clean] || null;
             }
 
+            var isMobileScreen = window.innerWidth < 640;
             var option = {
                 tooltip: {
                     trigger: 'item',
@@ -1723,7 +1724,7 @@
                     borderColor: '#374151',
                     borderWidth: 1,
                     padding: [10, 14],
-                    extraCssText: 'box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); border-radius: 14px; max-width: 320px; white-space: normal; z-index: 999999 !important;',
+                    extraCssText: 'box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); border-radius: 14px; max-width: 300px; white-space: normal; z-index: 999999 !important;',
                     formatter: function(params) {
                         if (params.dataType === 'node') {
                             var info = getMeaning(params.name);
@@ -1781,16 +1782,16 @@
                         show: true, 
                         position: 'right', 
                         fontWeight: 'bold',
-                        fontSize: 11
+                        fontSize: isMobileScreen ? 9 : 11
                     },
                     edgeSymbol: ['circle', 'arrow'],
-                    edgeSymbolSize: [4, 10],
-                    edgeLabel: { fontSize: 10 },
+                    edgeSymbolSize: isMobileScreen ? [3, 8] : [4, 10],
+                    edgeLabel: { fontSize: isMobileScreen ? 8 : 10 },
                     data: rawGraphData.nodes,
                     links: rawGraphData.edges,
                     force: {
-                        repulsion: 450,
-                        edgeLength: [60, 160]
+                        repulsion: isMobileScreen ? 240 : 450,
+                        edgeLength: isMobileScreen ? [40, 100] : [60, 160]
                     },
                     lineStyle: {
                         color: 'source',
