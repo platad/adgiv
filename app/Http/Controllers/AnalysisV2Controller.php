@@ -214,6 +214,7 @@ class AnalysisV2Controller extends Controller
         $mhsSegments = 0;
         $adviceCounts = [];
         $modeCounts = [];
+        $intonationCounts = ['up' => 0, 'down' => 0, 'neutral' => 0];
 
         foreach ($transcription as $item) {
             $speaker = $item['speaker'] ?? 'Unknown';
@@ -232,7 +233,58 @@ class AnalysisV2Controller extends Controller
                 $mode = $item['modes_of_interaction'];
                 $modeCounts[$mode] = ($modeCounts[$mode] ?? 0) + 1;
             }
+
+            $intType = strtolower($item['intonation_type'] ?? ($item['intonation_markers'][0]['type'] ?? 'neutral'));
+            if (in_array($intType, ['up', 'down', 'neutral'])) {
+                $intonationCounts[$intType]++;
+            } else {
+                $intonationCounts['neutral']++;
+            }
         }
+
+        // Tentukan nilai sintesis summary Hasil Analisis Akhir (V1 parity)
+        $topAdvice = !empty($adviceCounts) ? array_keys($adviceCounts, max($adviceCounts))[0] : null;
+        $topMode = !empty($modeCounts) ? array_keys($modeCounts, max($modeCounts))[0] : null;
+        
+        $kategoriAdvice = 'Saran Bimbingan Akademik';
+        if ($topAdvice === 'arahan_eksplisit') {
+            $kategoriAdvice = 'Instruksi Direktif Dosen';
+        } elseif ($topAdvice === 'bimbingan_bertahap') {
+            $kategoriAdvice = 'Saran Akademik Terarah';
+        } elseif ($topAdvice === 'dukungan_keputusan') {
+            $kategoriAdvice = 'Dukungan Keputusan Kolaboratif';
+        } elseif ($topAdvice === 'jawaban_tegas') {
+            $kategoriAdvice = 'Jawaban Tegas & Penegasan Riset';
+        } elseif ($topAdvice === 'petunjuk_kontekstual') {
+            $kategoriAdvice = 'Petunjuk Kontekstual Metodologi';
+        }
+
+        $karakterRelasi = 'Kondusif & Seimbang';
+        if ($topMode === 'power_over' || $topMode === 'otoritas') {
+            $karakterRelasi = 'Relasi Kuasa Direktif Dosen';
+        } elseif ($topMode === 'power_gaining') {
+            $karakterRelasi = 'Koperatif & Dialogis';
+        } elseif ($topMode === 'power_maintaining') {
+            $karakterRelasi = 'Dialogis Kondusif';
+        }
+
+        $intonasiDominan = 'Intonasi Seimbang';
+        if ($intonationCounts['down'] > $intonationCounts['up']) {
+            $intonasiDominan = 'Intonasi Turun Dominan';
+        } elseif ($intonationCounts['up'] > $intonationCounts['down']) {
+            $intonasiDominan = 'Intonasi Naik Dominan';
+        }
+
+        // Fallback or existing summary from result_data
+        $existingSummary = $analysis->result_data['summary'] ?? [];
+        $summary = [
+            'kategori_advice' => $existingSummary['kategori_advice'] ?? $kategoriAdvice,
+            'karakter_relasi' => $existingSummary['karakter_relasi'] ?? $karakterRelasi,
+            'intonasi_dominan' => $existingSummary['intonasi_dominan'] ?? $intonasiDominan,
+            'ranah_pembicaraan' => $existingSummary['ranah_pembicaraan'] ?? 'Bimbingan Skripsi & Pendalaman Metodologi Penelitian',
+            'arah_tujuan' => $existingSummary['arah_tujuan'] ?? ($topAdvice ? 'Dosen mengarahkan mahasiswa dengan fokus pada penyempurnaan landasan teori, ketepatan metode penelitian, dan perumusan simpulan yang valid.' : 'Membimbing mahasiswa dalam memahami kerangka konseptual serta sistematika penulisan karya ilmiah.'),
+            'saran_perbaikan' => $existingSummary['saran_perbaikan'] ?? 'Mahasiswa disarankan menindaklanjuti catatan revisi Dosen, mengonfirmasi instrumen riset, dan menyusun target mingguan agar jadwal bimbingan berjalan optimal.',
+        ];
 
         $stats = [
             'total_segments' => $totalSegments,
@@ -242,8 +294,9 @@ class AnalysisV2Controller extends Controller
             'mhs_ratio' => $totalSegments > 0 ? round(($mhsSegments / $totalSegments) * 100) : 0,
             'advice_counts' => $adviceCounts,
             'mode_counts' => $modeCounts,
+            'intonation_counts' => $intonationCounts,
         ];
 
-        return view('analysis.v2.result', compact('analysis', 'stats', 'transcription'));
+        return view('analysis.v2.result', compact('analysis', 'stats', 'transcription', 'summary'));
     }
 }
