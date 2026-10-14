@@ -260,6 +260,86 @@
         </div>
         @endif
 
+        {{-- Conversation Dynamics Chart & Agent Analysis (Grafik Aliran Intonasi V1 Parity) --}}
+        <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-8 relative overflow-hidden">
+            <div class="flex flex-col lg:flex-row gap-8 items-stretch">
+                <!-- Left part: The Chart (2/3 width) -->
+                <div class="lg:w-2/3 flex flex-col justify-between">
+                    <div>
+                        <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                            <i data-lucide="activity" class="w-3.5 h-3.5 text-purple-600 animate-pulse"></i> 
+                            <span>Grafik Aliran Intonasi Percakapan</span>
+                        </span>
+                        <h3 class="text-base sm:text-lg font-black text-gray-950 uppercase tracking-wide mb-6">
+                            Dinamika Intonasi Per Baris (Pitch Dynamics)
+                        </h3>
+                    </div>
+                    <div class="w-full overflow-x-auto pb-4 scrollbar-thin">
+                        <div class="relative min-w-[600px] w-full h-64">
+                            <canvas id="dynamicsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right part: AI Summary of Chart (1/3 width) -->
+                <div class="lg:w-1/3 bg-gray-50 border border-gray-100 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 text-gray-200/30 pointer-events-none">
+                        <i data-lucide="sparkles" class="w-32 h-32"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center p-1.5">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <span class="block text-[0.55rem] font-black text-gray-400 uppercase tracking-widest">Supervisory AI</span>
+                                <span class="text-xs font-black text-gray-800 uppercase tracking-wider">
+                                    Interpretasi Aliran
+                                </span>
+                            </div>
+                        </div>
+
+                        @php
+                            $upCount = 0;
+                            $downCount = 0;
+                            foreach ($transcription as $block) {
+                                $type = $block['intonation_type'] ?? ($block['intonation_markers'][0]['type'] ?? 'neutral');
+                                if ($type === 'up') $upCount++;
+                                if ($type === 'down') $downCount++;
+                            }
+
+                            if ($downCount > $upCount) {
+                                $dynamicsSummary = 'Alur percakapan didominasi oleh intonasi menurun (' . $downCount . ' kali) yang menandakan instruksi tegas, korektif, dan arahan bimbingan akademik yang pasti dari Dosen. Hal ini menunjukkan dinamika direktif di mana pembimbing mengontrol wacana untuk memastikan mutu riset mahasiswa.';
+                                $dynamicsStatus = 'Direktif & Korektif';
+                                $statusColor = 'text-red-700 bg-red-50 border-red-200';
+                            } elseif ($upCount > $downCount) {
+                                $dynamicsSummary = 'Alur percakapan didominasi oleh intonasi menaik (' . $upCount . ' kali) yang mencerminkan nada tanya, klarifikasi, atau eksplorasi produktif. Ini mencerminkan hubungan dialogis di mana bimbingan berjalan interaktif dan koperatif.';
+                                $dynamicsStatus = 'Dialogis & Koperatif';
+                                $statusColor = 'text-blue-700 bg-blue-50 border-blue-200';
+                            } else {
+                                $dynamicsSummary = 'Dinamika percakapan berjalan seimbang antara intonasi turun (penegasan) dan naik (klarifikasi/pertanyaan). Ini mencerminkan keseimbangan relasi bimbingan yang sangat kondusif, interaktif, dan berorientasi pada pemecahan masalah bersama.';
+                                $dynamicsStatus = 'Kondusif & Seimbang';
+                                $statusColor = 'text-green-700 bg-green-50 border-green-200';
+                            }
+                        @endphp
+
+                        <p class="text-xs sm:text-sm font-medium text-gray-600 leading-relaxed font-serif mt-4">
+                            {{ $dynamicsSummary }}
+                        </p>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-gray-200 flex justify-between items-center relative z-10">
+                        <span class="text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">
+                            Karakter Aliran
+                        </span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest border {{ $statusColor }}">
+                            {{ $dynamicsStatus }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- Graph Network Section (ECharts) --}}
         <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-8 relative overflow-hidden">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
@@ -993,8 +1073,144 @@
     </div>
 
     <x-slot name="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    @php
+        $chartPoints = array_map(
+            function ($block, $idx) {
+                $type = strtolower($block['intonation_type'] ?? ($block['intonation_markers'][0]['type'] ?? 'neutral'));
+                $val = 0;
+                if ($type === 'up') $val = 1;
+                elseif ($type === 'down') $val = -1;
+
+                $speaker = $block['speaker'] ?? 'Unknown';
+                $isDosen = strcasecmp($speaker, 'Dosen') === 0 || strcasecmp($speaker, 'Supervisor') === 0;
+
+                return [
+                    'label' => 'Baris ' . ($idx + 1),
+                    'value' => $val,
+                    'speaker' => $isDosen ? 'Dosen' : 'Mahasiswa',
+                    'type' => $type === 'up' ? 'Naik' : ($type === 'down' ? 'Turun' : 'Netral'),
+                    'text' => mb_strimwidth(strip_tags($block['text_html'] ?? ($block['text'] ?? '')), 0, 50, '...'),
+                ];
+            },
+            $transcription,
+            array_keys($transcription)
+        );
+    @endphp
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi Grafik Aliran Intonasi (Chart.js - V1 Parity)
+            const canvasEl = document.getElementById('dynamicsChart');
+            if (canvasEl) {
+                const ctx = canvasEl.getContext('2d');
+                const chartData = @json($chartPoints);
+                const labels = chartData.map(d => d.label);
+                const values = chartData.map(d => d.value);
+                const pointColors = chartData.map(d => d.speaker === 'Dosen' ? '#9333ea' : '#2563eb');
+                const pointStyles = chartData.map(d => d.speaker === 'Dosen' ? 'circle' : 'rectRot');
+
+                const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+                gradient.addColorStop(0, 'rgba(147, 51, 234, 0.2)');
+                gradient.addColorStop(0.5, 'rgba(37, 99, 235, 0.08)');
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Dinamika Nada Intonasi',
+                            data: values,
+                            borderColor: '#4b5563',
+                            borderWidth: 2.5,
+                            tension: 0.35,
+                            fill: true,
+                            backgroundColor: gradient,
+                            pointBackgroundColor: pointColors,
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2.5,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            pointStyle: pointStyles
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        onClick: function(e, activeEls) {
+                            if (activeEls && activeEls.length > 0) {
+                                const idx = activeEls[0].index;
+                                const targetEl = document.getElementById('baris-' + idx);
+                                if (targetEl) {
+                                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    targetEl.classList.add('ring-2', 'ring-purple-400', 'bg-purple-50/40');
+                                    setTimeout(() => targetEl.classList.remove('ring-2', 'ring-purple-400', 'bg-purple-50/40'), 2500);
+                                }
+                            }
+                        },
+                        onHover: function(e, el) {
+                            const canvas = e.chart.canvas;
+                            canvas.style.cursor = el.length ? 'pointer' : 'default';
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#111827',
+                                titleFont: { size: 11, weight: 'bold', family: 'Inter' },
+                                bodyFont: { size: 11, family: 'Inter' },
+                                padding: 12,
+                                borderRadius: 12,
+                                callbacks: {
+                                    title: function(context) {
+                                        const idx = context[0].dataIndex;
+                                        const d = chartData[idx];
+                                        return `${d.label} - ${d.speaker}`;
+                                    },
+                                    label: function(context) {
+                                        const idx = context.dataIndex;
+                                        const d = chartData[idx];
+                                        return [
+                                            `Intonasi: ${d.type}`,
+                                            `Teks: "${d.text}"`
+                                        ];
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: {
+                                    font: { size: 10, family: 'Inter', weight: '600' },
+                                    color: '#9ca3af'
+                                }
+                            },
+                            y: {
+                                min: -1.2,
+                                max: 1.2,
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        if (value === 1) return 'Naik ↑';
+                                        if (value === 0) return 'Netral ➖';
+                                        if (value === -1) return 'Turun ↓';
+                                        return '';
+                                    },
+                                    font: { size: 10, family: 'Inter', weight: 'bold' },
+                                    color: '#9ca3af'
+                                },
+                                grid: {
+                                    color: 'rgba(243, 244, 246, 0.8)',
+                                    drawBorder: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
         function v2ResultApp() {
             return {
                 showRaw: false,
