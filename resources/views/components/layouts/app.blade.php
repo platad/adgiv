@@ -2,6 +2,8 @@
     'title' => null,
     'welcomeAudio' => null,
     'activeSessionId' => null,
+    'styles' => null,
+    'scripts' => null,
 ])
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">

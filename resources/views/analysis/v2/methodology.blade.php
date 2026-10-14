@@ -182,45 +182,122 @@
                         </div>
                     </div>
 
-                    {{-- Formulasi Matematis dengan KaTeX Renderer Otomatis --}}
-                    <div class="p-6 rounded-2xl bg-gray-900 text-white mb-6 border border-white/10 space-y-4">
-                        <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                            <span class="text-xs font-black tracking-widest uppercase text-purple-400 flex items-center gap-2">
-                                <i data-lucide="function-square" class="w-4 h-4"></i>
-                                Formulasi Matematis Multi-Task Learning
+                    {{-- Cara Kerja Kecerdasan Buatan (Visual & Mudah Dipahami) --}}
+                    <div class="p-6 md:p-8 rounded-3xl bg-gradient-to-br from-gray-900 via-gray-900 to-indigo-950 text-white mb-6 border border-white/10 space-y-6 shadow-2xl">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 gap-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                                    <i data-lucide="brain" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-black tracking-wide uppercase text-white">
+                                        Cara Kerja Model RoBERTa (Multi-Task Learning)
+                                    </h4>
+                                    <p class="text-[0.7rem] text-purple-300">Bagaimana AI memahami kalimat dan menghasilkan 2 analisa sekaligus</p>
+                                </div>
+                            </div>
+                            <span class="inline-flex self-start sm:self-auto px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[0.65rem] font-bold">
+                                1 Input ➔ 2 Hasil Otomatis
                             </span>
-                            <span class="text-[0.65rem] text-gray-400 font-mono">BPE + Dynamic Masking</span>
                         </div>
                         
-                        <p class="text-xs text-gray-300 leading-relaxed">
-                            Model mengubah susunan kata pada kalimat percakapan <span class="math-tex inline-math font-mono text-purple-300">\mathbf{x} = (x_1, x_2, \dots, x_N)</span> menjadi pemahaman vektor semantik yang utuh melalui enkoder cerdas RoBERTa:
-                        </p>
+                        {{-- 3 Langkah Alur Logika Visual --}}
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {{-- Step 1 --}}
+                            <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-[0.65rem] font-black uppercase tracking-widest text-purple-400">Langkah 1: Masukan</span>
+                                        <span class="w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold flex items-center justify-center">1</span>
+                                    </div>
+                                    <h5 class="text-xs font-bold text-white mb-1.5">Kalimat Tuturan Suara</h5>
+                                    <p class="text-[0.75rem] text-gray-300 leading-relaxed mb-3">
+                                        Setiap baris kalimat percakapan dipotong menjadi kumpulan kata berurutan:
+                                    </p>
+                                </div>
+                                <div class="p-2.5 rounded-xl bg-black/40 border border-white/10 text-center font-mono text-xs text-indigo-300">
+                                    Kalimat = (kata₁, kata₂, ..., kataₙ)
+                                </div>
+                            </div>
 
-                        <div class="p-4 bg-black/40 rounded-xl font-mono text-xs text-center text-indigo-300 overflow-x-auto">
-                            <div class="math-tex block-math">\mathbf{h}_{[\text{CLS}]} = \text{RoBERTa}_{\boldsymbol{\theta}}(\mathbf{x})</div>
+                            {{-- Step 2 --}}
+                            <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-[0.65rem] font-black uppercase tracking-widest text-indigo-400">Langkah 2: Enkoder AI</span>
+                                        <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold flex items-center justify-center">2</span>
+                                    </div>
+                                    <h5 class="text-xs font-bold text-white mb-1.5">Memahami Makna Konteks</h5>
+                                    <p class="text-[0.75rem] text-gray-300 leading-relaxed mb-3">
+                                        RoBERTa mencerna arti seluruh kalimat secara bolak-balik menjadi satu inti pemahaman:
+                                    </p>
+                                </div>
+                                <div class="p-2.5 rounded-xl bg-black/40 border border-white/10 text-center font-mono text-xs text-purple-300 font-bold">
+                                    Inti_Makna = RoBERTa(Kalimat)
+                                </div>
+                            </div>
+
+                            {{-- Step 3 --}}
+                            <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-[0.65rem] font-black uppercase tracking-widest text-emerald-400">Langkah 3: Output</span>
+                                        <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold flex items-center justify-center">3</span>
+                                    </div>
+                                    <h5 class="text-xs font-bold text-white mb-1.5">Dua Keputusan Sekaligus</h5>
+                                    <p class="text-[0.75rem] text-gray-300 leading-relaxed mb-3">
+                                        Dari 1 inti makna, sistem langsung memutuskan kategori saran dan relasi kuasanya.
+                                    </p>
+                                </div>
+                                <div class="p-2.5 rounded-xl bg-black/40 border border-white/10 text-center font-mono text-[0.68rem] text-emerald-300 font-bold">
+                                    Pola Saran + Relasi Kuasa
+                                </div>
+                            </div>
                         </div>
 
-                        <p class="text-xs text-gray-300 leading-relaxed">
-                            Hasil pemahaman vektor <span class="math-tex inline-math font-mono text-purple-300">\mathbf{h}_{[\text{CLS}]}</span> tersebut langsung diolah bersamaan ke dua cabang klasifikasi sekaligus:
-                        </p>
+                        {{-- Kotak Rincian Formula Sederhana --}}
+                        <div class="p-4 rounded-2xl bg-black/30 border border-white/10 space-y-3">
+                            <span class="text-[0.7rem] font-black uppercase tracking-wider text-purple-300 block">
+                                Rincian Perhitungan Komputasi (Formula Ringkas):
+                            </span>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
-                            <div class="p-3.5 bg-white/5 rounded-xl border border-white/10">
-                                <span class="text-pink-300 block font-bold mb-1.5 uppercase tracking-wider text-[0.68rem]">Cabang 1: Pola Saran (Advice Giving)</span>
-                                <div class="math-tex block-math">\hat{y}_{\text{advice}} = \text{softmax}(\mathbf{W}_a \mathbf{h}_{[\text{CLS}]} + \mathbf{b}_a)</div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="font-bold text-pink-300">Pola Pemberian Saran:</span>
+                                        <span class="text-[0.65rem] text-gray-400">Klasifikasi 5 Kelas</span>
+                                    </div>
+                                    <div class="font-mono text-xs text-white bg-black/40 p-2 rounded-lg my-1.5 text-center">
+                                        Hasil_Saran = Probabilitas(Bobot_A × Inti_Makna)
+                                    </div>
+                                    <p class="text-[0.7rem] text-gray-300 leading-snug">
+                                        Menentukan apakah kalimat dosen berisi: <i>Arahan Eksplisit, Bimbingan Bertahap, Dukungan Keputusan, Jawaban Tegas,</i> atau <i>Petunjuk Kontekstual</i>.
+                                    </p>
+                                </div>
+
+                                <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="font-bold text-blue-300">Pola Relasi Kuasa:</span>
+                                        <span class="text-[0.65rem] text-gray-400">Klasifikasi 3 Kelas</span>
+                                    </div>
+                                    <div class="font-mono text-xs text-white bg-black/40 p-2 rounded-lg my-1.5 text-center">
+                                        Hasil_Relasi = Probabilitas(Bobot_M × Inti_Makna)
+                                    </div>
+                                    <p class="text-[0.7rem] text-gray-300 leading-snug">
+                                        Menentukan suasana komunikasi: <i>Power Over</i> (dominan), <i>Power Maintaining</i> (setara/kemitraan), atau <i>Power Gaining</i> (inisiatif mahasiswa).
+                                    </p>
+                                </div>
                             </div>
-                            <div class="p-3.5 bg-white/5 rounded-xl border border-white/10">
-                                <span class="text-blue-300 block font-bold mb-1.5 uppercase tracking-wider text-[0.68rem]">Cabang 2: Relasi Komunikasi (Modes)</span>
-                                <div class="math-tex block-math">\hat{y}_{\text{mode}} = \text{softmax}(\mathbf{W}_m \mathbf{h}_{[\text{CLS}]} + \mathbf{b}_m)</div>
+
+                            <div class="pt-2 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[0.72rem] text-gray-300">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="check-check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                                    <span>Kedua tugas dilatih secara seimbang (*Joint Optimization*) sehingga akurasi saling melengkapi.</span>
+                                </div>
+                                <span class="font-mono text-[0.68rem] text-purple-300 self-end sm:self-auto bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+                                    Total_Error = Error_Saran + Error_Relasi
+                                </span>
                             </div>
-                        </div>
-
-                        <p class="text-xs text-gray-300 leading-relaxed">
-                            Kedua cabang tersebut dipelajari dan dioptimalkan secara seimbang menggunakan perhitungan rugi terpadu (*Joint Loss*):
-                        </p>
-
-                        <div class="p-4 bg-black/40 rounded-xl font-mono text-xs text-center text-purple-300 overflow-x-auto">
-                            <div class="math-tex block-math">\mathcal{L}_{\text{total}} = \alpha \mathcal{L}_{\text{advice}}(\hat{y}_a, y_a) + \beta \mathcal{L}_{\text{mode}}(\hat{y}_m, y_m)</div>
                         </div>
                     </div>
 
