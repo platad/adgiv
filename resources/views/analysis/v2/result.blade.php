@@ -230,12 +230,14 @@
             </div>
         </div>
 
-        {{-- Audio Player Bar (Integrated) --}}
+        {{-- Audio Player Bar (Floating Glassmorphism Bar di Bawah Tengah) --}}
         @if($analysis->audio_path)
-        <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm mb-8 flex flex-col md:flex-row items-center gap-6">
-            <div class="flex items-center gap-4 w-full md:w-auto">
+        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] sm:w-[540px] md:w-[620px]">
+            <div class="bg-gray-950/90 backdrop-blur-xl rounded-2xl md:rounded-3xl p-3.5 sm:p-4 border border-gray-700/80 shadow-2xl text-white flex items-center gap-3.5 sm:gap-4 transition-all">
+                
+                {{-- Play / Pause Button --}}
                 <button type="button" @click="toggleAudio()"
-                    class="w-12 h-12 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-600/30 transition-transform active:scale-95 cursor-pointer">
+                    class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-purple-600/40 transition-transform active:scale-95 cursor-pointer">
                     <template x-if="!isPlaying">
                         <svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </template>
@@ -243,16 +245,32 @@
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                     </template>
                 </button>
-                <div>
-                    <span class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 block">Pemutar Audio Rekaman</span>
-                    <p class="text-xs font-bold text-gray-800" x-text="audioTimeDisplay">00:00 / 00:00</p>
-                </div>
-            </div>
 
-            {{-- Progress bar --}}
-            <div class="flex-grow w-full">
-                <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden cursor-pointer relative" @click="seekAudio($event)">
-                    <div class="bg-purple-600 h-full rounded-full transition-all duration-100" :style="'width: ' + progressPercent + '%'"></div>
+                {{-- Track Info & Progress Bar --}}
+                <div class="flex-grow min-w-0">
+                    <div class="flex items-center justify-between text-[0.65rem] sm:text-xs mb-1.5 font-bold">
+                        <div class="flex items-center gap-2 truncate">
+                            <span class="text-purple-300 uppercase tracking-widest text-[0.6rem] font-black">
+                                <span x-show="activeSegmentIndex === null">Audio Rekaman</span>
+                                <span x-show="activeSegmentIndex !== null" class="text-amber-400">Baris <span x-text="(activeSegmentIndex || 0) + 1"></span></span>
+                            </span>
+                            <span class="text-gray-400 hidden sm:inline">•</span>
+                            <span class="text-gray-300 font-medium truncate hidden sm:inline">{{ Str::limit($analysis->title, 26) }}</span>
+                        </div>
+                        <span class="text-gray-200 font-mono tracking-tight shrink-0 ml-2" x-text="audioTimeDisplay">00:00 / 00:00</span>
+                    </div>
+
+                    {{-- Progress Bar with Hover effect --}}
+                    <div class="w-full bg-white/10 hover:bg-white/20 h-2 sm:h-2.5 rounded-full overflow-hidden cursor-pointer relative transition-colors" @click="seekAudio($event)">
+                        <div class="bg-gradient-to-r from-purple-500 to-indigo-400 h-full rounded-full transition-all duration-100" :style="'width: ' + progressPercent + '%'"></div>
+                    </div>
+                </div>
+
+                {{-- Status Indicator / Live Visualizer --}}
+                <div class="hidden sm:flex items-center gap-1 shrink-0 px-2 py-1 rounded-lg bg-white/5 border border-white/10">
+                    <span class="w-1.5 h-3.5 rounded-full bg-purple-400" :class="isPlaying ? 'animate-pulse' : 'opacity-40'"></span>
+                    <span class="w-1.5 h-5 rounded-full bg-indigo-400" :class="isPlaying ? 'animate-pulse delay-75' : 'opacity-40'"></span>
+                    <span class="w-1.5 h-2.5 rounded-full bg-purple-300" :class="isPlaying ? 'animate-pulse delay-150' : 'opacity-40'"></span>
                 </div>
             </div>
 
@@ -635,9 +653,28 @@
                                     <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">
                                         BARIS {{ $index + 1 }}
                                     </div>
-                                    <div class="text-[0.7rem] font-semibold text-gray-500 mt-1 flex items-center">
-                                        <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 text-gray-400"></i>
-                                        <span>{{ $item['timestamp'] ?? '00:00' }}</span>
+                                    <div class="mt-1.5 flex items-center gap-1.5">
+                                        {{-- Tombol Putar Audio Segmen Ini --}}
+                                        @if($analysis->audio_path && !empty($item['timestamp']))
+                                            <button type="button"
+                                                @click="playSegment({{ $index }}, '{{ addslashes($item['timestamp']) }}')"
+                                                class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[0.68rem] font-bold transition-all cursor-pointer border"
+                                                :class="activeSegmentIndex === {{ $index }} && isPlaying ? 'bg-purple-600 text-white border-purple-600 shadow-sm animate-pulse' : 'bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200'"
+                                                title="Putar audio khusus untuk baris tuturan ini">
+                                                <template x-if="activeSegmentIndex === {{ $index }} && isPlaying">
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                                                </template>
+                                                <template x-if="!(activeSegmentIndex === {{ $index }} && isPlaying)">
+                                                    <svg class="w-3 h-3 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                                </template>
+                                                <span>{{ $item['timestamp'] }}</span>
+                                            </button>
+                                        @else
+                                            <div class="text-[0.7rem] font-semibold text-gray-500 flex items-center">
+                                                <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 text-gray-400"></i>
+                                                <span>{{ $item['timestamp'] ?? '00:00' }}</span>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
 
@@ -1685,39 +1722,110 @@
                     });
                 },
 
+                // Audio Player state
+                isPlaying: false,
+                progressPercent: 0,
+                audioTimeDisplay: '00:00 / 00:00',
+                activeSegmentIndex: null,
+                segmentEndTime: null,
+
                 toggleAudio() {
                     const audio = this.$refs.audioPlayer;
                     if (!audio) return;
                     if (audio.paused) {
+                        this.segmentEndTime = null;
+                        this.activeSegmentIndex = null;
                         audio.play();
                         this.isPlaying = true;
                     } else {
                         audio.pause();
                         this.isPlaying = false;
+                        this.activeSegmentIndex = null;
+                        this.segmentEndTime = null;
                     }
                 },
+
+                parseTimeString(str) {
+                    if (!str || typeof str !== 'string') return 0;
+                    const parts = str.trim().split(':').map(Number);
+                    if (parts.length === 2) {
+                        return (parts[0] * 60) + parts[1];
+                    }
+                    if (parts.length === 3) {
+                        return (parts[0] * 3600) + (parts[1] * 60) + parts[2];
+                    }
+                    return 0;
+                },
+
+                playSegment(idx, timeStr) {
+                    const audio = this.$refs.audioPlayer;
+                    if (!audio) return;
+
+                    // Jika segment yang sama sedang diputar, klik lagi akan pause/stop
+                    if (this.isPlaying && this.activeSegmentIndex === idx) {
+                        audio.pause();
+                        this.isPlaying = false;
+                        this.activeSegmentIndex = null;
+                        this.segmentEndTime = null;
+                        return;
+                    }
+
+                    if (!timeStr) return;
+                    // Format waktu bisa "01:41 - 01:49" atau "01:41"
+                    const parts = timeStr.split('-').map(s => s.trim());
+                    const startSec = this.parseTimeString(parts[0]);
+                    const endSec = parts.length > 1 ? this.parseTimeString(parts[1]) : (startSec + 5);
+
+                    this.activeSegmentIndex = idx;
+                    this.segmentEndTime = endSec;
+
+                    audio.currentTime = startSec;
+                    audio.play().then(() => {
+                        this.isPlaying = true;
+                    }).catch(err => {
+                        console.error('Audio play error:', err);
+                    });
+                },
+
                 onTimeUpdate() {
                     const audio = this.$refs.audioPlayer;
                     if (!audio || !audio.duration) return;
                     this.progressPercent = (audio.currentTime / audio.duration) * 100;
                     this.audioTimeDisplay = this.formatTime(audio.currentTime) + ' / ' + this.formatTime(audio.duration);
+
+                    // Auto-stop jika memutar segment percakapan spesifik dan sudah mencapai batas durasi
+                    if (this.segmentEndTime !== null && audio.currentTime >= this.segmentEndTime) {
+                        audio.pause();
+                        this.isPlaying = false;
+                        this.activeSegmentIndex = null;
+                        this.segmentEndTime = null;
+                    }
                 },
+
                 onEnded() {
                     this.isPlaying = false;
                     this.progressPercent = 0;
+                    this.activeSegmentIndex = null;
+                    this.segmentEndTime = null;
                 },
+
                 onLoadedMetadata() {
                     const audio = this.$refs.audioPlayer;
                     if (!audio) return;
                     this.audioTimeDisplay = '00:00 / ' + this.formatTime(audio.duration);
                 },
+
                 seekAudio(e) {
                     const audio = this.$refs.audioPlayer;
                     if (!audio || !audio.duration) return;
                     const rect = e.currentTarget.getBoundingClientRect();
                     const clickPos = (e.clientX - rect.left) / rect.width;
                     audio.currentTime = clickPos * audio.duration;
+                    // Reset segment limit jika pengguna drag / seek manual bar audio
+                    this.segmentEndTime = null;
+                    this.activeSegmentIndex = null;
                 },
+
                 formatTime(sec) {
                     if (isNaN(sec)) return '00:00';
                     const m = Math.floor(sec / 60);
