@@ -37,26 +37,26 @@
                     <span class="lang-id">
                         Analisis Suara Cerdas & <br class="hidden md:inline" />
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-300">
-                            Peta Hubungan Bimbingan Skripsi
+                            Peta Hubungan Bimbingan Akademik
                         </span>
                     </span>
                     <span class="lang-en">
                         Intelligent Voice Analysis & <br class="hidden md:inline" />
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-300">
-                            Supervision Interaction Mapping
+                            Academic Supervision Interaction Mapping
                         </span>
                     </span>
                     <span class="lang-zh">
                         智能语音分析与 <br class="hidden md:inline" />
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-300">
-                            论文指导交互关系图谱
+                            学术指导交互关系图谱
                         </span>
                     </span>
                 </h1>
                 
                 <p class="text-gray-300 text-sm md:text-base font-medium leading-relaxed max-w-3xl">
                     <span class="lang-id">
-                        Metode ilmiah terbaru untuk menganalisis rekaman bimbingan skripsi secara otomatis dan menyeluruh. Sistem ini memisahkan suara dosen dan mahasiswa, membaca tinggi-rendahnya intonasi nada bicara, mengenali pola pemberian saran dosen serta relasi komunikasi (kemitraan vs dominasi), lalu merangkum alur bimbingan dalam bentuk bagan interaktif yang mudah dipahami.
+                        Metode ilmiah terbaru untuk menganalisis rekaman bimbingan akademik secara otomatis dan menyeluruh. Sistem ini memisahkan suara dosen dan mahasiswa, membaca tinggi-rendahnya intonasi nada bicara, mengenali pola pemberian saran dosen serta relasi komunikasi (kemitraan vs dominasi), lalu merangkum alur bimbingan dalam bentuk bagan interaktif yang mudah dipahami.
                     </span>
                     <span class="lang-en">
                         The latest scientific methodology to analyze academic thesis supervision audio recordings automatically and comprehensively. The system separates the voices of supervisors and students, tracks pitch intonation dynamics, detects advice-giving patterns and communicative power relations (partnership vs dominance), and summarizes the interaction flow into an intuitive, interactive flowchart.
