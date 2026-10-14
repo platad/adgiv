@@ -554,9 +554,10 @@
             <div class="lg:col-span-2 bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8"
                 :class="activeMobileTab === 'transkrip' ? 'block' : 'hidden lg:block'">
                 
-                <div class="flex items-center justify-between pb-6 border-b border-gray-100 mb-6">
+                {{-- Header with Automatic Speaker Filter --}}
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-100 mb-6">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
                             <i data-lucide="message-square" class="w-4 h-4"></i>
                         </div>
                         <div>
@@ -564,7 +565,32 @@
                             <p class="text-xs text-gray-400 font-medium">Dialog berurutan lengkap dengan atribusi peran, menit rekaman, dan sintesis AI</p>
                         </div>
                     </div>
-                    <span class="text-xs font-bold text-gray-400">Total {{ $totalSegments }} Tuturan</span>
+
+                    {{-- Automatic Speaker Filter Pills --}}
+                    <div class="flex items-center gap-1.5 bg-gray-100/80 p-1 rounded-2xl border border-gray-200 text-xs font-bold shrink-0 self-start sm:self-auto">
+                        <button type="button" @click="setSpeakerFilter('all')"
+                            class="px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
+                            :class="speakerFilter === 'all' ? 'bg-white text-gray-950 shadow-sm font-black' : 'text-gray-500 hover:text-gray-900'">
+                            <span>Semua</span>
+                            <span class="px-1.5 py-0.2 rounded-full text-[0.62rem] bg-gray-100 text-gray-600">{{ $totalSegments }}</span>
+                        </button>
+                        <button type="button" @click="setSpeakerFilter('Dosen')"
+                            class="px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
+                            :class="speakerFilter === 'Dosen' ? 'bg-purple-700 text-white shadow-sm font-black' : 'text-gray-500 hover:text-purple-700'">
+                            <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                            <span>Dosen</span>
+                            <span class="px-1.5 py-0.2 rounded-full text-[0.62rem]"
+                                  :class="speakerFilter === 'Dosen' ? 'bg-purple-800 text-purple-200' : 'bg-gray-200/80 text-gray-600'">{{ $dosenSegments }}</span>
+                        </button>
+                        <button type="button" @click="setSpeakerFilter('Mahasiswa')"
+                            class="px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
+                            :class="speakerFilter === 'Mahasiswa' ? 'bg-blue-600 text-white shadow-sm font-black' : 'text-gray-500 hover:text-blue-600'">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-300"></span>
+                            <span>Mahasiswa</span>
+                            <span class="px-1.5 py-0.2 rounded-full text-[0.62rem]"
+                                  :class="speakerFilter === 'Mahasiswa' ? 'bg-blue-700 text-blue-200' : 'bg-gray-200/80 text-gray-600'">{{ $mhsSegments }}</span>
+                        </button>
+                    </div>
                 </div>
 
                 {{-- Dialog Rows --}}
@@ -596,7 +622,7 @@
 
                         <div id="baris-{{ $index }}"
                             class="flex flex-col gap-4 group rounded-2xl p-3 sm:p-4 transition-all duration-300 border border-transparent hover:bg-gray-50/50"
-                            x-show="{{ $index }} >= (currentPage - 1) * pageSize && {{ $index }} < (currentPage) * pageSize">
+                            x-show="isRowVisible({{ $index }})">
                             
                             <div class="flex flex-col md:flex-row gap-4 md:gap-8">
                                 {{-- Speaker & Timestamp Column (Identical to V1) --}}
@@ -794,6 +820,12 @@
                             Belum ada baris transkripsi tersedia.
                         </div>
                     @endforelse
+
+                    {{-- Empty state when filter results in 0 items --}}
+                    <div x-show="currentFilteredCount === 0" style="display: none;" class="text-center py-12 text-gray-400 font-medium">
+                        <i data-lucide="filter-x" class="w-10 h-10 mx-auto text-gray-300 mb-2"></i>
+                        <span>Tidak ditemukan tuturan percakapan untuk filter penutur ini.</span>
+                    </div>
                 </div>
 
                 {{-- Pagination Control (Rapi, Lengkap dengan Info Baris) --}}
@@ -807,7 +839,10 @@
                         </button>
                         <span class="text-xs font-bold text-gray-500 uppercase tracking-widest text-center">
                             Halaman <span x-text="currentPage" class="text-gray-900 font-black"></span> dari <span x-text="totalPages"></span>
-                            <span class="block md:inline-block md:ml-1 text-[0.65rem] text-gray-400 font-medium lowercase tracking-normal">(total <span x-text="totalRows" class="font-bold text-gray-600"></span> baris transkrip)</span>
+                            <span class="block md:inline-block md:ml-1 text-[0.65rem] text-gray-400 font-medium lowercase tracking-normal">
+                                (<span x-text="currentFilteredCount" class="font-bold text-gray-700"></span> baris 
+                                <span x-text="speakerFilter === 'all' ? 'total' : 'terfilter'"></span>)
+                            </span>
                         </span>
                         <button type="button" 
                             @click="currentPage = Math.min(totalPages, currentPage + 1)" 
@@ -1449,9 +1484,47 @@
                 activeMobileTab: 'transkrip',
                 currentPage: 1,
                 pageSize: 10,
+                speakerFilter: 'all', // 'all', 'Dosen', 'Mahasiswa'
+                rawRows: @json($chartPoints),
                 totalRows: {{ $totalSegments }},
+
+                get filteredIndices() {
+                    if (this.speakerFilter === 'all') {
+                        return Array.from({ length: this.totalRows }, (_, i) => i);
+                    }
+                    return this.rawRows
+                        .map((item, idx) => ({ speaker: item.speaker, idx }))
+                        .filter(item => {
+                            if (this.speakerFilter === 'Dosen') {
+                                return item.speaker.toLowerCase() === 'dosen' || item.speaker.toLowerCase() === 'supervisor';
+                            }
+                            if (this.speakerFilter === 'Mahasiswa') {
+                                return item.speaker.toLowerCase() === 'mahasiswa' || item.speaker.toLowerCase() === 'student';
+                            }
+                            return true;
+                        })
+                        .map(item => item.idx);
+                },
+
+                get currentFilteredCount() {
+                    return this.filteredIndices.length;
+                },
+
                 get totalPages() {
-                    return Math.max(1, Math.ceil(this.totalRows / this.pageSize));
+                    return Math.max(1, Math.ceil(this.currentFilteredCount / this.pageSize));
+                },
+
+                setSpeakerFilter(filter) {
+                    this.speakerFilter = filter;
+                    this.currentPage = 1;
+                },
+
+                isRowVisible(idx) {
+                    const pos = this.filteredIndices.indexOf(idx);
+                    if (pos === -1) return false;
+                    const startIndex = (this.currentPage - 1) * this.pageSize;
+                    const endIndex = this.currentPage * this.pageSize;
+                    return pos >= startIndex && pos < endIndex;
                 },
 
                 // Audio Player state
@@ -1475,8 +1548,16 @@
 
                 goToBaris(idx) {
                     if (idx === undefined || idx === null) return;
-                    const targetPage = Math.ceil((Number(idx) + 1) / this.pageSize);
-                    this.currentPage = targetPage;
+                    idx = Number(idx);
+
+                    // Jika filter aktif menyembunyikan baris ini, kembalikan filter ke 'all'
+                    if (this.speakerFilter !== 'all' && !this.filteredIndices.includes(idx)) {
+                        this.speakerFilter = 'all';
+                    }
+
+                    const pos = this.filteredIndices.indexOf(idx);
+                    const targetPage = pos !== -1 ? Math.ceil((pos + 1) / this.pageSize) : Math.ceil((idx + 1) / this.pageSize);
+                    this.currentPage = Math.max(1, targetPage);
                     this.activeMobileTab = 'transkrip';
 
                     setTimeout(() => {
