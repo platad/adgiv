@@ -51,7 +51,7 @@
                             <i data-lucide="radio" class="w-4 h-4"></i>
                         </div>
                         <div class="pt-1">
-                            <p class="text-sm font-bold text-gray-900" id="step1-title">Koneksi & Verifikasi Audio</p>
+                            <p class="text-sm font-bold text-gray-900" id="step1-title">Kompresi & Format Audio</p>
                             <p class="text-xs font-medium text-gray-500 mt-1" id="step1-desc">Menunggu inisialisasi...</p>
                         </div>
                     </div>

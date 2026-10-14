@@ -43,119 +43,187 @@
             </div>
         </div>
 
-        {{-- INLINE LAYOUT GRID --}}
-        <div style="display: flex; flex-wrap: wrap; gap: 2rem; width: 100%;">
+        {{-- Main Execution Card (Style Serupa Versi 2) --}}
+        <div class="bg-white border border-gray-100 rounded-[2.5rem] shadow-xl shadow-gray-100/60 p-8 md:p-12 mb-8">
             
-            {{-- Kolom Kiri: Proses Utama (Dibuat Center & Full Width) --}}
-            <div style="flex: 1 1 100%; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
-                
-                {{-- Processing Card --}}
-                <div class="bg-white border border-gray-100 rounded-[2rem] shadow-xl shadow-gray-100/60 divide-y divide-gray-50 overflow-hidden">
-
-                    {{-- Status Audio --}}
-                    <div class="p-6 flex items-start gap-4">
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-green-100 text-green-600">
-                            <i data-lucide="check-circle" class="w-5 h-5"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center justify-between">
-                                <p class="font-black text-sm text-gray-900 uppercase tracking-wide">Audio Terkirim (Selesai)</p>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1 font-medium">
-                                1 File Utuh <span class="text-gray-400">Tersimpan di server</span>
-                            </p>
-                        </div>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-gray-50">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center transition-colors"
+                         :class="globalStatus === 'completed' ? 'bg-green-50 text-green-600' : (globalStatus === 'failed' ? 'bg-red-50 text-red-600' : 'bg-red-50 text-bima-red')">
+                        <template x-if="globalStatus === 'completed'">
+                            <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                        </template>
+                        <template x-if="globalStatus === 'failed'">
+                            <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                        </template>
+                        <template x-if="globalStatus !== 'completed' && globalStatus !== 'failed'">
+                            <i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i>
+                        </template>
                     </div>
-
-                    {{-- Analisis AI Streaming (Step 2) --}}
-                    <div class="p-6">
-                        <div class="flex items-start gap-4 mb-4">
-                            <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :class="step2Class">
-                                <svg x-show="globalProgress >= 80 || globalStatus === 'completed'" style="display: none;" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                                
-                                <svg x-show="globalStatus === 'processing' && globalProgress < 80" style="display: none;" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                                
-                                <svg x-show="globalStatus === 'failed'" style="display: none;" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-3 flex-wrap">
-                                    <p class="font-black text-sm text-gray-900 uppercase tracking-wide">Transkripsi AI Real-Time</p>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1" x-text="(globalProgress >= 80 || globalStatus === 'completed') ? 'Selesai mentranskripsi.' : (vpsMessage || 'Menunggu respon VPS...')"></p>
-                            </div>
-                        </div>
-
-                        {{-- Real-time Text Box --}}
-                        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 h-64 overflow-y-auto font-mono text-xs text-gray-700 leading-relaxed" id="realtime-text-box">
-                            <template x-for="(text, idx) in realtimeTexts" :key="idx">
-                                <div class="mb-2" x-html="text"></div>
-                            </template>
-                            <template x-if="realtimeTexts.length === 0">
-                                <span class="text-gray-400 italic">... transkripsi akan muncul di sini ...</span>
-                            </template>
-                        </div>
+                    <div>
+                        <p class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 mb-1">Status Pemrosesan AI V1</p>
+                        <h2 class="text-lg font-black text-gray-900" x-text="vpsMessage || transcriptionStatus || 'Menyiapkan proses...'"></h2>
                     </div>
-
-                    {{-- Sintesis AI (Step 3) --}}
-                    <div class="p-6">
-                        <div class="flex items-start gap-4">
-                            <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors" :class="step3Class">
-                                <svg x-show="globalStatus === 'completed'" style="display: none;" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                                
-                                <svg x-show="globalStatus === 'processing' && globalProgress >= 80" style="display: none;" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                                
-                                <svg x-show="globalStatus === 'processing' && globalProgress < 80" style="display: none;" class="w-5 h-5 text-blue-300" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-
-                                <svg x-show="globalStatus === 'failed'" style="display: none;" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-3 flex-wrap">
-                                    <p class="font-black text-sm text-gray-900 uppercase tracking-wide" :class="{'opacity-50': globalProgress < 80 && globalStatus !== 'failed'}">Analisis & Sintesis AI</p>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1" :class="{'opacity-50': globalProgress < 80 && globalStatus !== 'failed'}" x-text="(globalStatus === 'completed') ? 'Analisis intonasi, relasi, dan advice giving selesai.' : ((globalProgress >= 80 && globalStatus !== 'failed') ? transcriptionStatus : 'Menunggu tahap transkripsi selesai...')"></p>
-
-                                <!-- Timeline Batch AI -->
-                                <div x-show="globalProgress >= 80 || batchHistory.length > 0" style="display: none;" class="mt-6 space-y-4">
-                                    <template x-for="(batch, index) in batchHistory" :key="index">
-                                        <div x-data="{ expanded: false }" class="relative pl-6 border-l-2 border-gray-200 py-1">
-                                            <div class="absolute w-3 h-3 bg-blue-500 rounded-full -left-[7px] top-2 shadow"></div>
-                                            <div class="flex items-center justify-between gap-4">
-                                                <div>
-                                                    <span class="text-xs font-bold text-gray-900">Batch <span x-text="index + 1"></span> Selesai</span>
-                                                    <span class="text-[0.65rem] text-gray-500 block">Baris <span x-text="batch.start_idx + 1"></span> - <span x-text="batch.end_idx + 1"></span></span>
-                                                </div>
-                                                <button @click="expanded = !expanded" class="text-[0.65rem] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-2 py-1 rounded border border-blue-100 transition-colors uppercase tracking-wider flex items-center gap-1">
-                                                    <span x-text="expanded ? 'Tutup Detail' : 'Lihat Detail'"></span>
-                                                    <svg x-show="!expanded" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                                    <svg x-show="expanded" style="display:none;" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                                                </button>
-                                            </div>
-                                            
-                                            <!-- Expandable Detail -->
-                                            <div x-show="expanded" x-collapse class="mt-3 space-y-3 bg-gray-900 text-gray-300 p-4 rounded-xl border border-gray-800 text-[0.65rem] overflow-hidden shadow-inner">
-                                                <div>
-                                                    <div class="font-black text-gray-400 uppercase tracking-widest mb-1 border-b border-gray-800 pb-1">System Prompt</div>
-                                                    <pre class="whitespace-pre-wrap font-mono leading-relaxed" x-text="batch.system_prompt"></pre>
-                                                </div>
-                                                <div>
-                                                    <div class="font-black text-blue-400 uppercase tracking-widest mb-1 border-b border-gray-800 pb-1">User Prompt (Chunks Data)</div>
-                                                    <pre class="whitespace-pre-wrap font-mono leading-relaxed text-blue-200" x-text="batch.user_prompt"></pre>
-                                                </div>
-                                                <div>
-                                                    <div class="font-black text-green-400 uppercase tracking-widest mb-1 border-b border-gray-800 pb-1">Raw Response dari AI</div>
-                                                    <pre class="whitespace-pre-wrap font-mono leading-relaxed text-green-200" x-text="batch.raw_response"></pre>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
+                </div>
+                <div class="flex items-center sm:text-right gap-6 justify-between">
+                    <div x-show="totalSegments > 0" class="text-left sm:text-right">
+                        <p class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 mb-1">Total Segmen</p>
+                        <p class="text-sm font-black text-gray-800"><span x-text="totalSegments"></span> Segmen (<span x-text="totalDuration"></span>s)</p>
                     </div>
-
+                    <div>
+                        <p class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 mb-1">Progres</p>
+                        <p class="text-3xl font-black text-bima-red"><span x-text="globalProgress"></span>%</p>
+                    </div>
                 </div>
             </div>
-            
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {{-- Status Tahapan Pipeline --}}
+                <div class="space-y-6">
+                    <h3 class="text-sm font-black uppercase tracking-widest text-gray-400 mb-4">Pipeline Execution</h3>
+                    
+                    {{-- Step 1: Kompresi & Format Audio --}}
+                    <div class="flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 border"
+                             :class="globalProgress >= 15 ? 'bg-green-50 border-green-200 text-green-600' : 'bg-red-50 border-red-200 text-bima-red'">
+                            <template x-if="globalProgress >= 15">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                            </template>
+                            <template x-if="globalProgress < 15">
+                                <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                            </template>
+                        </div>
+                        <div class="pt-1">
+                            <p class="text-sm font-bold text-gray-900">Kompresi & Format Audio</p>
+                            <p class="text-xs font-medium text-gray-500 mt-0.5" 
+                               x-text="globalProgress >= 15 ? 'Format optimal MP3 16kHz mono siap' : 'Mengompresi audio untuk model Whisper...'"></p>
+                        </div>
+                    </div>
+
+                    {{-- Step 2: Transkripsi & IndoBERT Audio Processing --}}
+                    <div class="flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 border"
+                             :class="globalProgress >= 80 ? 'bg-green-50 border-green-200 text-green-600' : (globalProgress >= 15 ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-gray-50 border-gray-200 text-gray-400')">
+                            <template x-if="globalProgress >= 80">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                            </template>
+                            <template x-if="globalProgress >= 15 && globalProgress < 80">
+                                <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                            </template>
+                            <template x-if="globalProgress < 15">
+                                <i data-lucide="mic" class="w-4 h-4"></i>
+                            </template>
+                        </div>
+                        <div class="pt-1">
+                            <p class="text-sm font-bold text-gray-900">Transkripsi & Deteksi Ucapan</p>
+                            <p class="text-xs font-medium text-gray-500 mt-0.5"
+                               x-text="globalProgress >= 80 ? ('Selesai (' + totalSegments + ' segmen terdeteksi)') : (globalProgress >= 15 ? 'Mentranskripsi percakapan via VPS...' : 'Menunggu antrean...')"></p>
+                        </div>
+                    </div>
+
+                    {{-- Step 3: Sintesis AI & IndoBERT Analysis --}}
+                    <div class="flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 border"
+                             :class="globalStatus === 'completed' ? 'bg-green-50 border-green-200 text-green-600' : (globalProgress >= 80 ? 'bg-purple-50 border-purple-200 text-purple-600' : 'bg-gray-50 border-gray-200 text-gray-400')">
+                            <template x-if="globalStatus === 'completed'">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                            </template>
+                            <template x-if="globalStatus !== 'completed' && globalProgress >= 80">
+                                <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                            </template>
+                            <template x-if="globalProgress < 80">
+                                <i data-lucide="network" class="w-4 h-4"></i>
+                            </template>
+                        </div>
+                        <div class="pt-1">
+                            <p class="text-sm font-bold text-gray-900">Sintesis & Analisis Wacana</p>
+                            <p class="text-xs font-medium text-gray-500 mt-0.5"
+                               x-text="globalStatus === 'completed' ? 'Analisis batch dan wacana tersimpan rapi' : (globalProgress >= 80 ? 'Menganalisis relasi, intonasi, dan advice giving...' : 'Menunggu tahap transkripsi...')"></p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Informasi Panel Tambahan & Quick Actions --}}
+                <div class="bg-gray-50 rounded-3xl p-6 md:p-8 border border-gray-100 flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-red-50 text-bima-red flex items-center justify-center mb-4">
+                            <i data-lucide="activity" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-900 mb-1">Sinkronisasi VPS Aktif</h4>
+                        <p class="text-xs text-gray-500 font-medium leading-relaxed mb-6">
+                            Audio distandarisasi dan diproses otomatis di backend VPS. Setelah transkripsi dan prediksi IndoBERT selesai disintesiskan, sistem akan mengarahkan Anda langsung ke halaman laporan hasil analisis.
+                        </p>
+                    </div>
+
+                    {{-- Tombol Buka Detail & Inspeksi --}}
+                    <div class="flex items-center gap-3 pt-4 border-t border-gray-200/60">
+                        <button type="button" @click="showDetailModal = !showDetailModal" 
+                                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-xs font-bold text-gray-700 hover:bg-gray-100 hover:text-gray-900 shadow-sm transition-all">
+                            <i data-lucide="list-collapse" class="w-4 h-4 text-gray-500"></i>
+                            <span x-text="showDetailModal ? 'Sembunyikan Detail Log' : 'Lihat Detail Transkripsi & Log'"></span>
+                        </button>
+                        <span class="text-[0.65rem] text-gray-400 font-mono" x-show="realtimeTexts.length > 0">
+                            <span x-text="realtimeTexts.length"></span> baris data
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Collapsible Section untuk Detail Transkripsi & Log Real-Time (Rapi & Tidak Mengotori Layar) --}}
+            <div x-show="showDetailModal" x-collapse class="mt-8 pt-8 border-t border-gray-100 space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {{-- Transkripsi Stream Box --}}
+                    <div class="bg-gray-50/70 rounded-2xl p-4 border border-gray-200">
+                        <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-200/80">
+                            <span class="text-xs font-black uppercase tracking-wider text-gray-600 flex items-center gap-2">
+                                <i data-lucide="message-square" class="w-3.5 h-3.5 text-blue-500"></i> Pratinjau Teks Audio
+                            </span>
+                            <span class="text-[0.65rem] font-mono text-gray-400" x-text="realtimeTexts.length + ' segmen'"></span>
+                        </div>
+                        <div class="h-64 overflow-y-auto space-y-2 pr-2 font-mono text-xs text-gray-700 leading-relaxed" id="realtime-text-box">
+                            <template x-for="(text, idx) in realtimeTexts" :key="idx">
+                                <div class="p-2 rounded bg-white border border-gray-100 shadow-2xs" x-html="text"></div>
+                            </template>
+                            <template x-if="realtimeTexts.length === 0">
+                                <div class="text-center py-12 text-gray-400 italic">Belum ada segmen transkripsi yang diterima...</div>
+                            </template>
+                        </div>
+                    </div>
+
+                    {{-- VPS / Batch Log Box --}}
+                    <div class="bg-gray-900 rounded-2xl p-4 border border-gray-800 text-gray-300">
+                        <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-800">
+                            <span class="text-xs font-black uppercase tracking-wider text-gray-400 flex items-center gap-2">
+                                <i data-lucide="terminal" class="w-3.5 h-3.5 text-green-400"></i> Log Sinkronisasi VPS
+                            </span>
+                            <span class="text-[0.65rem] font-mono text-green-400">Live feed</span>
+                        </div>
+                        <div class="h-64 overflow-y-auto space-y-1.5 pr-2 font-mono text-[0.7rem] leading-relaxed" id="vps-log-box">
+                            <template x-for="(log, idx) in logs" :key="idx">
+                                <div class="flex items-start gap-2">
+                                    <span class="text-gray-500 shrink-0" x-text="'[' + log.time + ']'"></span>
+                                    <span :class="{'text-green-400': log.level === 'success', 'text-red-400': log.level === 'error', 'text-yellow-400': log.level === 'warning', 'text-gray-300': log.level === 'info'}" x-text="log.msg"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Timeline Batch AI History jika ada --}}
+                <div x-show="batchHistory.length > 0" class="mt-6 space-y-3">
+                    <h4 class="text-xs font-black uppercase tracking-wider text-gray-500">Histori Batch Sintesis AI</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <template x-for="(batch, index) in batchHistory" :key="index">
+                            <div class="p-4 rounded-xl border border-gray-200 bg-white shadow-2xs">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-800">Batch #<span x-text="index + 1"></span> Selesai</span>
+                                    <span class="text-[0.65rem] font-mono bg-blue-50 text-blue-700 px-2 py-0.5 rounded">Baris <span x-text="batch.start_idx + 1"></span> - <span x-text="batch.end_idx + 1"></span></span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
@@ -177,6 +245,7 @@
             vpsLogs: [],
             batchHistory: @json($initialBatchHistory),
             resumeStartIdx: {{ $resumeStartIdx }},
+            showDetailModal: false,
 
             init() {
                 if (!this.isProcessing) {
