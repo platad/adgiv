@@ -1716,11 +1716,14 @@
             var option = {
                 tooltip: {
                     trigger: 'item',
+                    appendToBody: true,
+                    confine: false,
+                    enterable: false,
                     backgroundColor: '#111827',
                     borderColor: '#374151',
                     borderWidth: 1,
                     padding: [10, 14],
-                    extraCssText: 'box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4); border-radius: 14px; max-width: 320px; white-space: normal;',
+                    extraCssText: 'box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); border-radius: 14px; max-width: 320px; white-space: normal; z-index: 999999 !important;',
                     formatter: function(params) {
                         if (params.dataType === 'node') {
                             var info = getMeaning(params.name);
@@ -1739,6 +1742,7 @@
                             } else {
                                 html += '<div style="font-size: 11px; color: #9ca3af; line-height: 1.4;">Simpul entitas interaksi dalam korpus bimbingan akademik.</div>';
                             }
+                            html += '<div style="font-size: 9px; color: #9ca3af; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;">(Klik simpul untuk membuka penjelasan detail)</div>';
                             html += '</div>';
                             return html;
                         } else if (params.dataType === 'edge') {
@@ -1763,6 +1767,7 @@
                                 html += 'Hubungan wacana antara ' + params.data.source + ' dan ' + params.data.target + ' dengan intensitas interaksi ' + freq + '.';
                             }
                             html += '</div>';
+                            html += '<div style="font-size: 9px; color: #9ca3af; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;">(Klik garis untuk membuka penjelasan detail)</div>';
                             html += '</div>';
                             return html;
                         }
@@ -1795,6 +1800,40 @@
                 }]
             };
             chart.setOption(option);
+
+            // Handler Klik Node & Edge (Terutama untuk Perangkat Mobile & Touchscreen)
+            chart.on('click', function(params) {
+                const appEl = document.querySelector('[x-data*="v2ResultApp"]');
+                if (!appEl || !appEl.__x) return;
+                const alpineData = appEl.__x.$data;
+
+                if (params.dataType === 'node') {
+                    const info = getMeaning(params.name);
+                    const title = 'Simpul Graf: ' + params.name;
+                    const type = 'network';
+                    const exp = info ? (info.role + ' - ' + info.desc) : 'Simpul entitas interaksi dalam korpus bimbingan akademik.';
+                    const rel = info && info.category ? ('Kategori Wacana: ' + info.category) : 'Bagian dari topologi jaringan percakapan.';
+                    alpineData.openInsight(title, type, exp, rel);
+                } else if (params.dataType === 'edge') {
+                    const edgeVal = params.data.value || '';
+                    const freq = edgeVal ? (edgeVal.toString().match(/\d+/) ? edgeVal : edgeVal) : 'Terhubung';
+                    const info = getMeaning(params.data.target) || getMeaning(edgeVal);
+                    const title = 'Relasi Graf: ' + params.data.source + ' ➔ ' + params.data.target;
+                    const type = 'network';
+                    let exp = '';
+                    if (params.data.source === 'Dosen' && params.data.target === 'Mahasiswa') {
+                        exp = 'Interaksi dialogis dua arah dan arahan akademik langsung dari Dosen kepada Mahasiswa.';
+                    } else if (params.data.source === 'Mahasiswa' && params.data.target === 'Dosen') {
+                        exp = 'Respons, klarifikasi, atau inisiatif pertanyaan dari Mahasiswa kepada Dosen.';
+                    } else if (info) {
+                        exp = 'Korelasi aliran percakapan menuju ' + (info.role || params.data.target) + ': ' + info.desc;
+                    } else {
+                        exp = 'Hubungan wacana antara ' + params.data.source + ' dan ' + params.data.target + '.';
+                    }
+                    const rel = 'Frekuensi Interaksi Terdeteksi: ' + freq;
+                    alpineData.openInsight(title, type, exp, rel);
+                }
+            });
             
             window.addEventListener('resize', function() {
                 chart.resize();
