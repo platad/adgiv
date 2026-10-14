@@ -1894,13 +1894,13 @@
                                     secondaryColor: '#eff6ff',
                                     tertiaryColor: '#f0fdf4',
                                     fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
-                                    fontSize: '12px'
+                                    fontSize: '11px'
                                 },
                                 flowchart: {
                                     curve: 'basis',
-                                    padding: 16,
-                                    nodeSpacing: 40,
-                                    rankSpacing: 45,
+                                    padding: 10,
+                                    nodeSpacing: 25,
+                                    rankSpacing: 35,
                                     useMaxWidth: true
                                 }
                             });
@@ -1925,13 +1925,13 @@
                                     secondaryColor: '#eff6ff',
                                     tertiaryColor: '#f0fdf4',
                                     fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
-                                    fontSize: '12px'
+                                    fontSize: '11px'
                                 },
                                 flowchart: {
                                     curve: 'basis',
-                                    padding: 16,
-                                    nodeSpacing: 40,
-                                    rankSpacing: 45,
+                                    padding: 10,
+                                    nodeSpacing: 25,
+                                    rankSpacing: 35,
                                     useMaxWidth: true
                                 }
                             });
@@ -2042,9 +2042,11 @@
                     container.innerHTML = svgCode;
                     const svgEl = container.querySelector('svg');
                     if (svgEl) {
-                        svgEl.style.maxWidth = '100%';
+                        svgEl.style.maxWidth = '680px';
+                        svgEl.style.width = '100%';
                         svgEl.style.height = 'auto';
                         svgEl.style.display = 'block';
+                        svgEl.style.margin = '0 auto';
                     }
                     if (alpineData) alpineData.mermaidError = false;
                 }
@@ -2063,6 +2065,14 @@
                     const fallbackSvg = typeof fallbackResult === 'string' ? fallbackResult : (fallbackResult.svg || '');
                     if (fallbackSvg) {
                         container.innerHTML = fallbackSvg;
+                        const svgEl = container.querySelector('svg');
+                        if (svgEl) {
+                            svgEl.style.maxWidth = '680px';
+                            svgEl.style.width = '100%';
+                            svgEl.style.height = 'auto';
+                            svgEl.style.display = 'block';
+                            svgEl.style.margin = '0 auto';
+                        }
                     }
                 } catch (fallbackErr) {
                     container.innerHTML = `
