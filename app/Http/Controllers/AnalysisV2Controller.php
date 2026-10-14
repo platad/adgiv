@@ -194,7 +194,7 @@ class AnalysisV2Controller extends Controller
 
         $transcription = $analysis->result_data['transcription'] ?? [];
 
-        // Pastikan setiap item memiliki format timestamp menit-detik yang valid (00:00 - 00:00)
+        // Format timestamp dan perbaiki/buat text_html dengan intonasi inline (V1 parity)
         foreach ($transcription as &$item) {
             if (empty($item['timestamp'])) {
                 $startSec = $item['start'] ?? ($item['start_sec'] ?? 0);
@@ -205,6 +205,88 @@ class AnalysisV2Controller extends Controller
                 $s2 = floor($endSec % 60);
                 $item['timestamp'] = sprintf("%02d:%02d - %02d:%02d", $m1, $s1, $m2, $s2);
             }
+
+            $speaker = $item['speaker'] ?? 'Unknown';
+            $isDosen = (strcasecmp($speaker, 'Dosen') === 0 || strcasecmp($speaker, 'Supervisor') === 0);
+
+            // Tentukan tipe intonasi jika belum ada
+            if (empty($item['intonation_type'])) {
+                if (!empty($item['intonation_markers'][0]['type'])) {
+                    $item['intonation_type'] = $item['intonation_markers'][0]['type'];
+                } else {
+                    $item['intonation_type'] = $isDosen ? 'down' : 'up';
+                }
+            }
+            $intType = strtolower($item['intonation_type']);
+
+            // Tentukan alasan & relasi intonasi
+            $intReason = $intType === 'down'
+                ? 'Intonasi menurun menandakan penegasan instruksi atau arahan akademik yang pasti dari Dosen.'
+                : ($intType === 'up'
+                    ? 'Intonasi menaik menandakan nada eksploratif, klarifikasi, atau pertanyaan bimbingan.'
+                    : 'Intonasi netral menandakan pertukaran informasi akademis umum.');
+            if (!empty($item['intonation_markers'][0]['reason'])) {
+                $intReason = $item['intonation_markers'][0]['reason'];
+            }
+
+            $intRelation = !empty($item['relation']) 
+                ? $item['relation'] 
+                : (!empty($item['advice_relation']) 
+                    ? $item['advice_relation'] 
+                    : ($isDosen ? 'Arahan direktif dosen membimbing arah riset mahasiswa.' : 'Tanggapan dialogis mahasiswa terhadap arahan dosen.'));
+            if (!empty($item['intonation_markers'][0]['relation'])) {
+                $intRelation = $item['intonation_markers'][0]['relation'];
+            }
+
+            // Pastikan intonation_markers terisi minimal 1 marker
+            if (empty($item['intonation_markers']) || !is_array($item['intonation_markers'])) {
+                $item['intonation_markers'] = [
+                    [
+                        'id' => 'MARKER_1',
+                        'type' => $intType,
+                        'reason' => $intReason,
+                        'relation' => $intRelation
+                    ]
+                ];
+            }
+
+            // Bangun text_html yang konsisten dengan V1
+            $rawText = $item['text_html'] ?? ($item['text'] ?? '');
+            
+            // Generate icon inline button untuk intonasi
+            $iconSvg = '';
+            if ($intType === 'up') {
+                $iconSvg = '<svg class="inline-block w-4 h-4 text-blue-500 mx-1 align-middle hover:scale-125 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>';
+            } elseif ($intType === 'down') {
+                $iconSvg = '<svg class="inline-block w-4 h-4 text-red-500 mx-1 align-middle hover:scale-125 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>';
+            } else {
+                $iconSvg = '<svg class="inline-block w-4 h-4 text-gray-400 mx-1 align-middle hover:scale-125 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14"></path></svg>';
+            }
+
+            $jsonTitle = htmlspecialchars(json_encode('Intonasi ' . ($intType === 'up' ? 'Naik (High pitch)' : ($intType === 'down' ? 'Turun (Low pitch)' : 'Netral'))), ENT_QUOTES);
+            $jsonType = htmlspecialchars(json_encode($intType), ENT_QUOTES);
+            $jsonReason = htmlspecialchars(json_encode($intReason), ENT_QUOTES);
+            $jsonRelation = htmlspecialchars(json_encode($intRelation), ENT_QUOTES);
+
+            $inlineButton = "<button type=\"button\" @click=\"openInsight({$jsonTitle}, {$jsonType}, {$jsonReason}, {$jsonRelation})\" class=\"inline-flex items-center justify-center p-0.5 hover:bg-gray-100 border border-transparent hover:border-gray-200 rounded-lg transition-all focus:outline-none cursor-pointer align-middle\" title=\"Klik untuk melihat detail intonasi & relasi\">{$iconSvg}</button>";
+
+            // Jika rawText sudah memiliki [MARKER_...]
+            if (preg_match('/\[MARKER_\d+\]/i', $rawText)) {
+                $formattedHtml = preg_replace('/\[MARKER_\d+\]/i', $inlineButton, $rawText);
+            } else {
+                // Sisipkan inline button di tengah kalimat (setelah tanda koma/titik pertama) atau di akhir kalimat
+                if (preg_match('/([,;])\s+/u', $rawText, $match, PREG_OFFSET_CAPTURE)) {
+                    $pos = $match[0][1] + strlen($match[1][0]);
+                    $formattedHtml = substr($rawText, 0, $pos) . ' ' . $inlineButton . ' ' . substr($rawText, $pos);
+                } elseif (preg_match('/([.?!])$/u', trim($rawText), $match, PREG_OFFSET_CAPTURE)) {
+                    $trimmed = trim($rawText);
+                    $formattedHtml = substr($trimmed, 0, -1) . ' ' . $inlineButton . substr($trimmed, -1);
+                } else {
+                    $formattedHtml = $rawText . ' ' . $inlineButton;
+                }
+            }
+
+            $item['text_html'] = $formattedHtml;
         }
         unset($item);
 
