@@ -3,6 +3,11 @@
         {{ app()->getLocale() === 'zh' ? 'Multi-Task RoBERTa V2 方法论' : (app()->getLocale() === 'en' ? 'Multi-Task RoBERTa V2 Methodology' : 'Metodologi Multi-Task RoBERTa V2') }}
     </x-slot>
 
+    {{-- KaTeX Math Renderer Assets --}}
+    <x-slot name="styles">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    </x-slot>
+
     <div x-data="{ showStatsModal: false, showDatasetModal: false, appLang: '{{ app()->getLocale() }}' }" class="space-y-10 pb-12">
         {{-- Header Banner --}}
         <div class="relative bg-gray-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl overflow-hidden border border-white/5">
@@ -39,13 +44,13 @@
                 
                 <p class="text-gray-300 text-sm md:text-base font-medium leading-relaxed max-w-3xl">
                     <span class="lang-id">
-                        Evolusi komputasional mutakhir untuk analisis wacana kritis bimbingan akademik. Mengintegrasikan pemisahan penutur (Speaker Diarization), kontur pitch intonasi ($F_0$), arsitektur Transformer Multi-Task RoBERTa untuk klasifikasi simultan <i>Advice Giving</i> dan relasi kuasa (<i>Modes of Interaction</i>), serta sintesis multimodal otomatis berbasis graf dan Mermaid Flowchart.
+                        Metode ilmiah terbaru untuk menganalisis rekaman bimbingan skripsi secara otomatis dan menyeluruh. Sistem ini memisahkan suara dosen dan mahasiswa, membaca tinggi-rendahnya intonasi nada bicara, mengenali pola pemberian saran dosen serta relasi komunikasi (kemitraan vs dominasi), lalu merangkum alur bimbingan dalam bentuk bagan interaktif yang mudah dipahami.
                     </span>
                     <span class="lang-en">
-                        Cutting-edge computational evolution for academic supervision critical discourse analysis. Integrating speaker diarization, F0 pitch intonation contours, Multi-Task RoBERTa Transformer architecture for simultaneous classification of Advice Giving and power relations (Modes of Interaction), and zero-click automated multimodal synthesis based on network graphs and Mermaid Flowchart.
+                        The latest scientific methodology to analyze academic thesis supervision audio recordings automatically and comprehensively. The system separates the voices of supervisors and students, tracks pitch intonation dynamics, detects advice-giving patterns and communicative power relations (partnership vs dominance), and summarizes the interaction flow into an intuitive, interactive flowchart.
                     </span>
                     <span class="lang-zh">
-                        学术指导批判性话语分析的前沿计算演进。整合说话人日志分离、F0 音调语调轮廓、用于同时分类建议提供（Advice Giving）与权力关系（Modes of Interaction）的 Multi-Task RoBERTa Transformer 架构，以及基于网络图和 Mermaid 流程图的零点击自动多模态合成。
+                        全面且自动分析学术论文指导录音的最新科学方法。该系统自动分离导师与学生的发言角色，提取语调高低变化，识别建议传达模式与权力沟通关系（平等协作或指导权威），并将指导对话全过程梳理为直观互动的流程图。
                     </span>
                 </p>
             </div>
@@ -66,25 +71,26 @@
                             </div>
                             <div>
                                 <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">
-                                    <span class="lang-id">Alur Eksekusi Sistem</span>
-                                    <span class="lang-en">System Execution Flow</span>
-                                    <span class="lang-zh">系统执行流程</span>
+                                    <span class="lang-id">Alur Kerja Sistem</span>
+                                    <span class="lang-en">System Workflow</span>
+                                    <span class="lang-zh">系统运行流程</span>
                                 </span>
                                 <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">
-                                    <span class="lang-id">Arsitektur Pipeline End-to-End V2</span>
-                                    <span class="lang-en">End-to-End Pipeline Architecture V2</span>
-                                    <span class="lang-zh">端到端管道架构 V2</span>
+                                    <span class="lang-id">Alur Lengkap Pemrosesan Suara V2 (End-to-End)</span>
+                                    <span class="lang-en">End-to-End Voice Processing Pipeline V2</span>
+                                    <span class="lang-zh">V2 语音端到端处理全流程</span>
                                 </h3>
                             </div>
                         </div>
                         <span class="hidden sm:inline-flex px-3 py-1 bg-purple-50 text-purple-700 text-xs font-bold rounded-xl border border-purple-200">
-                            4-Stage Sequential
+                            4 Tahap Utama
                         </span>
                     </div>
 
-                    {{-- Image Container --}}
+                    {{-- Image Container (with multiple fallback sources for cPanel resilience) --}}
                     <div class="rounded-2xl overflow-hidden border border-gray-200 bg-gray-950/5 mb-6 group relative">
-                        <img src="{{ asset('assets/images/pipeline_end_to_end_v2.png') }}" 
+                        <img src="{{ asset('assets/img/pipeline_end_to_end_v2.png') }}" 
+                             onerror="this.onerror=null; this.src='{{ asset('assets/images/pipeline_end_to_end_v2.png') }}';"
                              alt="Arsitektur Pipeline End-to-End Sistem Analisis Suara Bimbingan Akademik V2"
                              class="w-full h-auto object-contain transition duration-300 group-hover:scale-[1.01]" />
                         <div class="p-3 bg-gray-50 border-t border-gray-200 text-center">
@@ -94,45 +100,45 @@
                         </div>
                     </div>
 
-                    {{-- 4 Stages Description Breakdown --}}
+                    {{-- 4 Stages Description Breakdown (Bahasa Santai & Mudah Dipahami) --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="p-4 rounded-2xl bg-purple-50/50 border border-purple-100">
                             <div class="flex items-center gap-2 mb-2">
                                 <span class="w-6 h-6 rounded-lg bg-purple-600 text-white text-xs font-black flex items-center justify-center">1</span>
-                                <h4 class="font-black text-gray-900 text-xs uppercase tracking-wider">Audio Ingestion & Diarization</h4>
+                                <h4 class="font-black text-gray-900 text-xs uppercase tracking-wider">Pemisahan Suara Dosen & Mahasiswa</h4>
                             </div>
                             <p class="text-gray-600 text-xs leading-relaxed">
-                                Sinyal percakapan mentah difilter melalui Voice Activity Detection (VAD) dan disegmentasi ke dalam klaster pembicara (Dosen vs Mahasiswa) menggunakan komputasi backend inference server.
+                                Rekaman suara bimbingan dibersihkan dari jeda hening, lalu AI secara otomatis membedakan giliran bicara siapa dosen pembimbing dan siapa mahasiswa yang sedang berkonsultasi.
                             </p>
                         </div>
 
                         <div class="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100">
                             <div class="flex items-center gap-2 mb-2">
                                 <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white text-xs font-black flex items-center justify-center">2</span>
-                                <h4 class="font-black text-gray-900 text-xs uppercase tracking-wider">Multi-Task RoBERTa & Pitch F0</h4>
+                                <h4 class="font-black text-gray-900 text-xs uppercase tracking-wider">Analisis Makna & Intonasi Nada Bicara</h4>
                             </div>
                             <p class="text-gray-600 text-xs leading-relaxed">
-                                Transkrip tuturan diekstraksi embedding semantiknya oleh RoBERTa untuk mengklasifikasikan pola saran dan relasi kuasa secara simultan, diperkaya ekstraksi kontur nada intonasi ($F_0$).
+                                Kalimat yang diucapkan dibaca maknanya oleh kecerdasan buatan RoBERTa, sekaligus mendeteksi nada suara (apakah bernada tanya ramah, netral, atau penegasan instruksi langsung).
                             </p>
                         </div>
 
                         <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-100">
                             <div class="flex items-center gap-2 mb-2">
                                 <span class="w-6 h-6 rounded-lg bg-blue-600 text-white text-xs font-black flex items-center justify-center">3</span>
-                                <h4 class="font-black text-gray-900 text-xs uppercase tracking-wider">Konstruksi Topologi Graf</h4>
+                                <h4 class="font-black text-gray-900 text-xs uppercase tracking-wider">Pemetaan Jaringan Interaksi (Graf)</h4>
                             </div>
                             <p class="text-gray-600 text-xs leading-relaxed">
-                                Memetakan keterkaitan aktor dan kategori wacana ke dalam graf berarah (Node & Edge Network) interaktif dengan bobot interaksi dan simulasi fisika daya tolak (force-directed layout).
+                                Hubungan komunikasi dipetakan ke dalam jaringan titik interaktif. Semakin sering dosen memberi arahan atau mahasiswa aktif bertanya, semakin tebal garis penghubung yang terlihat.
                             </p>
                         </div>
 
                         <div class="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100">
                             <div class="flex items-center gap-2 mb-2">
                                 <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white text-xs font-black flex items-center justify-center">4</span>
-                                <h4 class="font-black text-gray-900 text-xs uppercase tracking-wider">Sintesis Multimodal Otomatis</h4>
+                                <h4 class="font-black text-gray-900 text-xs uppercase tracking-wider">Sintesis Otomatis & Alur Bimbingan</h4>
                             </div>
                             <p class="text-gray-600 text-xs leading-relaxed">
-                                Vision AI GPT-4o menalar tangkapan visual topologi graf untuk menghasilkan interpretasi kualitatif komprehensif serta diagram alur kronologis percakapan (Mermaid Flowchart).
+                                AI langsung membaca peta interaksi dan menghasilkan ringkasan dinamika bimbingan, rekomendasi tindak lanjut, serta bagan alur tahapan bimbingan dari awal hingga akhir.
                             </p>
                         </div>
                     </div>
@@ -147,9 +153,9 @@
                             </div>
                             <div>
                                 <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">
-                                    <span class="lang-id">Detail Transformer & Klasifikasi Dual-Head</span>
-                                    <span class="lang-en">Transformer Details & Dual-Head Classification</span>
-                                    <span class="lang-zh">Transformer 细节与双头分类</span>
+                                    <span class="lang-id">Struktur Model AI Cerdas</span>
+                                    <span class="lang-en">Intelligent AI Model Structure</span>
+                                    <span class="lang-zh">智能 AI 模型架构</span>
                                 </span>
                                 <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">
                                     <span class="lang-id">Arsitektur Multi-Task RoBERTa V2</span>
@@ -159,13 +165,14 @@
                             </div>
                         </div>
                         <span class="hidden sm:inline-flex px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-200">
-                            Shared Representation
+                            Dual-Task Processing
                         </span>
                     </div>
 
-                    {{-- Image Container --}}
+                    {{-- Image Container (with fallback) --}}
                     <div class="rounded-2xl overflow-hidden border border-gray-200 bg-gray-950/5 mb-6 group relative">
-                        <img src="{{ asset('assets/images/roberta_v2_architecture.png') }}" 
+                        <img src="{{ asset('assets/img/roberta_v2_architecture.png') }}" 
+                             onerror="this.onerror=null; this.src='{{ asset('assets/images/roberta_v2_architecture.png') }}';"
                              alt="Arsitektur Model Multi-Task RoBERTa V2"
                              class="w-full h-auto object-contain transition duration-300 group-hover:scale-[1.01]" />
                         <div class="p-3 bg-gray-50 border-t border-gray-200 text-center">
@@ -175,7 +182,7 @@
                         </div>
                     </div>
 
-                    {{-- Deep Mathematical Formulation --}}
+                    {{-- Formulasi Matematis dengan KaTeX Renderer Otomatis --}}
                     <div class="p-6 rounded-2xl bg-gray-900 text-white mb-6 border border-white/10 space-y-4">
                         <div class="flex items-center justify-between border-b border-white/10 pb-3">
                             <span class="text-xs font-black tracking-widest uppercase text-purple-400 flex items-center gap-2">
@@ -186,62 +193,62 @@
                         </div>
                         
                         <p class="text-xs text-gray-300 leading-relaxed">
-                            Model mengonversi urutan token masukan $\mathbf{x} = (x_1, x_2, \dots, x_N)$ ke dalam representasi vektor tersembunyi kontekstual menggunakan RoBERTa encoder bidirectional:
+                            Model mengubah susunan kata pada kalimat percakapan <span class="math-tex inline-math font-mono text-purple-300">\mathbf{x} = (x_1, x_2, \dots, x_N)</span> menjadi pemahaman vektor semantik yang utuh melalui enkoder cerdas RoBERTa:
                         </p>
 
-                        <div class="p-3 bg-black/40 rounded-xl font-mono text-xs text-center text-indigo-300 overflow-x-auto">
-                            $$\mathbf{h}_{[\text{CLS}]} = \text{RoBERTa}_{\boldsymbol{\theta}}(\mathbf{x})$$
+                        <div class="p-4 bg-black/40 rounded-xl font-mono text-xs text-center text-indigo-300 overflow-x-auto">
+                            <div class="math-tex block-math">\mathbf{h}_{[\text{CLS}]} = \text{RoBERTa}_{\boldsymbol{\theta}}(\mathbf{x})</div>
                         </div>
 
                         <p class="text-xs text-gray-300 leading-relaxed">
-                            Representasi $\mathbf{h}_{[\text{CLS}]}$ diproyeksikan ke dua kepala klasifikasi (*classification heads*) yang dilatih secara bersamaan:
+                            Hasil pemahaman vektor <span class="math-tex inline-math font-mono text-purple-300">\mathbf{h}_{[\text{CLS}]}</span> tersebut langsung diolah bersamaan ke dua cabang klasifikasi sekaligus:
                         </p>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
-                            <div class="p-3 bg-white/5 rounded-xl border border-white/10">
-                                <span class="text-pink-300 block font-bold mb-1">Head 1: Advice Giving</span>
-                                $$\hat{y}_{\text{advice}} = \text{softmax}(\mathbf{W}_a \mathbf{h}_{[\text{CLS}]} + \mathbf{b}_a)$$
+                            <div class="p-3.5 bg-white/5 rounded-xl border border-white/10">
+                                <span class="text-pink-300 block font-bold mb-1.5 uppercase tracking-wider text-[0.68rem]">Cabang 1: Pola Saran (Advice Giving)</span>
+                                <div class="math-tex block-math">\hat{y}_{\text{advice}} = \text{softmax}(\mathbf{W}_a \mathbf{h}_{[\text{CLS}]} + \mathbf{b}_a)</div>
                             </div>
-                            <div class="p-3 bg-white/5 rounded-xl border border-white/10">
-                                <span class="text-blue-300 block font-bold mb-1">Head 2: Modes of Interaction</span>
-                                $$\hat{y}_{\text{mode}} = \text{softmax}(\mathbf{W}_m \mathbf{h}_{[\text{CLS}]} + \mathbf{b}_m)$$
+                            <div class="p-3.5 bg-white/5 rounded-xl border border-white/10">
+                                <span class="text-blue-300 block font-bold mb-1.5 uppercase tracking-wider text-[0.68rem]">Cabang 2: Relasi Komunikasi (Modes)</span>
+                                <div class="math-tex block-math">\hat{y}_{\text{mode}} = \text{softmax}(\mathbf{W}_m \mathbf{h}_{[\text{CLS}]} + \mathbf{b}_m)</div>
                             </div>
                         </div>
 
                         <p class="text-xs text-gray-300 leading-relaxed">
-                            Optimasi parameter jaringan menggunakan fungsi *Joint Cross-Entropy Loss* dengan bobot penyeimbang $(\alpha, \beta)$:
+                            Kedua cabang tersebut dipelajari dan dioptimalkan secara seimbang menggunakan perhitungan rugi terpadu (*Joint Loss*):
                         </p>
 
-                        <div class="p-3 bg-black/40 rounded-xl font-mono text-xs text-center text-purple-300 overflow-x-auto">
-                            $$\mathcal{L}_{\text{total}} = \alpha \mathcal{L}_{\text{advice}}(\hat{y}_a, y_a) + \beta \mathcal{L}_{\text{mode}}(\hat{y}_m, y_m)$$
+                        <div class="p-4 bg-black/40 rounded-xl font-mono text-xs text-center text-purple-300 overflow-x-auto">
+                            <div class="math-tex block-math">\mathcal{L}_{\text{total}} = \alpha \mathcal{L}_{\text{advice}}(\hat{y}_a, y_a) + \beta \mathcal{L}_{\text{mode}}(\hat{y}_m, y_m)</div>
                         </div>
                     </div>
 
-                    {{-- Taksonomi Klasifikasi --}}
+                    {{-- Taksonomi Klasifikasi Sederhana & Jelas --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="border border-gray-200 rounded-2xl p-4">
                             <h4 class="text-xs font-black text-purple-700 uppercase tracking-wider mb-2 flex items-center gap-2">
                                 <span class="w-2 h-2 rounded-full bg-purple-600"></span>
-                                5 Pola Advice Giving
+                                5 Pola Saran Dosen (Advice Giving)
                             </h4>
                             <ul class="text-xs text-gray-600 space-y-1.5 list-disc pl-4 font-medium">
-                                <li><strong class="text-gray-900">Arahan Eksplisit:</strong> Instruksi tegas, korektif, dan direktif langsung dari dosen.</li>
-                                <li><strong class="text-gray-900">Bimbingan Bertahap:</strong> Panduan langkah demi langkah memandu pemikiran mahasiswa.</li>
-                                <li><strong class="text-gray-900">Dukungan Keputusan:</strong> Afirmasi atau persetujuan atas gagasan mahasiswa.</li>
-                                <li><strong class="text-gray-900">Jawaban Tegas:</strong> Klarifikasi langsung atas pertanyaan atau keraguan teknis.</li>
-                                <li><strong class="text-gray-900">Petunjuk Kontekstual:</strong> Saran implisit yang mengarahkan literatur atau teori rujukan.</li>
+                                <li><strong class="text-gray-900">Arahan Eksplisit:</strong> Perintah tegas, petunjuk langsung, dan koreksi jelas dari dosen.</li>
+                                <li><strong class="text-gray-900">Bimbingan Bertahap:</strong> Bimbingan runtut langkah demi langkah menuntun pemikiran mahasiswa.</li>
+                                <li><strong class="text-gray-900">Dukungan Keputusan:</strong> Persetujuan atau penguatan atas ide yang diajukan mahasiswa.</li>
+                                <li><strong class="text-gray-900">Jawaban Tegas:</strong> Klarifikasi langsung menjawab keraguan atau pertanyaan teknis mahasiswa.</li>
+                                <li><strong class="text-gray-900">Petunjuk Kontekstual:</strong> Saran halus yang mengarahkan mahasiswa membaca teori atau referensi tertentu.</li>
                             </ul>
                         </div>
 
                         <div class="border border-gray-200 rounded-2xl p-4">
                             <h4 class="text-xs font-black text-indigo-700 uppercase tracking-wider mb-2 flex items-center gap-2">
                                 <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
-                                3 Modes of Interaction (Relasi Kuasa)
+                                3 Relasi Komunikasi Bimbingan (Modes)
                             </h4>
                             <ul class="text-xs text-gray-600 space-y-1.5 list-disc pl-4 font-medium">
-                                <li><strong class="text-gray-900">Power Over:</strong> Dominasi instruksional di mana otoritas mutlak dipegang oleh dosen pembimbing.</li>
-                                <li><strong class="text-gray-900">Power Maintaining:</strong> Relasi kolegial seimbang, saling menghormati pendapat ilmiah.</li>
-                                <li><strong class="text-gray-900">Power Gaining:</strong> Inisiatif aktif dan kemandirian mahasiswa dalam mengusulkan gagasan atau data.</li>
+                                <li><strong class="text-gray-900">Power Over (Dominan):</strong> Dosen memegang kendali penuh dan menentukan keputusan secara instruksional.</li>
+                                <li><strong class="text-gray-900">Power Maintaining (Seimbang):</strong> Komunikasi dua arah yang setara, santai, dan saling bertukar gagasan ilmiah.</li>
+                                <li><strong class="text-gray-900">Power Gaining (Inisiatif):</strong> Mahasiswa menunjukkan keaktifan, kemandirian, dan berani menyampaikan ide baru.</li>
                             </ul>
                         </div>
                     </div>
@@ -255,14 +262,14 @@
                         </div>
                         <div>
                             <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">
-                                <span class="lang-id">Akustik & Struktur Jaringan</span>
-                                <span class="lang-en">Acoustics & Network Structure</span>
-                                <span class="lang-zh">声学与网络结构</span>
+                                <span class="lang-id">Nada Suara & Visualisasi Hubungan</span>
+                                <span class="lang-en">Voice Tone & Relationship Visualization</span>
+                                <span class="lang-zh">语音语调与交互关系可视化</span>
                             </span>
                             <h3 class="text-base font-black text-gray-950 uppercase tracking-wide">
-                                <span class="lang-id">Dinamika Intonasi (F0) & Pemodelan Graf Interaksi</span>
-                                <span class="lang-en">Intonation Dynamics (F0) & Interaction Graph Modeling</span>
-                                <span class="lang-zh">语调动态 (F0) 与交互图建模</span>
+                                <span class="lang-id">Dinamika Intonasi Bicara & Peta Hubungan Interaksi</span>
+                                <span class="lang-en">Speech Intonation Dynamics & Interaction Network</span>
+                                <span class="lang-zh">语音语调动态与交互网络图</span>
                             </h3>
                         </div>
                     </div>
@@ -294,7 +301,7 @@
                     </div>
 
                     <p class="text-gray-600 text-xs font-medium leading-relaxed">
-                        Topologi graf interaksi $G = (V, E)$ mengkristalkan relasi temporal menjadi struktur relasional berbobot. Simpul ($V$) mewakili entitas aktor dan kategori wacana, sedangkan tepi ($E$) menyimpan bobot keterhubungan interaksi. Hal ini memungkinkan AI dan peneliti membaca polarisasi kekuasaan dan pola bimbingan hanya dalam satu tampilan grafis yang intuitif.
+                        Peta jaringan graf interaksi menyatukan seluruh percakapan menjadi gambar diagram yang hidup. Lingkaran (simpul) menggambarkan dosen, mahasiswa, dan kategori topik, sementara garis tebal-tipisnya menunjukkan seberapa sering pola komunikasi tersebut terjadi. Dengan begitu, dosen dan peneliti bisa langsung melihat apakah bimbingan berjalan interaktif atau satu arah.
                     </p>
                 </div>
 
@@ -351,7 +358,7 @@
                             <i data-lucide="zap" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
                             <div class="text-xs text-gray-600">
                                 <strong class="text-gray-900 block">Sintesis Otomatis (Zero-Click)</strong>
-                                Hasil graf dan Mermaid langsung digenerate tanpa klik manual.
+                                Hasil graf interaksi dan bagan alur langsung dibuat otomatis tanpa perlu klik tombol lagi.
                             </div>
                         </div>
 
@@ -359,23 +366,23 @@
                             <i data-lucide="refresh-cw" class="w-4 h-4 text-blue-500 shrink-0 mt-0.5"></i>
                             <div class="text-xs text-gray-600">
                                 <strong class="text-gray-900 block">Tukar Peran Pembicara</strong>
-                                Fleksibilitas membalik atribusi peran jika model diarization keliru.
+                                Dapat membalik peran pembicara dalam satu klik jika deteksi peran dosen/mahasiswa tertukar.
                             </div>
                         </div>
 
                         <div class="flex items-start gap-2.5">
                             <i data-lucide="smartphone" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i>
                             <div class="text-xs text-gray-600">
-                                <strong class="text-gray-900 block">Touchscreen Modal Insight</strong>
-                                Simpul graf dapat disentuh di HP untuk melihat modal penjelasan detail.
+                                <strong class="text-gray-900 block">Detail Titik Graf di Layar Sentuh</strong>
+                                Titik graf dapat disentuh di HP untuk membuka kotak penjelasan detail tanpa terpotong layar.
                             </div>
                         </div>
 
                         <div class="flex items-start gap-2.5">
                             <i data-lucide="shield-check" class="w-4 h-4 text-indigo-500 shrink-0 mt-0.5"></i>
                             <div class="text-xs text-gray-600">
-                                <strong class="text-gray-900 block">Multi-CDN Resilient Fallback</strong>
-                                Pemuatan pustaka diagram tahan gangguan jaringan dengan tombol <i>Try Again</i>.
+                                <strong class="text-gray-900 block">Pemuat Diagram Tahan Gangguan</strong>
+                                Diagram alur tetap tampil stabil dengan jalur cadangan otomatis dan tombol <i>Coba Lagi</i>.
                             </div>
                         </div>
 
@@ -383,7 +390,7 @@
                             <i data-lucide="globe" class="w-4 h-4 text-rose-500 shrink-0 mt-0.5"></i>
                             <div class="text-xs text-gray-600">
                                 <strong class="text-gray-900 block">Dukungan Multi-Bahasa</strong>
-                                Navigasi dan teks bilingual/trilingual (Indonesia, English, 中文).
+                                Tersedia dalam 3 pilihan bahasa yang mudah diganti (Indonesia, Inggris, dan Mandarin).
                             </div>
                         </div>
                     </div>
@@ -396,7 +403,7 @@
                     </div>
                     <div>
                         <h4 class="text-base font-black uppercase tracking-tight">Coba Analisis Suara V2</h4>
-                        <p class="text-xs text-purple-200 mt-1">Uji coba langsung kehandalan Multi-Task RoBERTa pada percakapan bimbingan Anda.</p>
+                        <p class="text-xs text-purple-200 mt-1">Uji coba langsung kemampuan analisis suara bimbingan pada rekaman bimbingan Anda.</p>
                     </div>
                     <a href="{{ route('analysis.v2.create') }}" 
                        class="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-white text-purple-900 font-black text-xs uppercase tracking-wider hover:bg-purple-50 transition shadow-lg">
@@ -410,4 +417,30 @@
         </div>
 
     </div>
+
+    {{-- KaTeX Math Auto-Render Script --}}
+    <x-slot name="scripts">
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const renderKaTeX = () => {
+                    if (window.renderMathInElement) {
+                        renderMathInElement(document.body, {
+                            delimiters: [
+                                {left: '$$', right: '$$', display: true},
+                                {left: '$', right: '$', display: false},
+                                {left: '\\(', right: '\\)', display: false},
+                                {left: '\\[', right: '\\]', display: true}
+                            ],
+                            throwOnError: false
+                        });
+                    } else {
+                        setTimeout(renderKaTeX, 100);
+                    }
+                };
+                renderKaTeX();
+            });
+        </script>
+    </x-slot>
 </x-layouts.app>
