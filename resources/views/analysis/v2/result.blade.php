@@ -387,33 +387,53 @@
                 </div>
             </div>
             
-            {{-- Grid Kontainer: Kiri Graf (lg:col-span-1 atau w-1/2), Kanan Teks Hasil Analisis --}}
+            {{-- Grid Kontainer Card: Kiri Graf (lg:col-span-6), Kanan Hasil Analisis Teks / Skeleton (lg:col-span-6) --}}
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 
-                {{-- Kolom Kiri: Peta Graf ECharts (5 atau 6 Kolom di Desktop) --}}
-                <div :class="graphInterpretationData ? 'lg:col-span-5 xl:col-span-5' : 'lg:col-span-12'" class="transition-all duration-300">
-                    <div id="graph-container" class="w-full bg-gray-50/50 rounded-2xl border border-gray-100" style="height: 520px;"></div>
+                {{-- Kolom Kiri: Peta Graf ECharts (Tetap 6 Kolom di Desktop agar stabil dan tidak geser/mengecil) --}}
+                <div class="lg:col-span-6 w-full">
+                    <div id="graph-container" class="w-full bg-gray-50/50 rounded-2xl border border-gray-100" style="height: 540px;"></div>
                 </div>
 
-                {{-- Kolom Kanan: Hasil Generate Teks Analisis AI --}}
-                <div x-show="graphInterpretationData || isInterpretingGraph" 
-                    :class="graphInterpretationData ? 'lg:col-span-7 xl:col-span-7' : 'lg:col-span-12'"
-                    class="space-y-4" x-transition>
+                {{-- Kolom Kanan: Hasil Generate Teks Analisis AI / Loading Skeleton / Placeholder Awal --}}
+                <div class="lg:col-span-6 w-full">
                     
-                    {{-- Loading Skeleton saat Menganalisis --}}
-                    <div x-show="isInterpretingGraph" class="bg-purple-50/40 rounded-2xl p-6 border border-purple-100 animate-pulse space-y-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-purple-200"></div>
-                            <div class="h-4 bg-purple-200 rounded-lg w-1/2"></div>
+                    {{-- 1. Loading Skeleton saat Sedang Menganalisis (Tepat di kolom kanan, sejajar graf) --}}
+                    <div x-show="isInterpretingGraph" style="display: none;" class="bg-purple-50/40 rounded-2xl p-6 border border-purple-100 animate-pulse space-y-4 h-[540px] flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-xl bg-purple-200"></div>
+                                <div class="h-4 bg-purple-200 rounded-lg w-1/2"></div>
+                            </div>
+                            <div class="h-20 bg-white/80 rounded-xl w-full"></div>
+                            <div class="h-24 bg-white/80 rounded-xl w-full"></div>
+                            <div class="h-20 bg-white/80 rounded-xl w-full"></div>
                         </div>
-                        <div class="h-20 bg-white/80 rounded-xl w-full"></div>
-                        <div class="h-24 bg-white/80 rounded-xl w-full"></div>
-                        <div class="h-20 bg-white/80 rounded-xl w-full"></div>
+                        <div class="flex items-center justify-center gap-2 text-xs font-bold text-purple-600">
+                            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                            <span>Model Multimodal AI sedang menyintesis graf & intonasi...</span>
+                        </div>
                     </div>
 
-                    {{-- Tampilan Konten Interpretasi AI --}}
-                    <div x-show="!isInterpretingGraph && graphInterpretationData" class="space-y-4 max-h-[520px] overflow-y-auto pr-1 scrollbar-thin">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-purple-50/60 border border-purple-100 rounded-2xl p-3.5">
+                    {{-- 2. Placeholder Ketika Belum Dianalisis --}}
+                    <div x-show="!isInterpretingGraph && !graphInterpretationData" class="bg-gray-50/70 border border-dashed border-gray-200 rounded-2xl p-8 text-center flex flex-col items-center justify-center h-[540px]">
+                        <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4 border border-purple-100 shadow-sm">
+                            <i data-lucide="sparkles" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-sm font-black uppercase tracking-wider text-gray-800 mb-2">Interpretasi Makna Graf (AI)</h3>
+                        <p class="text-xs text-gray-500 font-medium leading-relaxed max-w-sm mb-6">
+                            Klik tombol <strong>"Analisis Makna Graf (AI)"</strong> di atas untuk memproses gambar peta wacana ini secara multimodal bersama dinamika intonasi dan hasil analisis akhir.
+                        </p>
+                        <button type="button" @click="analyzeGraphWithAI()"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider shadow-md shadow-purple-600/20 transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-purple-200"></i>
+                            <span>Mulai Analisis Sekarang</span>
+                        </button>
+                    </div>
+
+                    {{-- 3. Tampilan Konten Hasil Interpretasi AI --}}
+                    <div x-show="!isInterpretingGraph && graphInterpretationData" style="display: none;" class="space-y-4 max-h-[540px] overflow-y-auto pr-1 scrollbar-thin">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-purple-50/60 border border-purple-100 rounded-2xl p-3.5 sticky top-0 z-10 backdrop-blur-md">
                             <div class="flex items-center gap-2">
                                 <div class="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-sm">
                                     <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
@@ -1439,6 +1459,9 @@
                     }
 
                     this.isInterpretingGraph = true;
+                    this.$nextTick(() => {
+                        if (window.v2GraphChart) window.v2GraphChart.resize();
+                    });
 
                     try {
                         const res = await fetch("{{ route('analysis.v2.interpret-graph', $analysis->slug) }}", {
@@ -1459,7 +1482,10 @@
                             this.graphAnalyzedAt = data.analyzed_at;
                             this.$nextTick(() => {
                                 if (window.lucide) window.lucide.createIcons();
-                                if (window.v2GraphChart) window.v2GraphChart.resize();
+                                if (window.v2GraphChart) {
+                                    window.v2GraphChart.resize();
+                                    setTimeout(() => window.v2GraphChart.resize(), 300);
+                                }
                             });
                         } else {
                             this.showError('Sintesis Multimodal Gagal', data.message || 'Gagal memproses interpretasi graf.');
@@ -1469,6 +1495,9 @@
                         this.showError('Koneksi Jaringan', 'Terjadi kesalahan jaringan saat menganalisis graf wacana.');
                     } finally {
                         this.isInterpretingGraph = false;
+                        this.$nextTick(() => {
+                            if (window.v2GraphChart) window.v2GraphChart.resize();
+                        });
                     }
                 },
 
