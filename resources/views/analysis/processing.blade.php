@@ -395,7 +395,7 @@
 
             async startAiBatchProcessing() {
                 try {
-                    const batchSize = 30;
+                    const batchSize = 100;
                     const total = this.totalSegments;
                     let processed = this.resumeStartIdx;
                     
