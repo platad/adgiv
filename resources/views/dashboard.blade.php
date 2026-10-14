@@ -1,21 +1,170 @@
 <x-layouts.app title="Dashboard" :welcome-audio="$welcomeAudio ?? null">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
         
-        {{-- Banner Info Model Analisis Suara --}}
-        <div class="bg-gradient-to-r from-purple-50 via-indigo-50 to-red-50 border border-purple-200/80 text-gray-800 px-6 py-4 rounded-2xl mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-500/20">
-                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+        {{-- Interactive Before & After Model Comparison Slider (IndoBERT vs RoBERTa) --}}
+        <div class="mb-8" 
+             x-data="{ 
+                 sliderPos: 50,
+                 isDragging: false,
+                 setPos(e) {
+                     const rect = $refs.compareContainer.getBoundingClientRect();
+                     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                     let pos = ((clientX - rect.left) / rect.width) * 100;
+                     if (pos < 5) pos = 5;
+                     if (pos > 95) pos = 95;
+                     this.sliderPos = Math.round(pos);
+                 }
+             }">
+            
+            <div class="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-7 border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.03)] relative overflow-hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-[0.6rem] font-black uppercase tracking-wider shadow-xs">
+                                Fitur Interaktif
+                            </span>
+                            <h2 class="text-sm sm:text-base font-black uppercase tracking-widest text-gray-900 flex items-center gap-2">
+                                <span>Komparasi Model: IndoBERT vs RoBERTa</span>
+                            </h2>
+                        </div>
+                        <p class="text-xs text-gray-500 font-medium mt-1">
+                            Geser garis pembatas di bawah untuk membandingkan kemampuan arsitektur IndoBERT (Sebelumnya) dan RoBERTa + Graf (Terbaru).
+                        </p>
+                    </div>
+
+                    {{-- Quick Switch Pills --}}
+                    <div class="flex items-center gap-2 bg-gray-100/80 p-1 rounded-2xl text-[0.65rem] font-black uppercase tracking-wider self-start sm:self-auto">
+                        <button type="button" @click="sliderPos = 10" 
+                                class="px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+                                :class="sliderPos < 30 ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'">
+                            IndoBERT
+                        </button>
+                        <button type="button" @click="sliderPos = 50" 
+                                class="px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+                                :class="sliderPos >= 30 && sliderPos <= 70 ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'">
+                            50 : 50
+                        </button>
+                        <button type="button" @click="sliderPos = 90" 
+                                class="px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+                                :class="sliderPos > 70 ? 'bg-purple-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'">
+                            RoBERTa
+                        </button>
+                    </div>
                 </div>
-                <div class="text-sm leading-relaxed">
-                    <span class="font-black uppercase tracking-wider text-purple-900 mr-1.5">Model Analisis Suara Cerdas:</span> 
-                    <span class="font-medium text-gray-700">Tersedia dua opsi mesin analisis suara percakapan bimbingan akademik: <b>IndoBERT</b> (versi 1) dan <b>RoBERTa Multi-Task</b> (versi 2 dengan topologi graf).</span>
+
+                {{-- The Split Slider Container --}}
+                <div x-ref="compareContainer" 
+                     @mousedown="isDragging = true; setPos($event)"
+                     @mousemove="if (isDragging) setPos($event)"
+                     @mouseup="isDragging = false"
+                     @mouseleave="isDragging = false"
+                     @touchstart="isDragging = true; setPos($event)"
+                     @touchmove="if (isDragging) setPos($event)"
+                     @touchend="isDragging = false"
+                     class="relative w-full h-[360px] sm:h-[300px] rounded-[1.75rem] overflow-hidden select-none cursor-ew-resize border border-gray-200/80 shadow-inner group">
+
+                    {{-- RIGHT SIDE (LAYER DASAR): RoBERTa (AFTER / VERSI 2) --}}
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-950 via-indigo-950 to-gray-950 text-white p-6 sm:p-8 flex flex-col justify-between">
+                        <div class="flex items-start justify-end">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30 text-[0.62rem] font-black uppercase tracking-widest shadow-sm">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-300"></i>
+                                <span>MODEL TERBARU (RoBERTa + Graf)</span>
+                            </span>
+                        </div>
+
+                        <div class="max-w-md ml-auto text-right">
+                            <div class="inline-block text-left bg-purple-900/40 backdrop-blur-md border border-purple-400/20 rounded-2xl p-4 sm:p-5 shadow-xl">
+                                <h3 class="text-sm sm:text-base font-black text-purple-200 flex items-center justify-end gap-2 uppercase tracking-wide mb-2">
+                                    <span>Multi-Task RoBERTa</span>
+                                    <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
+                                </h3>
+                                <ul class="space-y-2 text-xs text-gray-200 font-medium">
+                                    <li class="flex items-center justify-end gap-2">
+                                        <span>Klasifikasi 3 Dimensi Sekaligus (Multi-Task)</span>
+                                        <i data-lucide="check" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
+                                    </li>
+                                    <li class="flex items-center justify-end gap-2">
+                                        <span>Pemetaan Dinamika Kuasa & Topologi Graf</span>
+                                        <i data-lucide="check" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
+                                    </li>
+                                    <li class="flex items-center justify-end gap-2">
+                                        <span>Akurasi Kontekstual Percakapan Tinggi (92.4%)</span>
+                                        <i data-lucide="check" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
+                                    </li>
+                                </ul>
+                                <div class="mt-4 pt-3 border-t border-purple-400/20 flex justify-end">
+                                    <a href="{{ route('analysis.v2.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider transition shadow-md shadow-purple-600/30">
+                                        <span>Coba RoBERTa</span>
+                                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- LEFT SIDE (CLIPPED OVERLAY): IndoBERT (BEFORE / VERSI 1) --}}
+                    <div class="absolute inset-y-0 left-0 bg-gradient-to-br from-blue-950 via-slate-900 to-gray-950 text-white p-6 sm:p-8 flex flex-col justify-between overflow-hidden pointer-events-none"
+                         :style="`width: ${sliderPos}%;`">
+                        
+                        <div class="flex items-start justify-start w-[calc(100vw-4rem)] max-w-7xl">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[0.62rem] font-black uppercase tracking-widest shadow-sm">
+                                <i data-lucide="mic" class="w-3.5 h-3.5 text-blue-300"></i>
+                                <span>MODEL STANDAR (IndoBERT)</span>
+                            </span>
+                        </div>
+
+                        <div class="max-w-md text-left w-[calc(100vw-4rem)] max-w-7xl">
+                            <div class="inline-block bg-blue-900/40 backdrop-blur-md border border-blue-400/20 rounded-2xl p-4 sm:p-5 shadow-xl">
+                                <h3 class="text-sm sm:text-base font-black text-blue-200 flex items-center gap-2 uppercase tracking-wide mb-2">
+                                    <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                                    <span>IndoBERT Base</span>
+                                </h3>
+                                <ul class="space-y-2 text-xs text-gray-200 font-medium">
+                                    <li class="flex items-center gap-2">
+                                        <i data-lucide="check" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+                                        <span>Klasifikasi Kalimat Tunggal (Single-Task)</span>
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <i data-lucide="check" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+                                        <span>Analisis Wacana Kritis Linier Tradisional</span>
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <i data-lucide="check" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+                                        <span>Ringan & Cepat untuk Rekaman Pendek</span>
+                                    </li>
+                                </ul>
+                                <div class="mt-4 pt-3 border-t border-blue-400/20 flex justify-start pointer-events-auto">
+                                    <a href="{{ route('analysis.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase tracking-wider transition shadow-md shadow-blue-600/30">
+                                        <span>Coba IndoBERT</span>
+                                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- SLIDER DIVIDER LINE & DRAG HANDLE --}}
+                    <div class="absolute inset-y-0 w-1 bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] pointer-events-none"
+                         :style="`left: ${sliderPos}%;`">
+                        <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-gray-900 shadow-2xl flex items-center justify-center border-2 border-purple-500/30 cursor-ew-resize group-hover:scale-110 transition-transform">
+                            <i data-lucide="chevrons-left-right" class="w-5 h-5 text-purple-700"></i>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Hint Footer --}}
+                <div class="flex items-center justify-between text-[0.68rem] text-gray-400 font-medium mt-3 px-1">
+                    <span class="flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
+                        Sisi Kiri: IndoBERT (V1)
+                    </span>
+                    <span class="hidden sm:inline italic text-gray-400">💡 Tip: Klik dan geser tombol bulat di tengah ke kanan / kiri</span>
+                    <span class="flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-purple-500 inline-block"></span>
+                        Sisi Kanan: RoBERTa Multi-Task (V2)
+                    </span>
                 </div>
             </div>
-            <a href="{{ route('methodology.v2') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-purple-700 hover:text-purple-900 bg-white px-3.5 py-2 rounded-xl border border-purple-200 shadow-sm shrink-0 hover:bg-purple-50 transition">
-                <span>Pelajari Metodologi</span>
-                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-            </a>
         </div>
 
         {{-- Welcome Banner Section --}}
