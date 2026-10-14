@@ -5,13 +5,14 @@ DATA POTONGAN CHUNKS:
 {CHUNKS_JSON}
 
 ATURAN SINTESIS MUTLAK:
-1. JANGAN PERNAH MENYINGKAT ATAU MERANGKUM TRANSKRIPSI: Anda wajib menyertakan SETIAP baris transkripsi dari seluruh potongan chunk yang diberikan secara lengkap dari awal hingga akhir audio. Jangan ada satu kalimat pun yang hilang!
+1. PERTAHANKAN ALUR PERCAKAPAN & HINDARI HALUSINASI GANDA: Anda wajib menyertakan setiap baris percakapan penting dari seluruh potongan chunk. NAMUN, jika ada baris berurutan dengan teks kalimat yang SAMA PERSIS / DUPLIKAT KARENA GLITCH AUDIO WHISPER (misal pengulangan pertanyaan identik berulang kali di segmen berbeda), JANGAN membuat narasi palsu yang mengulang-ulang hal yang sama. Gabungkan atau pertahankan satu kemunculan yang valid secara wajar agar alur dialog tetap natural dan akurat.
 2. IDENTIFIKASI PEMBICARA: Karena data input dilabeli "Unknown", Anda WAJIB mengubah label "speaker" menjadi "Dosen" atau "Mahasiswa" berdasarkan konteks. JANGAN PERNAH mengisi dengan "Unknown".
 3. PERTAHANKAN LABEL INDOBERT: Setiap objek dalam JSON input memiliki key "advice_giving" dan "modes_of_interaction". Anda DILARANG MENGUBAH / MENGHALUSINASI label ini. Anda HANYA menyalin ulang label tersebut.
 4. TAMBAHKAN PENANDA INLINE SECARA UTUH: Anda wajib meletakkan tag marker seperti [MARKER_1], [MARKER_2], dst. serta tag [PAUSE] di dalam teks transkripsi ('text_html'). Anda WAJIB menambahkan intonasi marker (seperti di koma atau di akhir kalimat) di setiap kalimatnya dan mengisi array 'intonation_markers'.
 5. KONSISTENSI MARKER: Pastikan setiap tag [MARKER_x] yang tercantum di dalam 'text_html' memiliki objek padanannya di dalam array 'intonation_markers' untuk baris tersebut dengan id yang persis sama. Pastikan array 'intonation_markers' SELALU TERISI minimal 1 marker per baris percakapan.
 6. BUAT DETAIL ANALISIS YANG SANGAT MENDALAM DAN LUAS (COMPREHENSIVE ANALYSIS): Karena sistem didukung oleh arsitektur backend parser yang tangguh dan rendering real-time, Anda WAJIB memberikan penjelasan yang sangat komprehensif, akademis, dan mendalam pada 'agent_insight', 'advice_relation', 'reason', dan 'relation' (1-2 kalimat detail, minimal 20-30 kata per item). Jelaskan secara tajam aspek sosiolinguistik, dinamika relasi kekuasaan (power dynamics), serta implikasi akademik dari ujaran dosen dan mahasiswa tersebut agar hasil analisis bernilai akademis tinggi.
 7. DILARANG MENGOSONGKAN FIELD (NO EMPTY STRINGS): Anda DILARANG KERAS mengosongkan field 'advice_type', 'indobert_reasoning', 'agent_insight', atau 'advice_relation'. Semua field ini WAJIB diisi dengan kalimat panjang yang bermakna yang secara eksplisit menganalisis konteks percakapan. Jangan ada string kosong "" kecuali untuk 'is_advice' jika memang kalimat tersebut bukan saran.
+8. KESADARAN TERHADAP TEKS DUPLIKAT: Jika terdapat kalimat yang tampak redundan, berikan analisis substansi akademik yang kontekstual dan objektif, bukan analisis copy-paste atau penjelasan generik.
 
 Format output HARUS murni dalam format JSON terstruktur yang valid dengan skema berikut:
 {
