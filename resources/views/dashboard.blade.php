@@ -198,322 +198,292 @@
             </div>
         </div>
 
-        {{-- Interactive Before & After Model Comparison Slider (IndoBERT vs RoBERTa) - HIGH-IMPACT COCKPIT --}}
-        <div class="mb-12" 
+        {{-- Benchmark Arsitektur Model: IndoBERT Base (V1) vs Multi-Task RoBERTa (V2) --}}
+        <div class="mb-10" 
              x-data="{ 
-                 sliderPos: 50,
-                 isDragging: false,
                  activeTab: 'overview', // 'overview', 'curves', 'matrix'
-                 setPos(e) {
-                     const rect = $refs.compareContainer.getBoundingClientRect();
-                     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                     let pos = ((clientX - rect.left) / rect.width) * 100;
-                     if (pos < 5) pos = 5;
-                     if (pos > 95) pos = 95;
-                     this.sliderPos = Math.round(pos);
-                 }
+                 activeModel: 'both',   // 'both', 'indobert', 'roberta'
              }">
             
-            <div class="bg-gray-950 rounded-[2.2rem] sm:rounded-[2.8rem] p-5 sm:p-8 border border-gray-800 shadow-[0_20px_60px_rgba(0,0,0,0.5)] relative overflow-hidden text-white">
-                <!-- Background Ambient Glow -->
-                <div class="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-                <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-600/15 rounded-full blur-[120px] pointer-events-none"></div>
-
-                {{-- Header & Sub-nav Bar --}}
-                <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 pb-5 border-b border-white/10">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200">
+                {{-- Header & Switcher --}}
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-100">
                     <div>
-                        <div class="flex flex-wrap items-center gap-2.5">
-                            <span class="px-2.5 py-1 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white text-[0.6rem] font-black uppercase tracking-widest shadow-md">
-                                Deep Tech Benchmark
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="px-2.5 py-0.5 rounded-md bg-gray-100 text-gray-700 text-[0.68rem] font-bold uppercase tracking-wider border border-gray-200">
+                                Eksperimen Google Colab
                             </span>
-                            <span class="text-xs text-gray-400 font-medium">Berdasarkan Hasil Eksperimen Google Colab Prototipe BIMA</span>
+                            <span class="text-xs text-gray-500">Hasil Riset BIMA</span>
                         </div>
-                        <h2 class="text-base sm:text-xl font-black uppercase tracking-wider text-white mt-1.5 flex items-center gap-2">
-                            <span>Komparasi Arsitektur: IndoBERT Base vs Multi-Task RoBERTa</span>
+                        <h2 class="text-lg sm:text-xl font-bold text-gray-900 tracking-tight">
+                            Komparasi Model: IndoBERT Base vs RoBERTa Multi-Task
                         </h2>
+                        <p class="text-xs text-gray-500 mt-0.5">
+                            Evaluasi performa klasifikasi wacana pedagogis & relasi kuasa bimbingan skripsi.
+                        </p>
                     </div>
 
-                    {{-- Control Tabs & Quick Split Pills --}}
-                    <div class="flex flex-wrap items-center gap-2.5">
-                        {{-- Mode Visualisasi --}}
-                        <div class="flex items-center bg-white/5 border border-white/10 p-1 rounded-2xl text-[0.65rem] font-black uppercase tracking-wider">
+                    {{-- Navigation Tabs --}}
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="flex items-center bg-gray-100/90 p-1 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600">
                             <button type="button" @click="activeTab = 'overview'" 
-                                    class="px-3 py-1.5 rounded-xl transition-all cursor-pointer"
-                                    :class="activeTab === 'overview' ? 'bg-white text-gray-950 shadow-md font-extrabold' : 'text-gray-400 hover:text-white'">
+                                    class="px-3 py-1.5 rounded-lg transition cursor-pointer"
+                                    :class="activeTab === 'overview' ? 'bg-white text-gray-900 font-bold border border-gray-200/80' : 'hover:text-gray-900'">
                                 Ikhtisar Fitur
                             </button>
                             <button type="button" @click="activeTab = 'curves'" 
-                                    class="px-3 py-1.5 rounded-xl transition-all cursor-pointer"
-                                    :class="activeTab === 'curves' ? 'bg-white text-gray-950 shadow-md font-extrabold' : 'text-gray-400 hover:text-white'">
+                                    class="px-3 py-1.5 rounded-lg transition cursor-pointer"
+                                    :class="activeTab === 'curves' ? 'bg-white text-gray-900 font-bold border border-gray-200/80' : 'hover:text-gray-900'">
                                 Kurva Training Loss
                             </button>
                             <button type="button" @click="activeTab = 'matrix'" 
-                                    class="px-3 py-1.5 rounded-xl transition-all cursor-pointer"
-                                    :class="activeTab === 'matrix' ? 'bg-white text-gray-950 shadow-md font-extrabold' : 'text-gray-400 hover:text-white'">
+                                    class="px-3 py-1.5 rounded-lg transition cursor-pointer"
+                                    :class="activeTab === 'matrix' ? 'bg-white text-gray-900 font-bold border border-gray-200/80' : 'hover:text-gray-900'">
                                 Confusion Matrix
                             </button>
                         </div>
 
-                        {{-- Quick Split Preset --}}
-                        <div class="flex items-center bg-white/5 border border-white/10 p-1 rounded-2xl text-[0.62rem] font-black uppercase tracking-wider">
-                            <button type="button" @click="sliderPos = 12" 
-                                    class="px-2.5 py-1.5 rounded-xl transition-all cursor-pointer"
-                                    :class="sliderPos < 25 ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-400 hover:text-white'">
+                        {{-- Filter Model (Desktop & Mobile) --}}
+                        <div class="flex items-center bg-gray-50 p-1 rounded-xl border border-gray-200 text-xs font-medium text-gray-600">
+                            <button type="button" @click="activeModel = 'both'"
+                                    class="px-2.5 py-1.5 rounded-lg transition cursor-pointer"
+                                    :class="activeModel === 'both' ? 'bg-gray-900 text-white font-bold' : 'hover:text-gray-900'">
+                                Keduanya
+                            </button>
+                            <button type="button" @click="activeModel = 'indobert'"
+                                    class="px-2.5 py-1.5 rounded-lg transition cursor-pointer"
+                                    :class="activeModel === 'indobert' ? 'bg-blue-700 text-white font-bold' : 'hover:text-gray-900'">
                                 IndoBERT
                             </button>
-                            <button type="button" @click="sliderPos = 50" 
-                                    class="px-2.5 py-1.5 rounded-xl transition-all cursor-pointer"
-                                    :class="sliderPos >= 25 && sliderPos <= 75 ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-sm' : 'text-gray-400 hover:text-white'">
-                                50:50
-                            </button>
-                            <button type="button" @click="sliderPos = 88" 
-                                    class="px-2.5 py-1.5 rounded-xl transition-all cursor-pointer"
-                                    :class="sliderPos > 75 ? 'bg-purple-600 text-white shadow-sm' : 'text-gray-400 hover:text-white'">
+                            <button type="button" @click="activeModel = 'roberta'"
+                                    class="px-2.5 py-1.5 rounded-lg transition cursor-pointer"
+                                    :class="activeModel === 'roberta' ? 'bg-purple-700 text-white font-bold' : 'hover:text-gray-900'">
                                 RoBERTa
                             </button>
                         </div>
                     </div>
                 </div>
 
-                {{-- The Split Slider Container (Taller, Dramatic Cockpit View) --}}
-                <div x-ref="compareContainer" 
-                     @mousedown="isDragging = true; setPos($event)"
-                     @mousemove="if (isDragging) setPos($event)"
-                     @mouseup="isDragging = false"
-                     @mouseleave="isDragging = false"
-                     @touchstart="isDragging = true; setPos($event)"
-                     @touchmove="if (isDragging) setPos($event)"
-                     @touchend="isDragging = false"
-                     class="relative w-full h-[520px] sm:h-[460px] rounded-[2rem] overflow-hidden select-none cursor-ew-resize border border-white/10 shadow-2xl group">
+                {{-- TAB 1: OVERVIEW COMPONENT (DUAL COLUMN ELEGANT) --}}
+                <div x-show="activeTab === 'overview'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    {{-- CARD 1: INDOBERT BASE (V1) --}}
+                    <div x-show="activeModel === 'both' || activeModel === 'indobert'" 
+                         class="bg-slate-50/60 rounded-2xl border border-gray-200 p-5 sm:p-6 flex flex-col justify-between">
+                        <div>
+                            {{-- Card Badge & Header --}}
+                            <div class="flex items-center justify-between pb-4 mb-4 border-b border-gray-200/80">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-blue-100/70 text-blue-800 text-[0.68rem] font-bold uppercase tracking-wider border border-blue-200">
+                                        Versi 1 (Baseline)
+                                    </span>
+                                    <h3 class="text-base font-bold text-gray-900 mt-2">IndoBERT Base Model</h3>
+                                    <p class="text-xs text-gray-500">Single-Task Sequence Classification</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-blue-900">0.5566</div>
+                                    <span class="text-[0.65rem] text-gray-500 font-semibold uppercase">Macro F1-Score</span>
+                                </div>
+                            </div>
 
-                    {{-- RIGHT SIDE (LAYER DASAR): RoBERTa (AFTER / VERSI 2) --}}
-                    <div class="absolute inset-0 bg-gradient-to-br from-purple-950 via-gray-950 to-indigo-950 text-white p-5 sm:p-8 flex flex-col justify-between overflow-hidden">
-                        
-                        {{-- Top Meta Info --}}
-                        <div class="flex items-center justify-end gap-3 z-10">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/40 text-[0.62rem] font-black uppercase tracking-widest shadow-md">
-                                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-300"></i>
-                                <span>MODEL TERBARU: MULTI-TASK ROBERTA + GRAF</span>
-                            </span>
-                            <span class="px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[0.6rem] font-black uppercase">
-                                Akurasi 91.6% - 94.0%
-                            </span>
+                            {{-- Metrics Summary Grid --}}
+                            <div class="grid grid-cols-2 gap-3 mb-5 text-xs">
+                                <div class="bg-white rounded-xl p-3 border border-gray-200/70">
+                                    <span class="text-[0.65rem] text-gray-500 font-medium block">Akurasi Validasi</span>
+                                    <span class="text-sm font-bold text-gray-900">33.4% - 60.3%</span>
+                                </div>
+                                <div class="bg-white rounded-xl p-3 border border-gray-200/70">
+                                    <span class="text-[0.65rem] text-gray-500 font-medium block">Dimensi Analisis</span>
+                                    <span class="text-sm font-bold text-gray-900">1 Aspek Tunggal</span>
+                                </div>
+                            </div>
+
+                            {{-- Detail Points --}}
+                            <div class="space-y-3 text-xs text-gray-700">
+                                <div class="flex items-start gap-2.5">
+                                    <i data-lucide="info" class="w-4 h-4 text-gray-500 shrink-0 mt-0.5"></i>
+                                    <span><strong>Klasifikasi Linier Tunggal:</strong> Memprediksi satu label per segment teks tanpa memperhitungkan relasi kontekstual antar kalimat.</span>
+                                </div>
+                                <div class="flex items-start gap-2.5">
+                                    <i data-lucide="info" class="w-4 h-4 text-gray-500 shrink-0 mt-0.5"></i>
+                                    <span><strong>Keterbatasan Relasi Kuasa:</strong> Belum memiliki topologi wacana sehingga interaksi hierarki bimbingan belum terpetakan.</span>
+                                </div>
+                                <div class="flex items-start gap-2.5">
+                                    <i data-lucide="check" class="w-4 h-4 text-blue-700 shrink-0 mt-0.5"></i>
+                                    <span><strong>Inferensi Ringan:</strong> Cocok untuk ringkasan cepat pada transkrip pendek tanpa kebutuhan analisis multi-level.</span>
+                                </div>
+                            </div>
                         </div>
 
-                        {{-- Main Content Area: Switches with activeTab --}}
-                        <div class="my-auto z-10 max-w-xl ml-auto text-right">
-                            
-                            {{-- TAB 1: OVERVIEW --}}
-                            <div x-show="activeTab === 'overview'" class="space-y-4">
-                                <div class="inline-block text-left bg-purple-950/60 backdrop-blur-xl border border-purple-400/30 rounded-3xl p-5 sm:p-6 shadow-2xl">
-                                    <div class="flex items-center justify-between gap-4 mb-3 border-b border-purple-400/20 pb-3">
-                                        <div>
-                                            <span class="text-[0.6rem] font-black text-purple-300 uppercase tracking-widest">Arsitektur Terpadu</span>
-                                            <h3 class="text-base sm:text-lg font-black text-white uppercase tracking-wide">Multi-Task Cross-Discourse</h3>
-                                        </div>
-                                        <div class="text-right">
-                                            <span class="text-xl sm:text-2xl font-black text-purple-400">0.9570</span>
-                                            <span class="block text-[0.55rem] text-purple-300/80 font-bold uppercase">Macro F1-Score</span>
-                                        </div>
-                                    </div>
-
-                                    <ul class="space-y-2.5 text-xs text-gray-200 font-medium">
-                                        <li class="flex items-start gap-2.5">
-                                            <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-400 shrink-0 mt-0.5"></i>
-                                            <span><b>Simultan 3 Dimensi:</b> Mengklasifikasi Kategori Advice, Mode Interaksi Kuasa, & Intonasi sekaligus dalam 1 model backbone.</span>
-                                        </li>
-                                        <li class="flex items-start gap-2.5">
-                                            <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-400 shrink-0 mt-0.5"></i>
-                                            <span><b>Topologi Graf Wacana:</b> Memetakan relasi dialektika (Power-over, Power-maintaining, Power-gaining) secara dinamis antar turn.</span>
-                                        </li>
-                                        <li class="flex items-start gap-2.5">
-                                            <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-400 shrink-0 mt-0.5"></i>
-                                            <span><b>Loss Weighted Balancing:</b> Menangani class-imbalance (Otoritas & Dukungan Keputusan) dengan class weight adaptif.</span>
-                                        </li>
-                                    </ul>
-
-                                    <div class="mt-4 pt-3 border-t border-purple-400/20 flex items-center justify-between">
-                                        <span class="text-[0.62rem] text-purple-300/70 font-semibold">Trained: 4 Epochs • AdamW (lr=2e-5)</span>
-                                        <a href="{{ route('analysis.v2.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black uppercase tracking-wider transition shadow-lg shadow-purple-600/40">
-                                            <span>Jalankan RoBERTa</span>
-                                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- TAB 2: TRAINING CURVES --}}
-                            <div x-show="activeTab === 'curves'" style="display: none;" class="inline-block text-left bg-purple-950/70 backdrop-blur-xl border border-purple-400/30 rounded-3xl p-4 sm:p-5 shadow-2xl max-w-lg">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-xs font-black uppercase tracking-wider text-purple-300">Hasil Kurva Evaluasi RoBERTa (Colab)</span>
-                                    <span class="text-[0.6rem] bg-purple-500/30 px-2 py-0.5 rounded text-purple-200 font-bold">Epoch 1-4</span>
-                                </div>
-                                <div class="rounded-xl overflow-hidden border border-purple-400/20 bg-black/40">
-                                    <img src="{{ asset('assets/images/compare/roberta_cell16_1.png') }}" 
-                                         onerror="this.src='{{ asset('assets/img/compare/roberta_cell16_1.png') }}'" 
-                                         alt="RoBERTa Training Curve" 
-                                         class="w-full h-44 sm:h-52 object-contain hover:scale-105 transition-transform duration-500">
-                                </div>
-                                <div class="flex items-start gap-1.5 text-[0.62rem] text-gray-300 font-medium mt-2">
-                                    <i data-lucide="info" class="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5"></i>
-                                    <span>Loss menurun stabil dari 2.12 ke 0.48 dengan akurasi validasi konvergen sempurna pada data tes bimbingan akademik.</span>
-                                </div>
-                            </div>
-
-                            {{-- TAB 3: CONFUSION MATRIX --}}
-                            <div x-show="activeTab === 'matrix'" style="display: none;" class="inline-block text-left bg-purple-950/70 backdrop-blur-xl border border-purple-400/30 rounded-3xl p-4 sm:p-5 shadow-2xl max-w-lg">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-xs font-black uppercase tracking-wider text-purple-300">Confusion Matrix: Advice & Interaksi</span>
-                                    <span class="text-[0.6rem] bg-emerald-500/30 text-emerald-300 px-2 py-0.5 rounded font-bold">Presisi Tinggi</span>
-                                </div>
-                                <div class="rounded-xl overflow-hidden border border-purple-400/20 bg-black/40">
-                                    <img src="{{ asset('assets/images/compare/roberta_cell18_2.png') }}" 
-                                         onerror="this.src='{{ asset('assets/img/compare/roberta_cell18_2.png') }}'" 
-                                         alt="RoBERTa Confusion Matrix" 
-                                         class="w-full h-44 sm:h-52 object-contain hover:scale-105 transition-transform duration-500">
-                                </div>
-                                <div class="flex items-start gap-1.5 text-[0.62rem] text-gray-300 font-medium mt-2">
-                                    <i data-lucide="crosshair" class="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5"></i>
-                                    <span>Diagonal dominan membuktikan pemisahan tegas antara Arahan Eksplisit vs Bimbingan Bertahap.</span>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        {{-- Footer Badge --}}
-                        <div class="flex items-center justify-end text-[0.65rem] text-purple-300/70 font-semibold z-10">
-                            <span>Engine: PyTorch 2.x • Transformer Architecture • Fast Inferencing</span>
+                        {{-- Action & Subtext --}}
+                        <div class="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between">
+                            <span class="text-[0.7rem] text-gray-500">Backbone: indobenchmark/indobert-base-p1</span>
+                            <a href="{{ route('analysis.create') }}" 
+                               class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold transition">
+                                <span>Gunakan V1</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-gray-500"></i>
+                            </a>
                         </div>
                     </div>
 
-                    {{-- LEFT SIDE (CLIPPED OVERLAY): IndoBERT (BEFORE / VERSI 1) --}}
-                    <div class="absolute inset-y-0 left-0 bg-gradient-to-br from-blue-950 via-slate-950 to-gray-950 text-white p-5 sm:p-8 flex flex-col justify-between overflow-hidden pointer-events-none"
-                         :style="`width: ${sliderPos}%;`">
-                        
-                        {{-- Top Meta Info with Fixed Minimum Content Width matching Parent --}}
-                        <div class="flex items-center justify-start gap-3 z-10 w-[1100px] max-w-none">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/40 text-[0.62rem] font-black uppercase tracking-widest shadow-md">
-                                <i data-lucide="mic" class="w-3.5 h-3.5 text-blue-300"></i>
-                                <span>MODEL SEBELUMNYA: INDOBERT BASE</span>
-                            </span>
-                            <span class="px-2 py-0.5 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[0.6rem] font-black uppercase">
-                                Akurasi Eksak: 33.4% - 60.3%
-                            </span>
-                        </div>
-
-                        {{-- Main Content Area: Matches Tabs with Fixed Minimum Width matching Container --}}
-                        <div class="my-auto z-10 max-w-xl text-left w-[1100px] max-w-none">
-                            
-                            {{-- TAB 1: OVERVIEW --}}
-                            <div x-show="activeTab === 'overview'" class="space-y-4 max-w-xl">
-                                <div class="inline-block text-left bg-blue-950/60 backdrop-blur-xl border border-blue-400/30 rounded-3xl p-5 sm:p-6 shadow-2xl">
-                                    <div class="flex items-center justify-between gap-4 mb-3 border-b border-blue-400/20 pb-3">
-                                        <div>
-                                            <span class="text-[0.6rem] font-black text-blue-300 uppercase tracking-widest">Arsitektur Awal</span>
-                                            <h3 class="text-base sm:text-lg font-black text-white uppercase tracking-wide">Single-Task Sequence Classification</h3>
-                                        </div>
-                                        <div class="text-right">
-                                            <span class="text-xl sm:text-2xl font-black text-blue-400">0.5566</span>
-                                            <span class="block text-[0.55rem] text-blue-300/80 font-bold uppercase">Macro F1-Score (V1)</span>
-                                        </div>
-                                    </div>
-
-                                    <ul class="space-y-2.5 text-xs text-gray-200 font-medium">
-                                        <li class="flex items-start gap-2.5">
-                                            <i data-lucide="alert-circle" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
-                                            <span><b>Klasifikasi Linier Tunggal:</b> Hanya mampu memproses 1 label per segment kalimat, tanpa pemodelan relasi antar penutur.</span>
-                                        </li>
-                                        <li class="flex items-start gap-2.5">
-                                            <i data-lucide="alert-circle" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
-                                            <span><b>Keterbatasan Konteks Wacana:</b> Belum memiliki topologi graf, sehingga dinamika kuasa tidak terpetakan secara utuh.</span>
-                                        </li>
-                                        <li class="flex items-start gap-2.5">
-                                            <i data-lucide="check-circle-2" class="w-4 h-4 text-blue-400 shrink-0 mt-0.5"></i>
-                                            <span><b>Kecepatan Ringan:</b> Sangat cepat untuk transkrip pendek tanpa tuntutan analisis pedagogis multi-level.</span>
-                                        </li>
-                                    </ul>
-
-                                    <div class="mt-4 pt-3 border-t border-blue-400/20 flex items-center justify-between pointer-events-auto">
-                                        <span class="text-[0.62rem] text-blue-300/70 font-semibold">Trained: HuggingFace Trainer Base</span>
-                                        <a href="{{ route('analysis.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-wider transition shadow-lg shadow-blue-600/40">
-                                            <span>Jalankan IndoBERT</span>
-                                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                                        </a>
-                                    </div>
+                    {{-- CARD 2: ROBERTA MULTI-TASK (V2) --}}
+                    <div x-show="activeModel === 'both' || activeModel === 'roberta'" 
+                         class="bg-purple-50/40 rounded-2xl border border-purple-200 p-5 sm:p-6 flex flex-col justify-between">
+                        <div>
+                            {{-- Card Badge & Header --}}
+                            <div class="flex items-center justify-between pb-4 mb-4 border-b border-purple-200/80">
+                                <div>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-900 text-[0.68rem] font-bold uppercase tracking-wider border border-purple-200">
+                                        Versi 2 (Rekomendasi)
+                                    </span>
+                                    <h3 class="text-base font-bold text-gray-900 mt-2">RoBERTa Multi-Task + Graf</h3>
+                                    <p class="text-xs text-gray-500">Cross-Discourse Dynamic Modeling</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-purple-900">0.9570</div>
+                                    <span class="text-[0.65rem] text-purple-800 font-semibold uppercase">Macro F1-Score</span>
                                 </div>
                             </div>
 
-                            {{-- TAB 2: TRAINING CURVES --}}
-                            <div x-show="activeTab === 'curves'" style="display: none;" class="inline-block text-left bg-blue-950/70 backdrop-blur-xl border border-blue-400/30 rounded-3xl p-4 sm:p-5 shadow-2xl max-w-lg">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-xs font-black uppercase tracking-wider text-blue-300">Kurva Loss IndoBERT (Colab Training)</span>
-                                    <span class="text-[0.6rem] bg-blue-500/30 px-2 py-0.5 rounded text-blue-200 font-bold">Model V1</span>
+                            {{-- Metrics Summary Grid --}}
+                            <div class="grid grid-cols-2 gap-3 mb-5 text-xs">
+                                <div class="bg-white rounded-xl p-3 border border-purple-200/70">
+                                    <span class="text-[0.65rem] text-gray-500 font-medium block">Akurasi Validasi</span>
+                                    <span class="text-sm font-bold text-purple-950">91.6% - 94.0%</span>
                                 </div>
-                                <div class="rounded-xl overflow-hidden border border-blue-400/20 bg-black/40">
-                                    <img src="{{ asset('assets/images/compare/indobert_cell12_2.png') }}" 
-                                         onerror="this.src='{{ asset('assets/img/compare/indobert_cell12_2.png') }}'" 
-                                         alt="IndoBERT Training Loss" 
-                                         class="w-full h-44 sm:h-52 object-contain">
-                                </div>
-                                <div class="flex items-start gap-1.5 text-[0.62rem] text-gray-300 font-medium mt-2">
-                                    <i data-lucide="trending-down" class="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5"></i>
-                                    <span>Kurva training loss IndoBERT menunjukkan konvergensi awal, namun mengalami fluktuasi pada epoch lanjutan.</span>
+                                <div class="bg-white rounded-xl p-3 border border-purple-200/70">
+                                    <span class="text-[0.65rem] text-gray-500 font-medium block">Dimensi Analisis</span>
+                                    <span class="text-sm font-bold text-purple-950">3 Tugas Simultan</span>
                                 </div>
                             </div>
 
-                            {{-- TAB 3: CONFUSION MATRIX --}}
-                            <div x-show="activeTab === 'matrix'" style="display: none;" class="inline-block text-left bg-blue-950/70 backdrop-blur-xl border border-blue-400/30 rounded-3xl p-4 sm:p-5 shadow-2xl max-w-lg">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-xs font-black uppercase tracking-wider text-blue-300">Distribusi Confusion Matrix (IndoBERT)</span>
-                                    <span class="text-[0.6rem] bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded font-bold">Class Imbalance</span>
+                            {{-- Detail Points --}}
+                            <div class="space-y-3 text-xs text-gray-700">
+                                <div class="flex items-start gap-2.5">
+                                    <i data-lucide="check" class="w-4 h-4 text-purple-700 shrink-0 mt-0.5"></i>
+                                    <span><strong>Simultan 3 Dimensi:</strong> Mengklasifikasi Kategori Advice, Mode Interaksi Kuasa, dan Intonasi suara dalam satu proses pipeline.</span>
                                 </div>
-                                <div class="rounded-xl overflow-hidden border border-blue-400/20 bg-black/40">
-                                    <img src="{{ asset('assets/images/compare/indobert_cell15_3.png') }}" 
-                                         onerror="this.src='{{ asset('assets/img/compare/indobert_cell15_3.png') }}'" 
-                                         alt="IndoBERT Matrix Sample" 
-                                         class="w-full h-44 sm:h-52 object-contain">
+                                <div class="flex items-start gap-2.5">
+                                    <i data-lucide="check" class="w-4 h-4 text-purple-700 shrink-0 mt-0.5"></i>
+                                    <span><strong>Topologi Graf Wacana:</strong> Memetakan dinamika timbal-balik antara dosen dan mahasiswa sepanjang sesi bimbingan.</span>
                                 </div>
-                                <div class="flex items-start gap-1.5 text-[0.62rem] text-gray-300 font-medium mt-2">
-                                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"></i>
-                                    <span>Terjadi bias klasifikasi pada kategori minoritas seperti 'Otoritas' akibat ketiadaan weighted cross-entropy.</span>
+                                <div class="flex items-start gap-2.5">
+                                    <i data-lucide="check" class="w-4 h-4 text-purple-700 shrink-0 mt-0.5"></i>
+                                    <span><strong>Loss Weighted Balancing:</strong> Mengatasi ketimpangan data minoritas secara adaptif untuk hasil yang lebih reliabel.</span>
                                 </div>
                             </div>
-
                         </div>
 
-                        {{-- Footer Badge --}}
-                        <div class="flex items-center justify-start text-[0.65rem] text-blue-300/70 font-semibold w-[1100px] max-w-none z-10">
-                            <span>Base: indobenchmark/indobert-base-p1 • Standard Tokenizer</span>
-                        </div>
-                    </div>
-
-                    {{-- SLIDER DIVIDER LINE & DRAG HANDLE --}}
-                    <div class="absolute inset-y-0 w-1.5 bg-gradient-to-b from-blue-400 via-white to-purple-400 shadow-[0_0_20px_rgba(255,255,255,0.9)] pointer-events-none"
-                         :style="`left: ${sliderPos}%;`">
-                        <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-gray-950 shadow-[0_0_30px_rgba(255,255,255,0.8)] flex items-center justify-center border-4 border-gray-900 cursor-ew-resize group-hover:scale-115 transition-transform duration-200">
-                            <i data-lucide="chevrons-left-right" class="w-6 h-6 text-purple-700"></i>
+                        {{-- Action & Subtext --}}
+                        <div class="mt-6 pt-4 border-t border-purple-200/80 flex items-center justify-between">
+                            <span class="text-[0.7rem] text-gray-500">Trained: 4 Epochs • PyTorch 2.x</span>
+                            <a href="{{ route('analysis.v2.create') }}" 
+                               class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-purple-700 text-white hover:bg-purple-800 text-xs font-semibold transition">
+                                <span>Gunakan V2 (Modern)</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                {{-- Hint & Quick Benchmark Stats Footer --}}
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-gray-400 font-medium mt-4 px-2">
-                    <div class="flex items-center gap-3">
-                        <span class="flex items-center gap-1.5 text-blue-400 font-bold">
-                            <span class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-sm inline-block"></span>
-                            Sisi Kiri: IndoBERT Base (V1)
-                        </span>
-                        <span>vs</span>
-                        <span class="flex items-center gap-1.5 text-purple-400 font-bold">
-                            <span class="w-2.5 h-2.5 rounded-full bg-purple-500 shadow-sm inline-block"></span>
-                            Sisi Kanan: RoBERTa Multi-Task (V2)
-                        </span>
+                {{-- TAB 2: TRAINING CURVES (SIDE-BY-SIDE LIGHT & CLEAN) --}}
+                <div x-show="activeTab === 'curves'" style="display: none;" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {{-- IndoBERT Curves --}}
+                    <div class="bg-gray-50 rounded-2xl border border-gray-200 p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-900">Kurva Evaluasi IndoBERT Base (V1)</h4>
+                                <span class="text-[0.7rem] text-gray-500">Colab Training Loss Profile</span>
+                            </div>
+                            <span class="text-xs px-2 py-0.5 rounded bg-gray-200/80 text-gray-700 font-semibold">Baseline</span>
+                        </div>
+                        <div class="rounded-xl overflow-hidden bg-white border border-gray-200 p-2">
+                            <img src="{{ asset('assets/images/compare/indobert_cell12_2.png') }}" 
+                                 onerror="this.src='{{ asset('assets/img/compare/indobert_cell12_2.png') }}'" 
+                                 alt="IndoBERT Training Loss" 
+                                 class="w-full h-56 object-contain">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3 leading-relaxed">
+                            Kurva menunjukkan penurunan loss bertahap, namun mengalami fluktuasi pada iterasi akhir data validasi.
+                        </p>
                     </div>
 
-                    <div class="flex items-center gap-1.5 text-[0.7rem] text-gray-400 font-medium">
-                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
-                        <span>Sentuh / klik & geser garis pembatas untuk mengintip perbedaan fitur & grafik pelatihan</span>
+                    {{-- RoBERTa Curves --}}
+                    <div class="bg-purple-50/30 rounded-2xl border border-purple-200 p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h4 class="text-sm font-bold text-purple-950">Kurva Evaluasi RoBERTa Multi-Task (V2)</h4>
+                                <span class="text-[0.7rem] text-gray-500">Multi-Loss Convergence Profile</span>
+                            </div>
+                            <span class="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-semibold">Optimasi Tinggi</span>
+                        </div>
+                        <div class="rounded-xl overflow-hidden bg-white border border-purple-200/80 p-2">
+                            <img src="{{ asset('assets/images/compare/roberta_cell16_1.png') }}" 
+                                 onerror="this.src='{{ asset('assets/img/compare/roberta_cell16_1.png') }}'" 
+                                 alt="RoBERTa Training Loss" 
+                                 class="w-full h-56 object-contain">
+                        </div>
+                        <p class="text-xs text-gray-600 mt-3 leading-relaxed">
+                            Loss menurun mulus dari 2.12 ke 0.48 dengan akurasi validasi konvergen stabil di 4 epoch pelatihan.
+                        </p>
                     </div>
+                </div>
+
+                {{-- TAB 3: CONFUSION MATRIX (SIDE-BY-SIDE LIGHT & CLEAN) --}}
+                <div x-show="activeTab === 'matrix'" style="display: none;" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {{-- IndoBERT Matrix --}}
+                    <div class="bg-gray-50 rounded-2xl border border-gray-200 p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-900">Distribusi Matrix IndoBERT (V1)</h4>
+                                <span class="text-[0.7rem] text-gray-500">Hasil Prediksi Kelas Bimbingan</span>
+                            </div>
+                            <span class="text-xs px-2 py-0.5 rounded bg-gray-200/80 text-gray-700 font-semibold">Class Imbalance</span>
+                        </div>
+                        <div class="rounded-xl overflow-hidden bg-white border border-gray-200 p-2">
+                            <img src="{{ asset('assets/images/compare/indobert_cell15_3.png') }}" 
+                                 onerror="this.src='{{ asset('assets/img/compare/indobert_cell15_3.png') }}'" 
+                                 alt="IndoBERT Confusion Matrix" 
+                                 class="w-full h-56 object-contain">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3 leading-relaxed">
+                            Terdapat dispersi prediksi pada kelas minoritas akibat ketiadaan pembobotan adaptif antar kategori.
+                        </p>
+                    </div>
+
+                    {{-- RoBERTa Matrix --}}
+                    <div class="bg-purple-50/30 rounded-2xl border border-purple-200 p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h4 class="text-sm font-bold text-purple-950">Confusion Matrix RoBERTa (V2)</h4>
+                                <span class="text-[0.7rem] text-gray-500">Cross-Discourse Multi-Head</span>
+                            </div>
+                            <span class="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-semibold">Presisi Tinggi</span>
+                        </div>
+                        <div class="rounded-xl overflow-hidden bg-white border border-purple-200/80 p-2">
+                            <img src="{{ asset('assets/images/compare/roberta_cell18_2.png') }}" 
+                                 onerror="this.src='{{ asset('assets/img/compare/roberta_cell18_2.png') }}'" 
+                                 alt="RoBERTa Confusion Matrix" 
+                                 class="w-full h-56 object-contain">
+                        </div>
+                        <p class="text-xs text-gray-600 mt-3 leading-relaxed">
+                            Diagonal dominan kuat membuktikan keberhasilan pemisahan kategori advice dan relasi interaksi secara presisi.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Clean Elegant Footer --}}
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-5 mt-6 border-t border-gray-100 text-xs text-gray-500">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                        <span>IndoBERT Base (V1 Baseline)</span>
+                        <span class="mx-1 text-gray-300">•</span>
+                        <span class="w-2 h-2 rounded-full bg-purple-600"></span>
+                        <span>RoBERTa Multi-Task (V2 Arsitektur Baru)</span>
+                    </div>
+                    <span class="text-[0.7rem] text-gray-400">
+                        Data validasi diekstraksi langsung dari notebook pelatihan Google Colab BIMA.
+                    </span>
                 </div>
             </div>
         </div>
