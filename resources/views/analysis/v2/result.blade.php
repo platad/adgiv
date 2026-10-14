@@ -356,7 +356,7 @@
                         Visualisasi topologi wacana interaktif. Klik dan seret node untuk mengeksplorasi hubungan antar pembicara dan relasi kuasa.
                     </p>
                 </div>
-                <div class="flex items-center gap-2.5">
+                <div class="flex flex-wrap items-center gap-2.5">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold shadow-2xs">
                         <i data-lucide="user-check" class="w-3.5 h-3.5 text-purple-600"></i>
                         <span>Dosen</span>
@@ -365,10 +365,119 @@
                         <i data-lucide="users" class="w-3.5 h-3.5 text-blue-600"></i>
                         <span>Mahasiswa</span>
                     </span>
+
+                    {{-- Tombol Analisis AI Multimodal (OpenAI Vision) --}}
+                    <button type="button" 
+                        @click="analyzeGraphWithAI()"
+                        :disabled="isInterpretingGraph"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider shadow-md shadow-purple-600/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 cursor-pointer">
+                        <template x-if="!isInterpretingGraph">
+                            <span class="flex items-center gap-1.5">
+                                <i data-lucide="sparkles" class="w-4 h-4 text-purple-200"></i>
+                                <span x-text="graphInterpretationData ? 'Analisis Ulang Graf (AI)' : 'Analisis Makna Graf (AI)'"></span>
+                            </span>
+                        </template>
+                        <template x-if="isInterpretingGraph">
+                            <span class="flex items-center gap-1.5">
+                                <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                                <span>Menganalisis Graf...</span>
+                            </span>
+                        </template>
+                    </button>
                 </div>
             </div>
             
-            <div id="graph-container" class="w-full bg-gray-50/50 rounded-3xl border border-gray-100" style="height: 480px;"></div>
+            <div id="graph-container" class="w-full bg-gray-50/50 rounded-2xl md:rounded-3xl border border-gray-100" style="height: 480px;"></div>
+
+            {{-- Panel Hasil Analisis Makna Graf (Multimodal AI) --}}
+            <div x-show="graphInterpretationData || isInterpretingGraph" x-transition class="mt-6 border-t border-gray-100 pt-6">
+                {{-- Loading Skeleton --}}
+                <div x-show="isInterpretingGraph" class="animate-pulse space-y-4">
+                    <div class="h-4 bg-purple-100 rounded-lg w-1/3"></div>
+                    <div class="h-20 bg-gray-50 rounded-2xl w-full"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="h-24 bg-gray-50 rounded-2xl"></div>
+                        <div class="h-24 bg-gray-50 rounded-2xl"></div>
+                    </div>
+                </div>
+
+                {{-- Interpretation Content Card --}}
+                <div x-show="!isInterpretingGraph && graphInterpretationData" class="space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-purple-50/60 border border-purple-100 rounded-2xl p-4">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-black uppercase tracking-widest text-purple-900">
+                                    Interpretasi Multimodal Peta Interaksi Wacana
+                                </h3>
+                                <p class="text-[0.7rem] font-medium text-purple-700">
+                                    Model OpenAI Multimodal (Vision + Pitch Dynamics + Discourse Relation)
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white text-purple-700 border border-purple-200 text-[0.65rem] font-bold">
+                                <i data-lucide="check-circle" class="w-3 h-3 text-emerald-500"></i>
+                                <span>Tersintesis</span>
+                            </span>
+                            <span class="text-[0.65rem] text-gray-400 font-medium" x-text="graphAnalyzedAt"></span>
+                        </div>
+                    </div>
+
+                    {{-- Ringkasan Eksekutif --}}
+                    <div class="bg-gray-50/80 rounded-2xl p-5 border border-gray-100">
+                        <span class="text-[0.65rem] font-black uppercase tracking-wider text-purple-700 block mb-1.5 flex items-center gap-1.5">
+                            <i data-lucide="compass" class="w-3.5 h-3.5 text-purple-600"></i>
+                            <span>Ringkasan Konfigurasi Kekuasaan & Dinamika Bimbingan</span>
+                        </span>
+                        <p class="text-sm font-medium text-gray-800 leading-relaxed font-serif" x-text="graphInterpretationData?.ringkasan_eksekutif"></p>
+                    </div>
+
+                    {{-- Grid 2 Kolom untuk Topologi & Korelasi Intonasi --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {{-- Topologi Graf --}}
+                        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-2xs">
+                            <span class="text-[0.65rem] font-black uppercase tracking-wider text-indigo-700 block mb-1.5 flex items-center gap-1.5">
+                                <i data-lucide="share-2" class="w-3.5 h-3.5 text-indigo-600"></i>
+                                <span>Analisis Topologi Simpul & Tepi (Edges)</span>
+                            </span>
+                            <p class="text-xs sm:text-sm font-medium text-gray-700 leading-relaxed" x-text="graphInterpretationData?.topologi_relasi"></p>
+                        </div>
+
+                        {{-- Korelasi Nada Intonasi --}}
+                        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-2xs">
+                            <span class="text-[0.65rem] font-black uppercase tracking-wider text-blue-700 block mb-1.5 flex items-center gap-1.5">
+                                <i data-lucide="activity" class="w-3.5 h-3.5 text-blue-600"></i>
+                                <span>Korelasi Dinamika Intonasi Per Baris</span>
+                            </span>
+                            <p class="text-xs sm:text-sm font-medium text-gray-700 leading-relaxed" x-text="graphInterpretationData?.korelasi_intonasi"></p>
+                        </div>
+                    </div>
+
+                    {{-- Makna Pedagogis & Rekomendasi Supervisi --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {{-- Makna Pedagogis --}}
+                        <div class="bg-emerald-50/50 rounded-2xl p-5 border border-emerald-100">
+                            <span class="text-[0.65rem] font-black uppercase tracking-wider text-emerald-800 block mb-1.5 flex items-center gap-1.5">
+                                <i data-lucide="book-open" class="w-3.5 h-3.5 text-emerald-600"></i>
+                                <span>Makna Pedagogis & Perkembangan Skripsi</span>
+                            </span>
+                            <p class="text-xs sm:text-sm font-medium text-emerald-950 leading-relaxed" x-text="graphInterpretationData?.makna_pedagogis"></p>
+                        </div>
+
+                        {{-- Rekomendasi Supervisi Riset --}}
+                        <div class="bg-amber-50/50 rounded-2xl p-5 border border-amber-100">
+                            <span class="text-[0.65rem] font-black uppercase tracking-wider text-amber-800 block mb-1.5 flex items-center gap-1.5">
+                                <i data-lucide="lightbulb" class="w-3.5 h-3.5 text-amber-600"></i>
+                                <span>Rekomendasi Tindak Lanjut Supervisi</span>
+                            </span>
+                            <p class="text-xs sm:text-sm font-medium text-amber-950 leading-relaxed" x-text="graphInterpretationData?.rekomendasi_supervisi"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         {{-- Mobile Tab Switcher --}}
@@ -1235,6 +1344,66 @@
                 progressPercent: 0,
                 audioTimeDisplay: '00:00 / 00:00',
 
+                // Graph Multimodal Interpretation state
+                isInterpretingGraph: false,
+                graphInterpretationData: @json($graphInterpretation['data'] ?? null),
+                graphAnalyzedAt: '{{ isset($graphInterpretation['analyzed_at']) ? \Carbon\Carbon::parse($graphInterpretation['analyzed_at'])->translatedFormat("d M Y, H:i") : "" }}',
+
+                async analyzeGraphWithAI() {
+                    if (this.isInterpretingGraph) return;
+                    
+                    if (!window.v2GraphChart) {
+                        alert('Grafik interaksi belum sepenuhnya dimuat.');
+                        return;
+                    }
+
+                    // Konversi ECharts canvas ke Base64 image
+                    let base64Image = '';
+                    try {
+                        base64Image = window.v2GraphChart.getDataURL({
+                            type: 'png',
+                            pixelRatio: 2,
+                            backgroundColor: '#ffffff'
+                        });
+                    } catch (e) {
+                        console.error('Gagal mengambil gambar graf:', e);
+                        alert('Gagal mengekspor gambar graf untuk analisis.');
+                        return;
+                    }
+
+                    this.isInterpretingGraph = true;
+
+                    try {
+                        const res = await fetch("{{ route('analysis.v2.interpret-graph', $analysis->slug) }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                image: base64Image
+                            })
+                        });
+
+                        const data = await res.json();
+                        if (data.status === 'success') {
+                            this.graphInterpretationData = data.interpretation;
+                            this.graphAnalyzedAt = data.analyzed_at;
+                            this.$nextTick(() => {
+                                if (window.lucide) window.lucide.createIcons();
+                            });
+                        } else {
+                            alert(data.message || 'Gagal memproses interpretasi graf.');
+                        }
+                    } catch (err) {
+                        console.error('Network Error:', err);
+                        alert('Terjadi kesalahan jaringan saat menganalisis graf.');
+                    } finally {
+                        this.isInterpretingGraph = false;
+                    }
+                },
+
                 openInsight(title, type, explanation, relation) {
                     this.insightTitle = title;
                     this.insightType = type;
@@ -1319,6 +1488,7 @@
             var chartDom = document.getElementById('graph-container');
             if (!chartDom) return;
             var chart = echarts.init(chartDom);
+            window.v2GraphChart = chart;
             
             var rawGraphData = {!! json_encode($analysis->graph_data) !!};
             

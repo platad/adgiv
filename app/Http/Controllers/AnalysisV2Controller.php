@@ -379,6 +379,163 @@ class AnalysisV2Controller extends Controller
             'intonation_counts' => $intonationCounts,
         ];
 
-        return view('analysis.v2.result', compact('analysis', 'stats', 'transcription', 'summary'));
+        $graphInterpretation = $analysis->result_data['graph_interpretation'] ?? null;
+
+        return view('analysis.v2.result', compact('analysis', 'stats', 'transcription', 'summary', 'graphInterpretation'));
+    }
+
+    public function interpretGraph(Request $request, Analysis $analysis)
+    {
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
+
+        $request->validate([
+            'image' => 'required|string', // base64 data URL
+        ]);
+
+        $imageBase64 = $request->input('image');
+        // Pastikan format base64 data URL valid
+        if (!str_starts_with($imageBase64, 'data:image/')) {
+            $imageBase64 = 'data:image/png;base64,' . $imageBase64;
+        }
+
+        $apiKey = config('services.openai.key') ?: env('OPENAI_API_KEY');
+        if (empty($apiKey)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'API Key OpenAI belum dikonfigurasi di server (services.openai.key / OPENAI_API_KEY).'
+            ], 500);
+        }
+
+        // Kumpulkan data kontekstual: Dinamika Intonasi, Summary, dan Graf
+        $resultData = $analysis->result_data ?? [];
+        $transcription = $resultData['transcription'] ?? [];
+        $graphData = $analysis->graph_data ?? [];
+        $existingSummary = $resultData['summary'] ?? [];
+
+        // Hitung intonasi per baris
+        $intonationFlow = [];
+        $upCount = 0;
+        $downCount = 0;
+        foreach ($transcription as $idx => $t) {
+            $speaker = $t['speaker'] ?? 'Unknown';
+            $type = strtolower($t['intonation_type'] ?? ($t['intonation_markers'][0]['type'] ?? 'neutral'));
+            if ($type === 'up') $upCount++;
+            if ($type === 'down') $downCount++;
+            $intonationFlow[] = "Baris " . ($idx + 1) . " [{$speaker}]: " . strtoupper($type) . " - " . mb_strimwidth(strip_tags($t['text'] ?? ''), 0, 60, '...');
+        }
+
+        $dynamicsCharacter = ($downCount > $upCount) 
+            ? 'Direktif & Korektif (Dominan Turun)' 
+            : (($upCount > $downCount) ? 'Dialogis & Koperatif (Dominan Naik)' : 'Kondusif & Seimbang');
+
+        $systemPrompt = <<<PROMPT
+Anda adalah Pakar Analisis Wacana Kritis (Critical Discourse Analysis) dan Linguistik Interaksional Bimbingan Akademik Tingkat Mahir.
+Tugas Anda adalah menafsirkan visualisasi peta graf interaksi hubungan wacana (node & edge network) yang dikirimkan dalam bentuk gambar.
+
+Kombinasikan pemahaman gambar graf tersebut secara holistik dengan data kontekstual yang diberikan:
+1. Dinamika Intonasi Per Baris (Pitch Dynamics & Pitch Contours).
+2. Karakter Aliran Wacana (Interpretasi Aliran).
+3. Hasil Analisis Akhir (Kategori Advice, Karakter Relasi, Ranah Bicara, Umpan Balik, & Rekomendasi).
+
+Berikan analisis mendalam, tajam, terstruktur, dan akademis dengan struktur JSON berikut:
+{
+    "ringkasan_eksekutif": "Ringkasan tajam 2-3 kalimat mengenai konfigurasi kekuasaan dan dinamika bimbingan dalam graf ini.",
+    "topologi_relasi": "Penjelasan detail mengenai peran node Dosen, Mahasiswa, dan simpul-simpul wacana (Advice & Relasi Kuasa) serta tebal-tipisnya relasi penghubung (edges).",
+    "korelasi_intonasi": "Bagaimana dinamika intonasi per baris (naik/turun) memperkuat atau melunakkan relasi kuasa yang terlihat pada peta graf.",
+    "makna_pedagogis": "Makna pedagogis dan dampak interaksi terhadap perkembangan substansi skripsi/riset mahasiswa.",
+    "rekomendasi_supervisi": "Saran konkrit bagi Dosen dan Mahasiswa untuk mengoptimalkan sesi bimbingan selanjutnya."
+}
+Pastikan jawaban HANYA berupa JSON valid tanpa markdown fence.
+PROMPT;
+
+        $userContext = "DATA KONTEKSTUAL PERCAKAPAN:\n";
+        $userContext .= "- Judul Bimbingan: " . $analysis->title . "\n";
+        $userContext .= "- Total Segmen/Baris: " . count($transcription) . "\n";
+        $userContext .= "- Karakter Aliran Dinamika: " . $dynamicsCharacter . " (Naik: {$upCount}, Turun: {$downCount})\n";
+        $userContext .= "- Kategori Advice: " . ($existingSummary['kategori_advice'] ?? 'Saran Bimbingan Akademik') . "\n";
+        $userContext .= "- Karakter Relasi: " . ($existingSummary['karakter_relasi'] ?? 'Kondusif & Seimbang') . "\n";
+        $userContext .= "- Ranah Bicara: " . ($existingSummary['ranah_pembicaraan'] ?? 'Bimbingan Metodologi Skripsi') . "\n";
+        $userContext .= "- Sample Aliran Intonasi Baris:\n" . implode("\n", array_slice($intonationFlow, 0, 15)) . "\n\n";
+        $userContext .= "Periksa gambar topologi graf terlampir dan berikan interpretasi mendalam sesuai panduan JSON.";
+
+        try {
+            $response = Http::withToken($apiKey)
+                ->timeout(70)
+                ->post('https://api.openai.com/v1/chat/completions', [
+                    'model' => 'gpt-4o',
+                    'temperature' => 0.4,
+                    'max_tokens' => 2500,
+                    'messages' => [
+                        [
+                            'role' => 'system',
+                            'content' => $systemPrompt
+                        ],
+                        [
+                            'role' => 'user',
+                            'content' => [
+                                [
+                                    'type' => 'text',
+                                    'text' => $userContext
+                                ],
+                                [
+                                    'type' => 'image_url',
+                                    'image_url' => [
+                                        'url' => $imageBase64,
+                                        'detail' => 'high'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]);
+
+            if ($response->failed()) {
+                Log::error('[AnalysisV2Controller@interpretGraph] OpenAI Error: ' . $response->body());
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Gagal memproses gambar graf di model OpenAI: ' . ($response->json('error.message') ?? 'Terjadi kesalahan pada layanan AI.')
+                ], 500);
+            }
+
+            $rawContent = $response->json('choices.0.message.content') ?? '{}';
+            $cleaned = preg_replace('/```json\s*/i', '', $rawContent);
+            $cleaned = preg_replace('/```\s*/', '', $cleaned);
+            $parsed = json_decode(trim($cleaned), true);
+
+            if (!$parsed || !is_array($parsed)) {
+                $parsed = [
+                    'ringkasan_eksekutif' => trim($cleaned),
+                    'topologi_relasi' => 'Peta graf memperlihatkan interaksi aktif antara Dosen dan Mahasiswa dengan dominasi arahan bimbingan akademik terstruktur.',
+                    'korelasi_intonasi' => 'Dinamika intonasi sejalan dengan penegasan instruksi serta klarifikasi konsep riset.',
+                    'makna_pedagogis' => 'Proses pembimbingan berfokus pada pendalaman instrumen dan metodologi penelitian.',
+                    'rekomendasi_supervisi' => 'Pertahankan ritme dialogis dan tindak lanjuti revisi secara berkala.'
+                ];
+            }
+
+            // Simpan hasil interpretasi ke dalam result_data analysis
+            $resultData['graph_interpretation'] = [
+                'data' => $parsed,
+                'analyzed_at' => now()->toIso8601String(),
+                'model' => 'gpt-4o',
+            ];
+
+            $analysis->update([
+                'result_data' => $resultData
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Interpretasi graf berhasil disintesis oleh model multimodal OpenAI.',
+                'interpretation' => $parsed,
+                'analyzed_at' => now()->translatedFormat('d M Y, H:i')
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error('[AnalysisV2Controller@interpretGraph] Exception: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

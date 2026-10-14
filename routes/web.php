@@ -68,6 +68,7 @@ Route::get('/', function (Request $request) {
                 Route::get('/{analysis}/result', [\App\Http\Controllers\AnalysisV2Controller::class, 'result'])->name('result');
                 Route::get('/{analysis}/audio', [\App\Http\Controllers\AnalysisV2Controller::class, 'getAudio'])->name('audio');
                 Route::post('/{analysis}/swap-speakers', [\App\Http\Controllers\AnalysisV2Controller::class, 'swapSpeakers'])->name('swap-speakers');
+                Route::post('/{analysis}/interpret-graph', [\App\Http\Controllers\AnalysisV2Controller::class, 'interpretGraph'])->name('interpret-graph');
             });
 
             Route::get('/{analysis}/processing', [AnalysisController::class, 'processing'])->name('processing');
