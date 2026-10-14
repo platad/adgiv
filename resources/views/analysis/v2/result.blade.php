@@ -111,7 +111,8 @@
 @endphp
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 animate-fade-in"
-        x-data="v2ResultApp()">
+        x-data="v2ResultApp()"
+        @go-to-baris.window="goToBaris($event.detail.index)">
 
         {{-- Top Breadcrumb & Actions --}}
         <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-100 pb-8">
@@ -266,10 +267,16 @@
                 <!-- Left part: The Chart (2/3 width) -->
                 <div class="lg:w-2/3 flex flex-col justify-between">
                     <div>
-                        <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                            <i data-lucide="activity" class="w-3.5 h-3.5 text-purple-600 animate-pulse"></i> 
-                            <span>Grafik Aliran Intonasi Percakapan</span>
-                        </span>
+                        <div class="flex items-center justify-between gap-3 mb-1.5">
+                            <span class="text-[0.6rem] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <i data-lucide="activity" class="w-3.5 h-3.5 text-purple-600 animate-pulse"></i> 
+                                <span>Grafik Aliran Intonasi Percakapan</span>
+                            </span>
+                            <span class="inline-flex items-center gap-1 text-[0.65rem] font-bold text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200">
+                                <i data-lucide="mouse-pointer-click" class="w-3 h-3 text-purple-600"></i>
+                                <span>Klik titik grafik untuk menuju baris percakapan</span>
+                            </span>
+                        </div>
                         <h3 class="text-base sm:text-lg font-black text-gray-950 uppercase tracking-wide mb-6">
                             Dinamika Intonasi Per Baris (Pitch Dynamics)
                         </h3>
@@ -1348,11 +1355,10 @@
                         onClick: function(e, activeEls) {
                             if (activeEls && activeEls.length > 0) {
                                 const idx = activeEls[0].index;
-                                const targetEl = document.getElementById('baris-' + idx);
-                                if (targetEl) {
-                                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    targetEl.classList.add('ring-2', 'ring-purple-400', 'bg-purple-50/40');
-                                    setTimeout(() => targetEl.classList.remove('ring-2', 'ring-purple-400', 'bg-purple-50/40'), 2500);
+                                if (window.v2App && typeof window.v2App.goToBaris === 'function') {
+                                    window.v2App.goToBaris(idx);
+                                } else {
+                                    window.dispatchEvent(new CustomEvent('go-to-baris', { detail: { index: idx } }));
                                 }
                             }
                         },
@@ -1466,6 +1472,24 @@
                 showErrorModal: false,
                 errorModalTitle: '',
                 errorModalMessage: '',
+
+                goToBaris(idx) {
+                    if (idx === undefined || idx === null) return;
+                    const targetPage = Math.ceil((Number(idx) + 1) / this.pageSize);
+                    this.currentPage = targetPage;
+                    this.activeMobileTab = 'transkrip';
+
+                    setTimeout(() => {
+                        const targetEl = document.getElementById('baris-' + idx);
+                        if (targetEl) {
+                            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            targetEl.classList.add('bg-purple-100/70', 'ring-4', 'ring-purple-300', 'scale-[1.01]', 'border-purple-300');
+                            setTimeout(() => {
+                                targetEl.classList.remove('bg-purple-100/70', 'ring-4', 'ring-purple-300', 'scale-[1.01]', 'border-purple-300');
+                            }, 2500);
+                        }
+                    }, 150);
+                },
 
                 init() {
                     window.v2App = this;
