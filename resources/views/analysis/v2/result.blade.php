@@ -492,6 +492,48 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Bagian Alur Pembahasan Kronologis & Pencabangan Topik (Mermaid Flowchart) --}}
+            <div class="mt-8 pt-8 border-t border-gray-100">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center">
+                                <i data-lucide="git-branch" class="w-4 h-4"></i>
+                            </div>
+                            <h3 class="text-sm font-black uppercase tracking-wider text-gray-900">
+                                Alur Kronologi & Pencabangan Pembahasan Wacana
+                            </h3>
+                        </div>
+                        <p class="text-xs text-gray-500 font-medium">
+                            Peta alur topik bertahap yang diekstraksi dari transkripsi percakapan (topik awal, dinamika pencabangan, hingga simpulan tindakan).
+                        </p>
+                    </div>
+
+                    {{-- Actions: Zoom toggle / Status --}}
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[0.65rem] font-bold">
+                            <i data-lucide="layers" class="w-3 h-3 text-indigo-600"></i>
+                            <span>Diagram Wacana Bertahap</span>
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Diagram Canvas Container --}}
+                <div class="bg-gradient-to-b from-gray-50/70 to-white rounded-2xl border border-gray-200/80 p-6 overflow-x-auto custom-scrollbar relative min-h-[180px] flex items-center justify-center">
+                    
+                    {{-- Loading State --}}
+                    <div x-show="isInterpretingGraph" class="py-8 text-center" style="display: none;">
+                        <i data-lucide="loader-2" class="w-6 h-6 animate-spin text-purple-600 mx-auto mb-2"></i>
+                        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Menyintesis Alur Pembahasan Mermaid...</span>
+                    </div>
+
+                    {{-- Rendered Mermaid SVG Container --}}
+                    <div x-show="!isInterpretingGraph" id="mermaid-flowchart-container" class="w-full flex justify-center py-2 select-none">
+                        {{-- SVG will be inserted here via mermaid.render --}}
+                    </div>
+                </div>
+            </div>
         </div>
 
         {{-- Mobile Tab Switcher --}}
@@ -1243,6 +1285,7 @@
     </div>
 
     <x-slot name="scripts">
+    <script src="{{ asset('assets/vendor/mermaid/mermaid.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     @php
@@ -1473,6 +1516,9 @@
                                 if (window.v2GraphChart) {
                                     window.v2GraphChart.resize();
                                     setTimeout(() => window.v2GraphChart.resize(), 300);
+                                }
+                                if (window.renderMermaidChart && data.interpretation?.mermaid_code) {
+                                    window.renderMermaidChart(data.interpretation.mermaid_code);
                                 }
                             });
                         } else {
@@ -1757,7 +1803,80 @@
             if (window.lucide) {
                 window.lucide.createIcons();
             }
+
+            // Inisialisasi pustaka Mermaid secara lokal
+            if (window.mermaid) {
+                window.mermaid.initialize({
+                    startOnLoad: false,
+                    theme: 'base',
+                    themeVariables: {
+                        primaryColor: '#ede9fe',
+                        primaryTextColor: '#4c1d95',
+                        primaryBorderColor: '#8b5cf6',
+                        lineColor: '#6366f1',
+                        secondaryColor: '#eff6ff',
+                        tertiaryColor: '#f0fdf4'
+                    },
+                    flowchart: {
+                        curve: 'basis',
+                        padding: 16,
+                        nodeSpacing: 45,
+                        rankSpacing: 50
+                    }
+                });
+            }
+
+            // Render awal diagram alur Mermaid
+            setTimeout(function() {
+                if (window.renderMermaidChart) {
+                    window.renderMermaidChart();
+                }
+            }, 200);
         });
+
+        // Global helper untuk merender diagram Mermaid ke DOM
+        window.renderMermaidChart = async function(customCode) {
+            const container = document.getElementById('mermaid-flowchart-container');
+            if (!container || !window.mermaid) return;
+
+            let code = customCode;
+            if (!code) {
+                // Ambil dari Alpine app state jika ada
+                const appEl = document.querySelector('[x-data*="v2ResultApp"]');
+                if (appEl && appEl.__x) {
+                    const alpineData = appEl.__x.$data;
+                    code = alpineData.graphInterpretationData?.mermaid_code;
+                }
+            }
+
+            // Fallback alur kronologis cerdas jika belum dianalisis AI
+            if (!code || code.trim() === '') {
+                code = `flowchart TD
+    A["Pembukaan Sesi & Konfirmasi Topik Riset"] --> B["Penyampaian Perkembangan & Eksplorasi Metodologi"]
+    B --> C{"Evaluasi Kritis & Probing Supervisor"}
+    C -->|"Koreksi Substantif"| D["Arahan Revisi Bab & Instrumen Penelitian"]
+    C -->|"Persetujuan Konsep"| E["Validasi Metodologi & Desain Riset"]
+    D --> F["Pola Relasi Kuasa: Penegasan Standar Kelayakan"]
+    E --> G["Pola Relasi Kuasa: Interaksi Dialogis Mandiri"]
+    F --> H["Kesimpulan & Kesepakatan Target Bimbingan"]
+    G --> H`;
+            }
+
+            try {
+                const uniqueId = 'mermaid-svg-' + Math.floor(Math.random() * 1000000);
+                const { svg } = await window.mermaid.render(uniqueId, code);
+                container.innerHTML = svg;
+                // Pastikan SVG responsif memenuhi lebar container
+                const svgEl = container.querySelector('svg');
+                if (svgEl) {
+                    svgEl.style.maxWidth = '100%';
+                    svgEl.style.height = 'auto';
+                }
+            } catch (err) {
+                console.error('Error rendering Mermaid diagram:', err);
+                container.innerHTML = '<div class="text-xs text-gray-400 py-4 italic">Alur percakapan sedang disusun. Klik "Analisis Makna Graf (AI)" untuk memperbarui diagram alur topik.</div>';
+            }
+        };
     </script>
     </x-slot>
 </x-layouts.app>

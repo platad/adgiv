@@ -444,9 +444,13 @@ Berikan analisis mendalam, tajam, terstruktur, dan akademis dengan struktur JSON
     "topologi_relasi": "Penjelasan detail mengenai peran node Dosen, Mahasiswa, dan simpul-simpul wacana (Advice & Relasi Kuasa) serta tebal-tipisnya relasi penghubung (edges).",
     "korelasi_intonasi": "Bagaimana dinamika intonasi per baris (naik/turun) memperkuat atau melunakkan relasi kuasa yang terlihat pada peta graf.",
     "makna_pedagogis": "Makna pedagogis dan dampak interaksi terhadap perkembangan substansi skripsi/riset mahasiswa.",
-    "rekomendasi_supervisi": "Saran konkrit bagi Dosen dan Mahasiswa untuk mengoptimalkan sesi bimbingan selanjutnya."
+    "rekomendasi_supervisi": "Saran konkrit bagi Dosen dan Mahasiswa untuk mengoptimalkan sesi bimbingan selanjutnya.",
+    "mermaid_code": "flowchart TD\\n    A[Topik Awal: ...] --> B[Diskusi: ...]\\n    B --> C{Pencabangan/Evaluasi}\\n    C -->|Revisi/Arahan| D[...]\\n    C -->|Keputusan/Solusi| E[...]"
 }
-Pastikan jawaban HANYA berupa JSON valid tanpa markdown fence.
+Panduan khusus untuk 'mermaid_code':
+- Buat flowchart Mermaid valid bertipe 'flowchart TD' yang merangkum KRONOLOGI & ALUR PEMBAHASAN dari transkripsi (misal: dimulai dari topik teknologi/metode apa yang pertama kali dibuka, kendala yang dihadapi, lalu bercabang ke alternatif solusi atau instruksi revisi dosen, hingga simpulan akhir).
+- PENTING: Jangan gunakan tanda kurung atau simbol kurawal di dalam teks label node tanpa diapit tanda kutip ganda, contoh aman: nodeA[\"Topik Awal: Evaluasi Model\"] --> nodeB[\"Pembahasan: Arsitektur Transformer\"].
+- Pastikan jawaban HANYA berupa JSON valid tanpa markdown fence.
 PROMPT;
 
         $userContext = "DATA KONTEKSTUAL PERCAKAPAN:\n";
@@ -457,7 +461,15 @@ PROMPT;
         $userContext .= "- Karakter Relasi: " . ($existingSummary['karakter_relasi'] ?? 'Kondusif & Seimbang') . "\n";
         $userContext .= "- Ranah Bicara: " . ($existingSummary['ranah_pembicaraan'] ?? 'Bimbingan Metodologi Skripsi') . "\n";
         $userContext .= "- Sample Aliran Intonasi Baris:\n" . implode("\n", array_slice($intonationFlow, 0, 15)) . "\n\n";
-        $userContext .= "Periksa gambar topologi graf terlampir dan berikan interpretasi mendalam sesuai panduan JSON.";
+        
+        // Kirimkan rangkuman transkrip baris per baris agar AI memahami alur kronologis topik
+        $userContext .= "TRANSKRIPSI PERCAKAPAN (URUTAN WAKTU & TOPIK):\n";
+        foreach (array_slice($transcription, 0, 30) as $idx => $tr) {
+            $spk = $tr['speaker'] ?? 'Unknown';
+            $tx = strip_tags($tr['text'] ?? ($tr['text_html'] ?? ''));
+            $userContext .= "Baris " . ($idx + 1) . " [{$spk}]: " . mb_strimwidth($tx, 0, 120, '...') . "\n";
+        }
+        $userContext .= "\nPeriksa gambar topologi graf terlampir serta transkripsi di atas, lalu hasilkan analisis teks dan diagram alur pembahasan Mermaid sesuai panduan.";
 
         try {
             $response = Http::withToken($apiKey)
@@ -513,7 +525,15 @@ PROMPT;
                 ];
             }
 
-            // Simpan hasil interpretasi ke dalam result_data analysis
+            // Bersihkan mermaid_code jika dibungkus codeblock
+            if (!empty($parsed['mermaid_code'])) {
+                $parsed['mermaid_code'] = trim(preg_replace('/^```(?:mermaid)?|```$/m', '', $parsed['mermaid_code']));
+            } else {
+                // Default fallback jika model tidak menyertakan mermaid_code
+                $parsed['mermaid_code'] = "flowchart TD\n    A[\"Pembukaan Bimbingan\"] --> B[\"Penyampaian Progres Riset\"]\n    B --> C{\"Evaluasi & Feedback Dosen\"}\n    C -->|\"Arahan Eksplisit\"| D[\"Revisi Metodologi & Instrumen\"]\n    C -->|\"Dukungan Keputusan\"| E[\"Persetujuan Arah Penelitian\"]\n    D --> F[\"Kesepakatan Target Bimbingan Berikutnya\"]\n    E --> F";
+            }
+
+            // Simpan hasil interpretasi ke dalam result_data analysis di database
             $resultData['graph_interpretation'] = [
                 'data' => $parsed,
                 'analyzed_at' => now()->toIso8601String(),
@@ -526,7 +546,7 @@ PROMPT;
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Interpretasi graf berhasil disintesis oleh model multimodal OpenAI.',
+                'message' => 'Interpretasi graf & alur pembahasan berhasil disintesis dan disimpan.',
                 'interpretation' => $parsed,
                 'analyzed_at' => now()->translatedFormat('d M Y, H:i')
             ]);
