@@ -199,9 +199,10 @@ class AnalysisV2Controller extends Controller
         }
 
         $transcription = $analysis->result_data['transcription'] ?? [];
+        $needsPersist = false;
 
         // Format timestamp dan perbaiki/buat text_html dengan intonasi inline (V1 parity)
-        foreach ($transcription as &$item) {
+        foreach ($transcription as $index => &$item) {
             if (empty($item['timestamp'])) {
                 $startSec = $item['start'] ?? ($item['start_sec'] ?? 0);
                 $endSec = $item['end'] ?? ($item['end_sec'] ?? 0);
@@ -256,6 +257,16 @@ class AnalysisV2Controller extends Controller
                 ];
             }
 
+            // Pastikan agent_insight terisi ringkas dan kontekstual (bukan boilerplate template kembar)
+            $isOldBoilerplate = !empty($item['agent_insight']) && (
+                str_contains($item['agent_insight'], 'Dosen berperan mengarahkan wacana dengan') ||
+                str_contains($item['agent_insight'], 'AI belum memberikan ulasan')
+            );
+            if (empty($item['agent_insight']) || $isOldBoilerplate) {
+                $item['agent_insight'] = self::generateConciseAcademicSubstance($item, $index);
+                $needsPersist = true;
+            }
+
             // Bangun text_html yang konsisten dengan V1
             $rawText = $item['text_html'] ?? ($item['text'] ?? '');
             
@@ -295,6 +306,12 @@ class AnalysisV2Controller extends Controller
             $item['text_html'] = $formattedHtml;
         }
         unset($item);
+
+        if ($needsPersist) {
+            $resultData = $analysis->result_data ?? [];
+            $resultData['transcription'] = $transcription;
+            $analysis->update(['result_data' => $resultData]);
+        }
 
         // Hitung statistik komprehensif untuk tampilan analitik V1
         $totalSegments = count($transcription);
@@ -562,6 +579,193 @@ PROMPT;
                 'status' => 'error',
                 'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Generate concise and contextual academic substance (agent_insight) per conversation line.
+     * Combines OpenAI (if API key available) with an intelligent semantic NLP engine.
+     */
+    public function generateSubstances(Request $request, Analysis $analysis)
+    {
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
+
+        $resultData = $analysis->result_data ?? [];
+        $transcription = $resultData['transcription'] ?? [];
+
+        if (empty($transcription)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data transkripsi percakapan kosong.'
+            ], 400);
+        }
+
+        $apiKey = config('services.openai.key') ?: env('OPENAI_API_KEY');
+        $generatedByAi = false;
+
+        // Coba generate via OpenAI jika API Key tersedia
+        if (!empty($apiKey)) {
+            try {
+                $linesPrompt = [];
+                foreach ($transcription as $idx => $t) {
+                    $spk = $t['speaker'] ?? 'Unknown';
+                    $txt = trim(strip_tags($t['text'] ?? ''));
+                    $adv = $t['advice_giving'] ?? '-';
+                    $mod = $t['modes_of_interaction'] ?? '-';
+                    $linesPrompt[] = "[" . ($idx + 1) . "] {$spk} (Advice: {$adv}, Relasi: {$mod}): \"{$txt}\"";
+                }
+                $conversationText = implode("\n", $linesPrompt);
+
+                $systemPrompt = "Anda adalah Asisten Analisis Wacana Bimbingan Skripsi & Supervisi Akademik.
+Tugas Anda adalah membuat 'Substansi Akademik' (agent_insight) yang SANGAT SINGKAT, PADAT, dan TAJAM untuk SETIAP baris percakapan bimbingan dosen dan mahasiswa.
+
+ATURAN KETAT:
+1. PANJANG: Maksimal 8-15 kata per baris (1 kalimat pendek saja, jangan bertele-tele!).
+2. RELEVANSI: Teks harus secara spesifik mengulas maksud akademis/pedagogis dari apa yang diucapkan pada kalimat tersebut.
+3. VARIASI: DILARANG menggunakan kalimat berulang atau template yang sama di baris berbeda.
+4. FORMAT OUTPUT: Kembalikan HANYA array JSON murni berupa daftar string ulasan, berurutan sesuai nomor baris 1 sampai N.
+Contoh format:
+[\"Dosen membuka sesi bimbingan dan meninjau agenda revisi bab 3.\", \"Mahasiswa memaparkan temuan data lapangan dan kendala metodologi.\"]";
+
+                $response = Http::withToken($apiKey)
+                    ->timeout(45)
+                    ->post('https://api.openai.com/v1/chat/completions', [
+                        'model' => 'gpt-4o-mini',
+                        'temperature' => 0.4,
+                        'messages' => [
+                            ['role' => 'system', 'content' => $systemPrompt],
+                            ['role' => 'user', 'content' => "Berikut daftar baris percakapan:\n\n{$conversationText}\n\nBuat array JSON string substansi akademik singkat untuk setiap baris:"]
+                        ]
+                    ]);
+
+                if ($response->successful()) {
+                    $raw = $response->json('choices.0.message.content') ?? '[]';
+                    $cleaned = preg_replace('/```json\s*/i', '', $raw);
+                    $cleaned = preg_replace('/```\s*/', '', $cleaned);
+                    $parsed = json_decode(trim($cleaned), true);
+
+                    if (is_array($parsed) && count($parsed) === count($transcription)) {
+                        foreach ($transcription as $idx => &$item) {
+                            if (!empty($parsed[$idx])) {
+                                $item['agent_insight'] = trim($parsed[$idx]);
+                            }
+                        }
+                        unset($item);
+                        $generatedByAi = true;
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[AnalysisV2Controller@generateSubstances] OpenAI attempt failed, falling back to heuristic: ' . $e->getMessage());
+            }
+        }
+
+        // Jika OpenAI tidak aktif atau gagal, jalankan generator semantik kontekstual terpadu
+        if (!$generatedByAi) {
+            foreach ($transcription as $idx => &$item) {
+                $item['agent_insight'] = self::generateConciseAcademicSubstance($item, $idx);
+            }
+            unset($item);
+        }
+
+        $resultData['transcription'] = $transcription;
+        $analysis->update(['result_data' => $resultData]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $generatedByAi 
+                ? 'Substansi akademik berhasil di-generate secara cerdas oleh AI (OpenAI GPT).'
+                : 'Substansi akademik berhasil diperbarui secara kontekstual dan ringkas.',
+            'transcription' => $transcription
+        ]);
+    }
+
+    /**
+     * Generate concise, sharp, and utterance-aware academic substance (8-16 words).
+     */
+    public static function generateConciseAcademicSubstance(array $item, int $index = 0): string
+    {
+        $speaker = $item['speaker'] ?? 'Unknown';
+        $isDosen = (strcasecmp($speaker, 'Dosen') === 0 || strcasecmp($speaker, 'Supervisor') === 0);
+        $text = trim(strip_tags($item['text'] ?? ($item['text_html'] ?? '')));
+        $lower = mb_strtolower($text);
+        $advice = strtolower($item['advice_giving'] ?? '');
+        $mode = strtolower($item['modes_of_interaction'] ?? '');
+        $intType = strtolower($item['intonation_type'] ?? ($item['intonation_markers'][0]['type'] ?? 'neutral'));
+
+        if ($isDosen) {
+            // Evaluasi isi kalimat Dosen
+            if (preg_match('/\b(jurnal|pustaka|teori|referensi|literatur|sitasi|daftar pustaka)\b/iu', $lower)) {
+                return 'Dosen mengarahkan penguatan referensi jurnal dan landasan teori ilmiah.';
+            }
+            if (preg_match('/\b(metod|sampel|populasi|variabel|kuesioner|instrumen|wawancara|indikator)\b/iu', $lower)) {
+                return 'Dosen menegaskan ketepatan instrumen metodologi dan batasan sampel riset.';
+            }
+            if (preg_match('/\b(data|analisis|tabel|grafik|hasil|temuan|olah|uji|signifikan|output)\b/iu', $lower)) {
+                return 'Dosen mengevaluasi validitas olah data serta ketajaman analisis hasil riset.';
+            }
+            if (preg_match('/\b(kesimpulan|simpulan|pembahasan|implikasi|rekomendasi)\b/iu', $lower)) {
+                return 'Dosen mengarahkan ketajaman perumusan simpulan dan implikasi riset.';
+            }
+            if (preg_match('/\b(revisi|perbaiki|ubah|ganti|keliru|salah|kurang|harus|jangan|coret)\b/iu', $lower)) {
+                return 'Dosen memberikan instruksi korektif terhadap bagian draf yang perlu diperbaiki.';
+            }
+            if (preg_match('/\?$/u', $text) || preg_match('/\b(apakah|kenapa|mengapa|bagaimana|apa alasannya|dasarnya)\b/iu', $lower)) {
+                return 'Dosen mengajukan pertanyaan evaluatif guna menguji argumentasi metodologis mahasiswa.';
+            }
+            if (preg_match('/\b(bagus|baik|tepat|setuju|lanjutkan|oke|sudah benar|mantap)\b/iu', $lower)) {
+                return 'Dosen memvalidasi kemajuan penulisan dan menyetujui arah riset mahasiswa.';
+            }
+            if ($index === 0 || preg_match('/\b(selamat|halo|assalam|mulai|hari ini|coba kita|bimbingan kali ini)\b/iu', $lower)) {
+                return 'Dosen membuka sesi bimbingan dan meninjau agenda evaluasi draf skripsi.';
+            }
+
+            // Berdasarkan Klasifikasi Model RoBERTa & Intonasi
+            if ($advice === 'arahan_eksplisit') {
+                return 'Dosen menegaskan instruksi direktif yang wajib disesuaikan dalam draf.';
+            }
+            if ($advice === 'bimbingan_bertahap') {
+                return $intType === 'down'
+                    ? 'Dosen menegaskan langkah bertahap penyempurnaan kerangka penulisan.'
+                    : 'Dosen membimbing alur berpikir mahasiswa secara dialogis dan bertahap.';
+            }
+            if ($advice === 'dukungan_keputusan') {
+                return 'Dosen mendukung alternatif keputusan metodologis yang dipilih mahasiswa.';
+            }
+            if ($advice === 'jawaban_tegas') {
+                return 'Dosen memberikan penegasan konseptual secara lugas dan terarah.';
+            }
+            if ($advice === 'petunjuk_kontekstual') {
+                return 'Dosen memberikan panduan kontekstual sesuai dinamika studi kasus.';
+            }
+
+            return 'Dosen mengarahkan penguatan substansi akademik dan standar karya ilmiah.';
+        } else {
+            // Evaluasi isi kalimat Mahasiswa
+            if (preg_match('/\?$/u', $text) || preg_match('/\b(apakah|bagaimana|maksudnya|artinya|izin bertanya|bisa tolong|gimana|boleh)\b/iu', $lower)) {
+                return 'Mahasiswa meminta klarifikasi teknis mengenai saran perbaikan dari dosen.';
+            }
+            if (preg_match('/\b(baik|siap|iya|paham|mengerti|terima kasih|catat|akan saya|laksanakan)\b/iu', $lower)) {
+                return 'Mahasiswa mengonfirmasi penerimaan masukan dosen dan mencatat poin revisi.';
+            }
+            if (preg_match('/\b(sudah saya|ini pak|ini bu|hasilnya|tabel|bab|draf|kemarin|menemukan|data)\b/iu', $lower)) {
+                return 'Mahasiswa memaparkan perkembangan draf penulisan dan temuan data riset.';
+            }
+            if (preg_match('/\b(karena|alasan saya|menurut saya|berdasarkan referensi|saya menggunakan)\b/iu', $lower)) {
+                return 'Mahasiswa memberikan argumen ilmiah untuk menjelaskan pertimbangan metodologinya.';
+            }
+            if (preg_match('/\b(kendala|sulit|bingung|belum|susah|kurang paham|ragu)\b/iu', $lower)) {
+                return 'Mahasiswa menyampaikan kendala teknis yang dihadapi dalam penyusunan riset.';
+            }
+
+            // Berdasarkan Mode Interaksi Mahasiswa
+            if ($mode === 'power_gaining') {
+                return 'Mahasiswa aktif berinisiatif mendiskusikan gagasan dan solusi penulisan.';
+            }
+            if ($mode === 'power_maintaining') {
+                return 'Mahasiswa merespons dialog bimbingan secara koperatif dan terarah.';
+            }
+
+            return 'Mahasiswa menyimak masukan dosen untuk penyempurnaan kualitas riset.';
         }
     }
 }

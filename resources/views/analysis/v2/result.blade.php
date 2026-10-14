@@ -592,51 +592,61 @@
                         </div>
                     </div>
 
-                    {{-- Automatic Responsive Speaker Filter Pills (Wrap gracefully, No dots) --}}
-                    <div class="flex flex-wrap items-center gap-1.5 bg-gray-100/80 p-1.5 rounded-2xl border border-gray-200 text-xs font-bold shrink-0 self-start sm:self-auto max-w-full">
-                        {{-- Tombol Semua --}}
-                        <button type="button" @click="setSpeakerFilter('all')"
-                            class="px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
-                            :class="speakerFilter === 'all' ? 'bg-white text-gray-950 shadow-sm font-black' : 'text-gray-500 hover:text-gray-900'">
-                            <span>Semua</span>
-                            <span class="px-1.5 py-0.2 rounded-full text-[0.62rem] bg-gray-200/70 text-gray-700 font-semibold">{{ $totalSegments }}</span>
+                    <div class="flex flex-wrap items-center gap-2">
+                        {{-- Tombol Generate AI Substansi --}}
+                        <button type="button" @click="generateAiSubstance()" :disabled="generatingSubstance"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-purple-200 bg-purple-50/80 hover:bg-purple-100 text-purple-700 text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                            title="Generate ulasan substansi akademik cerdas & ringkas per baris menggunakan AI">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-600" :class="generatingSubstance ? 'animate-spin' : ''"></i>
+                            <span x-text="generatingSubstance ? 'Memproses AI...' : 'Generate AI Substansi'"></span>
                         </button>
 
-                        {{-- Dynamic Loop Penutur (Dosen, Mahasiswa, atau Penutur Tambahan) --}}
-                        @foreach ($speakerCounts as $spkName => $count)
-                            @php
-                                $spkLower = strtolower($spkName);
-                                $isDosenSpk = $spkLower === 'dosen' || $spkLower === 'supervisor';
-                                $isMhsSpk = $spkLower === 'mahasiswa' || $spkLower === 'student';
-                                
-                                $activeClass = $isDosenSpk 
-                                    ? 'bg-purple-700 text-white shadow-sm font-black' 
-                                    : ($isMhsSpk 
-                                        ? 'bg-blue-600 text-white shadow-sm font-black' 
-                                        : 'bg-stone-800 text-white shadow-sm font-black');
-                                
-                                $hoverClass = $isDosenSpk 
-                                    ? 'hover:text-purple-700' 
-                                    : ($isMhsSpk 
-                                        ? 'hover:text-blue-600' 
-                                        : 'hover:text-stone-900');
-                                
-                                $badgeClass = $isDosenSpk 
-                                    ? 'bg-purple-800 text-purple-100' 
-                                    : ($isMhsSpk 
-                                        ? 'bg-blue-700 text-blue-100' 
-                                        : 'bg-stone-700 text-stone-100');
-                            @endphp
-                            <button type="button" @click="setSpeakerFilter('{{ addslashes($spkName) }}')"
+                        {{-- Automatic Responsive Speaker Filter Pills (Wrap gracefully, No dots) --}}
+                        <div class="flex flex-wrap items-center gap-1.5 bg-gray-100/80 p-1.5 rounded-2xl border border-gray-200 text-xs font-bold shrink-0 self-start sm:self-auto max-w-full">
+                            {{-- Tombol Semua --}}
+                            <button type="button" @click="setSpeakerFilter('all')"
                                 class="px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
-                                :class="speakerFilter.toLowerCase() === '{{ strtolower($spkName) }}' ? '{{ $activeClass }}' : 'text-gray-500 {{ $hoverClass }}'">
-                                <span>{{ $spkName }}</span>
-                                <span class="px-1.5 py-0.2 rounded-full text-[0.62rem]"
-                                      :class="speakerFilter.toLowerCase() === '{{ strtolower($spkName) }}' ? '{{ $badgeClass }}' : 'bg-gray-200/80 text-gray-700 font-semibold'">
-                                    {{ $count }}
-                                </span>
+                                :class="speakerFilter === 'all' ? 'bg-white text-gray-950 shadow-sm font-black' : 'text-gray-500 hover:text-gray-900'">
+                                <span>Semua</span>
+                                <span class="px-1.5 py-0.2 rounded-full text-[0.62rem] bg-gray-200/70 text-gray-700 font-semibold">{{ $totalSegments }}</span>
                             </button>
-                        @endforeach
+
+                            {{-- Dynamic Loop Penutur (Dosen, Mahasiswa, atau Penutur Tambahan) --}}
+                            @foreach ($speakerCounts as $spkName => $count)
+                                @php
+                                    $spkLower = strtolower($spkName);
+                                    $isDosenSpk = $spkLower === 'dosen' || $spkLower === 'supervisor';
+                                    $isMhsSpk = $spkLower === 'mahasiswa' || $spkLower === 'student';
+                                    
+                                    $activeClass = $isDosenSpk 
+                                        ? 'bg-purple-700 text-white shadow-sm font-black' 
+                                        : ($isMhsSpk 
+                                            ? 'bg-blue-600 text-white shadow-sm font-black' 
+                                            : 'bg-stone-800 text-white shadow-sm font-black');
+                                    
+                                    $hoverClass = $isDosenSpk 
+                                        ? 'hover:text-purple-700' 
+                                        : ($isMhsSpk 
+                                            ? 'hover:text-blue-600' 
+                                            : 'hover:text-stone-900');
+                                    
+                                    $badgeClass = $isDosenSpk 
+                                        ? 'bg-purple-800 text-purple-100' 
+                                        : ($isMhsSpk 
+                                            ? 'bg-blue-700 text-blue-100' 
+                                            : 'bg-stone-700 text-stone-100');
+                                @endphp
+                                <button type="button" @click="setSpeakerFilter('{{ addslashes($spkName) }}')"
+                                    class="px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
+                                    :class="speakerFilter.toLowerCase() === '{{ strtolower($spkName) }}' ? '{{ $activeClass }}' : 'text-gray-500 {{ $hoverClass }}'">
+                                    <span>{{ $spkName }}</span>
+                                    <span class="px-1.5 py-0.2 rounded-full text-[0.62rem]"
+                                          :class="speakerFilter.toLowerCase() === '{{ strtolower($spkName) }}' ? '{{ $badgeClass }}' : 'bg-gray-200/80 text-gray-700 font-semibold'">
+                                        {{ $count }}
+                                    </span>
+                                </button>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
 
@@ -650,20 +660,14 @@
                             $modeStyle = !empty($item['modes_of_interaction']) ? $getModeBadgeStyle($item['modes_of_interaction']) : null;
                             
                             // Generate intelligent substansi akademik based on speaker and annotations
-                            if (!empty($item['agent_insight'])) {
+                            $isOldBoilerplate = !empty($item['agent_insight']) && (
+                                str_contains($item['agent_insight'], 'Dosen berperan mengarahkan wacana dengan') ||
+                                str_contains($item['agent_insight'], 'AI belum memberikan ulasan')
+                            );
+                            if (!empty($item['agent_insight']) && !$isOldBoilerplate) {
                                 $academicSubstance = $item['agent_insight'];
-                            } elseif ($isDosen) {
-                                if ($adviceStyle && $modeStyle) {
-                                    $academicSubstance = "Dosen berperan mengarahkan wacana dengan " . strtolower($adviceStyle['badge']) . " serta menerapkan relasi " . strtolower($modeStyle['badge']) . " untuk memandu mahasiswa mencapai standar riset.";
-                                } else {
-                                    $academicSubstance = "Dosen memberikan arahan akademik dan umpan balik pembimbingan terhadap materi riset.";
-                                }
                             } else {
-                                if ($modeStyle && strtolower($item['modes_of_interaction']) === 'power_gaining') {
-                                    $academicSubstance = "Mahasiswa berinisiatif mengajukan pertanyaan dan klarifikasi untuk menguji pemahaman metodologi secara aktif.";
-                                } else {
-                                    $academicSubstance = "Mahasiswa merespons bimbingan dan mengonfirmasi pemahaman atas arahan yang diberikan oleh Dosen.";
-                                }
+                                $academicSubstance = \App\Http\Controllers\AnalysisV2Controller::generateConciseAcademicSubstance($item, $index);
                             }
                         @endphp
 
@@ -814,7 +818,7 @@
                                         <span class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 block mb-1">
                                             Substansi Akademik
                                         </span>
-                                        <p class="text-xs sm:text-sm font-medium text-gray-700 leading-relaxed">
+                                        <p class="text-xs sm:text-sm font-medium text-gray-700 leading-relaxed" id="substansi-text-{{ $index }}">
                                             {{ $academicSubstance }}
                                         </p>
                                     </div>
@@ -1612,6 +1616,44 @@
                 showErrorModal: false,
                 errorModalTitle: '',
                 errorModalMessage: '',
+
+                // Generate AI Substance State
+                generatingSubstance: false,
+                async generateAiSubstance() {
+                    if (this.generatingSubstance) return;
+                    this.generatingSubstance = true;
+                    try {
+                        let res = await fetch('{{ route('analysis.v2.generate-substance', $analysis->slug) }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+                        let data = await res.json();
+                        if (data.status === 'success') {
+                            if (data.transcription && Array.isArray(data.transcription)) {
+                                data.transcription.forEach((item, idx) => {
+                                    const el = document.getElementById('substansi-text-' + idx);
+                                    if (el && item.agent_insight) {
+                                        el.textContent = item.agent_insight;
+                                    }
+                                });
+                            }
+                        } else {
+                            alert(data.message || 'Gagal menghasilkan ulasan substansi akademik.');
+                        }
+                    } catch (err) {
+                        console.error('Error generating substance:', err);
+                        alert('Terjadi kesalahan saat memproses generasi substansi AI.');
+                    } finally {
+                        this.generatingSubstance = false;
+                        if (window.lucide) {
+                            window.lucide.createIcons();
+                        }
+                    }
+                },
 
                 goToBaris(idx) {
                     if (idx === undefined || idx === null) return;
