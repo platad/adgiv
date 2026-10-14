@@ -1,6 +1,6 @@
 <x-layouts.app title="Hasil Analisis V2 (Multi-Task RoBERTa & Graph Network)">
 @php
-    $transcription = $analysis->result_data['transcription'] ?? [];
+    $transcription = $transcription ?? ($analysis->result_data['transcription'] ?? []);
     $totalSegments = $stats['total_segments'] ?? count($transcription);
     $dosenSegments = $stats['dosen_segments'] ?? 0;
     $mhsSegments = $stats['mhs_segments'] ?? 0;
@@ -13,19 +13,61 @@
         $l = strtolower(trim($label ?? ''));
         switch ($l) {
             case 'arahan_eksplisit':
-                return ['bg' => 'bg-red-50 text-red-700 border-red-200', 'badge' => 'Arahan Eksplisit', 'color' => '#ef4444'];
+                return [
+                    'bg' => 'bg-red-50 hover:bg-red-100 text-red-700 border-red-200',
+                    'badge' => 'Arahan Eksplisit',
+                    'color' => '#ef4444',
+                    'icon' => '<svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+                    'desc' => 'Dosen memberikan instruksi langsung dan target tegas yang mengarahkan mahasiswa untuk melakukan langkah spesifik.'
+                ];
             case 'bimbingan_bertahap':
-                return ['bg' => 'bg-blue-50 text-blue-700 border-blue-200', 'badge' => 'Bimbingan Bertahap', 'color' => '#3b82f6'];
+                return [
+                    'bg' => 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200',
+                    'badge' => 'Bimbingan Bertahap',
+                    'color' => '#3b82f6',
+                    'icon' => '<svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>',
+                    'desc' => 'Dosen memandu proses penelitian langkah demi langkah secara terstruktur agar mudah dieksekusi oleh mahasiswa.'
+                ];
             case 'dukungan_keputusan':
-                return ['bg' => 'bg-emerald-50 text-emerald-700 border-emerald-200', 'badge' => 'Dukungan Keputusan', 'color' => '#10b981'];
+                return [
+                    'bg' => 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200',
+                    'badge' => 'Dukungan Keputusan',
+                    'color' => '#10b981',
+                    'icon' => '<svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                    'desc' => 'Dosen mengafirmasi atau menyepakati pilihan metodologi/solusi yang diajukan oleh mahasiswa.'
+                ];
             case 'jawaban_tegas':
-                return ['bg' => 'bg-amber-50 text-amber-700 border-amber-200', 'badge' => 'Jawaban Tegas', 'color' => '#f59e0b'];
+                return [
+                    'bg' => 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200',
+                    'badge' => 'Jawaban Tegas',
+                    'color' => '#f59e0b',
+                    'icon' => '<svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+                    'desc' => 'Dosen memberikan kepastian konseptual atau klarifikasi lugas terhadap pertanyaan krusial mahasiswa.'
+                ];
             case 'petunjuk_kontekstual':
-                return ['bg' => 'bg-purple-50 text-purple-700 border-purple-200', 'badge' => 'Petunjuk Kontekstual', 'color' => '#8b5cf6'];
-            case 'pertanyaan_reflektif':
-                return ['bg' => 'bg-cyan-50 text-cyan-700 border-cyan-200', 'badge' => 'Pertanyaan Reflektif', 'color' => '#06b6d4'];
+                return [
+                    'bg' => 'bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200',
+                    'badge' => 'Petunjuk Kontekstual',
+                    'color' => '#8b5cf6',
+                    'icon' => '<svg class="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+                    'desc' => 'Dosen memberikan acuan konteks penelitian terdahulu, studi literatur, atau batasan studi yang relevan.'
+                ];
+            case 'otoritas':
+                return [
+                    'bg' => 'bg-yellow-50 hover:bg-yellow-100 text-yellow-800 border-yellow-200',
+                    'badge' => 'Otoritas Akademik',
+                    'color' => '#ca8a04',
+                    'icon' => '<svg class="w-3.5 h-3.5 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+                    'desc' => 'Penetapan standar ilmiah berdasarkan keahlian dan wewenang akademik dosen.'
+                ];
             default:
-                return ['bg' => 'bg-gray-50 text-gray-700 border-gray-200', 'badge' => ucwords(str_replace('_', ' ', $l)), 'color' => '#6b7280'];
+                return [
+                    'bg' => 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200',
+                    'badge' => ucwords(str_replace('_', ' ', $l)),
+                    'color' => '#6b7280',
+                    'icon' => '<svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"/></svg>',
+                    'desc' => 'Bimbingan dan penjelasan wacana akademik.'
+                ];
         }
     };
 
@@ -33,13 +75,37 @@
         $l = strtolower(trim($label ?? ''));
         switch ($l) {
             case 'power_over':
-                return ['bg' => 'bg-rose-50 text-rose-700 border-rose-200', 'badge' => 'Power Over', 'color' => '#f43f5e'];
+                return [
+                    'bg' => 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200',
+                    'badge' => 'Power Over',
+                    'color' => '#f43f5e',
+                    'icon' => '<svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+                    'desc' => 'Relasi di mana Dosen mendominasi arah wacana untuk mengontrol kualitas, mengoreksi kekeliruan, atau menetapkan batasan riset.'
+                ];
             case 'power_maintaining':
-                return ['bg' => 'bg-indigo-50 text-indigo-700 border-indigo-200', 'badge' => 'Power Maintaining', 'color' => '#6366f1'];
+                return [
+                    'bg' => 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200',
+                    'badge' => 'Power Maintaining',
+                    'color' => '#6366f1',
+                    'icon' => '<svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M12 6v12M5 6l-2 9a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l-2-9M15 6l-2 9a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l-2-9"/></svg>',
+                    'desc' => 'Relasi yang menjaga keseimbangan wacana secara profesional, teratur, dan saling menghormati peran akademik.'
+                ];
             case 'power_gaining':
-                return ['bg' => 'bg-teal-50 text-teal-700 border-teal-200', 'badge' => 'Power Gaining', 'color' => '#14b8a6'];
+                return [
+                    'bg' => 'bg-teal-50 hover:bg-teal-100 text-teal-700 border-teal-200',
+                    'badge' => 'Power Gaining',
+                    'color' => '#14b8a6',
+                    'icon' => '<svg class="w-3.5 h-3.5 text-teal-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+                    'desc' => 'Mahasiswa aktif berinisiatif, mempertahankan argumen, atau mengajukan ide baru secara mandiri.'
+                ];
             default:
-                return ['bg' => 'bg-gray-50 text-gray-700 border-gray-200', 'badge' => ucwords(str_replace('_', ' ', $l)), 'color' => '#6b7280'];
+                return [
+                    'bg' => 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200',
+                    'badge' => ucwords(str_replace('_', ' ', $l)),
+                    'color' => '#6b7280',
+                    'icon' => '<svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"/></svg>',
+                    'desc' => 'Pola interaksi wacana bimbingan akademik.'
+                ];
         }
     };
 @endphp
@@ -227,7 +293,7 @@
         {{-- Main Two Columns Layout --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            {{-- Left Column: Paginated Transcript (2 Columns on Desktop) --}}
+            {{-- Left Column: Paginated Transcript (Rich V1 Layout with Timestamps, Boxes, & Substance) --}}
             <div class="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6 sm:p-8"
                 :class="activeMobileTab === 'transkrip' ? 'block' : 'hidden lg:block'">
                 
@@ -238,65 +304,120 @@
                         </div>
                         <div>
                             <h2 class="text-base font-black uppercase tracking-tight text-gray-900">Transkripsi & Penanda Wacana</h2>
-                            <p class="text-xs text-gray-400 font-medium">Dialog berurutan lengkap dengan atribusi peran</p>
+                            <p class="text-xs text-gray-400 font-medium">Dialog berurutan lengkap dengan atribusi peran, menit rekaman, dan sintesis AI</p>
                         </div>
                     </div>
                     <span class="text-xs font-bold text-gray-400">Total {{ $totalSegments }} Tuturan</span>
                 </div>
 
                 {{-- Dialog Rows --}}
-                <div class="space-y-4">
+                <div class="space-y-8">
                     @forelse ($transcription as $index => $item)
                         @php
                             $speaker = $item['speaker'] ?? 'Unknown';
                             $isDosen = strcasecmp($speaker, 'Dosen') === 0 || strcasecmp($speaker, 'Supervisor') === 0;
                             $adviceStyle = !empty($item['advice_giving']) ? $getAdviceBadgeStyle($item['advice_giving']) : null;
                             $modeStyle = !empty($item['modes_of_interaction']) ? $getModeBadgeStyle($item['modes_of_interaction']) : null;
+                            
+                            // Generate intelligent substansi akademik based on speaker and annotations
+                            if (!empty($item['agent_insight'])) {
+                                $academicSubstance = $item['agent_insight'];
+                            } elseif ($isDosen) {
+                                if ($adviceStyle && $modeStyle) {
+                                    $academicSubstance = "Dosen berperan mengarahkan wacana dengan " . strtolower($adviceStyle['badge']) . " serta menerapkan relasi " . strtolower($modeStyle['badge']) . " untuk memandu mahasiswa mencapai standar riset.";
+                                } else {
+                                    $academicSubstance = "Dosen memberikan arahan akademik dan umpan balik pembimbingan terhadap materi riset.";
+                                }
+                            } else {
+                                if ($modeStyle && strtolower($item['modes_of_interaction']) === 'power_gaining') {
+                                    $academicSubstance = "Mahasiswa berinisiatif mengajukan pertanyaan dan klarifikasi untuk menguji pemahaman metodologi secara aktif.";
+                                } else {
+                                    $academicSubstance = "Mahasiswa merespons bimbingan dan mengonfirmasi pemahaman atas arahan yang diberikan oleh Dosen.";
+                                }
+                            }
                         @endphp
 
                         <div id="baris-{{ $index }}"
-                            class="p-5 rounded-2xl border transition-all duration-300 {{ $isDosen ? 'bg-purple-50/20 border-purple-100 hover:border-purple-200' : 'bg-gray-50/40 border-gray-100 hover:border-gray-200' }}"
+                            class="flex flex-col gap-3 group rounded-3xl p-5 transition-all duration-500 border {{ $isDosen ? 'bg-purple-50/20 border-purple-100 hover:border-purple-200' : 'bg-gray-50/30 border-gray-100 hover:border-gray-200' }}"
                             x-show="{{ $index }} >= (currentPage - 1) * pageSize && {{ $index }} < (currentPage) * pageSize">
                             
-                            <div class="flex items-center justify-between gap-4 mb-2">
-                                <div class="flex items-center gap-2">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider {{ $isDosen ? 'bg-purple-600 text-white shadow-sm shadow-purple-600/20' : 'bg-gray-200 text-gray-700' }}">
-                                        @if($isDosen)
-                                            <i data-lucide="user-check" class="w-3.5 h-3.5"></i> Dosen
-                                        @else
-                                            <i data-lucide="user" class="w-3.5 h-3.5"></i> Mahasiswa
-                                        @endif
-                                    </span>
-                                    <span class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest">
-                                        #{{ $index + 1 }}
-                                    </span>
+                            <div class="flex flex-col md:flex-row gap-4 md:gap-8">
+                                {{-- Speaker & Timestamp Column (Identical to V1) --}}
+                                <div class="md:w-36 flex-shrink-0 pt-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-black text-sm uppercase tracking-wider {{ $isDosen ? 'text-purple-700' : 'text-blue-600' }}">
+                                            {{ $isDosen ? 'DOSEN' : 'MAHASISWA' }}
+                                        </span>
+                                    </div>
+                                    <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                        BARIS {{ $index + 1 }}
+                                    </div>
+                                    <div class="text-[0.7rem] font-semibold text-gray-500 mt-1 flex items-center">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 text-gray-400"></i>
+                                        <span>{{ $item['timestamp'] ?? '00:00' }}</span>
+                                    </div>
                                 </div>
 
-                                @if(!empty($item['timestamp']))
-                                    <span class="text-[0.68rem] font-semibold text-gray-400 flex items-center gap-1">
-                                        <i data-lucide="clock" class="w-3 h-3"></i> {{ $item['timestamp'] }}
-                                    </span>
-                                @endif
+                                {{-- Text Column & Boxes --}}
+                                <div class="flex-grow">
+                                    <p class="text-base md:text-lg font-medium text-gray-800 leading-relaxed tracking-wide font-sans mb-3">
+                                        {{ $item['text'] ?? '' }}
+                                    </p>
+
+                                    {{-- Interactive Clickable Badges (Pola Bimbingan & Relasi Kuasa) --}}
+                                    <div class="flex flex-col gap-2.5 w-full mt-3 select-none">
+                                        
+                                        {{-- Pola Bimbingan Box --}}
+                                        @if($adviceStyle)
+                                        <div class="w-full flex flex-wrap items-center gap-2 p-3 border border-dashed border-gray-300 bg-gray-50/70 rounded-2xl">
+                                            <span class="w-full block text-[0.65rem] font-black uppercase tracking-wider text-gray-400 mb-0.5">Pola Bimbingan:</span>
+                                            
+                                            <button type="button"
+                                                @click="openInsight('Advice Giving: {{ $adviceStyle['badge'] }}', 'advice', '{{ addslashes($adviceStyle['desc']) }}', 'Tuturan ini diklasifikasikan sebagai tindak tutur {{ strtolower($adviceStyle['badge']) }} melalui model Multi-Task RoBERTa V2.')"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[0.7rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border {{ $adviceStyle['bg'] }}"
+                                                title="Klik untuk melihat rangkuman & insight">
+                                                {!! $adviceStyle['icon'] !!}
+                                                <span>{{ $adviceStyle['badge'] }}</span>
+                                            </button>
+                                        </div>
+                                        @endif
+
+                                        {{-- Relasi Kuasa Box --}}
+                                        @if($modeStyle)
+                                        <div class="w-full flex flex-wrap items-center gap-2 p-3 border border-dashed border-purple-200 bg-purple-50/30 rounded-2xl">
+                                            <span class="w-full block text-[0.65rem] font-black uppercase tracking-wider text-purple-400 mb-0.5">Relasi Kuasa:</span>
+
+                                            <button type="button"
+                                                @click="openInsight('Modes of Interaction: {{ $modeStyle['badge'] }}', 'mode', '{{ addslashes($modeStyle['desc']) }}', 'Pemodelan relasi kuasa interaksi antara Dosen dan Mahasiswa pada segmen waktu ini.')"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[0.7rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border {{ $modeStyle['bg'] }}"
+                                                title="Klik untuk melihat rangkuman & insight relasi">
+                                                {!! $modeStyle['icon'] !!}
+                                                <span>{{ $modeStyle['badge'] }}</span>
+                                            </button>
+                                        </div>
+                                        @endif
+
+                                    </div>
+                                </div>
                             </div>
 
-                            <p class="text-sm font-medium text-gray-800 leading-relaxed font-sans mt-2 mb-3">
-                                {{ $item['text'] ?? '' }}
-                            </p>
-
-                            {{-- Multi-Task Annotations --}}
-                            <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-100/80">
-                                @if($adviceStyle)
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[0.65rem] font-black uppercase tracking-wider border {{ $adviceStyle['bg'] }}">
-                                        <i data-lucide="target" class="w-3 h-3"></i> Advice: {{ $adviceStyle['badge'] }}
-                                    </span>
-                                @endif
-
-                                @if($modeStyle)
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[0.65rem] font-black uppercase tracking-wider border {{ $modeStyle['bg'] }}">
-                                        <i data-lucide="shield" class="w-3 h-3"></i> Mode: {{ $modeStyle['badge'] }}
-                                    </span>
-                                @endif
+                            {{-- Substansi Akademik Card (Identik dengan Gambar 2) --}}
+                            <div class="ml-0 md:ml-44 bg-gray-50 border-l-4 border-purple-500 rounded-r-2xl p-4 mt-2">
+                                <div class="flex items-start gap-3">
+                                    <div class="mt-0.5 text-purple-600 w-5 h-5 shrink-0 flex items-center justify-center">
+                                        <i data-lucide="sparkles" class="w-4 h-4 text-purple-600"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 block mb-1">
+                                            Substansi Akademik
+                                        </span>
+                                        <p class="text-xs sm:text-sm font-medium text-gray-700 leading-relaxed">
+                                            {{ $academicSubstance }}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
                     @empty
                         <div class="text-center py-12 text-gray-400 font-medium">
@@ -408,6 +529,86 @@
             </div>
         </div>
 
+        {{-- Supervisory AI Insight Modal (Identik dengan Gambar 3) --}}
+        <div x-show="showInsightModal"
+            class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none"
+            style="display: none;">
+            <div x-show="showInsightModal" @click="showInsightModal = false"
+                x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-black/60 backdrop-blur-md"></div>
+
+            <div x-show="showInsightModal"
+                x-transition:enter="transition ease-out duration-300 transform"
+                x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-200 transform"
+                x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                class="relative w-full max-w-lg mx-auto my-6 z-50 bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 p-8">
+                
+                {{-- Modal Header --}}
+                <div class="flex items-center justify-between border-b border-gray-100 pb-5 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">
+                                Supervisory AI Insight
+                            </span>
+                            <h3 class="text-base font-black text-gray-900 uppercase tracking-wide" x-text="insightTitle"></h3>
+                        </div>
+                    </div>
+
+                    <button type="button" @click="showInsightModal = false"
+                        class="p-2 hover:bg-gray-100 text-gray-400 hover:text-gray-600 rounded-xl transition-all cursor-pointer">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                {{-- Modal Body --}}
+                <div class="space-y-5">
+                    {{-- Penjelasan AI Agent --}}
+                    <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 relative overflow-hidden">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-white border border-gray-100 text-purple-600 flex items-center justify-center shrink-0 shadow-sm">
+                                <i data-lucide="brain-circuit" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1.5">
+                                    Penjelasan AI Agent
+                                </span>
+                                <p class="text-sm font-medium text-gray-700 leading-relaxed font-sans" x-text="insightExplanation"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Karakter & Relasi Kalimat --}}
+                    <div class="bg-blue-50/50 border border-blue-100/80 rounded-2xl p-5 relative overflow-hidden">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-white border border-blue-100 text-blue-500 flex items-center justify-center shrink-0 shadow-sm">
+                                <i data-lucide="link" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <span class="block text-[0.6rem] font-black text-blue-500 uppercase tracking-widest mb-1.5">
+                                    Karakter & Relasi Kalimat (Syntactic Relation)
+                                </span>
+                                <p class="text-sm font-bold text-blue-900 leading-relaxed font-sans" x-text="insightRelation"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Modal Footer --}}
+                <div class="mt-8 flex justify-end">
+                    <button type="button" @click="showInsightModal = false"
+                        class="px-6 py-2.5 bg-gray-950 hover:bg-gray-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+
         {{-- Speaker Swap Confirmation Modal --}}
         <div x-show="showSwapModal"
             class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none"
@@ -419,8 +620,9 @@
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm"></div>
 
             <div x-show="showSwapModal"
-                x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95"
-                x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200"
+                x-transition:enter="transition ease-out duration-300 transform"
+                x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-200 transform"
                 x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                 class="relative bg-white rounded-[2.5rem] max-w-md w-full mx-4 p-8 shadow-2xl z-10 border border-gray-100">
                 
@@ -459,6 +661,11 @@
                 showRaw: false,
                 showSwapModal: false,
                 isSwapping: false,
+                showInsightModal: false,
+                insightTitle: '',
+                insightType: '',
+                insightExplanation: '',
+                insightRelation: '',
                 activeMobileTab: 'transkrip',
                 currentPage: 1,
                 pageSize: 15,
@@ -471,6 +678,17 @@
                 isPlaying: false,
                 progressPercent: 0,
                 audioTimeDisplay: '00:00 / 00:00',
+
+                openInsight(title, type, explanation, relation) {
+                    this.insightTitle = title;
+                    this.insightType = type;
+                    this.insightExplanation = explanation;
+                    this.insightRelation = relation;
+                    this.showInsightModal = true;
+                    this.$nextTick(() => {
+                        if (window.lucide) window.lucide.createIcons();
+                    });
+                },
 
                 toggleAudio() {
                     const audio = this.$refs.audioPlayer;

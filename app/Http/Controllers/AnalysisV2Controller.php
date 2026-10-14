@@ -194,6 +194,20 @@ class AnalysisV2Controller extends Controller
 
         $transcription = $analysis->result_data['transcription'] ?? [];
 
+        // Pastikan setiap item memiliki format timestamp menit-detik yang valid (00:00 - 00:00)
+        foreach ($transcription as &$item) {
+            if (empty($item['timestamp'])) {
+                $startSec = $item['start'] ?? ($item['start_sec'] ?? 0);
+                $endSec = $item['end'] ?? ($item['end_sec'] ?? 0);
+                $m1 = floor($startSec / 60);
+                $s1 = floor($startSec % 60);
+                $m2 = floor($endSec / 60);
+                $s2 = floor($endSec % 60);
+                $item['timestamp'] = sprintf("%02d:%02d - %02d:%02d", $m1, $s1, $m2, $s2);
+            }
+        }
+        unset($item);
+
         // Hitung statistik komprehensif untuk tampilan analitik V1
         $totalSegments = count($transcription);
         $dosenSegments = 0;
@@ -230,6 +244,6 @@ class AnalysisV2Controller extends Controller
             'mode_counts' => $modeCounts,
         ];
 
-        return view('analysis.v2.result', compact('analysis', 'stats'));
+        return view('analysis.v2.result', compact('analysis', 'stats', 'transcription'));
     }
 }
