@@ -1,17 +1,25 @@
-<x-layouts.app title="Input Analisa V2">
+<x-layouts.app title="Input Analisis Suara (RoBERTa)">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-        {{-- Banner Info V2 (Development Warning) --}}
-        <div class="bg-amber-50 border border-amber-200 text-amber-800 px-6 py-4 rounded-2xl mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
-            <div class="flex items-center gap-3">
-                <i data-lucide="info" class="w-6 h-6 text-amber-600 shrink-0"></i>
-                <p class="font-bold text-sm leading-relaxed">
-                    <span class="uppercase tracking-widest text-amber-600 mr-1">Perhatian:</span> 
-                    <span class="font-medium text-amber-900">Halaman ini adalah eksperimen Versi 2 yang sedang dalam masa pengembangan. Sistem mungkin tidak selalu stabil.</span>
-                </p>
+        {{-- Banner Pemberitahuan Fitur Baru --}}
+        <div class="bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 border border-purple-200 text-purple-900 px-6 py-5 rounded-3xl mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+            <div class="flex items-start sm:items-center gap-3.5">
+                <div class="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-500/25">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 mb-0.5">
+                        <span class="text-[0.65rem] px-2 py-0.5 rounded-full bg-purple-600 text-white font-black uppercase tracking-wider">Fitur Baru</span>
+                        <span class="font-bold text-sm text-purple-950">Analisis Suara Multi-Task RoBERTa</span>
+                    </div>
+                    <p class="text-xs text-purple-800/90 leading-relaxed font-medium">
+                        Kini dilengkapi pemisahan pembicara otomatis (*Speaker Diarization*), deteksi dinamika nada intonasi, visualisasi jaringan interaksi graf interaktif, dan bagan alur kronologis percakapan.
+                    </p>
+                </div>
             </div>
-            <a href="{{ route('analysis.create') }}" class="shrink-0 bg-white border border-amber-300 text-amber-700 hover:bg-amber-100 hover:text-amber-800 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors">
-                Gunakan Versi Stabil
+            <a href="{{ route('methodology.v2') }}" class="shrink-0 inline-flex items-center gap-1.5 bg-white border border-purple-200 text-purple-700 hover:bg-purple-600 hover:text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-sm">
+                <span>Pelajari Fitur</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
             </a>
         </div>
 
@@ -24,14 +32,14 @@
                 <span class="lang-zh">返回控制面板</span>
             </a>
             <h1 class="text-3xl font-black text-gray-900 tracking-tight uppercase flex items-center gap-3">
-                <span class="lang-id">Mulai Analisa Baru (V2)</span>
-                <span class="lang-en">Start New Analysis (V2)</span>
-                <span class="lang-zh">开始新语音分析 (V2)</span>
+                <span class="lang-id">Mulai Analisis Suara (RoBERTa)</span>
+                <span class="lang-en">Start Voice Analysis (RoBERTa)</span>
+                <span class="lang-zh">开始语音分析 (RoBERTa)</span>
             </h1>
             <p class="text-gray-500 font-medium mt-2">
-                <span class="lang-id">Unggah file audio percakapan bimbingan akademik Anda. Versi 2 dilengkapi dengan pemetaan interaksi graf secara visual.</span>
-                <span class="lang-en">Upload your academic supervision audio file. Version 2 is equipped with visual interaction graph mapping.</span>
-                <span class="lang-zh">上传您的学术指导录音文件，版本 2 具有视觉互动图形映射功能。</span>
+                <span class="lang-id">Unggah file audio percakapan bimbingan akademik Anda untuk memetakan dinamika nada dan jaringan interaksi bimbingan secara otomatis.</span>
+                <span class="lang-en">Upload your academic supervision audio file to automatically map tone dynamics and interaction networks.</span>
+                <span class="lang-zh">上传您的学术指导录音文件，系统将自动映射语调动态与互动关系网络。</span>
             </p>
         </div>
 
@@ -153,9 +161,9 @@
                     <button type="submit" id="submit-btn"
                             class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white p-5 rounded-2xl shadow-lg transition-all hover:scale-[1.02] group disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100">
                         <span class="font-bold uppercase tracking-wider text-sm" id="submit-label">
-                            <span class="lang-id">Unggah &amp; Mulai Analisa V2</span>
-                            <span class="lang-en">Upload &amp; Start V2 Analysis</span>
-                            <span class="lang-zh">上传并启动 V2 分析</span>
+                            <span class="lang-id">Unggah &amp; Mulai Analisis Suara</span>
+                            <span class="lang-en">Upload &amp; Start Voice Analysis</span>
+                            <span class="lang-zh">上传并启动语音分析</span>
                         </span>
                         <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform" id="submit-icon"></i>
                         <svg class="w-5 h-5 animate-spin hidden" id="submit-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -218,7 +226,7 @@
         }
 
         btn.disabled = true;
-        label.textContent = 'Menyiapkan Engine V2...';
+        label.textContent = 'Menyiapkan Pemrosesan AI...';
         icon.classList.add('hidden');
         spinner.classList.remove('hidden');
     });
