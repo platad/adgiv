@@ -11,11 +11,6 @@
                         Kembali ke Dashboard
                     </a>
                     <span class="text-gray-300">&bull;</span>
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-50 text-bima-red text-[0.6rem] font-black uppercase tracking-widest border border-red-100">
-                        <i data-lucide="sparkles" class="w-2.5 h-2.5"></i>
-                        GPT-4o-mini
-                    </span>
-                    <span class="text-gray-300">&bull;</span>
                     <span class="text-[0.65rem] font-bold text-gray-400 uppercase">
                         {{ $documentAnalysis->created_at->format('d M Y, H:i') }}
                     </span>

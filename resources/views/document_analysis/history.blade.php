@@ -36,11 +36,6 @@
                         <span class="lang-en">Back to Dashboard</span>
                         <span class="lang-zh">返回仪表盘</span>
                     </a>
-                    <span class="text-gray-300">&bull;</span>
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-50 text-bima-red text-[0.6rem] font-black uppercase tracking-widest border border-red-100">
-                        <i data-lucide="sparkles" class="w-2.5 h-2.5"></i>
-                        GPT-4o-mini
-                    </span>
                 </div>
                 <h1 class="text-2xl lg:text-3xl font-black text-gray-900 tracking-tight uppercase">
                     <span class="lang-id">Riwayat Analisis Dokumen PDF</span>

@@ -6,7 +6,7 @@
             <div class="flex items-center gap-2 mb-2">
                 <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-50 text-bima-red border border-red-100 text-[0.65rem] font-black uppercase tracking-widest">
                     <i data-lucide="sparkles" class="w-3 h-3"></i>
-                    OpenAI GPT-4o-mini &bull; Pipeline Analisis
+                    Pipeline Analisis Dokumen
                 </span>
                 <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[0.65rem] font-bold uppercase tracking-wider">
                     <i data-lucide="file-text" class="w-3 h-3"></i>
@@ -86,7 +86,7 @@
                         </span>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-bold text-gray-800" :class="step === 2 ? 'text-bima-red' : ''">Analisis Multi-Task OpenAI GPT-4o-mini</p>
+                        <p class="text-xs font-bold text-gray-800" :class="step === 2 ? 'text-bima-red' : ''">Analisis Multi-Task AI Dokumen</p>
                         <p class="text-[0.68rem] text-gray-400 mt-0.5">Merumuskan ringkasan eksekutif, kesimpulan, dan poin rekomendasi</p>
                     </div>
                     <span class="text-[0.65rem] font-bold uppercase tracking-wider shrink-0"
@@ -168,7 +168,7 @@
                         if (this.step < 2 && !this.isFailed) {
                             this.step = 2;
                             this.currentStatusTitle = 'Analisis Naskah Berjalan...';
-                            this.currentStatusDesc = 'OpenAI GPT-4o-mini sedang menelaah substansi dokumen & merumuskan rekomendasi...';
+                            this.currentStatusDesc = 'Sistem AI sedang menelaah substansi dokumen & merumuskan rekomendasi...';
                             this.$nextTick(() => { if (window.lucide) window.lucide.createIcons(); });
                         }
                     }, 4000);
