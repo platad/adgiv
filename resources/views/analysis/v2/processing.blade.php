@@ -77,15 +77,37 @@
                     </div>
                 </div>
 
-                {{-- Informasi Panel Tambahan --}}
-                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-100 flex flex-col justify-center text-center">
-                    <div class="w-16 h-16 mx-auto rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4">
-                        <i data-lucide="shield-check" class="w-8 h-8"></i>
+                {{-- Informasi Panel Tambahan & Speaker Feedback --}}
+                <div class="flex flex-col gap-4">
+                    {{-- Speaker Detection Live Feedback Box --}}
+                    <div id="speaker-detected-box" class="hidden bg-purple-50/70 border border-purple-200 rounded-3xl p-6 transition-all duration-500 animate-fade-in">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-600/20">
+                                <i data-lucide="users" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <span class="px-2 py-0.5 rounded-full bg-purple-200 text-purple-800 text-[0.6rem] font-black uppercase tracking-wider">Terdeteksi Otomatis</span>
+                                <h4 class="text-sm font-black text-purple-950 mt-0.5">2 Pembicara Teridentifikasi</h4>
+                            </div>
+                        </div>
+                        <p class="text-xs text-purple-800 leading-relaxed font-medium mb-3">
+                            Sistem AI telah memisahkan percakapan antara <strong class="font-bold">Dosen</strong> dan <strong class="font-bold">Mahasiswa</strong>. Anda dapat menukar peran ini di halaman hasil jika terbalik.
+                        </p>
+                        <div class="flex items-center gap-2 text-[0.7rem] font-bold text-purple-700 bg-white/80 p-2.5 rounded-xl border border-purple-100">
+                            <i data-lucide="info" class="w-4 h-4 shrink-0 text-purple-500"></i>
+                            <span>Pemisahan suara berhasil. Melanjutkan ke pemetaan relasi wacana...</span>
+                        </div>
                     </div>
-                    <h4 class="text-sm font-bold text-gray-900 mb-2">Analisis Real-time Bypass Aktif</h4>
-                    <p class="text-xs text-gray-500 font-medium leading-relaxed">
-                        Sistem menggunakan arsitektur WebSocket langsung ke Cloud AI. Halaman ini akan secara otomatis membawa Anda ke layar hasil setelah seluruh proses analisis wacana dan pembentukan graf interaksi selesai 100%.
-                    </p>
+
+                    <div class="bg-gray-50 rounded-3xl p-6 border border-gray-100 flex flex-col justify-center text-center">
+                        <div class="w-12 h-12 mx-auto rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center mb-3">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 mb-1">Analisis Multi-Task Aktif</h4>
+                        <p class="text-xs text-gray-500 font-medium leading-relaxed">
+                            Sistem memproses transkripsi, pemisahan pembicara, klasifikasi tindak tutur, dan pemetaan graf wacana secara otomatis.
+                        </p>
+                    </div>
                 </div>
             </div>
             
@@ -149,8 +171,18 @@
                             } else if (data.progress >= 40 && data.progress < 80) {
                                 updateStep(2, 'done', 'Transkripsi & diarization selesai.');
                                 updateStep(3, 'active', 'Menganalisis relasi kuasa dengan RoBERTa...');
+                                const speakerBox = document.getElementById('speaker-detected-box');
+                                if (speakerBox && speakerBox.classList.contains('hidden')) {
+                                    speakerBox.classList.remove('hidden');
+                                    if (window.lucide) window.lucide.createIcons();
+                                }
                             } else if (data.progress >= 80) {
                                 updateStep(3, 'done', 'Klasifikasi multi-task selesai.');
+                                const speakerBox = document.getElementById('speaker-detected-box');
+                                if (speakerBox && speakerBox.classList.contains('hidden')) {
+                                    speakerBox.classList.remove('hidden');
+                                    if (window.lucide) window.lucide.createIcons();
+                                }
                             }
                         }
                         

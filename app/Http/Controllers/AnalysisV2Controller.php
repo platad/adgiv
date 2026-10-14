@@ -96,12 +96,140 @@ class AnalysisV2Controller extends Controller
         return response()->json(['status' => 'success']);
     }
 
+    public function getAudio(Analysis $analysis)
+    {
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
+        $path = Storage::disk('local')->path($analysis->audio_path);
+        
+        if (!file_exists($path)) {
+            abort(404, 'Audio file not found.');
+        }
+
+        return response()->file($path, [
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+        ]);
+    }
+
+    public function swapSpeakers(Request $request, Analysis $analysis)
+    {
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
+
+        $resultData = $analysis->result_data ?? [];
+        $transcription = $resultData['transcription'] ?? [];
+
+        // Swap roles in transcription
+        foreach ($transcription as &$item) {
+            $currentSpeaker = $item['speaker'] ?? '';
+            if (strcasecmp($currentSpeaker, 'Dosen') === 0 || strcasecmp($currentSpeaker, 'Supervisor') === 0) {
+                $item['speaker'] = 'Mahasiswa';
+            } elseif (strcasecmp($currentSpeaker, 'Mahasiswa') === 0 || strcasecmp($currentSpeaker, 'Student') === 0) {
+                $item['speaker'] = 'Dosen';
+            }
+        }
+        unset($item);
+
+        $resultData['transcription'] = $transcription;
+
+        // Swap nodes and edges in graph_data if present
+        $graphData = $analysis->graph_data ?? [];
+        if (!empty($graphData['nodes']) && is_array($graphData['nodes'])) {
+            foreach ($graphData['nodes'] as &$node) {
+                if (isset($node['id'])) {
+                    if ($node['id'] === 'Dosen') {
+                        $node['id'] = 'Mahasiswa';
+                        $node['label'] = 'Mahasiswa';
+                    } elseif ($node['id'] === 'Mahasiswa' || $node['id'] === 'Mhs') {
+                        $node['id'] = 'Dosen';
+                        $node['label'] = 'Dosen';
+                    }
+                }
+            }
+            unset($node);
+        }
+
+        if (!empty($graphData['edges']) && is_array($graphData['edges'])) {
+            foreach ($graphData['edges'] as &$edge) {
+                if (isset($edge['from'])) {
+                    if ($edge['from'] === 'Dosen') {
+                        $edge['from'] = 'Mahasiswa';
+                    } elseif ($edge['from'] === 'Mahasiswa' || $edge['from'] === 'Mhs') {
+                        $edge['from'] = 'Dosen';
+                    }
+                }
+                if (isset($edge['to'])) {
+                    if ($edge['to'] === 'Dosen') {
+                        $edge['to'] = 'Mahasiswa';
+                    } elseif ($edge['to'] === 'Mahasiswa' || $edge['to'] === 'Mhs') {
+                        $edge['to'] = 'Dosen';
+                    }
+                }
+            }
+            unset($edge);
+        }
+
+        $analysis->update([
+            'result_data' => $resultData,
+            'graph_data' => $graphData,
+        ]);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Peran pembicara berhasil ditukar.',
+                'transcription' => $transcription,
+                'graph_data' => $graphData,
+            ]);
+        }
+
+        return back()->with('success', 'Peran pembicara (Dosen ↔ Mahasiswa) berhasil ditukar.');
+    }
+
     public function result(Analysis $analysis)
     {
         abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
         if (!$analysis->isCompleted()) {
             return redirect()->route('analysis.v2.processing', $analysis->slug);
         }
-        return view('analysis.v2.result', compact('analysis'));
+
+        $transcription = $analysis->result_data['transcription'] ?? [];
+
+        // Hitung statistik komprehensif untuk tampilan analitik V1
+        $totalSegments = count($transcription);
+        $dosenSegments = 0;
+        $mhsSegments = 0;
+        $adviceCounts = [];
+        $modeCounts = [];
+
+        foreach ($transcription as $item) {
+            $speaker = $item['speaker'] ?? 'Unknown';
+            if (strcasecmp($speaker, 'Dosen') === 0 || strcasecmp($speaker, 'Supervisor') === 0) {
+                $dosenSegments++;
+            } elseif (strcasecmp($speaker, 'Mahasiswa') === 0 || strcasecmp($speaker, 'Student') === 0) {
+                $mhsSegments++;
+            }
+
+            if (!empty($item['advice_giving'])) {
+                $adv = $item['advice_giving'];
+                $adviceCounts[$adv] = ($adviceCounts[$adv] ?? 0) + 1;
+            }
+
+            if (!empty($item['modes_of_interaction'])) {
+                $mode = $item['modes_of_interaction'];
+                $modeCounts[$mode] = ($modeCounts[$mode] ?? 0) + 1;
+            }
+        }
+
+        $stats = [
+            'total_segments' => $totalSegments,
+            'dosen_segments' => $dosenSegments,
+            'mhs_segments' => $mhsSegments,
+            'dosen_ratio' => $totalSegments > 0 ? round(($dosenSegments / $totalSegments) * 100) : 0,
+            'mhs_ratio' => $totalSegments > 0 ? round(($mhsSegments / $totalSegments) * 100) : 0,
+            'advice_counts' => $adviceCounts,
+            'mode_counts' => $modeCounts,
+        ];
+
+        return view('analysis.v2.result', compact('analysis', 'stats'));
     }
 }
