@@ -1458,6 +1458,15 @@
                 errorModalTitle: '',
                 errorModalMessage: '',
 
+                init() {
+                    window.v2App = this;
+                    this.$nextTick(() => {
+                        if (window.renderMermaidChart) {
+                            window.renderMermaidChart();
+                        }
+                    });
+                },
+
                 showError(title, message) {
                     this.errorModalTitle = title;
                     this.errorModalMessage = message;
@@ -1802,11 +1811,21 @@
             };
             chart.setOption(option);
 
+            // Helper aman untuk mengambil instance Alpine v2ResultApp
+            function getAlpineData() {
+                if (window.v2App) return window.v2App;
+                const appEl = document.querySelector('[x-data*="v2ResultApp"]');
+                if (!appEl) return null;
+                if (window.Alpine && window.Alpine.$data) {
+                    return window.Alpine.$data(appEl);
+                }
+                return appEl.__x ? appEl.__x.$data : null;
+            }
+
             // Handler Klik Node & Edge (Terutama untuk Perangkat Mobile & Touchscreen)
             chart.on('click', function(params) {
-                const appEl = document.querySelector('[x-data*="v2ResultApp"]');
-                if (!appEl || !appEl.__x) return;
-                const alpineData = appEl.__x.$data;
+                const alpineData = getAlpineData();
+                if (!alpineData) return;
 
                 if (params.dataType === 'node') {
                     const info = getMeaning(params.name);
@@ -1846,24 +1865,32 @@
 
             // Inisialisasi pustaka Mermaid secara lokal
             if (window.mermaid) {
-                window.mermaid.initialize({
-                    startOnLoad: false,
-                    theme: 'base',
-                    themeVariables: {
-                        primaryColor: '#ede9fe',
-                        primaryTextColor: '#4c1d95',
-                        primaryBorderColor: '#8b5cf6',
-                        lineColor: '#6366f1',
-                        secondaryColor: '#eff6ff',
-                        tertiaryColor: '#f0fdf4'
-                    },
-                    flowchart: {
-                        curve: 'basis',
-                        padding: 16,
-                        nodeSpacing: 45,
-                        rankSpacing: 50
-                    }
-                });
+                try {
+                    window.mermaid.initialize({
+                        startOnLoad: false,
+                        securityLevel: 'loose',
+                        theme: 'base',
+                        themeVariables: {
+                            primaryColor: '#ede9fe',
+                            primaryTextColor: '#4c1d95',
+                            primaryBorderColor: '#8b5cf6',
+                            lineColor: '#6366f1',
+                            secondaryColor: '#eff6ff',
+                            tertiaryColor: '#f0fdf4',
+                            fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+                            fontSize: '12px'
+                        },
+                        flowchart: {
+                            curve: 'basis',
+                            padding: 16,
+                            nodeSpacing: 40,
+                            rankSpacing: 45,
+                            useMaxWidth: true
+                        }
+                    });
+                } catch (e) {
+                    console.warn('Mermaid initialize warning:', e);
+                }
             }
 
             // Render awal diagram alur Mermaid
@@ -1871,29 +1898,43 @@
                 if (window.renderMermaidChart) {
                     window.renderMermaidChart();
                 }
-            }, 200);
+            }, 300);
         });
 
         // Global helper untuk merender diagram Mermaid ke DOM
         window.renderMermaidChart = async function(customCode) {
             const container = document.getElementById('mermaid-flowchart-container');
-            if (!container || !window.mermaid) return;
+            if (!container) return;
+
+            if (!window.mermaid) {
+                console.warn('Pustaka Mermaid belum siap.');
+                return;
+            }
 
             let code = customCode;
             if (!code) {
                 // Ambil dari Alpine app state jika ada
-                const appEl = document.querySelector('[x-data*="v2ResultApp"]');
-                if (appEl && appEl.__x) {
-                    const alpineData = appEl.__x.$data;
-                    code = alpineData.graphInterpretationData?.mermaid_code;
+                if (window.v2App && window.v2App.graphInterpretationData?.mermaid_code) {
+                    code = window.v2App.graphInterpretationData.mermaid_code;
+                } else {
+                    const appEl = document.querySelector('[x-data*="v2ResultApp"]');
+                    if (appEl) {
+                        const alpineData = window.Alpine && window.Alpine.$data ? window.Alpine.$data(appEl) : (appEl.__x ? appEl.__x.$data : null);
+                        code = alpineData?.graphInterpretationData?.mermaid_code;
+                    }
                 }
+            }
+
+            // Bersihkan format markdown jika AI menyertakan ```mermaid ... ```
+            if (code && typeof code === 'string') {
+                code = code.replace(/```mermaid/gi, '').replace(/```/g, '').trim();
             }
 
             // Fallback alur kronologis cerdas jika belum dianalisis AI
             if (!code || code.trim() === '') {
                 code = `flowchart TD
-    A["Pembukaan Sesi & Konfirmasi Topik Riset"] --> B["Penyampaian Perkembangan & Eksplorasi Metodologi"]
-    B --> C{"Evaluasi Kritis & Probing Supervisor"}
+    A["Pembukaan Sesi & Konfirmasi Topik Riset"] --> B["Penyampaian Perkembangan & Metodologi"]
+    B --> C{"Evaluasi Kritis & Diskusi Supervisor"}
     C -->|"Koreksi Substantif"| D["Arahan Revisi Bab & Instrumen Penelitian"]
     C -->|"Persetujuan Konsep"| E["Validasi Metodologi & Desain Riset"]
     D --> F["Pola Relasi Kuasa: Penegasan Standar Kelayakan"]
@@ -1903,18 +1944,38 @@
             }
 
             try {
-                const uniqueId = 'mermaid-svg-' + Math.floor(Math.random() * 1000000);
-                const { svg } = await window.mermaid.render(uniqueId, code);
-                container.innerHTML = svg;
-                // Pastikan SVG responsif memenuhi lebar container
-                const svgEl = container.querySelector('svg');
-                if (svgEl) {
-                    svgEl.style.maxWidth = '100%';
-                    svgEl.style.height = 'auto';
+                // Generate ID unik yang aman (hanya huruf dan angka tanpa karakter khusus)
+                const uniqueId = 'mermaidSvg' + Date.now();
+                const renderResult = await window.mermaid.render(uniqueId, code);
+                const svgCode = typeof renderResult === 'string' ? renderResult : (renderResult.svg || '');
+                
+                if (svgCode) {
+                    container.innerHTML = svgCode;
+                    const svgEl = container.querySelector('svg');
+                    if (svgEl) {
+                        svgEl.style.maxWidth = '100%';
+                        svgEl.style.height = 'auto';
+                        svgEl.style.display = 'block';
+                    }
                 }
             } catch (err) {
                 console.error('Error rendering Mermaid diagram:', err);
-                container.innerHTML = '<div class="text-xs text-gray-400 py-4 italic">Alur percakapan sedang disusun. Klik "Analisis Makna Graf (AI)" untuk memperbarui diagram alur topik.</div>';
+                // Jika syntax kustom dari AI gagal, coba render diagram default yang teruji aman
+                try {
+                    const safeId = 'mermaidFallback' + Date.now();
+                    const safeDefault = `flowchart TD
+    A["Pembukaan Sesi & Konfirmasi Topik"] --> B["Eksplorasi Metodologi Riset"]
+    B --> C{"Ulasan & Tanggapan Dosen"}
+    C --> D["Arahan Perbaikan & Validasi Data"]
+    D --> E["Simpulan & Tindak Lanjut Riset"]`;
+                    const fallbackResult = await window.mermaid.render(safeId, safeDefault);
+                    const fallbackSvg = typeof fallbackResult === 'string' ? fallbackResult : (fallbackResult.svg || '');
+                    if (fallbackSvg) {
+                        container.innerHTML = fallbackSvg;
+                    }
+                } catch (fallbackErr) {
+                    container.innerHTML = '<div class="text-xs text-gray-400 py-4 italic text-center">Diagram alur percakapan siap ditampilkan. Klik "Analisis Ulang Graf (AI)" untuk memperbarui alur topik secara otomatis.</div>';
+                }
             }
         };
     </script>
