@@ -1418,6 +1418,17 @@
             }
         });
 
+        // Helper global aman untuk mengambil instance Alpine v2ResultApp
+        window.getAlpineData = function() {
+            if (window.v2App) return window.v2App;
+            const appEl = document.querySelector('[x-data*="v2ResultApp"]');
+            if (!appEl) return null;
+            if (window.Alpine && window.Alpine.$data) {
+                return window.Alpine.$data(appEl);
+            }
+            return appEl.__x ? appEl.__x.$data : null;
+        };
+
         function v2ResultApp() {
             return {
                 showRaw: false,
@@ -1825,20 +1836,9 @@
             };
             chart.setOption(option);
 
-            // Helper aman untuk mengambil instance Alpine v2ResultApp
-            function getAlpineData() {
-                if (window.v2App) return window.v2App;
-                const appEl = document.querySelector('[x-data*="v2ResultApp"]');
-                if (!appEl) return null;
-                if (window.Alpine && window.Alpine.$data) {
-                    return window.Alpine.$data(appEl);
-                }
-                return appEl.__x ? appEl.__x.$data : null;
-            }
-
             // Handler Klik Node & Edge (Terutama untuk Perangkat Mobile & Touchscreen)
             chart.on('click', function(params) {
-                const alpineData = getAlpineData();
+                const alpineData = window.getAlpineData ? window.getAlpineData() : null;
                 if (!alpineData) return;
 
                 if (params.dataType === 'node') {
@@ -1965,7 +1965,7 @@
                 }
 
                 // Otomatis men-generate interpretasi graf & alur mermaid begitu halaman dimuat
-                const alpineData = getAlpineData();
+                const alpineData = window.getAlpineData ? window.getAlpineData() : null;
                 if (alpineData && !alpineData.graphInterpretationData && !alpineData.isInterpretingGraph) {
                     alpineData.analyzeGraphWithAI();
                 }
@@ -1977,7 +1977,7 @@
             const container = document.getElementById('mermaid-flowchart-container');
             if (!container) return;
 
-            const alpineData = getAlpineData();
+            const alpineData = window.getAlpineData ? window.getAlpineData() : null;
 
             // Pastikan library Mermaid telah termuat
             try {
