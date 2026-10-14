@@ -109,16 +109,16 @@
 
                     <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="flex items-center gap-3.5">
-                            {{-- Play/Pause Button (Deterministic Lucide SVG Render) --}}
+                            {{-- Play/Pause Button (Deterministic Native SVG) --}}
                             <button type="button" 
                                     @click="toggleAudio()"
                                     class="w-12 h-12 rounded-2xl bg-bima-red hover:bg-red-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-red-600/30 transition-transform active:scale-95 cursor-pointer"
                                     :title="isPlaying ? 'Jeda Audio' : 'Putar Audio Narasi'">
                                 <span x-show="!isPlaying" class="flex items-center justify-center">
-                                    <i data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>
+                                    <svg class="w-5 h-5 fill-current ml-0.5" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                                 </span>
                                 <span x-show="isPlaying" x-cloak class="flex items-center justify-center">
-                                    <i data-lucide="pause" class="w-5 h-5 fill-current"></i>
+                                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
                                 </span>
                             </button>
 
@@ -192,7 +192,7 @@
                         </div>
 
                         <button type="button" 
-                                @click="speakText({{ json_encode($documentAnalysis->executive_summary) }})"
+                                @click="speakExecutiveSummary()"
                                 class="px-3 py-1.5 rounded-xl bg-gray-50 hover:bg-red-50 hover:text-bima-red text-gray-600 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
                                 title="Dengarkan Bagian Ini">
                             <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
@@ -242,7 +242,7 @@
                                     </div>
 
                                     <button type="button" 
-                                            @click="speakText({{ json_encode(($conclusion['title'] ?? '') . '. ' . ($conclusion['detail'] ?? '')) }})"
+                                            @click="speakText({!! json_encode(($conclusion['title'] ?? '') . '. ' . ($conclusion['detail'] ?? '')) !!})"
                                             class="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition shrink-0 cursor-pointer"
                                             title="Dengarkan kesimpulan ini">
                                         <i data-lucide="volume-2" class="w-4 h-4"></i>
@@ -296,7 +296,7 @@
                                     </div>
 
                                     <button type="button" 
-                                            @click="speakText({{ json_encode('Temuan: ' . ($rec['finding'] ?? '') . '. Rekomendasi Aksi: ' . ($rec['action'] ?? '')) }})"
+                                            @click="speakText({!! json_encode('Temuan: ' . ($rec['finding'] ?? '') . '. Rekomendasi Aksi: ' . ($rec['action'] ?? '')) !!})"
                                             class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition shrink-0 cursor-pointer"
                                             title="Dengarkan butir rekomendasi ini">
                                         <i data-lucide="volume-2" class="w-4 h-4"></i>
@@ -469,7 +469,7 @@
                 },
 
                 speakExecutiveSummary() {
-                    const summary = {{ json_encode($documentAnalysis->executive_summary) }};
+                    const summary = {!! json_encode($documentAnalysis->executive_summary) !!};
                     this.speakText(summary);
                 }
             }
