@@ -474,6 +474,64 @@
                                 </div>
                             </div>
 
+                            {{-- Line Evaluation (Evaluasi Kalimat Jempol Atas / Bawah untuk Korpus Database) --}}
+                            <div class="ml-0 md:ml-44 flex items-center justify-between gap-4 mt-2 text-xs"
+                                x-data="{
+                                    feedback: '{{ $item['user_feedback'] ?? 'none' }}',
+                                    loading: false,
+                                    async sendFeedback(type) {
+                                        if (this.loading) return;
+                                        this.loading = true;
+                                        try {
+                                            let res = await fetch('{{ route('analysis.line-feedback', $analysis->slug) }}', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'Accept': 'application/json',
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                },
+                                                body: JSON.stringify({ index: {{ $index }}, type: type })
+                                            });
+                                            let data = await res.json();
+                                            if (data.status === 'success') {
+                                                this.feedback = data.user_feedback;
+                                            }
+                                        } catch (e) {
+                                            console.error('Error line feedback', e);
+                                        } finally {
+                                            this.loading = false;
+                                        }
+                                    }
+                                }">
+                                <div class="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-full px-3.5 py-1.5 text-gray-400">
+                                    <span class="text-[0.62rem] font-black uppercase tracking-widest text-gray-500 flex items-center gap-1">
+                                        <i data-lucide="check-square" class="w-3 h-3 text-purple-500"></i>
+                                        <span>Evaluasi Kalimat:</span>
+                                    </span>
+                                    <div class="flex items-center gap-2.5">
+                                        {{-- Thumbs Up --}}
+                                        <button type="button" @click="sendFeedback('up')"
+                                            class="hover:text-green-600 transition focus:outline-none flex items-center justify-center p-0.5 cursor-pointer"
+                                            :class="feedback === 'up' ? 'text-green-600 scale-110 font-bold' : 'text-gray-400 hover:scale-105'"
+                                            title="Tandai baris ini akurat / sesuai untuk korpus database">
+                                            <svg class="w-4 h-4" :fill="feedback === 'up' ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3" />
+                                            </svg>
+                                        </button>
+
+                                        {{-- Thumbs Down --}}
+                                        <button type="button" @click="sendFeedback('down')"
+                                            class="hover:text-red-600 transition focus:outline-none flex items-center justify-center p-0.5 cursor-pointer"
+                                            :class="feedback === 'down' ? 'text-red-600 scale-110 font-bold' : 'text-gray-400 hover:scale-105'"
+                                            title="Tandai baris ini belum sesuai">
+                                            <svg class="w-4 h-4" :fill="feedback === 'down' ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3zm7-13h3a2 2 0 012 2v7a2 2 0 01-2 2h-3" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     @empty
                         <div class="text-center py-12 text-gray-400 font-medium">
@@ -483,17 +541,18 @@
                     @endforelse
                 </div>
 
-                {{-- Pagination Control --}}
+                {{-- Pagination Control (Rapi, Lengkap dengan Info Baris) --}}
                 <template x-if="totalPages > 1">
-                    <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-between">
+                    <div class="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <button type="button" 
                             @click="currentPage = Math.max(1, currentPage - 1)" 
                             :disabled="currentPage === 1"
                             class="inline-flex items-center px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold uppercase tracking-widest text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors cursor-pointer">
                             <i data-lucide="chevron-left" class="w-4 h-4 mr-1"></i> Prev
                         </button>
-                        <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                        <span class="text-xs font-bold text-gray-500 uppercase tracking-widest text-center">
                             Halaman <span x-text="currentPage" class="text-gray-900 font-black"></span> dari <span x-text="totalPages"></span>
+                            <span class="block md:inline-block md:ml-1 text-[0.65rem] text-gray-400 font-medium lowercase tracking-normal">(total <span x-text="totalRows" class="font-bold text-gray-600"></span> baris transkrip)</span>
                         </span>
                         <button type="button" 
                             @click="currentPage = Math.min(totalPages, currentPage + 1)" 
@@ -658,6 +717,86 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+
+        {{-- Feedback Banner (Validasi Hasil Rekaman Terhadap Akurasi Output V2) --}}
+        <div x-data="{
+            submitted: {{ $analysis->feedback ? 'true' : 'false' }},
+            loading: false,
+            comments: '',
+            async submitFeedback(status) {
+                if (this.loading) return;
+                this.loading = true;
+                try {
+                    let res = await fetch('{{ route('analysis.feedback', $analysis->slug) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ is_accurate: status, comments: this.comments })
+                    });
+                    let data = await res.json();
+                    if (data.status === 'success') {
+                        this.submitted = true;
+                    }
+                } catch (e) {
+                    console.error('Error submitting feedback', e);
+                } finally {
+                    this.loading = false;
+                }
+            }
+        }" class="mt-10">
+            <div x-show="!submitted"
+                class="bg-gray-900 rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-900/30 via-indigo-900/20 to-transparent opacity-60"></div>
+                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="flex-grow text-center md:text-left">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[0.65rem] font-black uppercase tracking-widest mb-3">
+                            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                            <span>Validasi Model RoBERTa Multi-Task V2</span>
+                        </div>
+                        <h3 class="text-xl font-black uppercase tracking-tight text-white mb-2 flex items-center justify-center md:justify-start gap-2.5">
+                            <i data-lucide="check-circle-2" class="w-5 h-5 text-purple-400"></i>
+                            <span>Penilaian Kesesuaian Hasil Analisis</span>
+                        </h3>
+                        <p class="text-gray-300 text-xs sm:text-sm font-medium leading-relaxed max-w-3xl">
+                            Sebagai peninjau atau pakar akademik, penilaian Anda sangat berharga bagi penyempurnaan dataset dan akurasi model Multi-Task RoBERTa. Apakah anotasi diarization, pemisahan peran pembicara, dan penandaan relasi wacana pada rekaman ini sudah sesuai dengan fakta percakapan riil?
+                        </p>
+                    </div>
+
+                    <div class="flex-shrink-0 w-full md:w-auto flex items-center gap-4">
+                        <div class="flex gap-3 w-full" x-show="!loading">
+                            <button type="button" @click="submitFeedback(1)"
+                                class="flex-1 md:flex-none px-6 py-3.5 bg-green-600 hover:bg-green-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-green-600/20">
+                                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                <span>Sudah Sesuai</span>
+                            </button>
+                            <button type="button" @click="submitFeedback(0)"
+                                class="flex-1 md:flex-none px-6 py-3.5 bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-red-600/20">
+                                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                                <span>Belum Sesuai</span>
+                            </button>
+                        </div>
+
+                        <div x-show="loading" style="display: none;" class="flex items-center gap-2 text-white/70">
+                            <svg class="animate-spin h-6 w-6 text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            <span class="text-xs font-black uppercase tracking-wider">Menyimpan Validasi...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="submitted"
+                class="bg-emerald-950/60 border border-emerald-800 rounded-[2.5rem] p-6 text-center text-emerald-200">
+                <i data-lucide="check-check" class="w-6 h-6 mx-auto mb-2 text-emerald-400"></i>
+                <h4 class="text-sm font-bold">Terima kasih atas penilaian dan validasi akurasi Anda!</h4>
+                <p class="text-xs text-emerald-300/80 mt-1">Umpan balik telah tersimpan ke dalam database korpus penelitian.</p>
             </div>
         </div>
 
