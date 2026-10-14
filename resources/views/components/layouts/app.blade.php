@@ -199,30 +199,30 @@
 
                         {{-- Modules List --}}
                         <div class="flex flex-col gap-1.5">
-                            {{-- Analisis Suara V1 --}}
+                            {{-- Analisis Suara (RoBERTa) --}}
+                            <a href="{{ route('analysis.v2.create') }}"
+                                class="flex items-center gap-3 p-2.5 rounded-2xl transition group/item {{ request()->routeIs('analysis.v2.*') ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20' : 'hover:bg-white/5 text-white/80 hover:text-white' }}">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 {{ request()->routeIs('analysis.v2.*') ? 'bg-white/20 text-white' : 'bg-purple-500/10 text-purple-400 group-hover/item:scale-105 group-hover/item:bg-purple-500/20' }} transition">
+                                    <i data-lucide="sparkles" class="w-4.5 h-4.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold truncate flex items-center gap-1.5">
+                                        <span>Analisis Suara (RoBERTa)</span>
+                                        <span class="text-[0.55rem] px-1.5 py-0.2 rounded bg-purple-400/20 text-purple-300 uppercase font-black">Baru</span>
+                                    </div>
+                                    <div class="text-[0.65rem] {{ request()->routeIs('analysis.v2.*') ? 'text-white/80' : 'text-white/40' }} truncate">RoBERTa Multi-Task + Graf</div>
+                                </div>
+                            </a>
+
+                            {{-- Analisis Suara (IndoBERT) --}}
                             <a href="{{ route('analysis.create') }}"
                                 class="flex items-center gap-3 p-2.5 rounded-2xl transition group/item {{ request()->routeIs('analysis.create', 'analysis.processing', 'analysis.result') && !request()->routeIs('analysis.v2.*') ? 'bg-bima-red text-white shadow-md shadow-red-500/20' : 'hover:bg-white/5 text-white/80 hover:text-white' }}">
                                 <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 {{ request()->routeIs('analysis.create', 'analysis.processing', 'analysis.result') && !request()->routeIs('analysis.v2.*') ? 'bg-white/20 text-white' : 'bg-red-500/10 text-red-400 group-hover/item:scale-105 group-hover/item:bg-red-500/20' }} transition">
                                     <i data-lucide="mic" class="w-4.5 h-4.5"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <div class="text-xs font-bold truncate">Analisis Suara (V1)</div>
-                                    <div class="text-[0.65rem] {{ request()->routeIs('analysis.create') ? 'text-white/80' : 'text-white/40' }} truncate">Audio rekaman bimbingan C-CDA</div>
-                                </div>
-                            </a>
-
-                            {{-- Uji Coba Model V2 --}}
-                            <a href="{{ route('analysis.v2.create') }}"
-                                class="flex items-center gap-3 p-2.5 rounded-2xl transition group/item {{ request()->routeIs('analysis.v2.*') ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20' : 'hover:bg-white/5 text-white/80 hover:text-white' }}">
-                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 {{ request()->routeIs('analysis.v2.*') ? 'bg-white/20 text-white' : 'bg-purple-500/10 text-purple-400 group-hover/item:scale-105 group-hover/item:bg-purple-500/20' }} transition">
-                                    <i data-lucide="flask-conical" class="w-4.5 h-4.5"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="text-xs font-bold truncate flex items-center gap-1.5">
-                                        <span>Uji Coba Model V2</span>
-                                        <span class="text-[0.55rem] px-1.5 py-0.2 rounded bg-purple-400/20 text-purple-300 uppercase font-black">Beta</span>
-                                    </div>
-                                    <div class="text-[0.65rem] {{ request()->routeIs('analysis.v2.*') ? 'text-white/80' : 'text-white/40' }} truncate">WhisperX + RoBERTa Multi-Task</div>
+                                    <div class="text-xs font-bold truncate">Analisis Suara (IndoBERT)</div>
+                                    <div class="text-[0.65rem] {{ request()->routeIs('analysis.create') ? 'text-white/80' : 'text-white/40' }} truncate">IndoBERT + G-MLLM Hybrid</div>
                                 </div>
                             </a>
 
@@ -463,30 +463,30 @@
 
         {{-- Feature Cards Grid --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-            {{-- 1. Analisis Suara V1 --}}
+            {{-- 1. Analisis Suara (RoBERTa) --}}
+            <a href="{{ route('analysis.v2.create') }}"
+                class="flex items-center gap-3.5 p-3.5 rounded-2xl border transition {{ request()->routeIs('analysis.v2.*') ? 'bg-purple-600/20 border-purple-500 text-white' : 'bg-white/5 border-white/5 text-white/80 hover:bg-white/10' }}">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
+                    <i data-lucide="sparkles" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-bold text-sm text-white truncate flex items-center gap-2">
+                        <span>Analisis Suara (RoBERTa)</span>
+                        <span class="text-[0.6rem] px-1.5 py-0.5 rounded bg-purple-500/30 text-purple-300 uppercase font-black">Baru</span>
+                    </div>
+                    <div class="text-[0.7rem] text-white/50 truncate">RoBERTa Multi-Task + Graf</div>
+                </div>
+            </a>
+
+            {{-- 2. Analisis Suara (IndoBERT) --}}
             <a href="{{ route('analysis.create') }}"
                 class="flex items-center gap-3.5 p-3.5 rounded-2xl border transition {{ request()->routeIs('analysis.create', 'analysis.processing', 'analysis.result') && !request()->routeIs('analysis.v2.*') ? 'bg-bima-red/20 border-bima-red text-white' : 'bg-white/5 border-white/5 text-white/80 hover:bg-white/10' }}">
                 <div class="w-12 h-12 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
                     <i data-lucide="mic" class="w-6 h-6"></i>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <div class="font-bold text-sm text-white truncate">Analisis Suara (V1)</div>
-                    <div class="text-[0.7rem] text-white/50 truncate">Audio rekaman bimbingan</div>
-                </div>
-            </a>
-
-            {{-- 2. Uji Coba Model V2 --}}
-            <a href="{{ route('analysis.v2.create') }}"
-                class="flex items-center gap-3.5 p-3.5 rounded-2xl border transition {{ request()->routeIs('analysis.v2.*') ? 'bg-purple-600/20 border-purple-500 text-white' : 'bg-white/5 border-white/5 text-white/80 hover:bg-white/10' }}">
-                <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
-                    <i data-lucide="flask-conical" class="w-6 h-6"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="font-bold text-sm text-white truncate flex items-center gap-2">
-                        <span>Uji Coba Model V2</span>
-                        <span class="text-[0.6rem] px-1.5 py-0.5 rounded bg-purple-500/30 text-purple-300 uppercase font-black">Beta</span>
-                    </div>
-                    <div class="text-[0.7rem] text-white/50 truncate">WhisperX + RoBERTa Multi-Task</div>
+                    <div class="font-bold text-sm text-white truncate">Analisis Suara (IndoBERT)</div>
+                    <div class="text-[0.7rem] text-white/50 truncate">IndoBERT + G-MLLM Hybrid</div>
                 </div>
             </a>
 

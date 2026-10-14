@@ -1,15 +1,21 @@
 <x-layouts.app title="Dashboard" :welcome-audio="$welcomeAudio ?? null">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
         
-        {{-- Banner Info V2 --}}
-        <div class="bg-amber-50 border border-amber-200 text-amber-800 px-6 py-4 rounded-2xl mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+        {{-- Banner Info Model Analisis Suara --}}
+        <div class="bg-gradient-to-r from-purple-50 via-indigo-50 to-red-50 border border-purple-200/80 text-gray-800 px-6 py-4 rounded-2xl mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
             <div class="flex items-center gap-3">
-                <i data-lucide="info" class="w-6 h-6 text-amber-600 shrink-0"></i>
-                <p class="font-bold text-sm leading-relaxed">
-                    <span class="uppercase tracking-widest text-amber-600 mr-1">Pengumuman:</span> 
-                    <span class="font-medium text-amber-900">temaniskripsi.id sedang dalam masa pengembangan untuk Versi 2 nya (WhisperX + RoBERTa Multi-Task). Silakan coba fitur baru ini!</span>
-                </p>
+                <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-500/20">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                </div>
+                <div class="text-sm leading-relaxed">
+                    <span class="font-black uppercase tracking-wider text-purple-900 mr-1.5">Model Analisis Suara Cerdas:</span> 
+                    <span class="font-medium text-gray-700">Tersedia dua opsi mesin analisis suara percakapan bimbingan akademik: <b>IndoBERT</b> (versi 1) dan <b>RoBERTa Multi-Task</b> (versi 2 dengan topologi graf).</span>
+                </div>
             </div>
+            <a href="{{ route('methodology.v2') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-purple-700 hover:text-purple-900 bg-white px-3.5 py-2 rounded-xl border border-purple-200 shadow-sm shrink-0 hover:bg-purple-50 transition">
+                <span>Pelajari Metodologi</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
         </div>
 
         {{-- Welcome Banner Section --}}
@@ -40,11 +46,46 @@
                     </p>
                 </div>
                 
-                {{-- Action Buttons Row (Placed at the Bottom) --}}
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+                {{-- Action Buttons Row: Grouped by Voice Analysis (IndoBERT vs RoBERTa) and PDF Analysis --}}
+                <div class="flex flex-wrap items-center gap-3.5 pt-2">
+                    {{-- Analisis Suara (RoBERTa - V2) --}}
+                    <a href="{{ route('analysis.v2.create') }}" 
+                       class="inline-flex items-center justify-center gap-2.5 h-12 px-5 sm:px-6 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-600/30 hover:shadow-xl hover:shadow-purple-600/40 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer border border-purple-300/30">
+                        <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-purple-200"></i>
+                        </div>
+                        <div class="text-left">
+                            <div class="font-black text-xs sm:text-[0.8rem] uppercase tracking-wider whitespace-nowrap">
+                                <span class="lang-id">Analisis Suara (RoBERTa)</span>
+                                <span class="lang-en">Voice Analysis (RoBERTa)</span>
+                                <span class="lang-zh">语音分析 (RoBERTa)</span>
+                            </div>
+                            <div class="text-[0.62rem] text-purple-200/80 font-medium">Model V2 + Topologi Graf</div>
+                        </div>
+                    </a>
+
+                    {{-- Analisis Suara (IndoBERT - V1) --}}
+                    <a href="{{ route('analysis.create') }}" 
+                       class="inline-flex items-center justify-center gap-2.5 h-12 px-5 sm:px-6 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg shadow-red-600/25 hover:shadow-xl hover:shadow-red-600/35 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer border border-red-300/30">
+                        <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                            <i data-lucide="mic" class="w-4 h-4 text-rose-200"></i>
+                        </div>
+                        <div class="text-left">
+                            <div class="font-black text-xs sm:text-[0.8rem] uppercase tracking-wider whitespace-nowrap">
+                                <span class="lang-id">Analisis Suara (IndoBERT)</span>
+                                <span class="lang-en">Voice Analysis (IndoBERT)</span>
+                                <span class="lang-zh">语音分析 (IndoBERT)</span>
+                            </div>
+                            <div class="text-[0.62rem] text-rose-200/80 font-medium">Model V1 + G-MLLM Hybrid</div>
+                        </div>
+                    </a>
+
+                    {{-- Separator divider on desktop --}}
+                    <div class="hidden sm:block h-8 w-px bg-white/20 mx-1"></div>
+
                     {{-- Analisis PDF --}}
                     <a href="{{ route('document_analysis.create', ['locale' => app()->getLocale()]) }}" 
-                       class="inline-flex items-center justify-center gap-2.5 h-12 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer border border-amber-300/30">
+                       class="inline-flex items-center justify-center gap-2.5 h-12 px-5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer border border-amber-300/30">
                         <i data-lucide="file-text" class="w-4.5 h-4.5 group-hover:scale-110 transition-transform shrink-0"></i>
                         <span class="font-bold text-xs sm:text-[0.8rem] uppercase tracking-wider whitespace-nowrap">
                             <span class="lang-id">Analisis PDF</span>
@@ -55,34 +96,12 @@
 
                     {{-- Riwayat Dokumen PDF --}}
                     <a href="{{ route('document_analysis.history', ['locale' => app()->getLocale()]) }}" 
-                       class="inline-flex items-center justify-center gap-2 h-12 px-5 rounded-2xl bg-white/10 hover:bg-white/20 text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer border border-white/15">
+                       class="inline-flex items-center justify-center gap-2 h-12 px-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer border border-white/15">
                         <i data-lucide="history" class="w-4 h-4 group-hover:rotate-[-20deg] transition-transform shrink-0 text-amber-400"></i>
                         <span class="font-bold text-xs sm:text-[0.8rem] uppercase tracking-wider whitespace-nowrap">
                             <span class="lang-id">Riwayat PDF</span>
                             <span class="lang-en">PDF History</span>
-                            <span class="lang-zh">PDF 历史记录</span>
-                        </span>
-                    </a>
-
-                    {{-- Uji Coba V2 --}}
-                    <a href="{{ route('analysis.v2.create') }}" 
-                       class="inline-flex items-center justify-center gap-2.5 h-12 px-6 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md shadow-purple-500/20 hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer border border-purple-300/30">
-                        <i data-lucide="flask-conical" class="w-4.5 h-4.5 group-hover:rotate-12 transition-transform shrink-0"></i>
-                        <span class="font-bold text-xs sm:text-[0.8rem] uppercase tracking-wider whitespace-nowrap">
-                            <span class="lang-id">Uji Coba V2</span>
-                            <span class="lang-en">Try Model V2</span>
-                            <span class="lang-zh">体验 V2 模型</span>
-                        </span>
-                    </a>
-
-                    {{-- Mulai Analisa Suara (Primary) --}}
-                    <a href="{{ route('analysis.create') }}" 
-                       class="inline-flex items-center justify-center gap-2.5 h-12 px-6 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-md shadow-red-500/20 hover:shadow-lg hover:shadow-red-500/30 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 group cursor-pointer border border-red-300/30 ring-1 ring-white/10">
-                        <i data-lucide="mic" class="w-4.5 h-4.5 group-hover:scale-110 transition-transform shrink-0"></i>
-                        <span class="font-bold text-xs sm:text-[0.8rem] uppercase tracking-wider whitespace-nowrap">
-                            <span class="lang-id">Analisis Suara</span>
-                            <span class="lang-en">Voice Analysis</span>
-                            <span class="lang-zh">语音分析</span>
+                            <span class="lang-zh">PDF 历史</span>
                         </span>
                     </a>
                 </div>
