@@ -357,33 +357,18 @@
                     </p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 text-[0.7rem] font-bold shadow-2xs">
-                        <i data-lucide="user-check" class="w-3 h-3 text-purple-600"></i>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold shadow-2xs">
+                        <i data-lucide="user-check" class="w-3.5 h-3.5 text-purple-600"></i>
                         <span>Dosen</span>
                     </span>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 text-[0.7rem] font-bold shadow-2xs">
-                        <i data-lucide="users" class="w-3 h-3 text-blue-600"></i>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold shadow-2xs">
+                        <i data-lucide="users" class="w-3.5 h-3.5 text-blue-600"></i>
                         <span>Mahasiswa</span>
                     </span>
-
-                    {{-- Tombol Analisis AI Multimodal (OpenAI Vision) --}}
-                    <button type="button" 
-                        @click="analyzeGraphWithAI()"
-                        :disabled="isInterpretingGraph"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider shadow-md shadow-purple-600/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 cursor-pointer">
-                        <template x-if="!isInterpretingGraph">
-                            <span class="flex items-center gap-1.5">
-                                <i data-lucide="sparkles" class="w-4 h-4 text-purple-200"></i>
-                                <span x-text="graphInterpretationData ? 'Analisis Ulang Graf (AI)' : 'Analisis Makna Graf (AI)'"></span>
-                            </span>
-                        </template>
-                        <template x-if="isInterpretingGraph">
-                            <span class="flex items-center gap-1.5">
-                                <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
-                                <span>Menganalisis Graf...</span>
-                            </span>
-                        </template>
-                    </button>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold shadow-2xs">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <span>Sintesis Otomatis AI</span>
+                    </span>
                 </div>
             </div>
             
@@ -415,20 +400,19 @@
                         </div>
                     </div>
 
-                    {{-- 2. Placeholder Ketika Belum Dianalisis --}}
-                    <div x-show="!isInterpretingGraph && !graphInterpretationData" class="bg-gray-50/70 border border-dashed border-gray-200 rounded-2xl p-8 text-center flex flex-col items-center justify-center h-[540px]">
-                        <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4 border border-purple-100 shadow-sm">
+                    {{-- 2. Placeholder Ketika Belum Dianalisis / Auto-processing --}}
+                    <div x-show="!isInterpretingGraph && !graphInterpretationData" class="bg-gray-50/70 border border-dashed border-purple-200 rounded-2xl p-8 text-center flex flex-col items-center justify-center h-[380px] sm:h-[460px] md:h-[540px]">
+                        <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4 border border-purple-100 shadow-sm animate-bounce">
                             <i data-lucide="sparkles" class="w-7 h-7"></i>
                         </div>
-                        <h3 class="text-sm font-black uppercase tracking-wider text-gray-800 mb-2">Interpretasi Makna Graf (AI)</h3>
-                        <p class="text-xs text-gray-500 font-medium leading-relaxed max-w-sm mb-6">
-                            Klik tombol <strong>"Analisis Makna Graf (AI)"</strong> di atas untuk memproses gambar peta wacana ini secara multimodal bersama dinamika intonasi dan hasil analisis akhir.
+                        <h3 class="text-sm font-black uppercase tracking-wider text-gray-800 mb-2">Sintesis Otomatis Peta Wacana AI</h3>
+                        <p class="text-xs text-gray-500 font-medium leading-relaxed max-w-sm mb-4">
+                            Model AI sedang menyelaraskan topologi simpul jaringan, dinamika intonasi, dan alur percakapan secara otomatis.
                         </p>
-                        <button type="button" @click="analyzeGraphWithAI()"
-                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider shadow-md shadow-purple-600/20 transition-all hover:scale-105 active:scale-95 cursor-pointer">
-                            <i data-lucide="sparkles" class="w-4 h-4 text-purple-200"></i>
-                            <span>Mulai Analisis Sekarang</span>
-                        </button>
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200">
+                            <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>
+                            <span>Memproses analisis multimodal...</span>
+                        </div>
                     </div>
 
                     {{-- 3. Tampilan Konten Hasil Interpretasi AI --}}
@@ -1893,12 +1877,18 @@
                 }
             }
 
-            // Render awal diagram alur Mermaid
+            // Render awal diagram alur Mermaid & Sintesis Otomatis Graf jika belum ada data
             setTimeout(function() {
                 if (window.renderMermaidChart) {
                     window.renderMermaidChart();
                 }
-            }, 300);
+
+                // Otomatis men-generate interpretasi graf & alur mermaid begitu halaman dimuat
+                const alpineData = getAlpineData();
+                if (alpineData && !alpineData.graphInterpretationData && !alpineData.isInterpretingGraph) {
+                    alpineData.analyzeGraphWithAI();
+                }
+            }, 500);
         });
 
         // Global helper untuk merender diagram Mermaid ke DOM
