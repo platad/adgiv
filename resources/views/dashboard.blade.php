@@ -205,59 +205,59 @@
                  activeModel: 'both',   // 'both', 'indobert', 'roberta'
              }">
             
-            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200">
+            <div class="bg-[#FBF9F5] rounded-3xl p-6 sm:p-8 border border-[#E8E2D7]">
                 {{-- Header & Switcher --}}
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-100">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 mb-6 border-b border-[#E8E2D7]">
                     <div>
                         <div class="flex items-center gap-2 mb-1.5">
-                            <span class="px-2.5 py-0.5 rounded-md bg-gray-100 text-gray-700 text-[0.68rem] font-bold uppercase tracking-wider border border-gray-200">
+                            <span class="px-2.5 py-0.5 rounded-md bg-[#F2ECE1] text-amber-950 text-[0.68rem] font-bold uppercase tracking-wider border border-[#DECDBB]">
                                 Eksperimen Google Colab
                             </span>
-                            <span class="text-xs text-gray-500">Hasil Riset BIMA</span>
+                            <span class="text-xs text-stone-600 font-medium">Hasil Riset BIMA</span>
                         </div>
-                        <h2 class="text-lg sm:text-xl font-bold text-gray-900 tracking-tight">
+                        <h2 class="text-lg sm:text-xl font-bold text-stone-900 tracking-tight">
                             Komparasi Model: IndoBERT Base vs RoBERTa Multi-Task
                         </h2>
-                        <p class="text-xs text-gray-500 mt-0.5">
+                        <p class="text-xs text-stone-600 mt-0.5">
                             Evaluasi performa klasifikasi wacana pedagogis & relasi kuasa bimbingan skripsi.
                         </p>
                     </div>
 
                     {{-- Navigation Tabs --}}
                     <div class="flex flex-wrap items-center gap-2">
-                        <div class="flex items-center bg-gray-100/90 p-1 rounded-xl border border-gray-200 text-xs font-semibold text-gray-600">
+                        <div class="flex items-center bg-[#F2EDE4] p-1 rounded-xl border border-[#E0D8CB] text-xs font-semibold text-stone-700">
                             <button type="button" @click="activeTab = 'overview'" 
                                     class="px-3 py-1.5 rounded-lg transition cursor-pointer"
-                                    :class="activeTab === 'overview' ? 'bg-white text-gray-900 font-bold border border-gray-200/80' : 'hover:text-gray-900'">
+                                    :class="activeTab === 'overview' ? 'bg-white text-stone-900 font-bold border border-[#DDD4C5]' : 'hover:text-stone-950'">
                                 Ikhtisar Fitur
                             </button>
                             <button type="button" @click="activeTab = 'curves'" 
                                     class="px-3 py-1.5 rounded-lg transition cursor-pointer"
-                                    :class="activeTab === 'curves' ? 'bg-white text-gray-900 font-bold border border-gray-200/80' : 'hover:text-gray-900'">
+                                    :class="activeTab === 'curves' ? 'bg-white text-stone-900 font-bold border border-[#DDD4C5]' : 'hover:text-stone-950'">
                                 Kurva Training Loss
                             </button>
                             <button type="button" @click="activeTab = 'matrix'" 
                                     class="px-3 py-1.5 rounded-lg transition cursor-pointer"
-                                    :class="activeTab === 'matrix' ? 'bg-white text-gray-900 font-bold border border-gray-200/80' : 'hover:text-gray-900'">
+                                    :class="activeTab === 'matrix' ? 'bg-white text-stone-900 font-bold border border-[#DDD4C5]' : 'hover:text-stone-950'">
                                 Confusion Matrix
                             </button>
                         </div>
 
                         {{-- Filter Model (Desktop & Mobile) --}}
-                        <div class="flex items-center bg-gray-50 p-1 rounded-xl border border-gray-200 text-xs font-medium text-gray-600">
+                        <div class="flex items-center bg-[#F2EDE4] p-1 rounded-xl border border-[#E0D8CB] text-xs font-medium text-stone-700">
                             <button type="button" @click="activeModel = 'both'"
                                     class="px-2.5 py-1.5 rounded-lg transition cursor-pointer"
-                                    :class="activeModel === 'both' ? 'bg-gray-900 text-white font-bold' : 'hover:text-gray-900'">
+                                    :class="activeModel === 'both' ? 'bg-stone-900 text-white font-bold' : 'hover:text-stone-950'">
                                 Keduanya
                             </button>
                             <button type="button" @click="activeModel = 'indobert'"
                                     class="px-2.5 py-1.5 rounded-lg transition cursor-pointer"
-                                    :class="activeModel === 'indobert' ? 'bg-blue-700 text-white font-bold' : 'hover:text-gray-900'">
+                                    :class="activeModel === 'indobert' ? 'bg-blue-700 text-white font-bold' : 'hover:text-stone-950'">
                                 IndoBERT
                             </button>
                             <button type="button" @click="activeModel = 'roberta'"
                                     class="px-2.5 py-1.5 rounded-lg transition cursor-pointer"
-                                    :class="activeModel === 'roberta' ? 'bg-purple-700 text-white font-bold' : 'hover:text-gray-900'">
+                                    :class="activeModel === 'roberta' ? 'bg-purple-700 text-white font-bold' : 'hover:text-stone-950'">
                                 RoBERTa
                             </button>
                         </div>
@@ -473,15 +473,15 @@
                 </div>
 
                 {{-- Clean Elegant Footer --}}
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-5 mt-6 border-t border-gray-100 text-xs text-gray-500">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-5 mt-6 border-t border-[#E8E2D7] text-xs text-stone-600">
                     <div class="flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-                        <span>IndoBERT Base (V1 Baseline)</span>
-                        <span class="mx-1 text-gray-300">•</span>
+                        <span class="font-medium text-stone-700">IndoBERT Base (V1 Baseline)</span>
+                        <span class="mx-1 text-stone-400">•</span>
                         <span class="w-2 h-2 rounded-full bg-purple-600"></span>
-                        <span>RoBERTa Multi-Task (V2 Arsitektur Baru)</span>
+                        <span class="font-medium text-stone-700">RoBERTa Multi-Task (V2 Arsitektur Baru)</span>
                     </div>
-                    <span class="text-[0.7rem] text-gray-400">
+                    <span class="text-[0.7rem] text-stone-500 font-medium">
                         Data validasi diekstraksi langsung dari notebook pelatihan Google Colab BIMA.
                     </span>
                 </div>
