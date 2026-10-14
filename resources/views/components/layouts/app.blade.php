@@ -97,7 +97,7 @@
     </script>
 </head>
 
-<body class="min-h-screen bg-gray-50 flex font-sans antialiased" x-data="{ mobileAnalysisDrawer: false }">
+<body class="min-h-screen bg-gray-50 flex font-sans antialiased" x-data="{ mobileAnalysisDrawer: false, mobileMethodologyDrawer: false }">
 
     {{-- Mobile Header --}}
     <div
@@ -251,15 +251,75 @@
                     </div>
                 </div>
 
-                {{-- 3. Methodology --}}
-                <a href="{{ route('methodology') }}"
-                    class="w-12 h-12 rounded-2xl {{ request()->routeIs('methodology') ? 'bg-bima-red text-white shadow-lg shadow-red-500/25 ring-2 ring-red-400/20' : 'bg-white/5 text-white/50 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
-                    title="Metodologi C-CDA">
-                    <i data-lucide="book-open" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
-                    <div
-                        class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.65rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50 border border-white/10 shadow-xl">
-                        Metodologi</div>
-                </a>
+                {{-- 3. Methodology Group Dropdown --}}
+                <div class="relative" x-data="{ openMethodology: false }" @click.away="openMethodology = false">
+                    <button type="button" @click="openMethodology = !openMethodology"
+                        class="w-12 h-12 rounded-2xl {{ request()->routeIs('methodology', 'methodology.v2') ? 'bg-bima-red text-white shadow-lg shadow-red-500/25 ring-2 ring-red-400/20' : 'bg-white/5 text-white/50 hover:text-white hover:bg-white/10' }} flex items-center justify-center transition-all group relative cursor-pointer"
+                        title="Metodologi Penelitian">
+                        <i data-lucide="book-open" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                        
+                        {{-- Active Indicator dot --}}
+                        @if(request()->routeIs('methodology', 'methodology.v2'))
+                            <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-white ring-2 ring-bima-red"></span>
+                        @endif
+
+                        {{-- Tooltip when flyout is closed --}}
+                        <div x-show="!openMethodology"
+                            class="hidden lg:block absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-[0.65rem] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest z-50 border border-white/10 shadow-xl">
+                            Metodologi</div>
+                    </button>
+
+                    {{-- Flyout Dropdown Panel --}}
+                    <div x-show="openMethodology"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 translate-x-2 scale-95"
+                        x-transition:enter-end="opacity-100 translate-x-0 scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 translate-x-0 scale-100"
+                        x-transition:leave-end="opacity-0 translate-x-2 scale-95"
+                        style="display: none;"
+                        class="absolute left-full top-1/2 -translate-y-1/2 ml-4 w-80 bg-gray-900/98 backdrop-blur-2xl border border-white/15 rounded-3xl p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-[80]">
+                        
+                        {{-- Flyout Header --}}
+                        <div class="px-3 py-2 border-b border-white/10 mb-2.5 flex items-center justify-between">
+                            <div>
+                                <span class="text-[0.65rem] font-black uppercase tracking-widest text-bima-red">Metodologi Ilmiah</span>
+                                <p class="text-[0.68rem] text-white/50 mt-0.5">Pilih model & kerangka riset</p>
+                            </div>
+                            <span class="text-[0.6rem] font-black px-2 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10">2 Versi</span>
+                        </div>
+
+                        {{-- Methodology List --}}
+                        <div class="flex flex-col gap-1.5">
+                            {{-- Metodologi V1: IndoBERT & G-MLLM --}}
+                            <a href="{{ route('methodology') }}"
+                                class="flex items-center gap-3 p-2.5 rounded-2xl transition group/item {{ request()->routeIs('methodology') ? 'bg-bima-red text-white shadow-md shadow-red-500/20' : 'hover:bg-white/5 text-white/80 hover:text-white' }}">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 {{ request()->routeIs('methodology') ? 'bg-white/20 text-white' : 'bg-red-500/10 text-red-400 group-hover/item:scale-105 group-hover/item:bg-red-500/20' }} transition">
+                                    <i data-lucide="book-open" class="w-4.5 h-4.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold truncate">Metodologi V1 (IndoBERT)</div>
+                                    <div class="text-[0.65rem] {{ request()->routeIs('methodology') ? 'text-white/80' : 'text-white/40' }} truncate">IndoBERT & G-MLLM Hybrid C-CDA</div>
+                                </div>
+                            </a>
+
+                            {{-- Metodologi V2: Multi-Task RoBERTa & Graf --}}
+                            <a href="{{ route('methodology.v2') }}"
+                                class="flex items-center gap-3 p-2.5 rounded-2xl transition group/item {{ request()->routeIs('methodology.v2') ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20' : 'hover:bg-white/5 text-white/80 hover:text-white' }}">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 {{ request()->routeIs('methodology.v2') ? 'bg-white/20 text-white' : 'bg-purple-500/10 text-purple-400 group-hover/item:scale-105 group-hover/item:bg-purple-500/20' }} transition">
+                                    <i data-lucide="sparkles" class="w-4.5 h-4.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold truncate flex items-center gap-1.5">
+                                        <span>Metodologi V2 (RoBERTa)</span>
+                                        <span class="text-[0.55rem] px-1.5 py-0.2 rounded bg-purple-400/20 text-purple-300 uppercase font-black">Baru</span>
+                                    </div>
+                                    <div class="text-[0.65rem] {{ request()->routeIs('methodology.v2') ? 'text-white/80' : 'text-white/40' }} truncate">Multi-Task RoBERTa & Topologi Graf</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </nav>
 
             {{-- Bottom Actions (Accessibility, Compact Language Switcher, Logout) --}}
@@ -345,11 +405,16 @@
             <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">Analisis</span>
         </button>
 
-        {{-- Methodology --}}
-        <a href="{{ route('methodology') }}" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('methodology') ? 'text-bima-red font-black' : 'text-white/60 hover:text-white' }} transition">
-            <i data-lucide="book-open" class="w-5 h-5"></i>
+        {{-- Methodology (Opens Mobile Drawer) --}}
+        <button type="button" @click="mobileMethodologyDrawer = true; $nextTick(() => window.lucide && window.lucide.createIcons())" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl {{ request()->routeIs('methodology', 'methodology.v2') ? 'text-bima-red font-black' : 'text-white/60 hover:text-white' }} transition cursor-pointer">
+            <div class="relative">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                @if(request()->routeIs('methodology', 'methodology.v2'))
+                    <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-bima-red ring-2 ring-gray-900"></span>
+                @endif
+            </div>
             <span class="text-[0.55rem] font-bold mt-1 tracking-wider uppercase">Metode</span>
-        </a>
+        </button>
 
         {{-- Accessibility / Voice Mode Toggle --}}
         <button type="button" onclick="toggleAccessibilityMode()" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl text-white/60 hover:text-white transition cursor-pointer">
@@ -462,6 +527,73 @@
                     ZH (中文)
                 </button>
             </div>
+        </div>
+    </div>
+
+    {{-- Mobile Methodology Bottom Sheet Drawer --}}
+    <div x-show="mobileMethodologyDrawer"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="lg:hidden fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm"
+        style="display: none;"
+        @click="mobileMethodologyDrawer = false"></div>
+
+    <div x-show="mobileMethodologyDrawer"
+        x-transition:enter="transition ease-out duration-300 transform"
+        x-transition:enter-start="translate-y-full"
+        x-transition:enter-end="translate-y-0"
+        x-transition:leave="transition ease-in duration-200 transform"
+        x-transition:leave-start="translate-y-0"
+        x-transition:leave-end="translate-y-full"
+        class="lg:hidden fixed inset-x-0 bottom-0 z-[85] bg-gray-900 border-t border-white/10 rounded-t-[2.5rem] p-6 shadow-2xl max-h-[85vh] overflow-y-auto"
+        style="display: none;">
+        
+        {{-- Drawer Handle --}}
+        <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-5"></div>
+
+        {{-- Drawer Header --}}
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <h3 class="text-lg font-black text-white tracking-tight uppercase">Metodologi Ilmiah</h3>
+                <p class="text-xs text-white/50">Pilih model & kerangka riset BIMA</p>
+            </div>
+            <button @click="mobileMethodologyDrawer = false" class="w-10 h-10 rounded-xl bg-white/5 text-white/60 hover:text-white flex items-center justify-center cursor-pointer">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        {{-- Methodology Cards Grid --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+            {{-- 1. Metodologi V1 --}}
+            <a href="{{ route('methodology') }}"
+                class="flex items-center gap-3.5 p-3.5 rounded-2xl border transition {{ request()->routeIs('methodology') ? 'bg-bima-red/20 border-bima-red text-white' : 'bg-white/5 border-white/5 text-white/80 hover:bg-white/10' }}">
+                <div class="w-12 h-12 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
+                    <i data-lucide="book-open" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-bold text-sm text-white truncate">Metodologi V1 (IndoBERT)</div>
+                    <div class="text-[0.7rem] text-white/50 truncate">IndoBERT & G-MLLM Hybrid C-CDA</div>
+                </div>
+            </a>
+
+            {{-- 2. Metodologi V2 --}}
+            <a href="{{ route('methodology.v2') }}"
+                class="flex items-center gap-3.5 p-3.5 rounded-2xl border transition {{ request()->routeIs('methodology.v2') ? 'bg-purple-600/20 border-purple-500 text-white' : 'bg-white/5 border-white/5 text-white/80 hover:bg-white/10' }}">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
+                    <i data-lucide="sparkles" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-bold text-sm text-white truncate flex items-center gap-2">
+                        <span>Metodologi V2 (RoBERTa)</span>
+                        <span class="text-[0.6rem] px-1.5 py-0.5 rounded bg-purple-500/30 text-purple-300 uppercase font-black">Baru</span>
+                    </div>
+                    <div class="text-[0.7rem] text-white/50 truncate">Multi-Task RoBERTa & Topologi Graf</div>
+                </div>
+            </a>
         </div>
     </div>
 

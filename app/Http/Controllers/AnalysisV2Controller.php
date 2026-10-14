@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Http;
 
 class AnalysisV2Controller extends Controller
 {
+    public function methodology()
+    {
+        return view('analysis.v2.methodology');
+    }
+
     public function create()
     {
         return view('analysis.v2.create');

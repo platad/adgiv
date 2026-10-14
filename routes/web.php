@@ -55,6 +55,7 @@ Route::get('/', function (Request $request) {
         Route::get('/dashboard/realtime-data', [DashboardController::class, 'getRealtimeChartData'])->name('dashboard.realtime-data');
         Route::get('/dashboard/history-data', [DashboardController::class, 'getHistoryData'])->name('dashboard.history-data');
         Route::get('/methodology', [DashboardController::class, 'methodology'])->name('methodology');
+        Route::get('/methodology/v2', [\App\Http\Controllers\AnalysisV2Controller::class, 'methodology'])->name('methodology.v2');
 
         Route::prefix('analysis')->name('analysis.')->group(function () {
             Route::get('/create', [AnalysisController::class, 'create'])->name('create');
