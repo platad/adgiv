@@ -11,7 +11,6 @@
             </a>
 
             <div class="flex items-center gap-3 mb-2">
-                <div class="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse" id="status-dot"></div>
                 <span class="text-xs font-black text-purple-600 uppercase tracking-widest" id="status-badge-text">
                     <span class="lang-id">Sedang Menganalisis</span>
                     <span class="lang-en">Processing Analysis</span>
@@ -46,7 +45,7 @@
         </div>
 
         {{-- Main Execution Card --}}
-        <div class="bg-white border border-gray-100 rounded-[2.5rem] shadow-xl shadow-gray-100/60 p-8 md:p-12">
+        <div class="bg-white border border-gray-100 rounded-[2.5rem] shadow-xl shadow-gray-100/60 p-8 md:p-12" x-data="{ showLogs: false, logCount: 0 }">
             
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-gray-50">
                 <div class="flex items-center gap-4">
@@ -67,9 +66,33 @@
                         <h2 class="text-lg font-black text-gray-900" id="status-text">Menyiapkan koneksi ke Cloud AI...</h2>
                     </div>
                 </div>
-                <div class="text-right">
-                    <p class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 mb-1">Progres Keseluruhan</p>
-                    <p class="text-3xl font-black text-purple-600" id="progress-text">0%</p>
+                <div class="flex items-center gap-4">
+                    <button type="button" @click="showLogs = !showLogs"
+                            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-xs font-bold text-gray-700 transition shadow-xs cursor-pointer">
+                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+                        </svg>
+                        <span x-text="showLogs ? 'Tutup Log' : 'Lihat Log Latar Belakang'"></span>
+                        <span class="px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 text-[0.65rem] font-mono" x-text="logCount"></span>
+                    </button>
+                    <div class="text-right">
+                        <p class="text-[0.65rem] font-black uppercase tracking-widest text-gray-400 mb-1">Progres Keseluruhan</p>
+                        <p class="text-3xl font-black text-purple-600" id="progress-text">0%</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Collapsible Log Console (Rapi, Responsif & Modern) --}}
+            <div x-show="showLogs" x-collapse class="mb-8 p-5 bg-gray-950 rounded-2xl border border-gray-800 text-gray-200 font-mono shadow-inner">
+                <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-800 text-xs font-bold text-gray-400">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        <span class="text-gray-300 uppercase tracking-wider text-[0.7rem]">Log Sinkronisasi Cloud Temaniskripsi (V2)</span>
+                    </div>
+                    <span class="text-[0.65rem] text-gray-500">Live WebSocket Telemetry</span>
+                </div>
+                <div id="v2-log-box" class="h-48 overflow-y-auto space-y-1.5 text-xs text-gray-300 pr-2 scrollbar-thin scrollbar-thumb-gray-800">
+                    <div class="text-gray-500 italic">[Sistem] Menginisialisasi koneksi analitik suara...</div>
                 </div>
             </div>
 
@@ -157,6 +180,29 @@
             
             let ws;
             let retryCount = 0;
+            const logBox = document.getElementById('v2-log-box');
+
+            function addLog(message, type = 'info') {
+                if (!logBox) return;
+                const time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const row = document.createElement('div');
+                row.className = "flex items-start gap-2 leading-relaxed";
+                
+                let colorClass = "text-gray-300";
+                if (type === 'success') colorClass = "text-green-400 font-semibold";
+                else if (type === 'warning') colorClass = "text-amber-400";
+                else if (type === 'error') colorClass = "text-red-400";
+                
+                row.innerHTML = `<span class="text-gray-500 shrink-0 select-none">[${time}]</span><span class="${colorClass}">${message}</span>`;
+                logBox.appendChild(row);
+                logBox.scrollTop = logBox.scrollHeight;
+
+                // Update Alpine logCount if available
+                const executionCard = logBox.closest('[x-data]');
+                if (executionCard && executionCard._x_dataStack && executionCard._x_dataStack[0]) {
+                    executionCard._x_dataStack[0].logCount++;
+                }
+            }
 
             function updateStep(stepNum, status, desc) {
                 const icon = document.getElementById('step' + stepNum + '-icon');
@@ -187,12 +233,15 @@
             }
 
             function connectWS() {
+                addLog("Membuka saluran WebSocket wss://vps.temaniskripsi.id/api/v2/ws/" + slug, "info");
                 ws = new WebSocket(wsUrl);
 
                 ws.onopen = function() {
                     document.getElementById('status-text').innerText = "Terhubung dengan aman ke Cloud AI";
                     updateStep(1, 'active', 'Koneksi stabil. Menyiapkan audio...');
+                    addLog("Koneksi aman ke Cloud AI berhasil dibangun.", "success");
                     ws.send(JSON.stringify({action: "start_processing"}));
+                    addLog("Sinyal proses 'start_processing' dikirimkan.", "info");
                 };
 
                 ws.onmessage = function(event) {
@@ -214,6 +263,7 @@
                                 const speakerBox = document.getElementById('speaker-detected-box');
                                 if (speakerBox && speakerBox.classList.contains('hidden')) {
                                     speakerBox.classList.remove('hidden');
+                                    addLog("2 Pembicara (Dosen & Mahasiswa) berhasil teridentifikasi dari gelombang audio.", "success");
                                     if (window.lucide) window.lucide.createIcons();
                                 }
                             } else if (data.progress >= 80) {
@@ -230,10 +280,12 @@
                         
                         if (data.message) {
                             document.getElementById('status-text').innerText = data.message;
+                            addLog(data.message, data.status === 'completed' ? 'success' : 'info');
                         }
 
                         if (data.status === 'completed') {
                             document.getElementById('status-text').innerText = "Analisis selesai! Mengalihkan ke hasil...";
+                            addLog("Seluruh pipeline RoBERTa Multi-Task selesai 100%. Menyiapkan pengalihan...", "success");
                             
                             // Swap spinner with checkmark icon without spinning
                             const iconWrapper = document.getElementById('status-icon-wrapper');
@@ -250,10 +302,6 @@
                             if (badgeText) {
                                 badgeText.innerHTML = '<span class="text-green-600">Selesai</span>';
                             }
-                            const dot = document.getElementById('status-dot');
-                            if (dot) {
-                                dot.className = "w-2.5 h-2.5 rounded-full bg-green-600";
-                            }
                             
                             setTimeout(() => {
                                 window.location.href = "/{{ app()->getLocale() }}/analysis/v2/" + slug + "/result";
@@ -261,6 +309,7 @@
                         }
                     } catch (e) {
                         console.error("WS Parse Error", e);
+                        addLog("Gagal mem-parsing pesan WebSocket: " + e.message, "error");
                     }
                 };
 
@@ -269,6 +318,7 @@
                         retryCount++;
                         document.getElementById('status-text').innerText = `Menghubungkan ulang... (${retryCount}/5)`;
                         updateStep(1, 'error', 'Koneksi terputus. Mencoba ulang...');
+                        addLog(`Koneksi terputus. Mencoba reconnect (${retryCount}/5)...`, "warning");
                         setTimeout(connectWS, 2000);
                     } else {
                         document.getElementById('status-text').innerText = "Proses Berjalan di Latar Belakang";
@@ -278,6 +328,7 @@
                             iconWrapper.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"></circle><path stroke-width="2" d="M12 6v6l4 2"></path></svg>';
                         }
                         updateStep(1, 'error', 'Koneksi real-time terputus. Anda dapat me-refresh halaman ini.');
+                        addLog("Koneksi real-time terputus permanen. Proses analisis tetap berjalan di background VPS.", "warning");
                     }
                 };
             }
