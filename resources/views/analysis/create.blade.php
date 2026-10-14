@@ -125,16 +125,35 @@
                     </p>
                 </div>
 
-                {{-- Consent Checkbox --}}
-                <div class="flex items-start pt-2">
-                    <div class="flex items-center h-5 mt-0.5">
-                        <input id="consent" name="consent" type="checkbox" required class="w-5 h-5 rounded border-gray-300 text-gray-900 focus:ring-gray-900 cursor-pointer transition-all">
+                {{-- Persetujuan Etika Riset & Kemitraan (Trust & Compliance Card) --}}
+                <div class="rounded-3xl border-2 border-red-200/80 bg-gradient-to-br from-red-50/60 via-white to-gray-50 p-5 md:p-6 transition-all hover:border-red-300 shadow-sm">
+                    <div class="flex items-start gap-4">
+                        <div class="flex items-center h-6 mt-0.5">
+                            <input id="consent" name="consent" type="checkbox" required
+                                   class="w-5 h-5 rounded-lg border-2 border-red-400 text-bima-red focus:ring-bima-red cursor-pointer transition-all">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 text-[0.62rem] font-black uppercase tracking-wider">
+                                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-bima-red"></i>
+                                    Integritas Riset &amp; Privasi
+                                </span>
+                                <span class="text-[0.65rem] font-bold text-red-500 uppercase tracking-widest">*Wajib Dicentang</span>
+                            </div>
+
+                            <label for="consent" class="text-xs sm:text-sm font-bold text-gray-900 cursor-pointer select-none leading-relaxed block">
+                                <span class="lang-id">Saya menyetujui bahwa data rekaman yang dimasukkan adalah murni untuk keperluan penelitian ilmiah dan peningkatan mutu akademik.</span>
+                                <span class="lang-en">I agree that the recorded data entered is strictly for scientific research purposes and academic quality improvement.</span>
+                                <span class="lang-zh">我同意所输入的录音数据完全用于科学研究目的和提升学术质量。</span>
+                            </label>
+
+                            <p class="text-[0.7rem] text-gray-500 mt-1.5 leading-relaxed">
+                                <span class="lang-id">Kerahasiaan identitas penutur terlindungi sesuai standar kepatuhan etika penelitian dan komitmen kemitraan akademik BIMA UMPO.</span>
+                                <span class="lang-en">Speaker identity confidentiality is protected in accordance with research ethics compliance and BIMA UMPO academic partnership standards.</span>
+                                <span class="lang-zh">发言人身份隐私严格受保护，完全符合学术研究伦理标准与合作机构信任承诺。</span>
+                            </p>
+                        </div>
                     </div>
-                    <label for="consent" class="ml-3 text-xs font-bold text-gray-600 cursor-pointer select-none">
-                        <span class="lang-id">Saya menyetujui bahwa data yang dimasukkan adalah murni untuk keperluan penelitian.</span>
-                        <span class="lang-en">I agree that the data entered is strictly for research purposes.</span>
-                        <span class="lang-zh">我同意所输入的数据完全用于研究目的。</span>
-                    </label>
                 </div>
 
                 {{-- Submit Button --}}
