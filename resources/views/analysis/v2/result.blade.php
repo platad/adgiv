@@ -1008,7 +1008,7 @@
                 insightRelation: '',
                 activeMobileTab: 'transkrip',
                 currentPage: 1,
-                pageSize: 15,
+                pageSize: 10,
                 totalRows: {{ $totalSegments }},
                 get totalPages() {
                     return Math.max(1, Math.ceil(this.totalRows / this.pageSize));
