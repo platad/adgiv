@@ -1002,11 +1002,21 @@
                 </div>
             </div>
 
-            <div x-show="submitted"
-                class="bg-emerald-950/60 border border-emerald-800 rounded-[2.5rem] p-6 text-center text-emerald-200">
-                <i data-lucide="check-check" class="w-6 h-6 mx-auto mb-2 text-emerald-400"></i>
-                <h4 class="text-sm font-bold">Terima kasih atas penilaian dan validasi akurasi Anda!</h4>
-                <p class="text-xs text-emerald-300/80 mt-1">Umpan balik telah tersimpan ke dalam database korpus penelitian.</p>
+            <div x-show="submitted" x-transition.opacity style="display: none;"
+                class="bg-green-50 border border-green-200 rounded-2xl md:rounded-3xl p-8 text-center text-green-800 shadow-sm">
+                <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    <i data-lucide="check-circle" class="w-6 h-6"></i>
+                </div>
+                <p class="font-black text-sm uppercase tracking-wider">
+                    <span class="lang-id">Apresiasi Kami Atas Umpan Balik Anda!</span>
+                    <span class="lang-en">Our Sincere Appreciation for Your Feedback!</span>
+                    <span class="lang-zh">衷心感谢您的宝贵反馈！</span>
+                </p>
+                <p class="text-xs mt-1 text-green-600 font-medium">
+                    <span class="lang-id">Validasi Anda berhasil direkam untuk terus meningkatkan akurasi algoritma metrik Supervisory AI.</span>
+                    <span class="lang-en">Your validation has been successfully recorded to continuously improve the accuracy of the Supervisory AI metrics algorithm.</span>
+                    <span class="lang-zh">您的评估反馈已成功记录，这将用于持续改进 Supervisory AI 的度量算法准确性。</span>
+                </p>
             </div>
         </div>
 
