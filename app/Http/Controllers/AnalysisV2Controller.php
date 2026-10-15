@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Analysis;
 use App\Services\GraphAnalyticsService;
+use App\Services\RoBERTaAnalyticsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -439,6 +440,23 @@ class AnalysisV2Controller extends Controller
             'mode_counts' => $modeCounts,
             'intonation_counts' => $intonationCounts,
         ];
+
+        // Pengayaan XAI & Kalibrasi Distribusi Probabilitas Softmax RoBERTa
+        $robertaAnalyticsService = app(RoBERTaAnalyticsService::class);
+        $transcription = $robertaAnalyticsService->enrichTranscription($transcription);
+
+        // Agregasi Statistik Keyakinan Model & Entropi untuk Skripsi
+        $totalAdviceConf = 0;
+        $totalModeConf = 0;
+        $totalEntropy = 0;
+        foreach ($transcription as $it) {
+            $totalAdviceConf += $it['advice_confidence'] ?? 0;
+            $totalModeConf += $it['mode_confidence'] ?? 0;
+            $totalEntropy += $it['advice_xai']['normalized_entropy'] ?? 0;
+        }
+        $stats['avg_advice_confidence'] = $totalSegments > 0 ? round(($totalAdviceConf / $totalSegments) * 100, 1) : 0;
+        $stats['avg_mode_confidence'] = $totalSegments > 0 ? round(($totalModeConf / $totalSegments) * 100, 1) : 0;
+        $stats['avg_entropy'] = $totalSegments > 0 ? round(($totalEntropy / $totalSegments) * 100, 1) : 0;
 
         $graphInterpretation = $analysis->result_data['graph_interpretation'] ?? null;
         $speakerSamples = self::extractSpeakerSamples($transcription);

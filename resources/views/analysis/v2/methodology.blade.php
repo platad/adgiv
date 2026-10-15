@@ -567,6 +567,80 @@
                             </ul>
                         </div>
                     </div>
+
+                    {{-- Metrik XAI: Probabilitas Softmax & Entropi Shannon (Explainable AI untuk Skripsi) --}}
+                    <div class="mt-6 p-6 rounded-3xl bg-gradient-to-br from-purple-900/90 to-gray-900 text-white border border-purple-500/20 shadow-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center border border-purple-500/30">
+                                <i data-lucide="cpu" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <span class="text-[0.62rem] font-black uppercase tracking-widest text-purple-300 block">
+                                    <span class="lang-id">Transparansi Model & Explainable AI (XAI)</span>
+                                    <span class="lang-en">Model Transparency & Explainable AI (XAI)</span>
+                                    <span class="lang-zh">模型透明度与可解释人工智能 (XAI)</span>
+                                </span>
+                                <h4 class="text-sm font-black uppercase tracking-tight text-white">
+                                    <span class="lang-id">Distribusi Probabilitas Softmax, Margin Kepastian, & Entropi Shannon</span>
+                                    <span class="lang-en">Softmax Probabilities, Certainty Margin, & Shannon Entropy</span>
+                                    <span class="lang-zh">Softmax 概率分布、置信边际与香农信息熵</span>
+                                </h4>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-gray-300 leading-relaxed mb-4">
+                            <span class="lang-id">
+                                Dalam sidang skripsi, model deep learning sering kali diuji apakah bekerja seperti <i>black-box</i>. Sistem kami mengatasi hal tersebut dengan mengekstraksi seluruh distribusi probabilitas <strong>Softmax</strong> pada output layer klasifikasi RoBERTa multi-task, lalu mengukur tingkat kepastian prediksi menggunakan <strong>Entropi Shannon</strong>.
+                            </span>
+                            <span class="lang-en">
+                                To prevent deep learning models from acting as opaque black boxes, our system exposes the full multi-task Softmax probability vector and quantifies prediction ambiguity via Shannon Entropy.
+                            </span>
+                            <span class="lang-zh">
+                                为避免深度学习模型陷入黑盒质疑，本系统完整输出 RoBERTa 多任务分类层的 Softmax 概率全分布，并采用香农信息熵量化预测置信度与模糊度。
+                            </span>
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+                                <span class="text-[0.62rem] font-bold text-purple-300 uppercase tracking-wider block mb-1">1. Vektor Probabilitas Softmax</span>
+                                <div class="font-mono text-[0.72rem] text-pink-300 bg-black/40 p-2 rounded-lg text-center mb-1.5">
+                                    P(y_i|x) = e^{z_i} / \sum e^{z_j}
+                                </div>
+                                <p class="text-[0.68rem] text-gray-300 leading-snug">
+                                    Mengubah nilai logit mentah $z_i$ menjadi distribusi probabilitas ternormalisasi di mana total probabilitas seluruh kelas tepat $1.0$ (100%).
+                                </p>
+                            </div>
+
+                            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+                                <span class="text-[0.62rem] font-bold text-blue-300 uppercase tracking-wider block mb-1">2. Margin Kepastian (Margin of Victory)</span>
+                                <div class="font-mono text-[0.72rem] text-blue-300 bg-black/40 p-2 rounded-lg text-center mb-1.5">
+                                    \Delta P = P_{top1} - P_{top2}
+                                </div>
+                                <p class="text-[0.68rem] text-gray-300 leading-snug">
+                                    Selisih skor probabilitas antara kelas pemenang dengan kandidat terkuat kedua. Margin tinggi ($\Delta P > 0.5$) membuktikan keyakinan kategoris yang kuat.
+                                </p>
+                            </div>
+
+                            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+                                <span class="text-[0.62rem] font-bold text-emerald-300 uppercase tracking-wider block mb-1">3. Entropi Ketidakpastian Shannon</span>
+                                <div class="font-mono text-[0.72rem] text-emerald-300 bg-black/40 p-2 rounded-lg text-center mb-1.5">
+                                    H(X) = -\sum p_i \log_2(p_i)
+                                </div>
+                                <p class="text-[0.68rem] text-gray-300 leading-snug">
+                                    Mengukur dispersi ketidakpastian. Entropi rendah ($H < 0.5$) menandakan tuturan tegas, sedangkan entropi tinggi mendeteksi kalimat bimbingan yang memiliki fungsi pragmatik ganda.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 text-[0.7rem] text-purple-200 bg-purple-500/10 p-2.5 rounded-xl border border-purple-500/20">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                            <span>
+                                <span class="lang-id">Fitur ini memungkinkan penguji skripsi mengklik setiap label dialog untuk memverifikasi tingkat keyakinan model secara empiris dan transparan.</span>
+                                <span class="lang-en">This allows thesis examiners to inspect empirical confidence and class uncertainty for each utterance interactively.</span>
+                                <span class="lang-zh">该特性支持答辩评审专家点击对话标签，透明审查模型在每个句段上的实证置信度与不确定性指标。</span>
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Dinamika Intonasi & Topologi Graf --}}
