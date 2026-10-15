@@ -1793,6 +1793,43 @@
             </div>
         </div>
 
+        {{-- Modal Notifikasi Sukses Modern (Pengganti alert browser) --}}
+        <div x-show="showSuccessModal"
+            class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none"
+            style="display: none;">
+            <div x-show="showSuccessModal" @click="showSuccessModal = false"
+                x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-black/60 backdrop-blur-md"></div>
+
+            <div x-show="showSuccessModal"
+                x-transition:enter="transition ease-out duration-300 transform"
+                x-transition:enter-start="opacity-0 scale-95 translate-y-2" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-200 transform"
+                x-transition:leave-start="opacity-100 scale-100 translate-y-0" x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+                class="relative bg-white rounded-3xl max-w-sm w-full mx-4 p-7 shadow-2xl z-10 border border-emerald-100 text-center animate-in">
+                
+                <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4 border border-emerald-100 shadow-sm shadow-emerald-500/10">
+                    <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-500"></i>
+                </div>
+
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/70 text-emerald-800 text-[0.65rem] font-black uppercase tracking-widest mb-3">
+                    <span x-text="successModalBadge || 'Berhasil'"></span>
+                </div>
+
+                <h3 class="text-base font-black text-gray-900 uppercase tracking-tight mb-2" x-text="successModalTitle"></h3>
+                <p class="text-xs text-gray-600 font-medium leading-relaxed mb-6" x-text="successModalMessage"></p>
+
+                <div class="flex justify-center">
+                    <button type="button" @click="showSuccessModal = false"
+                        class="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition shadow-md shadow-purple-600/20 cursor-pointer">
+                        Oke, Mengerti
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <x-slot name="scripts">
@@ -2046,6 +2083,12 @@
                 errorModalTitle: '',
                 errorModalMessage: '',
 
+                // Success Modal State (Modern UI Alert Replacement)
+                showSuccessModal: false,
+                successModalTitle: '',
+                successModalMessage: '',
+                successModalBadge: '',
+
                 // Generate AI Substance State
                 generatingSubstance: false,
                 async generateAiSubstance() {
@@ -2139,6 +2182,16 @@
                     this.errorModalTitle = title;
                     this.errorModalMessage = message;
                     this.showErrorModal = true;
+                    this.$nextTick(() => {
+                        if (window.lucide) window.lucide.createIcons();
+                    });
+                },
+
+                showSuccess(title, message, badge = 'Berhasil Diperbarui') {
+                    this.successModalTitle = title;
+                    this.successModalMessage = message;
+                    this.successModalBadge = badge;
+                    this.showSuccessModal = true;
                     this.$nextTick(() => {
                         if (window.lucide) window.lucide.createIcons();
                     });
@@ -2526,13 +2579,20 @@
                                 this.shareUrl = data.share_url;
                             }
                             this.showShareModal = false;
-                            alert('Pengaturan visibilitas berhasil diperbarui! ' + (data.visibility === 'public' ? 'Tautan kini terbuka untuk publik (Open Source) tanpa login.' : (data.visibility === 'login_required' ? 'Tautan kini terbuka khusus untuk pengguna yang login.' : 'Tautan kini disetel pribadi (hanya pemilik).')));
+                            
+                            const desc = data.visibility === 'public' 
+                                ? 'Tautan kini terbuka untuk publik (Open Source) tanpa login. Siapa saja dapat melihat analisis ini.'
+                                : (data.visibility === 'login_required' 
+                                    ? 'Tautan kini terbuka khusus untuk pengguna yang login ke akun platform.' 
+                                    : 'Tautan kini disetel pribadi (hanya akun Anda yang dapat mengakses).');
+                            
+                            this.showSuccess('Pengaturan Visibilitas', desc, 'Hak Akses Disimpan');
                         } else {
-                            alert(data.message || 'Gagal menyimpan pengaturan visibilitas.');
+                            this.showError('Gagal Menyimpan', data.message || 'Gagal menyimpan pengaturan visibilitas.');
                         }
                     } catch (e) {
                         console.error('Error updating visibility:', e);
-                        alert('Terjadi kendala saat memperbarui pengaturan visibilitas.');
+                        this.showError('Kendala Jaringan', 'Terjadi kendala saat memperbarui pengaturan visibilitas.');
                     } finally {
                         this.isSavingVisibility = false;
                         this.$nextTick(() => {
