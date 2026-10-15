@@ -140,6 +140,51 @@
                     {{-- Hidden Audio Player for Speaker Snippet Previews --}}
                     <audio x-ref="processingAudioPlayer" src="{{ route('analysis.v2.audio', $analysis->slug) }}" @timeupdate="onSpeakerAudioUpdate()" @ended="stopSpeakerAudio()"></audio>
 
+                    {{-- Completion Banner when AI 100% finished --}}
+                    <div x-show="isCompleted" x-collapse
+                        class="p-5 rounded-3xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-white/20 text-white flex items-center justify-center shrink-0">
+                                <i data-lucide="check-check" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-black uppercase tracking-wider">
+                                    <span class="lang-id">Analisis Selesai 100%!</span>
+                                    <span class="lang-en">Analysis 100% Completed!</span>
+                                    <span class="lang-zh">分析已 100% 完成!</span>
+                                </h4>
+                                <p class="text-xs text-emerald-100 font-medium leading-relaxed mt-0.5">
+                                    <span class="lang-id">Seluruh wacana & graf telah diproses. Anda dapat memvalidasi nama peran pembicara di bawah sebelum membuka halaman hasil.</span>
+                                    <span class="lang-en">All discourse & graphs are ready. You can verify speaker roles below before proceeding to results.</span>
+                                    <span class="lang-zh">话语与图谱已生成完毕。您可在下方确认或调整角色标签，然后进入结果页。</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-white/20">
+                            <button type="button" @click="saveAndProceed()" :disabled="isSavingSpeakers"
+                                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white text-emerald-900 font-black text-xs uppercase tracking-wider hover:bg-emerald-50 transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-50">
+                                <template x-if="isSavingSpeakers">
+                                    <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                </template>
+                                <span>
+                                    <span class="lang-id">Simpan & Buka Hasil Analisis</span>
+                                    <span class="lang-en">Save & View Results</span>
+                                    <span class="lang-zh">保存并查看分析结果</span>
+                                </span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                            <button type="button" @click="proceedToResult()"
+                                class="inline-flex items-center justify-center px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider transition cursor-pointer">
+                                <span>
+                                    <span class="lang-id">Lewati & Buka Hasil</span>
+                                    <span class="lang-en">Skip & Open Result</span>
+                                    <span class="lang-zh">跳过并直接查看</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
                     {{-- Speaker Detection Live Interactive Feedback Box --}}
                     <div id="speaker-detected-box" x-show="speakersLoaded && speakersList.length > 0" x-collapse
                         class="bg-purple-50/70 border border-purple-200 rounded-3xl p-6 transition-all duration-500 animate-fade-in space-y-4">
@@ -150,7 +195,11 @@
                                     <i data-lucide="users" class="w-5 h-5"></i>
                                 </div>
                                 <div>
-                                    <span class="px-2 py-0.5 rounded-full bg-purple-200 text-purple-800 text-[0.6rem] font-black uppercase tracking-wider">Anotasi Pembicara</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-purple-200 text-purple-800 text-[0.6rem] font-black uppercase tracking-wider">
+                                        <span class="lang-id">Anotasi Pembicara</span>
+                                        <span class="lang-en">Speaker Annotation</span>
+                                        <span class="lang-zh">说话人角色标注</span>
+                                    </span>
                                     <h4 class="text-sm font-black text-purple-950 mt-0.5" x-text="speakersList.length + ' Peran Terdeteksi'"></h4>
                                 </div>
                             </div>
@@ -160,7 +209,11 @@
                                 <button type="button" @click="swapTwoSpeakers()"
                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition shadow-sm cursor-pointer shrink-0">
                                     <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i>
-                                    <span>Tukar Peran</span>
+                                    <span>
+                                        <span class="lang-id">Tukar Peran</span>
+                                        <span class="lang-en">Swap Roles</span>
+                                        <span class="lang-zh">对调角色</span>
+                                    </span>
                                 </button>
                             </template>
                         </div>
@@ -174,7 +227,9 @@
                         </template>
 
                         <p class="text-xs text-purple-900 leading-relaxed font-medium">
-                            Dengarkan sampel suara untuk memvalidasi penutur, dan beri label nama peran (misal nama dosen/mahasiswa):
+                            <span class="lang-id">Dengarkan sampel suara untuk memvalidasi penutur, dan beri label nama peran (misal nama dosen/mahasiswa):</span>
+                            <span class="lang-en">Listen to speaker samples to verify voices and customize names/roles:</span>
+                            <span class="lang-zh">试听各角色声音片段进行确认，并自定义姓名或身份（如导师/学生）：</span>
                         </p>
 
                         {{-- List of Speaker Cards --}}
@@ -227,16 +282,26 @@
                             </template>
                         </div>
 
-                        {{-- Save / Apply Button in Processing --}}
-                        <div class="flex items-center justify-between pt-2">
+                        {{-- Action Buttons in Processing Panel --}}
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
                             <span class="text-[0.68rem] text-purple-700/80 font-medium" x-show="saveSuccessMsg" x-text="saveSuccessMsg"></span>
-                            <button type="button" @click="saveSpeakerChanges()" :disabled="isSavingSpeakers"
-                                class="ml-auto inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition shadow-sm cursor-pointer disabled:opacity-50">
-                                <template x-if="isSavingSpeakers">
-                                    <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                            
+                            <div class="flex items-center gap-2 ml-auto">
+                                <button type="button" @click="saveSpeakerChanges()" :disabled="isSavingSpeakers"
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition shadow-sm cursor-pointer disabled:opacity-50">
+                                    <template x-if="isSavingSpeakers">
+                                        <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                    </template>
+                                    <span x-text="isSavingSpeakers ? 'Menyimpan...' : 'Terapkan Label Peran'"></span>
+                                </button>
+
+                                <template x-if="isCompleted">
+                                    <button type="button" @click="saveAndProceed()" :disabled="isSavingSpeakers"
+                                        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider transition shadow-md cursor-pointer disabled:opacity-50">
+                                        <span>Buka Hasil ➔</span>
+                                    </button>
                                 </template>
-                                <span x-text="isSavingSpeakers ? 'Menyimpan...' : 'Terapkan Label Peran'"></span>
-                            </button>
+                            </div>
                         </div>
                     </div>
 
@@ -244,9 +309,15 @@
                         <div class="w-12 h-12 mx-auto rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center mb-3">
                             <i data-lucide="shield-check" class="w-6 h-6"></i>
                         </div>
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 mb-1">Analisis Multi-Task Real-Time</h4>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-900 mb-1">
+                            <span class="lang-id">Analisis Multi-Task Real-Time</span>
+                            <span class="lang-en">Real-Time Multi-Task Analysis</span>
+                            <span class="lang-zh">实时多任务智能分析</span>
+                        </h4>
                         <p class="text-xs text-gray-500 font-medium leading-relaxed">
-                            Sistem menggunakan saluran WebSocket langsung ke Cloud AI. Halaman ini akan secara otomatis membawa Anda ke layar hasil setelah seluruh proses analisis wacana dan graf selesai 100%.
+                            <span class="lang-id">Sistem menggunakan saluran WebSocket langsung ke Cloud AI. Setelah analisis selesai 100%, Anda dapat mengonfirmasi label peran di atas sebelum beralih ke hasil.</span>
+                            <span class="lang-en">Direct WebSocket connection to Cloud AI. After reaching 100%, verify speaker roles above before opening the result view.</span>
+                            <span class="lang-zh">系统通过直接 WebSocket 与 Cloud AI 连接。进度达 100% 后，您可在上方核验角色后再进入结果页。</span>
                         </p>
                     </div>
                 </div>
@@ -267,6 +338,7 @@
                 speakerAudioEndTime: null,
                 isSavingSpeakers: false,
                 saveSuccessMsg: '',
+                isCompleted: false,
 
                 init() {
                     window.v2ProcessingApp = this;
@@ -337,10 +409,10 @@
                     spk1.name = tempName;
                 },
 
-                async saveSpeakerChanges() {
+                async saveSpeakerChanges(silent = false) {
                     this.isSavingSpeakers = true;
                     this.stopSpeakerAudio();
-                    this.saveSuccessMsg = '';
+                    if (!silent) this.saveSuccessMsg = '';
 
                     try {
                         const payload = {
@@ -364,17 +436,34 @@
 
                         const data = await res.json();
                         if (data.status === 'success') {
-                            this.saveSuccessMsg = 'Label peran berhasil disimpan!';
-                            setTimeout(() => { this.saveSuccessMsg = ''; }, 3000);
+                            if (!silent) {
+                                this.saveSuccessMsg = 'Label peran berhasil disimpan!';
+                                setTimeout(() => { this.saveSuccessMsg = ''; }, 3000);
+                            }
+                            return true;
                         } else {
-                            alert(data.message || 'Gagal menyimpan perubahan pembicara.');
+                            if (!silent) alert(data.message || 'Gagal menyimpan perubahan pembicara.');
+                            return false;
                         }
                     } catch (err) {
                         console.error('Save speaker error:', err);
-                        alert('Terjadi kesalahan saat menyimpan peran.');
+                        if (!silent) alert('Terjadi kesalahan saat menyimpan peran.');
+                        return false;
                     } finally {
                         this.isSavingSpeakers = false;
                     }
+                },
+
+                async saveAndProceed() {
+                    if (this.speakersLoaded && this.speakersList.length > 0) {
+                        await this.saveSpeakerChanges(true);
+                    }
+                    this.proceedToResult();
+                },
+
+                proceedToResult() {
+                    this.stopSpeakerAudio();
+                    window.location.href = "/{{ app()->getLocale() }}/analysis/v2/{{ $analysis->slug }}/result";
                 }
             };
         }
@@ -487,8 +576,8 @@
                         }
 
                         if (data.status === 'completed') {
-                            document.getElementById('status-text').innerText = "Analisis selesai! Mengalihkan ke hasil...";
-                            addLog("Seluruh pipeline RoBERTa Multi-Task selesai 100%. Menyiapkan pengalihan...", "success");
+                            document.getElementById('status-text').innerText = "Analisis Selesai 100%! Verifikasi peran pembicara di bawah.";
+                            addLog("Seluruh pipeline RoBERTa Multi-Task selesai 100%. Menunggu konfirmasi peran pembicara.", "success");
                             
                             // Swap spinner with checkmark icon without spinning
                             const iconWrapper = document.getElementById('status-icon-wrapper');
@@ -503,12 +592,16 @@
 
                             const badgeText = document.getElementById('status-badge-text');
                             if (badgeText) {
-                                badgeText.innerHTML = '<span class="text-green-600">Selesai</span>';
+                                badgeText.innerHTML = '<span class="text-green-600">Selesai 100%</span>';
                             }
                             
-                            setTimeout(() => {
-                                window.location.href = "/{{ app()->getLocale() }}/analysis/v2/" + slug + "/result";
-                            }, 1200);
+                            if (window.v2ProcessingApp) {
+                                window.v2ProcessingApp.isCompleted = true;
+                                window.v2ProcessingApp.fetchSpeakerSamples();
+                                window.v2ProcessingApp.$nextTick(() => {
+                                    if (window.lucide) window.lucide.createIcons();
+                                });
+                            }
                         }
                     } catch (e) {
                         console.error("WS Parse Error", e);
