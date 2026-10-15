@@ -328,43 +328,16 @@ class AnalysisV2Controller extends Controller
                 $needsPersist = true;
             }
 
-            // Bangun text_html yang konsisten dengan V1
-            $rawText = $item['text_html'] ?? ($item['text'] ?? '');
-            
-            // Generate icon inline button untuk intonasi
-            $iconSvg = '';
-            if ($intType === 'up') {
-                $iconSvg = '<svg class="inline-block w-4 h-4 text-blue-500 mx-1 align-middle hover:scale-125 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>';
-            } elseif ($intType === 'down') {
-                $iconSvg = '<svg class="inline-block w-4 h-4 text-red-500 mx-1 align-middle hover:scale-125 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>';
-            } else {
-                $iconSvg = '<svg class="inline-block w-4 h-4 text-gray-400 mx-1 align-middle hover:scale-125 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14"></path></svg>';
+            // Bersihkan text dari button inline sebelumnya jika pernah ter-generate ganda / korup
+            $cleanText = preg_replace('/<button[^>]*>.*?<\/button>/is', '', $item['text_html'] ?? ($item['text'] ?? ''));
+            $cleanText = trim(strip_tags($cleanText));
+            if (empty($cleanText)) {
+                $cleanText = trim(strip_tags($item['text'] ?? ''));
             }
 
-            $jsonTitle = htmlspecialchars(json_encode('Intonasi ' . ($intType === 'up' ? 'Naik (High pitch)' : ($intType === 'down' ? 'Turun (Low pitch)' : 'Netral'))), ENT_QUOTES);
-            $jsonType = htmlspecialchars(json_encode($intType), ENT_QUOTES);
-            $jsonReason = htmlspecialchars(json_encode($intReason), ENT_QUOTES);
-            $jsonRelation = htmlspecialchars(json_encode($intRelation), ENT_QUOTES);
-
-            $inlineButton = "<button type=\"button\" @click=\"openInsight({$jsonTitle}, {$jsonType}, {$jsonReason}, {$jsonRelation})\" class=\"inline-flex items-center justify-center p-0.5 hover:bg-gray-100 border border-transparent hover:border-gray-200 rounded-lg transition-all focus:outline-none cursor-pointer align-middle\" title=\"Klik untuk melihat detail intonasi & relasi\">{$iconSvg}</button>";
-
-            // Jika rawText sudah memiliki [MARKER_...]
-            if (preg_match('/\[MARKER_\d+\]/i', $rawText)) {
-                $formattedHtml = preg_replace('/\[MARKER_\d+\]/i', $inlineButton, $rawText);
-            } else {
-                // Sisipkan inline button di tengah kalimat (setelah tanda koma/titik pertama) atau di akhir kalimat
-                if (preg_match('/([,;])\s+/u', $rawText, $match, PREG_OFFSET_CAPTURE)) {
-                    $pos = $match[0][1] + strlen($match[1][0]);
-                    $formattedHtml = substr($rawText, 0, $pos) . ' ' . $inlineButton . ' ' . substr($rawText, $pos);
-                } elseif (preg_match('/([.?!])$/u', trim($rawText), $match, PREG_OFFSET_CAPTURE)) {
-                    $trimmed = trim($rawText);
-                    $formattedHtml = substr($trimmed, 0, -1) . ' ' . $inlineButton . substr($trimmed, -1);
-                } else {
-                    $formattedHtml = $rawText . ' ' . $inlineButton;
-                }
-            }
-
-            $item['text_html'] = $formattedHtml;
+            // Simpan teks bersih ke text
+            $item['text'] = $cleanText;
+            $item['text_html'] = $cleanText;
         }
         unset($item);
 

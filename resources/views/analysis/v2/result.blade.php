@@ -725,8 +725,29 @@
 
                                 {{-- Text Column & Boxes --}}
                                 <div class="flex-grow">
+                                    @php
+                                        // Bersihkan text dari tag HTML/button yang korup
+                                        $cleanText = trim(strip_tags($item['text_html'] ?? ($item['text'] ?? '')));
+                                        $intType = strtolower($item['intonation_type'] ?? ($item['intonation_markers'][0]['type'] ?? ($isDosen ? 'down' : 'up')));
+                                        $intLabel = $intType === 'up' ? 'Naik' : ($intType === 'down' ? 'Turun' : 'Netral');
+                                        $intDesc = $intType === 'down' ? 'Intonasi menurun menandakan penegasan instruksi atau arahan akademik yang pasti dari Dosen.' : ($intType === 'up' ? 'Intonasi menaik menandakan nada eksploratif, klarifikasi, atau pertanyaan bimbingan.' : 'Intonasi netral menandakan pertukaran informasi akademis umum.');
+                                        $intRelation = $isDosen ? 'Arahan direktif dosen membimbing arah riset mahasiswa.' : 'Tanggapan dialogis mahasiswa terhadap arahan dosen.';
+                                    @endphp
                                     <p class="text-lg md:text-xl font-medium text-gray-800 leading-relaxed tracking-wide font-serif mb-3">
-                                        {!! $item['text_html'] ?? $item['text'] ?? '' !!}
+                                        {{ $cleanText }}
+                                        <button type="button"
+                                            @click="openInsight('Intonasi {{ $intLabel }}', '{{ $intType }}', '{{ addslashes($intDesc) }}', '{{ addslashes($intRelation) }}')"
+                                            class="inline-flex items-center justify-center p-1 mx-1 hover:bg-gray-100 border border-transparent hover:border-gray-200 rounded-lg transition-all focus:outline-none cursor-pointer align-middle"
+                                            title="Klik untuk melihat detail intonasi baris ini">
+                                            @if($intType === 'up')
+                                                <svg class="inline-block w-4 h-4 text-blue-500 hover:scale-125 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                                            @elseif($intType === 'down')
+                                                <svg class="inline-block w-4 h-4 text-red-500 hover:scale-125 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                                            @else
+                                                <svg class="inline-block w-4 h-4 text-gray-400 hover:scale-125 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14"></path></svg>
+                                            @endif
+                                        </button>
+                                    </p>
 
                                         {{-- Interactive Clickable Badges (Pola Bimbingan & Relasi Kuasa - Full V1 Parity) --}}
                                         <span class="flex flex-col gap-2.5 w-full mt-3 select-none">
