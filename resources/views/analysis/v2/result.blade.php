@@ -155,88 +155,99 @@
         </div>
         @endguest
 
-        {{-- Top Breadcrumb & Actions --}}
-        <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-100 pb-8">
-            <div>
-                @auth
-                <a href="{{ route('dashboard') }}"
-                    class="inline-flex items-center text-xs font-bold text-gray-400 hover:text-gray-900 transition-colors uppercase tracking-widest mb-4">
-                    <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
-                    <span class="lang-id">Kembali ke Dashboard</span>
-                    <span class="lang-en">Back to Dashboard</span>
-                    <span class="lang-zh">返回控制面板</span>
-                </a>
-                @else
-                <a href="{{ route('login') }}"
-                    class="inline-flex items-center text-xs font-bold text-gray-400 hover:text-gray-900 transition-colors uppercase tracking-widest mb-4">
-                    <i data-lucide="log-in" class="w-4 h-4 mr-2"></i>
-                    <span class="lang-id">Masuk / Login ke Akun</span>
-                    <span class="lang-en">Sign In / Login</span>
-                    <span class="lang-zh">登录账户</span>
-                </a>
-                @endauth
+        {{-- Canva-Style Sticky Top Workspace Navigation Bar --}}
+        <div class="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-gray-200/80 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 mb-6 transition-all shadow-xs">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                
+                {{-- Left: Back Link & Document Title & Status Badges --}}
+                <div class="flex items-center gap-3.5 min-w-0">
+                    @auth
+                    <a href="{{ route('dashboard') }}"
+                        class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center shrink-0 transition-colors"
+                        title="Kembali ke Dashboard">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    </a>
+                    @else
+                    <a href="{{ route('login') }}"
+                        class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center shrink-0 transition-colors"
+                        title="Masuk ke Akun">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
+                    </a>
+                    @endauth
 
-                <div class="flex items-center gap-3 flex-wrap">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 text-purple-700 border border-purple-200 text-[0.65rem] font-black uppercase tracking-widest">
-                        <i data-lucide="sparkles" class="w-3 h-3 text-purple-600"></i> Model Versi 2
-                    </span>
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 text-[0.65rem] font-bold">
-                        <i data-lucide="check-circle" class="w-3 h-3 text-green-600"></i> Selesai Diproses
-                    </span>
-                    @if(!$isOwner)
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[0.65rem] font-bold">
-                            <i data-lucide="eye" class="w-3 h-3 text-blue-600"></i>
-                            <span>Mode Berbagi (Read-Only)</span>
-                        </span>
-                    @endif
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 border border-purple-200 text-[0.62rem] font-black uppercase tracking-wider">
+                                <i data-lucide="sparkles" class="w-2.5 h-2.5 text-purple-600"></i> RoBERTa V2
+                            </span>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[0.62rem] font-bold">
+                                <i data-lucide="check-circle" class="w-2.5 h-2.5 text-emerald-600"></i> Selesai
+                            </span>
+                            @if(!$isOwner)
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[0.62rem] font-bold">
+                                    <i data-lucide="eye" class="w-2.5 h-2.5 text-blue-600"></i> Mode Baca
+                                </span>
+                            @endif
+                        </div>
+                        <h1 class="text-base sm:text-lg font-black text-gray-900 tracking-tight truncate max-w-md lg:max-w-xl" title="{{ $analysis->title }}">
+                            {{ $analysis->title }}
+                        </h1>
+                    </div>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight uppercase mt-3">
-                    {{ $analysis->title }}
-                </h1>
-                <p class="text-gray-500 font-medium mt-1 text-sm">
-                    Analisis Percakapan Bimbingan Akademik: Diarization & Relasi Wacana Graf RoBERTa
-                </p>
-            </div>
 
-            {{-- Action Buttons (Mobile-first Wrap & Responsive Full/Auto width) --}}
-            <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 w-full sm:w-auto shrink-0">
-                {{-- Tombol Bagikan (Google Drive Style Sharing) --}}
-                @if($isOwner)
-                <button type="button"
-                    @click="openShareModal()"
-                    class="inline-flex items-center justify-center px-4 py-3 sm:py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-indigo-600/20 active:scale-95 cursor-pointer">
-                    <i data-lucide="share-2" class="w-4 h-4 mr-2 shrink-0"></i>
-                    <span>Bagikan</span>
-                    <span class="ml-1.5 px-2 py-0.5 rounded-md bg-white/20 text-[0.62rem] font-bold uppercase tracking-wider"
-                          x-text="currentVisibility === 'public' ? 'Publik' : (currentVisibility === 'login_required' ? 'Wajib Login' : 'Pribadi')"></span>
-                </button>
-                @endif
+                {{-- Right: Canva Action Toolbar --}}
+                <div class="flex items-center gap-2 shrink-0 flex-wrap">
+                    
+                    {{-- Toggle Right Sidebar Analytics --}}
+                    <button type="button"
+                        @click="isSidebarOpen = !isSidebarOpen"
+                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer"
+                        :class="isSidebarOpen ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'"
+                        title="Toggle Panel Visualisasi & Analisis Kanan">
+                        <i data-lucide="panel-right" class="w-4 h-4 text-purple-600"></i>
+                        <span class="hidden sm:inline" x-text="isSidebarOpen ? 'Sembunyikan Panel' : 'Panel Analisis'"></span>
+                    </button>
 
-                {{-- Tombol Cetak Laporan (Modal Fitur Dalam Pengembangan) --}}
-                <button type="button"
-                    @click="showPrintModal = true"
-                    class="inline-flex items-center justify-center px-4 py-3 sm:py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-purple-600/20 active:scale-95 cursor-pointer">
-                    <i data-lucide="printer" class="w-4 h-4 mr-2 shrink-0"></i>
-                    <span>Cetak Laporan</span>
-                </button>
+                    {{-- Tombol Bagikan (Google Drive Style Sharing) --}}
+                    @if($isOwner)
+                    <button type="button"
+                        @click="openShareModal()"
+                        class="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs font-black uppercase tracking-wider transition-all shadow-xs active:scale-95 cursor-pointer">
+                        <i data-lucide="share-2" class="w-3.5 h-3.5 mr-1.5 shrink-0"></i>
+                        <span>Bagikan</span>
+                        <span class="ml-1.5 px-1.5 py-0.5 rounded bg-white/20 text-[0.58rem] font-bold uppercase tracking-wider"
+                              x-text="currentVisibility === 'public' ? 'Publik' : (currentVisibility === 'login_required' ? 'Login' : 'Pribadi')"></span>
+                    </button>
+                    @endif
 
-                {{-- Tombol Tukar Peran Pembicara (Hanya Pemilik) --}}
-                @if($isOwner)
-                <button type="button"
-                    @click="showSwapModal = true"
-                    class="inline-flex items-center justify-center px-4 py-3 sm:py-2.5 rounded-2xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer">
-                    <i data-lucide="arrow-left-right" class="w-4 h-4 mr-2 text-purple-600 shrink-0"></i>
-                    <span>Tukar Peran Pembicara</span>
-                </button>
-                @endif
+                    {{-- Tombol Cetak Laporan --}}
+                    <button type="button"
+                        @click="showPrintModal = true"
+                        class="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition-all shadow-xs active:scale-95 cursor-pointer">
+                        <i data-lucide="printer" class="w-3.5 h-3.5 mr-1.5 shrink-0"></i>
+                        <span class="hidden sm:inline">Cetak</span>
+                    </button>
 
-                {{-- Tombol Lihat / Tutup Raw --}}
-                <button type="button"
-                    @click="showRaw = !showRaw"
-                    class="inline-flex items-center justify-center px-4 py-3 sm:py-2.5 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-black uppercase tracking-wider transition-colors cursor-pointer">
-                    <i data-lucide="code" class="w-4 h-4 mr-2 shrink-0"></i>
-                    <span x-text="showRaw ? 'Tutup Raw' : 'Lihat Raw'"></span>
-                </button>
+                    {{-- Tombol Tukar Peran Pembicara (Hanya Pemilik) --}}
+                    @if($isOwner)
+                    <button type="button"
+                        @click="showSwapModal = true"
+                        class="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 text-xs font-black uppercase tracking-wider transition-all shadow-2xs active:scale-95 cursor-pointer"
+                        title="Tukar Peran Pembicara (Dosen / Mahasiswa)">
+                        <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-purple-600 sm:mr-1.5 shrink-0"></i>
+                        <span class="hidden md:inline">Tukar Peran</span>
+                    </button>
+                    @endif
+
+                    {{-- Tombol Lihat / Tutup Raw JSON --}}
+                    <button type="button"
+                        @click="showRaw = !showRaw"
+                        class="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-black uppercase tracking-wider transition-colors cursor-pointer"
+                        title="Lihat Raw JSON Output">
+                        <i data-lucide="code" class="w-3.5 h-3.5 sm:mr-1.5 shrink-0"></i>
+                        <span class="hidden md:inline" x-text="showRaw ? 'Tutup Raw' : 'Raw'"></span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -363,301 +374,16 @@
         </div>
         @endif
 
-        {{-- Conversation Dynamics Chart & Agent Analysis (Grafik Aliran Intonasi V1 Parity) --}}
-        <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-8 relative overflow-hidden">
-            <div class="flex flex-col lg:flex-row gap-8 items-stretch">
-                <!-- Left part: The Chart (2/3 width) -->
-                <div class="lg:w-2/3 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between gap-3 mb-1.5">
-                            <span class="text-[0.6rem] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                                <i data-lucide="activity" class="w-3.5 h-3.5 text-purple-600 animate-pulse"></i> 
-                                <span>Grafik Aliran Intonasi Percakapan</span>
-                            </span>
-                            <span class="inline-flex items-center gap-1 text-[0.65rem] font-bold text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200">
-                                <i data-lucide="mouse-pointer-click" class="w-3 h-3 text-purple-600"></i>
-                                <span>Klik titik grafik untuk menuju baris percakapan</span>
-                            </span>
-                        </div>
-                        <h3 class="text-base sm:text-lg font-black text-gray-950 uppercase tracking-wide mb-6">
-                            Dinamika Intonasi Per Baris (Pitch Dynamics)
-                        </h3>
-                    </div>
-                    <div class="w-full overflow-x-auto pb-4 scrollbar-thin">
-                        <div class="relative min-w-[600px] w-full h-64">
-                            <canvas id="dynamicsChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right part: AI Summary of Chart (1/3 width) -->
-                <div class="lg:w-1/3 bg-gray-50 border border-gray-100 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden">
-                    <div class="absolute -right-6 -bottom-6 text-gray-200/30 pointer-events-none">
-                        <i data-lucide="sparkles" class="w-32 h-32"></i>
-                    </div>
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-2 mb-3">
-                            <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center p-1.5">
-                                <i data-lucide="sparkles" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <span class="block text-[0.55rem] font-black text-gray-400 uppercase tracking-widest">Supervisory AI</span>
-                                <span class="text-xs font-black text-gray-800 uppercase tracking-wider">
-                                    Interpretasi Aliran
-                                </span>
-                            </div>
-                        </div>
-
-                        @php
-                            $upCount = 0;
-                            $downCount = 0;
-                            foreach ($transcription as $block) {
-                                $type = $block['intonation_type'] ?? ($block['intonation_markers'][0]['type'] ?? 'neutral');
-                                if ($type === 'up') $upCount++;
-                                if ($type === 'down') $downCount++;
-                            }
-
-                            if ($downCount > $upCount) {
-                                $dynamicsSummary = 'Alur percakapan didominasi oleh intonasi menurun (' . $downCount . ' kali) yang menandakan instruksi tegas, korektif, dan arahan bimbingan akademik yang pasti dari Dosen. Hal ini menunjukkan dinamika direktif di mana pembimbing mengontrol wacana untuk memastikan mutu riset mahasiswa.';
-                                $dynamicsStatus = 'Direktif & Korektif';
-                                $statusColor = 'text-red-700 bg-red-50 border-red-200';
-                            } elseif ($upCount > $downCount) {
-                                $dynamicsSummary = 'Alur percakapan didominasi oleh intonasi menaik (' . $upCount . ' kali) yang mencerminkan nada tanya, klarifikasi, atau eksplorasi produktif. Ini mencerminkan hubungan dialogis di mana bimbingan berjalan interaktif dan koperatif.';
-                                $dynamicsStatus = 'Dialogis & Koperatif';
-                                $statusColor = 'text-blue-700 bg-blue-50 border-blue-200';
-                            } else {
-                                $dynamicsSummary = 'Dinamika percakapan berjalan seimbang antara intonasi turun (penegasan) dan naik (klarifikasi/pertanyaan). Ini mencerminkan keseimbangan relasi bimbingan yang sangat kondusif, interaktif, dan berorientasi pada pemecahan masalah bersama.';
-                                $dynamicsStatus = 'Kondusif & Seimbang';
-                                $statusColor = 'text-green-700 bg-green-50 border-green-200';
-                            }
-                        @endphp
-
-                        <p class="text-xs sm:text-sm font-medium text-gray-600 leading-relaxed font-serif mt-4">
-                            {{ $dynamicsSummary }}
-                        </p>
-                    </div>
-
-                    <div class="mt-6 pt-4 border-t border-gray-200 flex justify-between items-center relative z-10">
-                        <span class="text-[0.6rem] font-black text-gray-400 uppercase tracking-widest">
-                            Karakter Aliran
-                        </span>
-                        <span class="inline-flex items-center px-3 py-1 rounded-xl text-[0.65rem] font-black uppercase tracking-widest border {{ $statusColor }}">
-                            {{ $dynamicsStatus }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Graph Network Section & Multimodal AI Analysis (Grid Desktop: Kiri Graf, Kanan Interpretasi) --}}
-        <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-8 relative overflow-hidden">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <div>
-                    <div class="flex items-center gap-2 mb-1">
-                        <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
-                            <i data-lucide="network" class="w-4 h-4"></i>
-                        </div>
-                        <h2 class="text-base sm:text-lg font-black uppercase tracking-tight text-gray-900">
-                            Peta Interaksi & Hubungan Wacana (Node & Edge Network)
-                        </h2>
-                    </div>
-                    <p class="text-xs sm:text-sm text-gray-500 font-medium">
-                        Visualisasi topologi wacana interaktif dipadukan dengan interpretasi mendalam kecerdasan buatan.
-                    </p>
-                </div>
-                <div class="flex flex-wrap items-center gap-2">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold shadow-2xs">
-                        <i data-lucide="user-check" class="w-3.5 h-3.5 text-purple-600"></i>
-                        <span>Dosen</span>
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold shadow-2xs">
-                        <i data-lucide="users" class="w-3.5 h-3.5 text-blue-600"></i>
-                        <span>Mahasiswa</span>
-                    </span>
-                </div>
-            </div>
+        {{-- Canva Workspace Grid Layout: Left/Center Main Canvas (Transcript + Hasil Analisis) & Right Collapsible Analytics Sidebar --}}
+        <div class="grid grid-cols-1 gap-8 items-start transition-all duration-300"
+             :class="isSidebarOpen ? 'lg:grid-cols-12' : 'lg:grid-cols-1'">
             
-            {{-- Grid Kontainer Card: Kiri Graf (lg:col-span-6), Kanan Hasil Analisis Teks / Skeleton (lg:col-span-6) --}}
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {{-- Main Canvas (Left/Center Column) --}}
+            <div class="space-y-8"
+                 :class="isSidebarOpen ? 'lg:col-span-7 xl:col-span-8' : 'lg:col-span-12 max-w-5xl mx-auto w-full'">
                 
-                {{-- Kolom Kiri: Peta Graf ECharts (Responsive height: 380px on mobile, 540px on desktop) --}}
-                <div class="lg:col-span-6 w-full">
-                    <div id="graph-container" class="w-full bg-gray-50/50 rounded-2xl border border-gray-100 h-[380px] sm:h-[460px] md:h-[540px]"></div>
-                </div>
-
-                {{-- Kolom Kanan: Hasil Generate Teks Analisis AI / Loading Skeleton / Placeholder Awal --}}
-                <div class="lg:col-span-6 w-full">
-                    
-                    {{-- 1. Loading Skeleton saat Sedang Menganalisis (Tepat di kolom kanan, sejajar graf) --}}
-                    <div x-show="isInterpretingGraph" style="display: none;" class="bg-purple-50/40 rounded-2xl p-6 border border-purple-100 animate-pulse space-y-4 h-[540px] flex flex-col justify-between">
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-xl bg-purple-200"></div>
-                                <div class="h-4 bg-purple-200 rounded-lg w-1/2"></div>
-                            </div>
-                            <div class="h-20 bg-white/80 rounded-xl w-full"></div>
-                            <div class="h-24 bg-white/80 rounded-xl w-full"></div>
-                            <div class="h-20 bg-white/80 rounded-xl w-full"></div>
-                        </div>
-                        <div class="flex items-center justify-center gap-2 text-xs font-bold text-purple-600">
-                            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
-                            <span>Model Multimodal AI sedang menyintesis graf & intonasi...</span>
-                        </div>
-                    </div>
-
-                    {{-- 2. Placeholder Ketika Belum Dianalisis / Auto-processing --}}
-                    <div x-show="!isInterpretingGraph && !graphInterpretationData" class="bg-gray-50/70 border border-dashed border-purple-200 rounded-2xl p-8 text-center flex flex-col items-center justify-center h-[380px] sm:h-[460px] md:h-[540px]">
-                        <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4 border border-purple-100 shadow-sm animate-bounce">
-                            <i data-lucide="sparkles" class="w-7 h-7"></i>
-                        </div>
-                        <h3 class="text-sm font-black uppercase tracking-wider text-gray-800 mb-2">Sintesis Otomatis Peta Wacana AI</h3>
-                        <p class="text-xs text-gray-500 font-medium leading-relaxed max-w-sm mb-4">
-                            Model AI sedang menyelaraskan topologi simpul jaringan, dinamika intonasi, dan alur percakapan secara otomatis.
-                        </p>
-                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200">
-                            <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>
-                            <span>Memproses analisis multimodal...</span>
-                        </div>
-                    </div>
-
-                    {{-- 3. Tampilan Konten Hasil Interpretasi AI --}}
-                    <div x-show="!isInterpretingGraph && graphInterpretationData" style="display: none;" class="space-y-4 max-h-[540px] overflow-y-auto pr-1 scrollbar-thin">
-                        <div class="bg-purple-50/60 border border-purple-100 rounded-2xl p-4 sticky top-0 z-10 backdrop-blur-md">
-                            <div>
-                                <h3 class="text-xs font-black uppercase tracking-widest text-purple-950 leading-tight">
-                                    Interpretasi Multimodal Peta Wacana
-                                </h3>
-                                <p class="text-[0.68rem] font-medium text-purple-700/90 mt-0.5">
-                                    Model OpenAI Vision (Topologi Graf + Dinamika Intonasi + Hasil Analisis)
-                                </p>
-                            </div>
-                        </div>
-
-                        {{-- Ringkasan Eksekutif --}}
-                        <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                            <span class="text-[0.65rem] font-black uppercase tracking-wider text-purple-700 block mb-1 flex items-center gap-1.5">
-                                <i data-lucide="compass" class="w-3.5 h-3.5 text-purple-600"></i>
-                                <span>Ringkasan Konfigurasi Kekuasaan & Dinamika Bimbingan</span>
-                            </span>
-                            <p class="text-xs sm:text-sm font-medium text-gray-800 leading-relaxed font-serif" x-text="graphInterpretationData?.ringkasan_eksekutif"></p>
-                        </div>
-
-                        {{-- Analisis Topologi --}}
-                        <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-2xs">
-                            <span class="text-[0.65rem] font-black uppercase tracking-wider text-indigo-700 block mb-1 flex items-center gap-1.5">
-                                <i data-lucide="share-2" class="w-3.5 h-3.5 text-indigo-600"></i>
-                                <span>Analisis Topologi Simpul & Tepi (Edges)</span>
-                            </span>
-                            <p class="text-xs font-medium text-gray-700 leading-relaxed" x-text="graphInterpretationData?.topologi_relasi"></p>
-                        </div>
-
-                        {{-- Korelasi Intonasi --}}
-                        <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-2xs">
-                            <span class="text-[0.65rem] font-black uppercase tracking-wider text-blue-700 block mb-1 flex items-center gap-1.5">
-                                <i data-lucide="activity" class="w-3.5 h-3.5 text-blue-600"></i>
-                                <span>Korelasi Dinamika Intonasi Per Baris</span>
-                            </span>
-                            <p class="text-xs font-medium text-gray-700 leading-relaxed" x-text="graphInterpretationData?.korelasi_intonasi"></p>
-                        </div>
-
-                        {{-- Makna Pedagogis & Rekomendasi Supervisi --}}
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div class="bg-emerald-50/50 rounded-2xl p-3.5 border border-emerald-100">
-                                <span class="text-[0.62rem] font-black uppercase tracking-wider text-emerald-800 block mb-1 flex items-center gap-1">
-                                    <i data-lucide="book-open" class="w-3 h-3 text-emerald-600"></i>
-                                    <span>Makna Pedagogis Riset</span>
-                                </span>
-                                <p class="text-xs font-medium text-emerald-950 leading-relaxed" x-text="graphInterpretationData?.makna_pedagogis"></p>
-                            </div>
-
-                            <div class="bg-amber-50/50 rounded-2xl p-3.5 border border-amber-100">
-                                <span class="text-[0.62rem] font-black uppercase tracking-wider text-amber-800 block mb-1 flex items-center gap-1">
-                                    <i data-lucide="lightbulb" class="w-3 h-3 text-amber-600"></i>
-                                    <span>Rekomendasi Supervisi</span>
-                                </span>
-                                <p class="text-xs font-medium text-amber-950 leading-relaxed" x-text="graphInterpretationData?.rekomendasi_supervisi"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Bagian Alur Pembahasan Kronologis & Pencabangan Topik (Mermaid Flowchart) --}}
-            <div class="mt-8 pt-8 border-t border-gray-100">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center">
-                                <i data-lucide="git-branch" class="w-4 h-4"></i>
-                            </div>
-                            <h3 class="text-sm font-black uppercase tracking-wider text-gray-900">
-                                Alur Kronologi & Pencabangan Pembahasan Wacana
-                            </h3>
-                        </div>
-                        <p class="text-xs text-gray-500 font-medium">
-                            Peta alur topik bertahap yang diekstraksi dari transkripsi percakapan (topik awal, dinamika pencabangan, hingga simpulan tindakan).
-                        </p>
-                    </div>
-
-                    {{-- Actions: Zoom toggle / Status / Try Again Button --}}
-                    <div class="flex items-center gap-2">
-                        <button type="button" 
-                            x-show="mermaidError"
-                            @click="retryMermaid()"
-                            style="display: none;"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition shadow-sm active:scale-95 cursor-pointer">
-                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5" :class="isRetryingMermaid ? 'animate-spin' : ''"></i>
-                            <span x-text="isRetryingMermaid ? 'Mencoba lagi...' : 'Coba Lagi (Try Again)'"></span>
-                        </button>
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[0.65rem] font-bold">
-                            <i data-lucide="layers" class="w-3 h-3 text-indigo-600"></i>
-                            <span>Diagram Wacana Bertahap</span>
-                        </span>
-                    </div>
-                </div>
-
-                {{-- Diagram Canvas Container --}}
-                <div class="bg-gradient-to-b from-gray-50/70 to-white rounded-2xl border border-gray-200/80 p-4 sm:p-5 overflow-auto custom-scrollbar relative min-h-[160px] max-h-[460px] flex items-center justify-center">
-                    
-                    {{-- Loading State --}}
-                    <div x-show="isInterpretingGraph || isRetryingMermaid" class="py-6 text-center" style="display: none;">
-                        <i data-lucide="loader-2" class="w-5 h-5 animate-spin text-purple-600 mx-auto mb-2"></i>
-                        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Menyintesis Alur Pembahasan Mermaid...</span>
-                    </div>
-
-                    {{-- Rendered Mermaid SVG Container --}}
-                    <div x-show="!isInterpretingGraph && !isRetryingMermaid" id="mermaid-flowchart-container" class="w-full max-w-md flex flex-col items-center justify-center py-1 select-none mx-auto">
-                        {{-- SVG will be inserted here via mermaid.render --}}
-                    </div>
-                </div>
-            </div>
-
-            {{-- Komponen Metrik Kuantitatif Sentralitas Graf (Network Science) --}}
-            @include('analysis.v2.components.graph-metrics-card', ['graphMetrics' => $graphMetrics ?? []])
-        </div>
-
-        {{-- Mobile Tab Switcher --}}
-        <div class="lg:hidden flex bg-gray-100 p-1 rounded-2xl mb-6 relative z-10">
-            <button type="button" @click="activeMobileTab = 'transkrip'"
-                class="flex-1 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
-                :class="activeMobileTab === 'transkrip' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-400'">
-                <i data-lucide="file-text" class="w-4 h-4"></i> 
-                <span>Transkrip ({{ $totalSegments }})</span>
-            </button>
-            <button type="button" @click="activeMobileTab = 'ringkasan'"
-                class="flex-1 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
-                :class="activeMobileTab === 'ringkasan' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-400'">
-                <i data-lucide="bar-chart-3" class="w-4 h-4"></i> 
-                <span>Distribusi Kategori</span>
-            </button>
-        </div>
-
-        {{-- Main Two Columns Layout --}}
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            {{-- Left Column: Paginated Transcript (Clean V1 Document View without Inner Cards) --}}
-            <div class="lg:col-span-2 bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8"
-                :class="activeMobileTab === 'transkrip' ? 'block' : 'hidden lg:block'">
+                {{-- Transkripsi & Penanda Wacana (Clean Document Canvas) --}}
+                <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8">
                 
                 {{-- Header with Automatic Speaker Filter --}}
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-100 mb-6">
@@ -1037,165 +763,379 @@
                             class="inline-flex items-center px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold uppercase tracking-widest text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors cursor-pointer">
                             Next <i data-lucide="chevron-right" class="w-4 h-4 ml-1"></i>
                         </button>
-                    </div>
-                </template>
-            </div>
+            </div> {{-- End of Transkripsi & Penanda Wacana Card --}}
 
-            {{-- Right Column: Category Distribution & Insights (Full V1 Parity) --}}
-            <div class="lg:col-span-1 space-y-6"
-                :class="activeMobileTab === 'ringkasan' ? 'block' : 'hidden lg:block'">
-                
-                {{-- Hasil Analisis Akhir (V1 Parity Card) --}}
-                <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 relative overflow-hidden">
-                    <div class="absolute -right-6 -top-6 text-purple-50 pointer-events-none">
-                        <i data-lucide="brain-circuit" class="w-40 h-40"></i>
-                    </div>
+            {{-- Hasil Analisis Akhir (Placed on the Main Canvas directly below Transcript) --}}
+            <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8 relative overflow-hidden">
+                <div class="absolute -right-6 -top-6 text-purple-50 pointer-events-none">
+                    <i data-lucide="brain-circuit" class="w-44 h-44"></i>
+                </div>
 
-                    <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center relative z-10">
-                        <i data-lucide="layout-dashboard" class="w-4 h-4 mr-2 text-purple-600"></i>
-                        <span>Hasil Analisis Akhir</span>
-                    </h2>
-
-                    <div class="space-y-3 mb-4 relative z-10">
-                        {{-- Kategori Advice --}}
-                        <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col justify-center">
-                            <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1">
-                                Kategori Advice
-                            </span>
-                            <span class="font-bold text-gray-900 leading-tight block break-words text-sm">
-                                {{ $summary['kategori_advice'] ?? 'Saran Bimbingan Akademik' }}
-                            </span>
+                <div class="flex items-center justify-between gap-4 mb-6 relative z-10 border-b border-gray-100 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
+                            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
                         </div>
-
-                        {{-- Karakter Relasi --}}
-                        <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col justify-center">
-                            <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1">
-                                Karakter Relasi
-                            </span>
-                            <span class="font-bold text-gray-900 leading-tight block break-words text-sm">
-                                {{ $summary['karakter_relasi'] ?? 'Kondusif & Seimbang' }}
-                            </span>
-                        </div>
-
-                        {{-- Intonasi Dominan --}}
-                        <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col justify-center">
-                            <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1">
-                                Intonasi Dominan
-                            </span>
-                            <span class="font-bold text-gray-900 leading-tight block break-words text-sm">
-                                {{ $summary['intonasi_dominan'] ?? 'Intonasi Seimbang' }}
-                            </span>
-                        </div>
-
-                        {{-- Ranah Bicara --}}
-                        <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col justify-center">
-                            <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1">
-                                Ranah Bicara
-                            </span>
-                            <span class="font-bold text-gray-900 leading-tight block break-words text-sm">
-                                {{ $summary['ranah_pembicaraan'] ?? 'Bimbingan Skripsi & Pendalaman Metodologi Penelitian' }}
-                            </span>
+                        <div>
+                            <h2 class="text-base font-black uppercase tracking-tight text-gray-900">Hasil Analisis Akhir</h2>
+                            <p class="text-xs text-gray-400 font-medium">Sintesis kategori bimbingan, modalitas relasi kuasa, dan intonasi dominan wacana</p>
                         </div>
                     </div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[0.65rem] font-bold">
+                        <i data-lucide="sparkles" class="w-3 h-3 text-purple-600"></i> Executive Synthesis
+                    </span>
+                </div>
 
-                    {{-- Umpan Balik --}}
-                    <div class="bg-purple-600 rounded-2xl p-5 text-white shadow-md shadow-purple-600/20 mb-4 relative z-10">
-                        <span class="block text-[0.6rem] font-black text-purple-200 uppercase tracking-widest mb-2 flex items-center">
-                            <i data-lucide="target" class="w-3.5 h-3.5 mr-1.5"></i>
-                            <span>Umpan Balik</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 relative z-10">
+                    {{-- Kategori Advice --}}
+                    <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col justify-center">
+                        <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1">
+                            Kategori Advice
                         </span>
-                        <p class="font-medium text-xs sm:text-sm leading-relaxed text-purple-50">
-                            {{ ucfirst($summary['arah_tujuan'] ?? 'Dosen mengarahkan mahasiswa dengan fokus pada penyempurnaan landasan teori, metodologi, dan perumusan simpulan yang valid.') }}
-                        </p>
+                        <span class="font-bold text-gray-900 leading-tight block break-words text-sm">
+                            {{ $summary['kategori_advice'] ?? 'Saran Bimbingan Akademik' }}
+                        </span>
+                    </div>
+
+                    {{-- Karakter Relasi --}}
+                    <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col justify-center">
+                        <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1">
+                            Karakter Relasi
+                        </span>
+                        <span class="font-bold text-gray-900 leading-tight block break-words text-sm">
+                            {{ $summary['karakter_relasi'] ?? 'Kondusif & Seimbang' }}
+                        </span>
+                    </div>
+
+                    {{-- Intonasi Dominan --}}
+                    <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col justify-center">
+                        <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1">
+                            Intonasi Dominan
+                        </span>
+                        <span class="font-bold text-gray-900 leading-tight block break-words text-sm">
+                            {{ $summary['intonasi_dominan'] ?? 'Intonasi Seimbang' }}
+                        </span>
+                    </div>
+
+                    {{-- Ranah Bicara --}}
+                    <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col justify-center">
+                        <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1">
+                            Ranah Bicara
+                        </span>
+                        <span class="font-bold text-gray-900 leading-tight block break-words text-sm">
+                            {{ $summary['ranah_pembicaraan'] ?? 'Bimbingan Skripsi & Pendalaman Metodologi Penelitian' }}
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Umpan Balik & Rekomendasi Grid --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+                    {{-- Umpan Balik --}}
+                    <div class="bg-purple-600 rounded-2xl p-5 text-white shadow-md shadow-purple-600/20 flex flex-col justify-between">
+                        <div>
+                            <span class="block text-[0.6rem] font-black text-purple-200 uppercase tracking-widest mb-2 flex items-center">
+                                <i data-lucide="target" class="w-3.5 h-3.5 mr-1.5"></i>
+                                <span>Umpan Balik</span>
+                            </span>
+                            <p class="font-medium text-xs sm:text-sm leading-relaxed text-purple-50">
+                                {{ ucfirst($summary['arah_tujuan'] ?? 'Dosen mengarahkan mahasiswa dengan fokus pada penyempurnaan landasan teori, metodologi, dan perumusan simpulan yang valid.') }}
+                            </p>
+                        </div>
                     </div>
 
                     {{-- Rekomendasi --}}
-                    <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 text-emerald-900 relative z-10">
-                        <span class="block text-[0.6rem] font-black text-emerald-600 uppercase tracking-widest mb-2 flex items-center">
-                            <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1.5"></i>
-                            <span>Rekomendasi</span>
-                        </span>
-                        <p class="font-medium text-xs sm:text-sm leading-relaxed text-emerald-800">
-                            {{ ucfirst($summary['saran_perbaikan'] ?? 'Mahasiswa disarankan menindaklanjuti catatan revisi Dosen, mengonfirmasi instrumen riset, dan menyusun target mingguan agar jadwal bimbingan berjalan optimal.') }}
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 text-emerald-900 flex flex-col justify-between">
+                        <div>
+                            <span class="block text-[0.6rem] font-black text-emerald-600 uppercase tracking-widest mb-2 flex items-center">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1.5"></i>
+                                <span>Rekomendasi</span>
+                            </span>
+                            <p class="font-medium text-xs sm:text-sm leading-relaxed text-emerald-800">
+                                {{ ucfirst($summary['saran_perbaikan'] ?? 'Mahasiswa disarankan menindaklanjuti catatan revisi Dosen, mengonfirmasi instrumen riset, dan menyusun target mingguan agar jadwal bimbingan berjalan optimal.') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div> {{-- End of Hasil Analisis Akhir Card --}}
+
+            </div> {{-- End of Main Canvas (Left/Center Column) --}}
+
+            {{-- Right Analytical Sidebar Panel (Canva Workspace Style) --}}
+            <aside class="space-y-6 lg:col-span-5 xl:col-span-4 transition-all"
+                   x-show="isSidebarOpen"
+                   x-transition:enter="transition ease-out duration-200"
+                   x-transition:enter-start="opacity-0 translate-x-4"
+                   x-transition:enter-end="opacity-100 translate-x-0">
+                
+                {{-- Sidebar Header Card with Tab Switcher --}}
+                <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-5">
+                    <div class="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-gray-100">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
+                                <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                            </div>
+                            <span class="text-xs font-black uppercase tracking-wider text-gray-900">Panel Analisis & Visualisasi</span>
+                        </div>
+                        <button type="button" @click="isSidebarOpen = false"
+                            class="text-gray-400 hover:text-gray-700 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                            title="Tutup Sidebar">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    {{-- Tab Pills Switcher --}}
+                    <div class="grid grid-cols-5 gap-1 p-1 bg-gray-100 rounded-xl text-[0.62rem] font-bold">
+                        <button type="button" @click="switchSidebarTab('graf')"
+                            class="py-2 rounded-lg transition-all text-center flex flex-col items-center gap-1 cursor-pointer"
+                            :class="sidebarTab === 'graf' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-800'">
+                            <i data-lucide="network" class="w-3.5 h-3.5"></i>
+                            <span class="truncate">Graf</span>
+                        </button>
+                        <button type="button" @click="switchSidebarTab('alur')"
+                            class="py-2 rounded-lg transition-all text-center flex flex-col items-center gap-1 cursor-pointer"
+                            :class="sidebarTab === 'alur' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-800'">
+                            <i data-lucide="git-branch" class="w-3.5 h-3.5"></i>
+                            <span class="truncate">Alur</span>
+                        </button>
+                        <button type="button" @click="switchSidebarTab('metrik')"
+                            class="py-2 rounded-lg transition-all text-center flex flex-col items-center gap-1 cursor-pointer"
+                            :class="sidebarTab === 'metrik' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-800'">
+                            <i data-lucide="binary" class="w-3.5 h-3.5"></i>
+                            <span class="truncate">Sentral</span>
+                        </button>
+                        <button type="button" @click="switchSidebarTab('intonasi')"
+                            class="py-2 rounded-lg transition-all text-center flex flex-col items-center gap-1 cursor-pointer"
+                            :class="sidebarTab === 'intonasi' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-800'">
+                            <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                            <span class="truncate">Intonasi</span>
+                        </button>
+                        <button type="button" @click="switchSidebarTab('distribusi')"
+                            class="py-2 rounded-lg transition-all text-center flex flex-col items-center gap-1 cursor-pointer"
+                            :class="sidebarTab === 'distribusi' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-800'">
+                            <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i>
+                            <span class="truncate">Distribusi</span>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Tab 1: Peta Interaksi Graf & Sintesis Multimodal AI --}}
+                <div x-show="sidebarTab === 'graf'" class="space-y-6">
+                    <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-5 relative overflow-hidden">
+                        <div class="flex items-center justify-between gap-3 mb-4">
+                            <div>
+                                <span class="text-[0.6rem] font-black uppercase tracking-widest text-gray-400 block">Topologi Interaksi</span>
+                                <h3 class="text-sm font-black uppercase text-gray-900">Peta Wacana RoBERTa</h3>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 text-[0.62rem] font-bold border border-purple-200">Dosen</span>
+                                <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[0.62rem] font-bold border border-blue-200">Mhs</span>
+                            </div>
+                        </div>
+
+                        {{-- Graph ECharts Container --}}
+                        <div id="graph-container" class="w-full bg-gray-50/50 rounded-2xl border border-gray-100 h-[380px] sm:h-[420px]"></div>
+
+                        {{-- AI Synthesis Block under Graph --}}
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            {{-- Skeleton Loading --}}
+                            <div x-show="isInterpretingGraph" style="display: none;" class="p-4 rounded-xl bg-purple-50/50 border border-purple-100 animate-pulse space-y-3">
+                                <div class="h-3 bg-purple-200 rounded w-1/2"></div>
+                                <div class="h-16 bg-white/70 rounded"></div>
+                                <span class="text-[0.65rem] font-bold text-purple-600 block text-center">Menyintesis wacana & topologi...</span>
+                            </div>
+
+                            {{-- Result Content --}}
+                            <div x-show="!isInterpretingGraph && graphInterpretationData" style="display: none;" class="space-y-3">
+                                <div class="p-3.5 rounded-xl bg-purple-50/60 border border-purple-100">
+                                    <span class="text-[0.62rem] font-black uppercase tracking-wider text-purple-900 block mb-1">
+                                        Ringkasan Konfigurasi Relasi
+                                    </span>
+                                    <p class="text-xs text-gray-800 leading-relaxed font-serif" x-text="graphInterpretationData?.ringkasan_eksekutif"></p>
+                                </div>
+                                <div class="p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+                                    <span class="text-[0.62rem] font-black uppercase tracking-wider text-indigo-700 block mb-1">
+                                        Analisis Topologi Simpul
+                                    </span>
+                                    <p class="text-xs text-gray-700 leading-relaxed" x-text="graphInterpretationData?.topologi_relasi"></p>
+                                </div>
+                                <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100">
+                                    <span class="text-[0.62rem] font-black uppercase tracking-wider text-emerald-800 block mb-1">
+                                        Makna Pedagogis Riset
+                                    </span>
+                                    <p class="text-xs text-emerald-950 leading-relaxed" x-text="graphInterpretationData?.makna_pedagogis"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Tab 2: Alur Kronologi & Pencabangan Mermaid Flowchart --}}
+                <div x-show="sidebarTab === 'alur'" style="display: none;" class="space-y-6">
+                    <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-5 relative overflow-hidden">
+                        <div class="flex items-center justify-between gap-3 mb-3">
+                            <div>
+                                <span class="text-[0.6rem] font-black uppercase tracking-widest text-gray-400 block">Pencabangan Wacana</span>
+                                <h3 class="text-sm font-black uppercase text-gray-900">Alur Topik Kronologis</h3>
+                            </div>
+                            <button type="button" x-show="mermaidError" @click="retryMermaid()" style="display: none;"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-[0.65rem] font-bold">
+                                <i data-lucide="refresh-cw" class="w-3 h-3" :class="isRetryingMermaid ? 'animate-spin' : ''"></i>
+                                <span>Coba Lagi</span>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-4 font-medium">
+                            Tahapan percakapan dari topik awal hingga simpulan tindakan bimbingan.
                         </p>
+
+                        <div class="bg-gradient-to-b from-gray-50/70 to-white rounded-2xl border border-gray-200/80 p-4 overflow-auto custom-scrollbar relative min-h-[160px] max-h-[460px] flex items-center justify-center">
+                            <div x-show="isInterpretingGraph || isRetryingMermaid" class="py-6 text-center" style="display: none;">
+                                <i data-lucide="loader-2" class="w-5 h-5 animate-spin text-purple-600 mx-auto mb-2"></i>
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Menyintesis Alur Mermaid...</span>
+                            </div>
+                            <div x-show="!isInterpretingGraph && !isRetryingMermaid" id="mermaid-flowchart-container" class="w-full max-w-md flex flex-col items-center justify-center py-1 select-none mx-auto"></div>
+                        </div>
                     </div>
                 </div>
 
-                {{-- Advice Distribution Card --}}
-                <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-2">
-                        <i data-lucide="pie-chart" class="w-4 h-4 text-purple-600"></i> Distribusi Tindak Tutur (Advice)
-                    </h3>
-                    
-                    @if(count($adviceCounts) > 0)
-                        <div class="space-y-3">
-                            @foreach($adviceCounts as $label => $count)
-                                @php
-                                    $style = $getAdviceBadgeStyle($label);
-                                    $pct = $totalSegments > 0 ? round(($count / $totalSegments) * 100) : 0;
-                                @endphp
-                                <div>
-                                    <div class="flex justify-between items-center text-xs mb-1">
-                                        <span class="font-bold text-gray-700">{{ $style['badge'] }}</span>
-                                        <span class="font-black text-gray-900">{{ $count }} <span class="text-[0.65rem] text-gray-400 font-semibold">({{ $pct }}%)</span></span>
-                                    </div>
-                                    <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                                        <div class="h-full rounded-full" style="width: {{ $pct }}%; background-color: {{ $style['color'] }}"></div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <p class="text-xs text-gray-400 italic">Tidak ada label tindak tutur ditemukan.</p>
-                    @endif
+                {{-- Tab 3: Metrik Kuantitatif Sentralitas Graf (Network Science) --}}
+                <div x-show="sidebarTab === 'metrik'" style="display: none;" class="space-y-6">
+                    @include('analysis.v2.components.graph-metrics-card', ['graphMetrics' => $graphMetrics ?? []])
                 </div>
 
-                {{-- Power Relation Mode Distribution Card --}}
-                <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-2">
-                        <i data-lucide="shield" class="w-4 h-4 text-indigo-600"></i> Relasi Kuasa (Modes of Interaction)
-                    </h3>
-                    
-                    @if(count($modeCounts) > 0)
-                        <div class="space-y-3">
-                            @foreach($modeCounts as $label => $count)
-                                @php
-                                    $style = $getModeBadgeStyle($label);
-                                    $pct = $totalSegments > 0 ? round(($count / $totalSegments) * 100) : 0;
-                                @endphp
-                                <div>
-                                    <div class="flex justify-between items-center text-xs mb-1">
-                                        <span class="font-bold text-gray-700">{{ $style['badge'] }}</span>
-                                        <span class="font-black text-gray-900">{{ $count }} <span class="text-[0.65rem] text-gray-400 font-semibold">({{ $pct }}%)</span></span>
-                                    </div>
-                                    <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                                        <div class="h-full rounded-full" style="width: {{ $pct }}%; background-color: {{ $style['color'] }}"></div>
-                                    </div>
-                                </div>
-                            @endforeach
+                {{-- Tab 4: Grafik Dinamika Intonasi Per Baris (Pitch Dynamics) --}}
+                <div x-show="sidebarTab === 'intonasi'" style="display: none;" class="space-y-6">
+                    <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-5 relative overflow-hidden">
+                        <div class="flex items-center justify-between gap-3 mb-3">
+                            <div>
+                                <span class="text-[0.6rem] font-black uppercase tracking-widest text-gray-400 block">Akustik & Prosodi</span>
+                                <h3 class="text-sm font-black uppercase text-gray-900">Dinamika Intonasi</h3>
+                            </div>
+                            <span class="inline-flex items-center gap-1 text-[0.62rem] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200">
+                                <i data-lucide="mouse-pointer-click" class="w-2.5 h-2.5 text-purple-600"></i> Klik titik
+                            </span>
                         </div>
-                    @else
-                        <p class="text-xs text-gray-400 italic">Tidak ada label relasi kuasa ditemukan.</p>
-                    @endif
-                </div>
+                        
+                        <div class="w-full overflow-x-auto pb-2 scrollbar-thin">
+                            <div class="relative min-w-[320px] w-full h-56">
+                                <canvas id="dynamicsChart"></canvas>
+                            </div>
+                        </div>
 
-                {{-- Model Architecture Info Card --}}
-                <div class="bg-gradient-to-br from-purple-900 to-indigo-900 rounded-2xl md:rounded-3xl p-6 text-white shadow-xl shadow-purple-900/20">
-                    <span class="px-2.5 py-1 rounded-full bg-white/10 text-[0.6rem] font-black uppercase tracking-widest border border-white/20 inline-block mb-3">
-                        Arsitektur Sistem
-                    </span>
-                    <h4 class="text-sm font-black uppercase tracking-wide mb-2">Multi-Task RoBERTa V2</h4>
-                    <p class="text-xs text-purple-200 leading-relaxed font-medium mb-4">
-                        Model membaca konteks wacana multi-turn secara simultan untuk mendeteksi tindak tutur advice dan modalitas relasi kuasa secara end-to-end.
-                    </p>
-                    <div class="pt-3 border-t border-white/10 flex items-center justify-between text-[0.7rem] font-bold text-purple-300">
-                        <span>Akurasi Multi-Task</span>
-                        <span class="text-white">State-of-the-Art</span>
+                        @php
+                            $upCount = 0;
+                            $downCount = 0;
+                            foreach ($transcription as $block) {
+                                $type = $block['intonation_type'] ?? ($block['intonation_markers'][0]['type'] ?? 'neutral');
+                                if ($type === 'up') $upCount++;
+                                if ($type === 'down') $downCount++;
+                            }
+
+                            if ($downCount > $upCount) {
+                                $dynamicsSummary = 'Alur percakapan didominasi oleh intonasi menurun (' . $downCount . ' kali) yang menandakan instruksi tegas, korektif, dan arahan bimbingan akademik yang pasti dari Dosen.';
+                                $dynamicsStatus = 'Direktif & Korektif';
+                                $statusColor = 'text-red-700 bg-red-50 border-red-200';
+                            } elseif ($upCount > $downCount) {
+                                $dynamicsSummary = 'Alur percakapan didominasi oleh intonasi menaik (' . $upCount . ' kali) yang mencerminkan nada tanya, klarifikasi, atau eksplorasi produktif.';
+                                $dynamicsStatus = 'Dialogis & Koperatif';
+                                $statusColor = 'text-blue-700 bg-blue-50 border-blue-200';
+                            } else {
+                                $dynamicsSummary = 'Dinamika percakapan berjalan seimbang antara intonasi turun (penegasan) dan naik (klarifikasi/pertanyaan).';
+                                $dynamicsStatus = 'Kondusif & Seimbang';
+                                $statusColor = 'text-green-700 bg-green-50 border-green-200';
+                            }
+                        @endphp
+
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[0.62rem] font-black uppercase text-gray-400">Karakter Aliran</span>
+                                <span class="px-2 py-0.5 rounded-md text-[0.62rem] font-black uppercase border {{ $statusColor }}">
+                                    {{ $dynamicsStatus }}
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-600 leading-relaxed font-serif">
+                                {{ $dynamicsSummary }}
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-            </div>
-        </div>
+                {{-- Tab 5: Distribusi Kategori Advice & Relasi Kuasa --}}
+                <div x-show="sidebarTab === 'distribusi'" style="display: none;" class="space-y-6">
+                    {{-- Advice Distribution --}}
+                    <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-5">
+                        <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-2">
+                            <i data-lucide="pie-chart" class="w-4 h-4 text-purple-600"></i> Distribusi Tindak Tutur
+                        </h3>
+                        @if(count($adviceCounts) > 0)
+                            <div class="space-y-3">
+                                @foreach($adviceCounts as $label => $count)
+                                    @php
+                                        $style = $getAdviceBadgeStyle($label);
+                                        $pct = $totalSegments > 0 ? round(($count / $totalSegments) * 100) : 0;
+                                    @endphp
+                                    <div>
+                                        <div class="flex justify-between items-center text-xs mb-1">
+                                            <span class="font-bold text-gray-700">{{ $style['badge'] }}</span>
+                                            <span class="font-black text-gray-900">{{ $count }} <span class="text-[0.65rem] text-gray-400 font-semibold">({{ $pct }}%)</span></span>
+                                        </div>
+                                        <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                                            <div class="h-full rounded-full" style="width: {{ $pct }}%; background-color: {{ $style['color'] }}"></div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-xs text-gray-400 italic">Tidak ada label tindak tutur ditemukan.</p>
+                        @endif
+                    </div>
+
+                    {{-- Power Relations Mode Distribution --}}
+                    <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-5">
+                        <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-2">
+                            <i data-lucide="shield" class="w-4 h-4 text-indigo-600"></i> Relasi Kuasa
+                        </h3>
+                        @if(count($modeCounts) > 0)
+                            <div class="space-y-3">
+                                @foreach($modeCounts as $label => $count)
+                                    @php
+                                        $style = $getModeBadgeStyle($label);
+                                        $pct = $totalSegments > 0 ? round(($count / $totalSegments) * 100) : 0;
+                                    @endphp
+                                    <div>
+                                        <div class="flex justify-between items-center text-xs mb-1">
+                                            <span class="font-bold text-gray-700">{{ $style['badge'] }}</span>
+                                            <span class="font-black text-gray-900">{{ $count }} <span class="text-[0.65rem] text-gray-400 font-semibold">({{ $pct }}%)</span></span>
+                                        </div>
+                                        <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                                            <div class="h-full rounded-full" style="width: {{ $pct }}%; background-color: {{ $style['color'] }}"></div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-xs text-gray-400 italic">Tidak ada label relasi kuasa ditemukan.</p>
+                        @endif
+                    </div>
+
+                    {{-- Model Architecture Info Card --}}
+                    <div class="bg-gradient-to-br from-purple-900 to-indigo-900 rounded-2xl md:rounded-3xl p-5 text-white shadow-xl shadow-purple-900/20">
+                        <span class="px-2 py-0.5 rounded-full bg-white/10 text-[0.58rem] font-black uppercase tracking-widest border border-white/20 inline-block mb-2">
+                            Arsitektur Sistem
+                        </span>
+                        <h4 class="text-xs font-black uppercase tracking-wide mb-1">Multi-Task RoBERTa V2</h4>
+                        <p class="text-[0.72rem] text-purple-200 leading-relaxed font-medium mb-3">
+                            Model membaca konteks wacana multi-turn secara simultan untuk mendeteksi tindak tutur advice dan modalitas relasi kuasa secara end-to-end.
+                        </p>
+                        <div class="pt-2 border-t border-white/10 flex items-center justify-between text-[0.68rem] font-bold text-purple-300">
+                            <span>Akurasi Multi-Task</span>
+                            <span class="text-white">State-of-the-Art</span>
+                        </div>
+                    </div>
+                </div>
+
+            </aside> {{-- End of Right Analytical Sidebar Panel --}}
+
+        </div> {{-- End of Canva Workspace Grid Layout --}}
 
         {{-- Feedback Banner (Validasi Hasil Rekaman Terhadap Akurasi Output V2) --}}
         <div x-data="{
@@ -1885,7 +1825,7 @@
                 gradient.addColorStop(0.5, 'rgba(37, 99, 235, 0.08)');
                 gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
-                new Chart(ctx, {
+                window.v2DynamicsChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: labels,
@@ -2011,6 +1951,8 @@
                 insightRelation: '',
                 insightXai: null,
                 activeMobileTab: 'transkrip',
+                sidebarTab: 'graf', // 'graf', 'alur', 'metrik', 'intonasi', 'ringkasan'
+                isSidebarOpen: true,
                 currentPage: 1,
                 pageSize: 10,
                 speakerFilter: 'all', // 'all', 'Dosen', 'Mahasiswa'
@@ -2151,6 +2093,23 @@
                             }, 2500);
                         }
                     }, 150);
+                },
+
+                switchSidebarTab(tabName) {
+                    this.sidebarTab = tabName;
+                    this.isSidebarOpen = true;
+                    this.$nextTick(() => {
+                        if (window.lucide) window.lucide.createIcons();
+                        if (tabName === 'graf' && window.v2GraphChart) {
+                            window.v2GraphChart.resize();
+                        }
+                        if (tabName === 'intonasi' && window.v2DynamicsChart) {
+                            window.v2DynamicsChart.resize();
+                        }
+                        if (tabName === 'alur' && window.renderMermaidChart) {
+                            window.renderMermaidChart();
+                        }
+                    });
                 },
 
                 init() {
