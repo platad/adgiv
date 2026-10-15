@@ -853,6 +853,30 @@ Contoh format:
     }
 
     /**
+     * Resolve the academic role of a speaker name/label dynamically.
+     */
+    public static function resolveSpeakerRole(?string $name, array $speakerSamples = []): string
+    {
+        $clean = trim($name ?? '');
+        if (!empty($speakerSamples)) {
+            foreach ($speakerSamples as $s) {
+                if (strcasecmp($s['name'] ?? '', $clean) === 0 || strcasecmp($s['original'] ?? '', $clean) === 0) {
+                    if (!empty($s['role'])) {
+                        return $s['role'];
+                    }
+                }
+            }
+        }
+        if (preg_match('/\b(dosen|supervisor|pembimbing|penguji|prof|dr|pak|bu)\b/iu', $clean)) {
+            return 'Dosen';
+        }
+        if (preg_match('/\b(mhs|mahasiswa|student|terbimbing)\b/iu', $clean)) {
+            return 'Mahasiswa';
+        }
+        return 'Lainnya';
+    }
+
+    /**
      * Extract sample voice snippet for each speaker in transcription.
      */
     public static function extractSpeakerSamples(array $transcription): array

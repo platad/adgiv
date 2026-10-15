@@ -17,27 +17,9 @@
         $speakerCounts[$spk] = ($speakerCounts[$spk] ?? 0) + 1;
     }
 
-    // Role helper untuk menentukan apakah penutur adalah dosen/supervisor atau mahasiswa
+    // Helper untuk menentukan peran pembicara (menggunakan static method dari controller agar aman di semua scope view)
     $getSpeakerRole = function($name) use ($speakerSamples) {
-        $clean = trim($name ?? '');
-        // Cek sample metadata terlebih dahulu jika ada
-        if (!empty($speakerSamples) && is_array($speakerSamples)) {
-            foreach ($speakerSamples as $s) {
-                if (strcasecmp($s['name'] ?? '', $clean) === 0 || strcasecmp($s['original'] ?? '', $clean) === 0) {
-                    if (!empty($s['role'])) {
-                        return $s['role'];
-                    }
-                }
-            }
-        }
-        // Fallback pendeteksi cerdas dari string nama/label
-        if (preg_match('/\b(dosen|supervisor|pembimbing|penguji|prof|dr|pak|bu)\b/iu', $clean)) {
-            return 'Dosen';
-        }
-        if (preg_match('/\b(mhs|mahasiswa|student|terbimbing)\b/iu', $clean)) {
-            return 'Mahasiswa';
-        }
-        return 'Lainnya';
+        return \App\Http\Controllers\AnalysisV2Controller::resolveSpeakerRole($name, $speakerSamples ?? []);
     };
 
     $getAdviceBadgeStyle = function($label) {
@@ -1523,7 +1505,7 @@
                 elseif ($type === 'down') $val = -1;
 
                 $speaker = $block['speaker'] ?? 'Unknown';
-                $role = $getSpeakerRole($speaker);
+                $role = \App\Http\Controllers\AnalysisV2Controller::resolveSpeakerRole($speaker, $speakerSamples ?? []);
                 $isDosen = ($role === 'Dosen' || $role === 'Penguji');
 
                 return [
