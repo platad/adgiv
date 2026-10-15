@@ -123,7 +123,7 @@
     };
 @endphp
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 animate-fade-in"
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 animate-fade-in"
         x-data="v2ResultApp()"
         @go-to-baris.window="goToBaris($event.detail.index)">
 
@@ -155,41 +155,41 @@
         </div>
         @endguest
 
-        {{-- Canva-Style Sticky Top Workspace Navigation Bar --}}
-        <div class="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-gray-200/80 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 mb-6 transition-all shadow-xs">
+        {{-- Canva-Style Workspace Toolbar (Clean Card floating at top) --}}
+        <div class="sticky top-4 z-40 bg-white/95 backdrop-blur-xl border border-gray-200/90 rounded-2xl px-4 sm:px-6 py-3.5 mb-8 shadow-sm transition-all">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 
                 {{-- Left: Back Link & Document Title & Status Badges --}}
                 <div class="flex items-center gap-3.5 min-w-0">
                     @auth
                     <a href="{{ route('dashboard') }}"
-                        class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center shrink-0 transition-colors"
+                        class="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center shrink-0 transition-colors shadow-2xs"
                         title="Kembali ke Dashboard">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i>
                     </a>
                     @else
                     <a href="{{ route('login') }}"
-                        class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center shrink-0 transition-colors"
+                        class="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center shrink-0 transition-colors shadow-2xs"
                         title="Masuk ke Akun">
                         <i data-lucide="log-in" class="w-4 h-4"></i>
                     </a>
                     @endauth
 
                     <div class="min-w-0">
-                        <div class="flex items-center gap-2 flex-wrap mb-0.5">
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 border border-purple-200 text-[0.62rem] font-black uppercase tracking-wider">
+                        <div class="flex items-center gap-2 flex-wrap mb-1">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200 text-[0.62rem] font-black uppercase tracking-wider">
                                 <i data-lucide="sparkles" class="w-2.5 h-2.5 text-purple-600"></i> RoBERTa V2
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[0.62rem] font-bold">
-                                <i data-lucide="check-circle" class="w-2.5 h-2.5 text-emerald-600"></i> Selesai
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[0.62rem] font-bold">
+                                <i data-lucide="check-circle" class="w-2.5 h-2.5 text-emerald-600"></i> Selesai Diproses
                             </span>
                             @if(!$isOwner)
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[0.62rem] font-bold">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[0.62rem] font-bold">
                                     <i data-lucide="eye" class="w-2.5 h-2.5 text-blue-600"></i> Mode Baca
                                 </span>
                             @endif
                         </div>
-                        <h1 class="text-base sm:text-lg font-black text-gray-900 tracking-tight truncate max-w-md lg:max-w-xl" title="{{ $analysis->title }}">
+                        <h1 class="text-base sm:text-lg font-black text-gray-950 tracking-tight truncate max-w-md lg:max-w-xl" title="{{ $analysis->title }}">
                             {{ $analysis->title }}
                         </h1>
                     </div>
@@ -201,18 +201,18 @@
                     {{-- Toggle Right Sidebar Analytics --}}
                     <button type="button"
                         @click="isSidebarOpen = !isSidebarOpen"
-                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer"
-                        :class="isSidebarOpen ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'"
+                        class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all border cursor-pointer shadow-2xs"
+                        :class="isSidebarOpen ? 'bg-purple-600 text-white border-purple-600 shadow-purple-600/20' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'"
                         title="Toggle Panel Visualisasi & Analisis Kanan">
-                        <i data-lucide="panel-right" class="w-4 h-4 text-purple-600"></i>
-                        <span class="hidden sm:inline" x-text="isSidebarOpen ? 'Sembunyikan Panel' : 'Panel Analisis'"></span>
+                        <i data-lucide="panel-right" class="w-4 h-4" :class="isSidebarOpen ? 'text-white' : 'text-purple-600'"></i>
+                        <span class="hidden sm:inline" x-text="isSidebarOpen ? 'Tutup Panel' : 'Panel Analisis'"></span>
                     </button>
 
                     {{-- Tombol Bagikan (Google Drive Style Sharing) --}}
                     @if($isOwner)
                     <button type="button"
                         @click="openShareModal()"
-                        class="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs font-black uppercase tracking-wider transition-all shadow-xs active:scale-95 cursor-pointer">
+                        class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs font-black uppercase tracking-wider transition-all shadow-sm shadow-indigo-600/20 active:scale-95 cursor-pointer">
                         <i data-lucide="share-2" class="w-3.5 h-3.5 mr-1.5 shrink-0"></i>
                         <span>Bagikan</span>
                         <span class="ml-1.5 px-1.5 py-0.5 rounded bg-white/20 text-[0.58rem] font-bold uppercase tracking-wider"
@@ -223,7 +223,7 @@
                     {{-- Tombol Cetak Laporan --}}
                     <button type="button"
                         @click="showPrintModal = true"
-                        class="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition-all shadow-xs active:scale-95 cursor-pointer">
+                        class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition-all shadow-sm shadow-purple-600/20 active:scale-95 cursor-pointer">
                         <i data-lucide="printer" class="w-3.5 h-3.5 mr-1.5 shrink-0"></i>
                         <span class="hidden sm:inline">Cetak</span>
                     </button>
@@ -232,7 +232,7 @@
                     @if($isOwner)
                     <button type="button"
                         @click="showSwapModal = true"
-                        class="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 text-xs font-black uppercase tracking-wider transition-all shadow-2xs active:scale-95 cursor-pointer"
+                        class="inline-flex items-center justify-center px-3.5 py-2.5 rounded-xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 text-xs font-black uppercase tracking-wider transition-all shadow-2xs active:scale-95 cursor-pointer"
                         title="Tukar Peran Pembicara (Dosen / Mahasiswa)">
                         <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-purple-600 sm:mr-1.5 shrink-0"></i>
                         <span class="hidden md:inline">Tukar Peran</span>
@@ -242,7 +242,7 @@
                     {{-- Tombol Lihat / Tutup Raw JSON --}}
                     <button type="button"
                         @click="showRaw = !showRaw"
-                        class="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-black uppercase tracking-wider transition-colors cursor-pointer"
+                        class="inline-flex items-center justify-center px-3.5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-black uppercase tracking-wider transition-colors cursor-pointer"
                         title="Lihat Raw JSON Output">
                         <i data-lucide="code" class="w-3.5 h-3.5 sm:mr-1.5 shrink-0"></i>
                         <span class="hidden md:inline" x-text="showRaw ? 'Tutup Raw' : 'Raw'"></span>
@@ -533,7 +533,7 @@
                                         $intDesc = $intType === 'down' ? 'Intonasi menurun menandakan penegasan instruksi atau arahan akademik yang pasti dari Dosen.' : ($intType === 'up' ? 'Intonasi menaik menandakan nada eksploratif, klarifikasi, atau pertanyaan bimbingan.' : 'Intonasi netral menandakan pertukaran informasi akademis umum.');
                                         $intRelation = $isDosen ? 'Arahan direktif dosen membimbing arah riset mahasiswa.' : 'Tanggapan dialogis mahasiswa terhadap arahan dosen.';
                                     @endphp
-                                    <p class="text-lg md:text-xl font-medium text-gray-800 leading-relaxed tracking-wide font-serif mb-3">
+                                    <p class="text-base sm:text-lg font-medium text-gray-800 leading-relaxed tracking-wide font-serif mb-3">
                                         {{ $cleanText }}
                                         <button type="button"
                                             @click="openInsight('Intonasi {{ $intLabel }}', '{{ $intType }}', '{{ addslashes($intDesc) }}', '{{ addslashes($intRelation) }}')"
@@ -549,105 +549,104 @@
                                         </button>
                                     </p>
 
-                                        {{-- Interactive Clickable Badges (Pola Bimbingan & Relasi Kuasa - Full V1 Parity) --}}
-                                        <span class="flex flex-col gap-2.5 w-full mt-3 select-none">
+                                    {{-- Interactive Clickable Badges (Pola Bimbingan & Relasi Kuasa - Full V1 Parity) --}}
+                                    <div class="flex flex-col gap-2.5 w-full mt-3 select-none">
+                                        
+                                        {{-- Pola Bimbingan Box --}}
+                                        <div class="w-full flex flex-wrap items-center gap-2 p-3 border border-dashed border-gray-300 bg-gray-50/70 rounded-2xl">
+                                            <span class="w-full block text-[0.65rem] font-black uppercase tracking-wider text-gray-400 mb-0.5">Pola Bimbingan:</span>
                                             
-                                            {{-- Pola Bimbingan Box --}}
-                                            <span class="w-full flex flex-wrap items-center gap-2 p-3 border border-dashed border-gray-300 bg-gray-50/70 rounded-2xl">
-                                                <span class="w-full block text-[0.65rem] font-black uppercase tracking-wider text-gray-400 mb-0.5">Pola Bimbingan:</span>
-                                                
-                                                {{-- 1. Advice Giving Badge --}}
-                                                @if($adviceStyle)
-                                                    <button type="button"
-                                                        @click="openInsight('Advice Giving: {{ $adviceStyle['badge'] }}', 'advice', '{{ addslashes($adviceStyle['desc']) }}', 'Klasifikasi tindak tutur pembimbingan akademik berdasarkan model Multi-Task RoBERTa V2.', {{ json_encode($item['advice_xai'] ?? null) }})"
-                                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[0.7rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border {{ $adviceStyle['bg'] }}"
-                                                        title="Klik untuk melihat rangkuman & probabilitas tindak tutur">
-                                                        {!! $adviceStyle['icon'] !!}
-                                                        <span>{{ $adviceStyle['badge'] }}</span>
-                                                        @if(!empty($item['advice_confidence_percent']))
-                                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded-md bg-white/90 text-purple-900 border border-purple-200/50 text-[0.62rem] font-black font-mono shadow-2xs">
-                                                                {{ $item['advice_confidence_percent'] }}
-                                                            </span>
-                                                        @endif
-                                                    </button>
-                                                @endif
-
-                                                {{-- 2. Advice Base Marker --}}
-                                                @php
-                                                    $isAdvice = !empty($item['is_advice']) && $item['is_advice'] !== 'false' && $item['is_advice'] !== false;
-                                                    $adviceDesc = is_string($item['is_advice'] ?? null) ? $item['is_advice'] : 'Dosen menyampaikan arahan substansial bimbingan akademik.';
-                                                @endphp
-                                                @if($isAdvice)
-                                                    <button type="button"
-                                                        @click="openInsight('Pemberian Saran (Advice Giving)', 'advice', '{{ addslashes($adviceDesc) }}', 'Kalimat ini diidentifikasi sebagai saran bimbingan akademik yang menanggapi progres riset mahasiswa.', {{ json_encode($item['advice_xai'] ?? null) }})"
-                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-[0.68rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
-                                                        title="Klik untuk melihat detail advice">
-                                                        <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.5a6.5 6.5 0 100-13 6.5 6.5 0 000 13zM12 11.5v3M12 9h.01" />
-                                                        </svg>
-                                                        <span>Advice</span>
-                                                    </button>
-                                                @endif
-
-                                                {{-- 3. Intonation Badge (Up / Down / Neutral) --}}
-                                                @php
-                                                    $intType = strtolower($item['intonation_type'] ?? ($item['intonation_markers'][0]['type'] ?? ($isDosen ? 'down' : 'up')));
-                                                    $intLabel = $intType === 'up' ? 'Naik' : ($intType === 'down' ? 'Turun' : 'Netral');
-                                                    $intColor = $intType === 'up' ? 'bg-blue-50 text-blue-700 border-blue-200' : ($intType === 'down' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-gray-50 text-gray-700 border-gray-200');
-                                                    $intDesc = $intType === 'down' ? 'Intonasi menurun menandakan penegasan instruksi atau arahan akademik yang pasti dari Dosen.' : ($intType === 'up' ? 'Intonasi menaik menandakan nada eksploratif, klarifikasi, atau pertanyaan bimbingan.' : 'Intonasi netral menandakan pertukaran informasi akademis umum.');
-                                                @endphp
+                                            {{-- 1. Advice Giving Badge --}}
+                                            @if($adviceStyle)
                                                 <button type="button"
-                                                    @click="openInsight('Intonasi Kalimat: {{ $intLabel }}', 'intonation', '{{ addslashes($intDesc) }}', 'Dinamika nada suara berkontribusi pada karakter direktif atau dialogis tuturan ini.')"
-                                                    class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[0.68rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border {{ $intColor }}"
-                                                    title="Klik untuk melihat detail intonasi baris">
-                                                    @if($intType === 'up')
-                                                        <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                                                    @elseif($intType === 'down')
-                                                        <svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" /></svg>
-                                                    @else
-                                                        <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>
+                                                    @click="openInsight('Advice Giving: {{ $adviceStyle['badge'] }}', 'advice', '{{ addslashes($adviceStyle['desc']) }}', 'Klasifikasi tindak tutur pembimbingan akademik berdasarkan model Multi-Task RoBERTa V2.', {{ json_encode($item['advice_xai'] ?? null) }})"
+                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[0.7rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border {{ $adviceStyle['bg'] }}"
+                                                    title="Klik untuk melihat rangkuman & probabilitas tindak tutur">
+                                                    {!! $adviceStyle['icon'] !!}
+                                                    <span>{{ $adviceStyle['badge'] }}</span>
+                                                    @if(!empty($item['advice_confidence_percent']))
+                                                        <span class="inline-flex items-center px-1.5 py-0.2 rounded-md bg-white/90 text-purple-900 border border-purple-200/50 text-[0.62rem] font-black font-mono shadow-2xs">
+                                                            {{ $item['advice_confidence_percent'] }}
+                                                        </span>
                                                     @endif
-                                                    <span>Intonasi: {{ $intLabel }}</span>
                                                 </button>
-                                            </span>
+                                            @endif
 
-                                            {{-- Relasi Kuasa Box --}}
-                                            <span class="w-full flex flex-wrap items-center gap-2 p-3 border border-dashed border-purple-200 bg-purple-50/30 rounded-2xl">
-                                                <span class="w-full block text-[0.65rem] font-black uppercase tracking-wider text-purple-400 mb-0.5">Relasi Kuasa:</span>
-
-                                                {{-- 1. Modes of Interaction Badge --}}
-                                                @if($modeStyle)
-                                                    <button type="button"
-                                                        @click="openInsight('Modes of Interaction: {{ $modeStyle['badge'] }}', 'mode', '{{ addslashes($modeStyle['desc']) }}', 'Pemodelan relasi kuasa interaksi antara Dosen dan Mahasiswa pada segmen waktu ini.', {{ json_encode($item['mode_xai'] ?? null) }})"
-                                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[0.7rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border {{ $modeStyle['bg'] }}"
-                                                        title="Klik untuk melihat rangkuman & probabilitas relasi">
-                                                        {!! $modeStyle['icon'] !!}
-                                                        <span>{{ $modeStyle['badge'] }}</span>
-                                                        @if(!empty($item['mode_confidence_percent']))
-                                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded-md bg-white/90 text-purple-900 border border-purple-200/50 text-[0.62rem] font-black font-mono shadow-2xs">
-                                                                {{ $item['mode_confidence_percent'] }}
-                                                            </span>
-                                                        @endif
-                                                    </button>
-                                                @endif
-
-                                                {{-- 2. Karakter Relasi Sintaksis/Wacana Badge --}}
-                                                @php
-                                                    $relText = !empty($item['relation']) ? $item['relation'] : (!empty($item['advice_relation']) ? $item['advice_relation'] : ($isDosen ? 'Relasi otoritas pedagogis membimbing topik mahasiswa.' : 'Relasi responsif mengonfirmasi pemahaman konsep.'));
-                                                @endphp
+                                            {{-- 2. Advice Base Marker --}}
+                                            @php
+                                                $isAdvice = !empty($item['is_advice']) && $item['is_advice'] !== 'false' && $item['is_advice'] !== false;
+                                                $adviceDesc = is_string($item['is_advice'] ?? null) ? $item['is_advice'] : 'Dosen menyampaikan arahan substansial bimbingan akademik.';
+                                            @endphp
+                                            @if($isAdvice)
                                                 <button type="button"
-                                                    @click="openInsight('Karakter & Relasi Kalimat', 'relation', 'AI mendeteksi hubungan antar-kalimat dan keterkaitan topik yang erat pada baris percakapan ini.', '{{ addslashes($relText) }}')"
-                                                    class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[0.68rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
-                                                    title="Klik untuk melihat karakter & relasi kalimat">
-                                                    <svg class="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                    @click="openInsight('Pemberian Saran (Advice Giving)', 'advice', '{{ addslashes($adviceDesc) }}', 'Kalimat ini diidentifikasi sebagai saran bimbingan akademik yang menanggapi progres riset mahasiswa.', {{ json_encode($item['advice_xai'] ?? null) }})"
+                                                    class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-[0.68rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
+                                                    title="Klik untuk melihat detail advice">
+                                                    <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.5a6.5 6.5 0 100-13 6.5 6.5 0 000 13zM12 11.5v3M12 9h.01" />
                                                     </svg>
-                                                    <span>Relasi Wacana</span>
+                                                    <span>Advice</span>
                                                 </button>
-                                            </span>
+                                            @endif
 
-                                        </span>
-                                    </p>
+                                            {{-- 3. Intonation Badge (Up / Down / Neutral) --}}
+                                            @php
+                                                $intType = strtolower($item['intonation_type'] ?? ($item['intonation_markers'][0]['type'] ?? ($isDosen ? 'down' : 'up')));
+                                                $intLabel = $intType === 'up' ? 'Naik' : ($intType === 'down' ? 'Turun' : 'Netral');
+                                                $intColor = $intType === 'up' ? 'bg-blue-50 text-blue-700 border-blue-200' : ($intType === 'down' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-gray-50 text-gray-700 border-gray-200');
+                                                $intDesc = $intType === 'down' ? 'Intonasi menurun menandakan penegasan instruksi atau arahan akademik yang pasti dari Dosen.' : ($intType === 'up' ? 'Intonasi menaik menandakan nada eksploratif, klarifikasi, atau pertanyaan bimbingan.' : 'Intonasi netral menandakan pertukaran informasi akademis umum.');
+                                            @endphp
+                                            <button type="button"
+                                                @click="openInsight('Intonasi Kalimat: {{ $intLabel }}', 'intonation', '{{ addslashes($intDesc) }}', 'Dinamika nada suara berkontribusi pada karakter direktif atau dialogis tuturan ini.')"
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[0.68rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border {{ $intColor }}"
+                                                title="Klik untuk melihat detail intonasi baris">
+                                                @if($intType === 'up')
+                                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                                @elseif($intType === 'down')
+                                                    <svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" /></svg>
+                                                @else
+                                                    <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" /></svg>
+                                                @endif
+                                                <span>Intonasi: {{ $intLabel }}</span>
+                                            </button>
+                                        </div>
+
+                                        {{-- Relasi Kuasa Box --}}
+                                        <div class="w-full flex flex-wrap items-center gap-2 p-3 border border-dashed border-purple-200 bg-purple-50/30 rounded-2xl">
+                                            <span class="w-full block text-[0.65rem] font-black uppercase tracking-wider text-purple-400 mb-0.5">Relasi Kuasa:</span>
+
+                                            {{-- 1. Modes of Interaction Badge --}}
+                                            @if($modeStyle)
+                                                <button type="button"
+                                                    @click="openInsight('Modes of Interaction: {{ $modeStyle['badge'] }}', 'mode', '{{ addslashes($modeStyle['desc']) }}', 'Pemodelan relasi kuasa interaksi antara Dosen dan Mahasiswa pada segmen waktu ini.', {{ json_encode($item['mode_xai'] ?? null) }})"
+                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[0.7rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105 border {{ $modeStyle['bg'] }}"
+                                                    title="Klik untuk melihat rangkuman & probabilitas relasi">
+                                                    {!! $modeStyle['icon'] !!}
+                                                    <span>{{ $modeStyle['badge'] }}</span>
+                                                    @if(!empty($item['mode_confidence_percent']))
+                                                        <span class="inline-flex items-center px-1.5 py-0.2 rounded-md bg-white/90 text-purple-900 border border-purple-200/50 text-[0.62rem] font-black font-mono shadow-2xs">
+                                                            {{ $item['mode_confidence_percent'] }}
+                                                        </span>
+                                                    @endif
+                                                </button>
+                                            @endif
+
+                                            {{-- 2. Karakter Relasi Sintaksis/Wacana Badge --}}
+                                            @php
+                                                $relText = !empty($item['relation']) ? $item['relation'] : (!empty($item['advice_relation']) ? $item['advice_relation'] : ($isDosen ? 'Relasi otoritas pedagogis membimbing topik mahasiswa.' : 'Relasi responsif mengonfirmasi pemahaman konsep.'));
+                                            @endphp
+                                            <button type="button"
+                                                @click="openInsight('Karakter & Relasi Kalimat', 'relation', 'AI mendeteksi hubungan antar-kalimat dan keterkaitan topik yang erat pada baris percakapan ini.', '{{ addslashes($relText) }}')"
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[0.68rem] font-black uppercase tracking-widest cursor-pointer transition-all hover:scale-105"
+                                                title="Klik untuk melihat karakter & relasi kalimat">
+                                                <svg class="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                </svg>
+                                                <span>Relasi Wacana</span>
+                                            </button>
+                                        </div>
+
+                                    </div>
                                 </div>
                             </div>
 
@@ -763,6 +762,8 @@
                             class="inline-flex items-center px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold uppercase tracking-widest text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors cursor-pointer">
                             Next <i data-lucide="chevron-right" class="w-4 h-4 ml-1"></i>
                         </button>
+                    </div>
+                </template>
             </div> {{-- End of Transkripsi & Penanda Wacana Card --}}
 
             {{-- Hasil Analisis Akhir (Placed on the Main Canvas directly below Transcript) --}}
