@@ -119,76 +119,137 @@ class AnalysisV2Controller extends Controller
 
     public function swapSpeakers(Request $request, Analysis $analysis)
     {
+        $request->merge(['mode' => 'swap']);
+        return $this->updateSpeakers($request, $analysis);
+    }
+
+    public function getSpeakerSamples(Analysis $analysis)
+    {
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
+
+        $transcription = $analysis->result_data['transcription'] ?? [];
+        $speakers = self::extractSpeakerSamples($transcription);
+
+        return response()->json([
+            'status' => 'success',
+            'audio_url' => route('analysis.v2.audio', $analysis->slug),
+            'total_speakers' => count($speakers),
+            'speakers' => $speakers
+        ]);
+    }
+
+    public function updateSpeakers(Request $request, Analysis $analysis)
+    {
         abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
 
         $resultData = $analysis->result_data ?? [];
         $transcription = $resultData['transcription'] ?? [];
-
-        // Swap roles in transcription
-        foreach ($transcription as &$item) {
-            $currentSpeaker = $item['speaker'] ?? '';
-            if (strcasecmp($currentSpeaker, 'Dosen') === 0 || strcasecmp($currentSpeaker, 'Supervisor') === 0) {
-                $item['speaker'] = 'Mahasiswa';
-            } elseif (strcasecmp($currentSpeaker, 'Mahasiswa') === 0 || strcasecmp($currentSpeaker, 'Student') === 0) {
-                $item['speaker'] = 'Dosen';
-            }
-        }
-        unset($item);
-
-        $resultData['transcription'] = $transcription;
-
-        // Swap nodes and edges in graph_data if present
         $graphData = $analysis->graph_data ?? [];
-        if (!empty($graphData['nodes']) && is_array($graphData['nodes'])) {
-            foreach ($graphData['nodes'] as &$node) {
-                if (isset($node['id'])) {
-                    if ($node['id'] === 'Dosen') {
-                        $node['id'] = 'Mahasiswa';
-                        $node['label'] = 'Mahasiswa';
-                    } elseif ($node['id'] === 'Mahasiswa' || $node['id'] === 'Mhs') {
-                        $node['id'] = 'Dosen';
-                        $node['label'] = 'Dosen';
+        $mode = $request->input('mode', 'update');
+
+        $mappings = [];
+
+        if ($mode === 'swap') {
+            // Dapatkan seluruh penutur unik berurutan
+            $uniqueSpeakers = array_values(array_unique(array_filter(array_map(function($item) {
+                return trim($item['speaker'] ?? '');
+            }, $transcription))));
+
+            if (count($uniqueSpeakers) >= 2) {
+                // Tukar speaker 0 dan speaker 1
+                $mappings[$uniqueSpeakers[0]] = $uniqueSpeakers[1];
+                $mappings[$uniqueSpeakers[1]] = $uniqueSpeakers[0];
+            } else {
+                $mappings = ['Dosen' => 'Mahasiswa', 'Mahasiswa' => 'Dosen'];
+            }
+        } else {
+            // Mode update / rename dari input user
+            if ($request->has('speakers') && is_array($request->input('speakers'))) {
+                foreach ($request->input('speakers') as $spkItem) {
+                    $orig = trim($spkItem['original'] ?? ($spkItem['from'] ?? ''));
+                    $newName = trim($spkItem['name'] ?? ($spkItem['to'] ?? ''));
+                    if (!empty($orig) && !empty($newName) && $orig !== $newName) {
+                        $mappings[$orig] = $newName;
+                    }
+                }
+            } elseif ($request->has('mappings') && is_array($request->input('mappings'))) {
+                foreach ($request->input('mappings') as $from => $to) {
+                    $from = trim($from);
+                    $to = trim($to);
+                    if (!empty($from) && !empty($to) && $from !== $to) {
+                        $mappings[$from] = $to;
                     }
                 }
             }
-            unset($node);
         }
 
-        if (!empty($graphData['edges']) && is_array($graphData['edges'])) {
-            foreach ($graphData['edges'] as &$edge) {
-                if (isset($edge['from'])) {
-                    if ($edge['from'] === 'Dosen') {
-                        $edge['from'] = 'Mahasiswa';
-                    } elseif ($edge['from'] === 'Mahasiswa' || $edge['from'] === 'Mhs') {
-                        $edge['from'] = 'Dosen';
-                    }
-                }
-                if (isset($edge['to'])) {
-                    if ($edge['to'] === 'Dosen') {
-                        $edge['to'] = 'Mahasiswa';
-                    } elseif ($edge['to'] === 'Mahasiswa' || $edge['to'] === 'Mhs') {
-                        $edge['to'] = 'Dosen';
-                    }
+        if (!empty($mappings)) {
+            // Terapkan mapping nama/peran ke transkripsi
+            foreach ($transcription as &$item) {
+                $curr = trim($item['speaker'] ?? '');
+                if (isset($mappings[$curr])) {
+                    $item['speaker'] = $mappings[$curr];
                 }
             }
-            unset($edge);
+            unset($item);
+
+            $resultData['transcription'] = $transcription;
+
+            // Terapkan mapping nama/peran ke Graph Data (Nodes & Edges)
+            if (!empty($graphData['nodes']) && is_array($graphData['nodes'])) {
+                foreach ($graphData['nodes'] as &$node) {
+                    $nid = $node['id'] ?? '';
+                    $nlabel = $node['label'] ?? ($node['name'] ?? '');
+
+                    if (isset($mappings[$nid])) {
+                        $node['id'] = $mappings[$nid];
+                        $node['label'] = $mappings[$nid];
+                        if (isset($node['name'])) $node['name'] = $mappings[$nid];
+                    } elseif (isset($mappings[$nlabel])) {
+                        $node['label'] = $mappings[$nlabel];
+                        if (isset($node['name'])) $node['name'] = $mappings[$nlabel];
+                    }
+                }
+                unset($node);
+            }
+
+            if (!empty($graphData['edges']) && is_array($graphData['edges'])) {
+                foreach ($graphData['edges'] as &$edge) {
+                    if (isset($edge['from']) && isset($mappings[$edge['from']])) {
+                        $edge['from'] = $mappings[$edge['from']];
+                    }
+                    if (isset($edge['to']) && isset($mappings[$edge['to']])) {
+                        $edge['to'] = $mappings[$edge['to']];
+                    }
+                    if (isset($edge['source']) && isset($mappings[$edge['source']])) {
+                        $edge['source'] = $mappings[$edge['source']];
+                    }
+                    if (isset($edge['target']) && isset($mappings[$edge['target']])) {
+                        $edge['target'] = $mappings[$edge['target']];
+                    }
+                }
+                unset($edge);
+            }
+
+            $analysis->update([
+                'result_data' => $resultData,
+                'graph_data' => $graphData,
+            ]);
         }
 
-        $analysis->update([
-            'result_data' => $resultData,
-            'graph_data' => $graphData,
-        ]);
+        $updatedSpeakers = self::extractSpeakerSamples($transcription);
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'status' => 'success',
-                'message' => 'Peran pembicara berhasil ditukar.',
+                'message' => 'Peran dan nama pembicara berhasil diperbarui.',
+                'speakers' => $updatedSpeakers,
                 'transcription' => $transcription,
                 'graph_data' => $graphData,
             ]);
         }
 
-        return back()->with('success', 'Peran pembicara (Dosen ↔ Mahasiswa) berhasil ditukar.');
+        return back()->with('success', 'Peran dan nama pembicara berhasil diperbarui.');
     }
 
     public function result(Analysis $analysis)
@@ -403,8 +464,9 @@ class AnalysisV2Controller extends Controller
         ];
 
         $graphInterpretation = $analysis->result_data['graph_interpretation'] ?? null;
+        $speakerSamples = self::extractSpeakerSamples($transcription);
 
-        return view('analysis.v2.result', compact('analysis', 'stats', 'transcription', 'summary', 'graphInterpretation'));
+        return view('analysis.v2.result', compact('analysis', 'stats', 'transcription', 'summary', 'graphInterpretation', 'speakerSamples'));
     }
 
     public function interpretGraph(Request $request, Analysis $analysis)
@@ -767,5 +829,83 @@ Contoh format:
 
             return 'Mahasiswa menyimak masukan dosen untuk penyempurnaan kualitas riset.';
         }
+    }
+
+    /**
+     * Parse formatted time string (e.g. "01:23" or "01:23:45") to seconds.
+     */
+    public static function parseTimeToSeconds(string $timeStr): float
+    {
+        $timeStr = trim($timeStr);
+        if (is_numeric($timeStr)) {
+            return (float)$timeStr;
+        }
+        $parts = explode(':', $timeStr);
+        if (count($parts) === 2) {
+            return ((float)$parts[0] * 60) + (float)$parts[1];
+        } elseif (count($parts) === 3) {
+            return ((float)$parts[0] * 3600) + ((float)$parts[1] * 60) + (float)$parts[2];
+        }
+        return 0.0;
+    }
+
+    /**
+     * Extract sample voice snippet for each speaker in transcription.
+     */
+    public static function extractSpeakerSamples(array $transcription): array
+    {
+        $speakersMap = [];
+
+        foreach ($transcription as $idx => $item) {
+            $spk = trim($item['speaker'] ?? 'Unknown');
+            if (empty($spk)) continue;
+
+            $start = $item['start'] ?? ($item['start_sec'] ?? null);
+            $end = $item['end'] ?? ($item['end_sec'] ?? null);
+            $timeStr = $item['timestamp'] ?? '';
+
+            if (($start === null || $end === null) && !empty($timeStr)) {
+                $parts = explode('-', $timeStr);
+                $start = self::parseTimeToSeconds(trim($parts[0] ?? '00:00'));
+                $end = isset($parts[1]) ? self::parseTimeToSeconds(trim($parts[1])) : ($start + 5);
+            }
+
+            $duration = ($start !== null && $end !== null) ? max(0, (float)$end - (float)$start) : 0;
+            $text = trim(strip_tags($item['text'] ?? ($item['text_html'] ?? '')));
+
+            // Detect likely role
+            $isDosen = (stripos($spk, 'Dosen') !== false || stripos($spk, 'Supervisor') !== false);
+            $isMhs = (stripos($spk, 'Mahasiswa') !== false || stripos($spk, 'Student') !== false || stripos($spk, 'Mhs') !== false);
+            $defaultRole = $isDosen ? 'Dosen' : ($isMhs ? 'Mahasiswa' : 'Lainnya');
+
+            if (!isset($speakersMap[$spk])) {
+                $speakersMap[$spk] = [
+                    'original' => $spk,
+                    'name' => $spk,
+                    'role' => $defaultRole,
+                    'sample_text' => $text,
+                    'start_sec' => (float)$start,
+                    'end_sec' => (float)$end,
+                    'timestamp' => $timeStr,
+                    'duration' => $duration,
+                    'utterance_count' => 1,
+                    'line_index' => $idx,
+                ];
+            } else {
+                $speakersMap[$spk]['utterance_count']++;
+                // Prefer clean sample between 3 and 12 seconds with substantial text
+                $currentDur = $speakersMap[$spk]['duration'];
+                if (($currentDur < 3 || $currentDur > 15) && ($duration >= 3 && $duration <= 15) && strlen($text) > 15) {
+                    $speakersMap[$spk]['sample_text'] = $text;
+                    $speakersMap[$spk]['start_sec'] = (float)$start;
+                    $speakersMap[$spk]['end_sec'] = (float)$end;
+                    $speakersMap[$spk]['timestamp'] = $timeStr;
+                    $speakersMap[$spk]['duration'] = $duration;
+                    $speakersMap[$spk]['line_index'] = $idx;
+                }
+            }
+        }
+
+        return array_values($speakersMap);
     }
 }

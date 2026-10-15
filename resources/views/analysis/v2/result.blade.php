@@ -1252,11 +1252,11 @@
             </div>
         </div>
 
-        {{-- Speaker Swap Confirmation Modal --}}
+        {{-- Modal Kelola & Tukar Peran Pembicara (Audio Preview & Rename) --}}
         <div x-show="showSwapModal"
-            class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none"
+            class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none p-4"
             style="display: none;">
-            <div x-show="showSwapModal" @click="showSwapModal = false"
+            <div x-show="showSwapModal" @click="closeSwapModal()"
                 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
@@ -1267,28 +1267,118 @@
                 x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                 x-transition:leave="transition ease-in duration-200 transform"
                 x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                class="relative bg-white rounded-[2.5rem] max-w-md w-full mx-4 p-8 shadow-2xl z-10 border border-gray-100">
+                class="relative bg-white rounded-[2.5rem] max-w-2xl w-full mx-auto p-6 sm:p-8 shadow-2xl z-10 border border-gray-100 max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200">
                 
-                <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4">
-                    <i data-lucide="arrow-left-right" class="w-6 h-6"></i>
+                {{-- Modal Audio Element for Samples --}}
+                <audio x-ref="modalAudioPlayer" src="{{ route('analysis.v2.audio', $analysis->slug) }}" @timeupdate="onModalAudioUpdate()" @ended="stopModalAudio()"></audio>
+
+                <div class="flex items-start justify-between gap-4 mb-4 pb-4 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                            <i data-lucide="users" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <span class="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 text-[0.62rem] font-black uppercase tracking-wider">Speaker Management</span>
+                            <h3 class="text-lg font-black text-gray-900 uppercase tracking-tight mt-0.5">Kelola & Verifikasi Peran Pembicara</h3>
+                        </div>
+                    </div>
+                    <button type="button" @click="closeSwapModal()" class="text-gray-400 hover:text-gray-600 p-1 rounded-xl transition cursor-pointer">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
                 </div>
 
-                <h3 class="text-lg font-black text-gray-900 uppercase tracking-tight mb-2">Tukar Peran Pembicara?</h3>
-                <p class="text-xs text-gray-500 font-medium leading-relaxed mb-6">
-                    Tindakan ini akan menukar seluruh label pembicara (<strong class="text-purple-700">Dosen ↔ Mahasiswa</strong>) pada transkripsi dan memperbarui topologi Graf Wacana secara otomatis.
+                <p class="text-xs text-gray-500 font-medium leading-relaxed mb-5">
+                    Dengarkan audio sampel untuk memastikan suara penutur tidak tertukar. Anda dapat mengubah nama peran (misal nama dosen/mahasiswa) atau menukar peran secara langsung.
                 </p>
 
-                <div class="flex gap-3 justify-end">
-                    <button type="button" @click="showSwapModal = false"
+                {{-- Notice if Multiparty --}}
+                <template x-if="speakersList.length > 2">
+                    <div class="mb-4 p-3 bg-indigo-50 border border-indigo-100 rounded-2xl text-xs text-indigo-900 font-medium flex items-center gap-2.5">
+                        <i data-lucide="info" class="w-4 h-4 text-indigo-600 shrink-0"></i>
+                        <span><strong>Multiparty Dialogue:</strong> Terdeteksi <span class="font-bold" x-text="speakersList.length"></span> pembicara. Sesuaikan nama untuk setiap penutur agar visualisasi graf akurat.</span>
+                    </div>
+                </template>
+
+                {{-- Quick Swap Button if exactly 2 speakers --}}
+                <template x-if="speakersList.length === 2">
+                    <div class="mb-5 p-3.5 bg-purple-50/70 border border-purple-200/80 rounded-2xl flex items-center justify-between gap-3">
+                        <div class="text-xs text-purple-900 font-medium">
+                            <span class="font-bold">Peran Terbalik?</span> Klik tombol ini untuk menukar peran Dosen ↔ Mahasiswa secara instan.
+                        </div>
+                        <button type="button" @click="swapTwoSpeakers()"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition shadow-sm cursor-pointer shrink-0">
+                            <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i>
+                            <span>Tukar Dosen ↔ Mahasiswa</span>
+                        </button>
+                    </div>
+                </template>
+
+                {{-- List of Speaker Cards --}}
+                <div class="space-y-3.5 mb-6">
+                    <template x-for="(spk, idx) in speakersList" :key="spk.original">
+                        <div class="bg-gray-50/80 border border-gray-200/70 rounded-2xl p-4 transition-all hover:bg-white hover:border-purple-200 hover:shadow-xs space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black text-white"
+                                          :class="idx === 0 ? 'bg-purple-600' : (idx === 1 ? 'bg-blue-600' : 'bg-stone-700')"
+                                          x-text="idx + 1"></span>
+                                    <div>
+                                        <div class="text-xs font-black text-gray-900 uppercase tracking-wide flex items-center gap-1.5">
+                                            <span x-text="spk.original"></span>
+                                            <span class="px-1.5 py-0.2 rounded-full text-[0.62rem] font-bold bg-gray-200/80 text-gray-600" x-text="spk.utterance_count + ' ujaran'"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Audio Preview Button --}}
+                                <button type="button" @click="toggleModalSpeakerSample(spk)"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer"
+                                    :class="playingSpeaker === spk.original ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-purple-700 hover:bg-purple-50 border border-purple-200'">
+                                    <i :data-lucide="playingSpeaker === spk.original ? 'square' : 'play'" class="w-3.5 h-3.5"></i>
+                                    <span x-text="playingSpeaker === spk.original ? 'Hentikan Audio' : 'Putar Sampel Suara'"></span>
+                                    <span class="text-[0.62rem] opacity-75 font-mono" x-text="'[' + (spk.timestamp || 'Audio') + ']'"></span>
+                                </button>
+                            </div>
+
+                            {{-- Text Sample Snippet --}}
+                            <div class="text-xs text-gray-600 italic bg-white p-2.5 rounded-xl border border-gray-100 line-clamp-2"
+                                 x-text="'“' + (spk.sample_text || '...') + '”'">
+                            </div>
+
+                            {{-- Editable Input Form --}}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                                <div>
+                                    <label class="block text-[0.62rem] font-bold text-gray-400 uppercase tracking-wider mb-1">Nama / Label Tampilan</label>
+                                    <input type="text" x-model="spk.name"
+                                        class="w-full text-xs font-bold rounded-xl border-gray-200 focus:border-purple-500 focus:ring-purple-500 py-1.5 px-3 bg-white"
+                                        :placeholder="idx === 0 ? 'Contoh: Pak Banu (Dosen)' : 'Contoh: Irham (Mahasiswa)'">
+                                </div>
+                                <div>
+                                    <label class="block text-[0.62rem] font-bold text-gray-400 uppercase tracking-wider mb-1">Peran Akademik</label>
+                                    <select x-model="spk.role" class="w-full text-xs font-semibold rounded-xl border-gray-200 focus:border-purple-500 focus:ring-purple-500 py-1.5 px-2.5 bg-white">
+                                        <option value="Dosen">Dosen / Pembimbing</option>
+                                        <option value="Mahasiswa">Mahasiswa Terbimbing</option>
+                                        <option value="Penguji">Dosen Penguji</option>
+                                        <option value="Moderator">Moderator / Peserta Lain</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                {{-- Modal Footer --}}
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                    <button type="button" @click="closeSwapModal()"
                         class="px-5 py-2.5 rounded-xl border border-gray-200 text-xs font-bold uppercase tracking-wider text-gray-600 hover:bg-gray-50 transition cursor-pointer">
                         Batal
                     </button>
-                    <button type="button" @click="executeSpeakerSwap()" :disabled="isSwapping"
-                        class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition shadow-md shadow-purple-600/20 flex items-center gap-2 cursor-pointer disabled:opacity-50">
+                    <button type="button" @click="saveSpeakerChanges()" :disabled="isSwapping"
+                        class="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition shadow-md shadow-purple-600/20 flex items-center gap-2 cursor-pointer disabled:opacity-50">
                         <template x-if="isSwapping">
-                            <svg class="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
                         </template>
-                        <span x-text="isSwapping ? 'Memproses...' : 'Ya, Tukar Peran'"></span>
+                        <span x-text="isSwapping ? 'Menyimpan...' : 'Simpan & Terapkan Peran'"></span>
                     </button>
                 </div>
             </div>
@@ -1903,6 +1993,104 @@
                     const m = Math.floor(sec / 60);
                     const s = Math.floor(sec % 60);
                     return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+                },
+
+                // Speaker Management Modal state & methods
+                speakersList: @json($speakerSamples ?? []),
+                playingSpeaker: null,
+                modalAudioEndTime: null,
+
+                closeSwapModal() {
+                    this.stopModalAudio();
+                    this.showSwapModal = false;
+                },
+
+                toggleModalSpeakerSample(spk) {
+                    const audio = this.$refs.modalAudioPlayer;
+                    if (!audio) return;
+
+                    if (this.playingSpeaker === spk.original) {
+                        this.stopModalAudio();
+                        return;
+                    }
+
+                    // Seek to speaker sample start
+                    const startSec = typeof spk.start_sec === 'number' ? spk.start_sec : 0;
+                    const endSec = typeof spk.end_sec === 'number' ? spk.end_sec : (startSec + 5);
+
+                    audio.currentTime = startSec;
+                    this.modalAudioEndTime = endSec;
+                    this.playingSpeaker = spk.original;
+                    audio.play().catch(e => console.warn('Audio preview play error:', e));
+                },
+
+                onModalAudioUpdate() {
+                    const audio = this.$refs.modalAudioPlayer;
+                    if (!audio) return;
+                    if (this.modalAudioEndTime !== null && audio.currentTime >= this.modalAudioEndTime) {
+                        this.stopModalAudio();
+                    }
+                },
+
+                stopModalAudio() {
+                    const audio = this.$refs.modalAudioPlayer;
+                    if (audio) {
+                        audio.pause();
+                    }
+                    this.playingSpeaker = null;
+                    this.modalAudioEndTime = null;
+                },
+
+                swapTwoSpeakers() {
+                    if (this.speakersList.length !== 2) return;
+                    const spk0 = this.speakersList[0];
+                    const spk1 = this.speakersList[1];
+
+                    // Swap roles and names between the two
+                    const tempRole = spk0.role;
+                    const tempName = spk0.name;
+                    spk0.role = spk1.role;
+                    spk0.name = spk1.name;
+                    spk1.role = tempRole;
+                    spk1.name = tempName;
+                },
+
+                async saveSpeakerChanges() {
+                    this.isSwapping = true;
+                    this.stopModalAudio();
+
+                    try {
+                        const payload = {
+                            mode: 'rename',
+                            speakers: this.speakersList.map(s => ({
+                                original: s.original,
+                                name: (s.name || s.role || s.original).trim(),
+                                role: s.role || 'Dosen'
+                            }))
+                        };
+
+                        const res = await fetch("{{ route('analysis.v2.update-speakers', $analysis->slug) }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const data = await res.json();
+                        if (data.status === 'success') {
+                            window.location.reload();
+                        } else {
+                            alert(data.message || 'Gagal menyimpan perubahan pembicara.');
+                            this.isSwapping = false;
+                        }
+                    } catch (err) {
+                        console.error('Save speaker error:', err);
+                        alert('Terjadi kesalahan jaringan.');
+                        this.isSwapping = false;
+                    }
                 },
 
                 async executeSpeakerSwap() {

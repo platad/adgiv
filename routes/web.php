@@ -71,6 +71,8 @@ Route::get('/', function (Request $request) {
                 Route::post('/{analysis}/swap-speakers', [\App\Http\Controllers\AnalysisV2Controller::class, 'swapSpeakers'])->name('swap-speakers');
                 Route::post('/{analysis}/interpret-graph', [\App\Http\Controllers\AnalysisV2Controller::class, 'interpretGraph'])->name('interpret-graph');
                 Route::post('/{analysis}/generate-substance', [\App\Http\Controllers\AnalysisV2Controller::class, 'generateSubstances'])->name('generate-substance');
+                Route::get('/{analysis}/speaker-samples', [\App\Http\Controllers\AnalysisV2Controller::class, 'getSpeakerSamples'])->name('speaker-samples');
+                Route::post('/{analysis}/update-speakers', [\App\Http\Controllers\AnalysisV2Controller::class, 'updateSpeakers'])->name('update-speakers');
             });
 
             Route::get('/{analysis}/processing', [AnalysisController::class, 'processing'])->name('processing');

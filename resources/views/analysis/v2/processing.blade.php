@@ -45,7 +45,7 @@
         </div>
 
         {{-- Main Execution Card --}}
-        <div class="bg-white border border-gray-100 rounded-[2.5rem] shadow-xl shadow-gray-100/60 p-8 md:p-12" x-data="{ showLogs: false, logCount: 0 }">
+        <div class="bg-white border border-gray-100 rounded-[2.5rem] shadow-xl shadow-gray-100/60 p-8 md:p-12" x-data="processingApp()">
             
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-gray-50">
                 <div class="flex items-center gap-4">
@@ -137,23 +137,106 @@
 
                 {{-- Informasi Panel Tambahan & Speaker Feedback --}}
                 <div class="flex flex-col gap-4">
-                    {{-- Speaker Detection Live Feedback Box --}}
-                    <div id="speaker-detected-box" class="hidden bg-purple-50/70 border border-purple-200 rounded-3xl p-6 transition-all duration-500 animate-fade-in">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-600/20">
-                                <i data-lucide="users" class="w-5 h-5"></i>
+                    {{-- Hidden Audio Player for Speaker Snippet Previews --}}
+                    <audio x-ref="processingAudioPlayer" src="{{ route('analysis.v2.audio', $analysis->slug) }}" @timeupdate="onSpeakerAudioUpdate()" @ended="stopSpeakerAudio()"></audio>
+
+                    {{-- Speaker Detection Live Interactive Feedback Box --}}
+                    <div id="speaker-detected-box" x-show="speakersLoaded && speakersList.length > 0" x-collapse
+                        class="bg-purple-50/70 border border-purple-200 rounded-3xl p-6 transition-all duration-500 animate-fade-in space-y-4">
+                        
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-600/20">
+                                    <i data-lucide="users" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <span class="px-2 py-0.5 rounded-full bg-purple-200 text-purple-800 text-[0.6rem] font-black uppercase tracking-wider">Anotasi Pembicara</span>
+                                    <h4 class="text-sm font-black text-purple-950 mt-0.5" x-text="speakersList.length + ' Peran Terdeteksi'"></h4>
+                                </div>
                             </div>
-                            <div>
-                                <span class="px-2 py-0.5 rounded-full bg-purple-200 text-purple-800 text-[0.6rem] font-black uppercase tracking-wider">Terdeteksi Otomatis</span>
-                                <h4 class="text-sm font-black text-purple-950 mt-0.5">2 Pembicara Teridentifikasi</h4>
-                            </div>
+
+                            {{-- Quick Swap Button if exactly 2 speakers --}}
+                            <template x-if="speakersList.length === 2">
+                                <button type="button" @click="swapTwoSpeakers()"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition shadow-sm cursor-pointer shrink-0">
+                                    <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i>
+                                    <span>Tukar Peran</span>
+                                </button>
+                            </template>
                         </div>
-                        <p class="text-xs text-purple-800 leading-relaxed font-medium mb-3">
-                            Sistem AI telah memisahkan percakapan antara <strong class="font-bold">Dosen</strong> dan <strong class="font-bold">Mahasiswa</strong>. Anda dapat menukar peran ini di halaman hasil jika terbalik.
+
+                        {{-- Multi-party Alert Notice if > 2 speakers --}}
+                        <template x-if="speakersList.length > 2">
+                            <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-2xl text-xs text-indigo-900 font-medium flex items-center gap-2">
+                                <i data-lucide="info" class="w-4 h-4 text-indigo-600 shrink-0"></i>
+                                <span><strong>Multiparty Dialogue:</strong> Putar sampel suara tiap penutur lalu beri nama peran spesifik agar analisis akurat.</span>
+                            </div>
+                        </template>
+
+                        <p class="text-xs text-purple-900 leading-relaxed font-medium">
+                            Dengarkan sampel suara untuk memvalidasi penutur, dan beri label nama peran (misal nama dosen/mahasiswa):
                         </p>
-                        <div class="flex items-center gap-2 text-[0.7rem] font-bold text-purple-700 bg-white/80 p-2.5 rounded-xl border border-purple-100">
-                            <i data-lucide="info" class="w-4 h-4 shrink-0 text-purple-500"></i>
-                            <span>Pemisahan suara berhasil. Melanjutkan ke pemetaan relasi wacana...</span>
+
+                        {{-- List of Speaker Cards --}}
+                        <div class="space-y-3">
+                            <template x-for="(spk, idx) in speakersList" :key="spk.original">
+                                <div class="bg-white/90 border border-purple-100 rounded-2xl p-3.5 transition-all shadow-xs space-y-2.5">
+                                    <div class="flex flex-wrap items-center justify-between gap-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black text-white"
+                                                  :class="idx === 0 ? 'bg-purple-600' : (idx === 1 ? 'bg-blue-600' : 'bg-gray-700')"
+                                                  x-text="idx + 1"></span>
+                                            <span class="text-xs font-black text-gray-800 uppercase" x-text="spk.original"></span>
+                                            <span class="px-1.5 py-0.2 rounded-full text-[0.6rem] font-bold bg-gray-100 text-gray-600" x-text="spk.utterance_count + ' ujaran'"></span>
+                                        </div>
+
+                                        {{-- Audio Playback Button --}}
+                                        <button type="button" @click="toggleSpeakerSample(spk)"
+                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer"
+                                            :class="playingSpeaker === spk.original ? 'bg-purple-600 text-white shadow-xs' : 'bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200'">
+                                            <i :data-lucide="playingSpeaker === spk.original ? 'square' : 'play'" class="w-3 h-3"></i>
+                                            <span x-text="playingSpeaker === spk.original ? 'Stop' : 'Putar Sampel'"></span>
+                                            <span class="text-[0.6rem] opacity-75 font-mono" x-text="'[' + (spk.timestamp || 'Audio') + ']'"></span>
+                                        </button>
+                                    </div>
+
+                                    {{-- Sample Quote --}}
+                                    <div class="text-[0.72rem] text-gray-600 italic bg-gray-50/80 p-2 rounded-xl border border-gray-100 line-clamp-2"
+                                         x-text="'“' + (spk.sample_text || '...') + '”'">
+                                    </div>
+
+                                    {{-- Editable Inputs --}}
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
+                                        <div>
+                                            <label class="block text-[0.6rem] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Nama / Label</label>
+                                            <input type="text" x-model="spk.name"
+                                                class="w-full text-xs font-bold rounded-lg border-gray-200 focus:border-purple-500 focus:ring-purple-500 py-1 px-2.5 bg-white"
+                                                :placeholder="idx === 0 ? 'Nama Dosen' : 'Nama Mahasiswa'">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[0.6rem] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Peran</label>
+                                            <select x-model="spk.role" class="w-full text-xs font-semibold rounded-lg border-gray-200 focus:border-purple-500 focus:ring-purple-500 py-1 px-2 bg-white">
+                                                <option value="Dosen">Dosen / Pembimbing</option>
+                                                <option value="Mahasiswa">Mahasiswa Terbimbing</option>
+                                                <option value="Penguji">Dosen Penguji</option>
+                                                <option value="Moderator">Moderator / Peserta</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        {{-- Save / Apply Button in Processing --}}
+                        <div class="flex items-center justify-between pt-2">
+                            <span class="text-[0.68rem] text-purple-700/80 font-medium" x-show="saveSuccessMsg" x-text="saveSuccessMsg"></span>
+                            <button type="button" @click="saveSpeakerChanges()" :disabled="isSavingSpeakers"
+                                class="ml-auto inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition shadow-sm cursor-pointer disabled:opacity-50">
+                                <template x-if="isSavingSpeakers">
+                                    <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                </template>
+                                <span x-text="isSavingSpeakers ? 'Menyimpan...' : 'Terapkan Label Peran'"></span>
+                            </button>
                         </div>
                     </div>
 
@@ -174,6 +257,128 @@
 
     <x-slot name="scripts">
     <script>
+        function processingApp() {
+            return {
+                showLogs: false,
+                logCount: 0,
+                speakersLoaded: false,
+                speakersList: [],
+                playingSpeaker: null,
+                speakerAudioEndTime: null,
+                isSavingSpeakers: false,
+                saveSuccessMsg: '',
+
+                init() {
+                    window.v2ProcessingApp = this;
+                },
+
+                async fetchSpeakerSamples() {
+                    if (this.speakersLoaded) return;
+                    try {
+                        const res = await fetch("{{ route('analysis.v2.speaker-samples', $analysis->slug) }}");
+                        const data = await res.json();
+                        if (data.status === 'success' && data.speakers && data.speakers.length > 0) {
+                            this.speakersList = data.speakers;
+                            this.speakersLoaded = true;
+                            this.$nextTick(() => {
+                                if (window.lucide) window.lucide.createIcons();
+                            });
+                        }
+                    } catch (e) {
+                        console.warn("Belum dapat mengambil sampel pembicara:", e);
+                    }
+                },
+
+                toggleSpeakerSample(spk) {
+                    const audio = this.$refs.processingAudioPlayer;
+                    if (!audio) return;
+
+                    if (this.playingSpeaker === spk.original) {
+                        this.stopSpeakerAudio();
+                        return;
+                    }
+
+                    const startSec = typeof spk.start_sec === 'number' ? spk.start_sec : 0;
+                    const endSec = typeof spk.end_sec === 'number' ? spk.end_sec : (startSec + 5);
+
+                    audio.currentTime = startSec;
+                    this.speakerAudioEndTime = endSec;
+                    this.playingSpeaker = spk.original;
+                    audio.play().catch(e => console.warn('Audio preview play error:', e));
+                },
+
+                onSpeakerAudioUpdate() {
+                    const audio = this.$refs.processingAudioPlayer;
+                    if (!audio) return;
+                    if (this.speakerAudioEndTime !== null && audio.currentTime >= this.speakerAudioEndTime) {
+                        this.stopSpeakerAudio();
+                    }
+                },
+
+                stopSpeakerAudio() {
+                    const audio = this.$refs.processingAudioPlayer;
+                    if (audio) {
+                        audio.pause();
+                    }
+                    this.playingSpeaker = null;
+                    this.speakerAudioEndTime = null;
+                },
+
+                swapTwoSpeakers() {
+                    if (this.speakersList.length !== 2) return;
+                    const spk0 = this.speakersList[0];
+                    const spk1 = this.speakersList[1];
+
+                    const tempRole = spk0.role;
+                    const tempName = spk0.name;
+                    spk0.role = spk1.role;
+                    spk0.name = spk1.name;
+                    spk1.role = tempRole;
+                    spk1.name = tempName;
+                },
+
+                async saveSpeakerChanges() {
+                    this.isSavingSpeakers = true;
+                    this.stopSpeakerAudio();
+                    this.saveSuccessMsg = '';
+
+                    try {
+                        const payload = {
+                            mode: 'rename',
+                            speakers: this.speakersList.map(s => ({
+                                original: s.original,
+                                name: (s.name || s.role || s.original).trim(),
+                                role: s.role || 'Dosen'
+                            }))
+                        };
+
+                        const res = await fetch("{{ route('analysis.v2.update-speakers', $analysis->slug) }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const data = await res.json();
+                        if (data.status === 'success') {
+                            this.saveSuccessMsg = 'Label peran berhasil disimpan!';
+                            setTimeout(() => { this.saveSuccessMsg = ''; }, 3000);
+                        } else {
+                            alert(data.message || 'Gagal menyimpan perubahan pembicara.');
+                        }
+                    } catch (err) {
+                        console.error('Save speaker error:', err);
+                        alert('Terjadi kesalahan saat menyimpan peran.');
+                    } finally {
+                        this.isSavingSpeakers = false;
+                    }
+                }
+            };
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const slug = "{{ $analysis->slug }}";
             const wsUrl = "wss://vps.temaniskripsi.id/api/v2/ws/" + slug;
@@ -198,9 +403,8 @@
                 logBox.scrollTop = logBox.scrollHeight;
 
                 // Update Alpine logCount if available
-                const executionCard = logBox.closest('[x-data]');
-                if (executionCard && executionCard._x_dataStack && executionCard._x_dataStack[0]) {
-                    executionCard._x_dataStack[0].logCount++;
+                if (window.v2ProcessingApp) {
+                    window.v2ProcessingApp.logCount++;
                 }
             }
 
@@ -260,20 +464,19 @@
                                 updateStep(1, 'done', 'Format audio optimal siap.');
                                 updateStep(2, 'done', 'Transkripsi & diarization selesai.');
                                 updateStep(3, 'active', 'Menganalisis relasi kuasa & membentuk graf...');
-                                const speakerBox = document.getElementById('speaker-detected-box');
-                                if (speakerBox && speakerBox.classList.contains('hidden')) {
-                                    speakerBox.classList.remove('hidden');
-                                    addLog("2 Pembicara (Dosen & Mahasiswa) berhasil teridentifikasi dari gelombang audio.", "success");
-                                    if (window.lucide) window.lucide.createIcons();
+                                
+                                // Fetch speaker samples for interactive audio preview
+                                if (window.v2ProcessingApp) {
+                                    window.v2ProcessingApp.fetchSpeakerSamples();
                                 }
+                                addLog("Anotasi peran & sampel pembicara siap diverifikasi.", "success");
                             } else if (data.progress >= 80) {
                                 updateStep(1, 'done', 'Format audio optimal siap.');
                                 updateStep(2, 'done', 'Transkripsi & diarization selesai.');
                                 updateStep(3, 'done', 'Klasifikasi multi-task dan pembentukan graf selesai.');
-                                const speakerBox = document.getElementById('speaker-detected-box');
-                                if (speakerBox && speakerBox.classList.contains('hidden')) {
-                                    speakerBox.classList.remove('hidden');
-                                    if (window.lucide) window.lucide.createIcons();
+                                
+                                if (window.v2ProcessingApp) {
+                                    window.v2ProcessingApp.fetchSpeakerSamples();
                                 }
                             }
                         }
