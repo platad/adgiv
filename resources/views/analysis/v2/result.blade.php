@@ -564,16 +564,16 @@
                 </div>
 
                 {{-- Diagram Canvas Container --}}
-                <div class="bg-gradient-to-b from-gray-50/70 to-white rounded-2xl border border-gray-200/80 p-6 overflow-x-auto custom-scrollbar relative min-h-[180px] flex items-center justify-center">
+                <div class="bg-gradient-to-b from-gray-50/70 to-white rounded-2xl border border-gray-200/80 p-4 sm:p-5 overflow-auto custom-scrollbar relative min-h-[160px] max-h-[460px] flex items-center justify-center">
                     
                     {{-- Loading State --}}
-                    <div x-show="isInterpretingGraph || isRetryingMermaid" class="py-8 text-center" style="display: none;">
-                        <i data-lucide="loader-2" class="w-6 h-6 animate-spin text-purple-600 mx-auto mb-2"></i>
+                    <div x-show="isInterpretingGraph || isRetryingMermaid" class="py-6 text-center" style="display: none;">
+                        <i data-lucide="loader-2" class="w-5 h-5 animate-spin text-purple-600 mx-auto mb-2"></i>
                         <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Menyintesis Alur Pembahasan Mermaid...</span>
                     </div>
 
                     {{-- Rendered Mermaid SVG Container --}}
-                    <div x-show="!isInterpretingGraph && !isRetryingMermaid" id="mermaid-flowchart-container" class="w-full flex flex-col items-center justify-center py-2 select-none">
+                    <div x-show="!isInterpretingGraph && !isRetryingMermaid" id="mermaid-flowchart-container" class="w-full max-w-md flex flex-col items-center justify-center py-1 select-none mx-auto">
                         {{-- SVG will be inserted here via mermaid.render --}}
                     </div>
                 </div>
@@ -2407,13 +2407,13 @@
                                     secondaryColor: '#eff6ff',
                                     tertiaryColor: '#f0fdf4',
                                     fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
-                                    fontSize: '11px'
+                                    fontSize: '9.5px'
                                 },
                                 flowchart: {
                                     curve: 'basis',
-                                    padding: 10,
-                                    nodeSpacing: 25,
-                                    rankSpacing: 35,
+                                    padding: 6,
+                                    nodeSpacing: 14,
+                                    rankSpacing: 20,
                                     useMaxWidth: true
                                 }
                             });
@@ -2438,13 +2438,13 @@
                                     secondaryColor: '#eff6ff',
                                     tertiaryColor: '#f0fdf4',
                                     fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
-                                    fontSize: '11px'
+                                    fontSize: '9.5px'
                                 },
                                 flowchart: {
                                     curve: 'basis',
-                                    padding: 10,
-                                    nodeSpacing: 25,
-                                    rankSpacing: 35,
+                                    padding: 6,
+                                    nodeSpacing: 14,
+                                    rankSpacing: 20,
                                     useMaxWidth: true
                                 }
                             });
@@ -2555,7 +2555,7 @@
                     container.innerHTML = svgCode;
                     const svgEl = container.querySelector('svg');
                     if (svgEl) {
-                        svgEl.style.maxWidth = '680px';
+                        svgEl.style.maxWidth = '440px';
                         svgEl.style.width = '100%';
                         svgEl.style.height = 'auto';
                         svgEl.style.display = 'block';
@@ -2580,7 +2580,7 @@
                         container.innerHTML = fallbackSvg;
                         const svgEl = container.querySelector('svg');
                         if (svgEl) {
-                            svgEl.style.maxWidth = '680px';
+                            svgEl.style.maxWidth = '440px';
                             svgEl.style.width = '100%';
                             svgEl.style.height = 'auto';
                             svgEl.style.display = 'block';
