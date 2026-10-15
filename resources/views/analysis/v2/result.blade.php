@@ -127,9 +127,38 @@
         x-data="v2ResultApp()"
         @go-to-baris.window="goToBaris($event.detail.index)">
 
+        {{-- Banner Publik untuk Pengunjung Tanpa Login --}}
+        @guest
+        <div class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-purple-900 via-indigo-950 to-gray-950 text-white border border-purple-500/30 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 border border-purple-500/30">
+                    <i data-lucide="globe" class="w-5 h-5 text-purple-400"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-black uppercase tracking-wider text-purple-300">Tautan Berbagi Publik (Open Source)</span>
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[0.62rem] font-bold">Tanpa Login</span>
+                    </div>
+                    <p class="text-xs text-gray-300 font-medium mt-0.5">
+                        Anda sedang meninjau hasil analisis bimbingan akademik RoBERTa V2. Ingin menganalisis rekaman suara bimbingan Anda sendiri?
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="{{ route('login') }}" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition shadow-sm">
+                    Masuk
+                </a>
+                <a href="{{ route('register') }}" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-black uppercase tracking-wider transition border border-white/20">
+                    Daftar Akun
+                </a>
+            </div>
+        </div>
+        @endguest
+
         {{-- Top Breadcrumb & Actions --}}
         <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-100 pb-8">
             <div>
+                @auth
                 <a href="{{ route('dashboard') }}"
                     class="inline-flex items-center text-xs font-bold text-gray-400 hover:text-gray-900 transition-colors uppercase tracking-widest mb-4">
                     <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
@@ -137,13 +166,29 @@
                     <span class="lang-en">Back to Dashboard</span>
                     <span class="lang-zh">返回控制面板</span>
                 </a>
-                <div class="flex items-center gap-3">
+                @else
+                <a href="{{ route('login') }}"
+                    class="inline-flex items-center text-xs font-bold text-gray-400 hover:text-gray-900 transition-colors uppercase tracking-widest mb-4">
+                    <i data-lucide="log-in" class="w-4 h-4 mr-2"></i>
+                    <span class="lang-id">Masuk / Login ke Akun</span>
+                    <span class="lang-en">Sign In / Login</span>
+                    <span class="lang-zh">登录账户</span>
+                </a>
+                @endauth
+
+                <div class="flex items-center gap-3 flex-wrap">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 text-purple-700 border border-purple-200 text-[0.65rem] font-black uppercase tracking-widest">
                         <i data-lucide="sparkles" class="w-3 h-3 text-purple-600"></i> Model Versi 2
                     </span>
                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 text-[0.65rem] font-bold">
                         <i data-lucide="check-circle" class="w-3 h-3 text-green-600"></i> Selesai Diproses
                     </span>
+                    @if(!$isOwner)
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[0.65rem] font-bold">
+                            <i data-lucide="eye" class="w-3 h-3 text-blue-600"></i>
+                            <span>Mode Berbagi (Read-Only)</span>
+                        </span>
+                    @endif
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight uppercase mt-3">
                     {{ $analysis->title }}
@@ -155,6 +200,18 @@
 
             {{-- Action Buttons (Mobile-first Wrap & Responsive Full/Auto width) --}}
             <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 w-full sm:w-auto shrink-0">
+                {{-- Tombol Bagikan (Google Drive Style Sharing) --}}
+                @if($isOwner)
+                <button type="button"
+                    @click="openShareModal()"
+                    class="inline-flex items-center justify-center px-4 py-3 sm:py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-indigo-600/20 active:scale-95 cursor-pointer">
+                    <i data-lucide="share-2" class="w-4 h-4 mr-2 shrink-0"></i>
+                    <span>Bagikan</span>
+                    <span class="ml-1.5 px-2 py-0.5 rounded-md bg-white/20 text-[0.62rem] font-bold uppercase tracking-wider"
+                          x-text="currentVisibility === 'public' ? 'Publik' : (currentVisibility === 'login_required' ? 'Wajib Login' : 'Pribadi')"></span>
+                </button>
+                @endif
+
                 {{-- Tombol Cetak Laporan (Modal Fitur Dalam Pengembangan) --}}
                 <button type="button"
                     @click="showPrintModal = true"
@@ -163,13 +220,15 @@
                     <span>Cetak Laporan</span>
                 </button>
 
-                {{-- Tombol Tukar Peran Pembicara --}}
+                {{-- Tombol Tukar Peran Pembicara (Hanya Pemilik) --}}
+                @if($isOwner)
                 <button type="button"
                     @click="showSwapModal = true"
                     class="inline-flex items-center justify-center px-4 py-3 sm:py-2.5 rounded-2xl bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer">
                     <i data-lucide="arrow-left-right" class="w-4 h-4 mr-2 text-purple-600 shrink-0"></i>
                     <span>Tukar Peran Pembicara</span>
                 </button>
+                @endif
 
                 {{-- Tombol Lihat / Tutup Raw --}}
                 <button type="button"
@@ -1501,6 +1560,151 @@
             </div>
         </div>
 
+        {{-- Modal Berbagi Analisis Gaya Google Drive (Visibility & Sharing) --}}
+        <div x-show="showShareModal"
+            class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none p-4"
+            style="display: none;">
+            <div x-show="showShareModal" @click="showShareModal = false"
+                x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-black/60 backdrop-blur-md"></div>
+
+            <div x-show="showShareModal"
+                x-transition:enter="transition ease-out duration-300 transform"
+                x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-200 transform"
+                x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                class="relative bg-white rounded-[2.5rem] max-w-lg w-full mx-auto p-6 sm:p-8 shadow-2xl z-10 border border-gray-100 space-y-6">
+                
+                {{-- Modal Header --}}
+                <div class="flex items-start justify-between gap-4 border-b border-gray-100 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-100 to-indigo-100 text-purple-600 flex items-center justify-center shrink-0 border border-purple-200/50 shadow-xs">
+                            <i data-lucide="share-2" class="w-6 h-6 text-purple-600"></i>
+                        </div>
+                        <div>
+                            <span class="block text-[0.62rem] font-black uppercase tracking-widest text-purple-600">
+                                Google Drive-Style Access
+                            </span>
+                            <h3 class="text-lg font-black text-gray-900 uppercase tracking-tight mt-0.5">Bagikan Analisis Bimbingan</h3>
+                        </div>
+                    </div>
+                    <button type="button" @click="showShareModal = false" class="text-gray-400 hover:text-gray-600 p-1.5 rounded-xl transition cursor-pointer">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                {{-- General Access / Visibilitas --}}
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-black uppercase tracking-wider text-gray-700">
+                            Akses Umum (Visibilitas Tautan)
+                        </label>
+                        <span class="text-[0.65rem] font-bold text-gray-400 font-mono" x-text="'Status: ' + (currentVisibility === 'public' ? 'Publik' : (currentVisibility === 'login_required' ? 'Wajib Login' : 'Pribadi'))"></span>
+                    </div>
+
+                    {{-- Option 1: Open Source / Publik (Tanpa Login) --}}
+                    <label class="flex items-start gap-3.5 p-3.5 rounded-2xl border transition-all cursor-pointer"
+                        :class="tempVisibility === 'public' ? 'border-purple-500 bg-purple-50/50 shadow-xs' : 'border-gray-200 hover:bg-gray-50/60'">
+                        <input type="radio" name="visibilityOption" value="public" x-model="tempVisibility" class="mt-1 text-purple-600 focus:ring-purple-500">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                                    <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+                                </span>
+                                <span class="text-xs font-black text-gray-900">Publik / Open Source</span>
+                                <span class="px-1.5 py-0.2 rounded-md bg-emerald-100 text-emerald-800 text-[0.58rem] font-bold uppercase tracking-wider">Tanpa Login</span>
+                            </div>
+                            <p class="text-[0.68rem] text-gray-500 mt-1 leading-relaxed">
+                                Siapa saja di internet yang memiliki tautan ini dapat melihat hasil analisis, transkripsi, metrik graf, dan mendengarkan audio secara bebas tanpa perlu mendaftar atau login.
+                            </p>
+                        </div>
+                    </label>
+
+                    {{-- Option 2: Wajib Login (Pengguna Terdaftar) --}}
+                    <label class="flex items-start gap-3.5 p-3.5 rounded-2xl border transition-all cursor-pointer"
+                        :class="tempVisibility === 'login_required' ? 'border-purple-500 bg-purple-50/50 shadow-xs' : 'border-gray-200 hover:bg-gray-50/60'">
+                        <input type="radio" name="visibilityOption" value="login_required" x-model="tempVisibility" class="mt-1 text-purple-600 focus:ring-purple-500">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                                    <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+                                </span>
+                                <span class="text-xs font-black text-gray-900">Terbatas (Pengguna Terdaftar)</span>
+                                <span class="px-1.5 py-0.2 rounded-md bg-blue-100 text-blue-800 text-[0.58rem] font-bold uppercase tracking-wider">Wajib Login</span>
+                            </div>
+                            <p class="text-[0.68rem] text-gray-500 mt-1 leading-relaxed">
+                                Hanya pengguna yang memiliki akun dan sedang login di platform yang dapat membuka tautan ini. Pengguna anonim akan diarahkan ke halaman login terlebih dahulu.
+                            </p>
+                        </div>
+                    </label>
+
+                    {{-- Option 3: Pribadi (Hanya Pemilik) --}}
+                    <label class="flex items-start gap-3.5 p-3.5 rounded-2xl border transition-all cursor-pointer"
+                        :class="tempVisibility === 'private' ? 'border-purple-500 bg-purple-50/50 shadow-xs' : 'border-gray-200 hover:bg-gray-50/60'">
+                        <input type="radio" name="visibilityOption" value="private" x-model="tempVisibility" class="mt-1 text-purple-600 focus:ring-purple-500">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="w-6 h-6 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center shrink-0">
+                                    <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                                </span>
+                                <span class="text-xs font-black text-gray-900">Pribadi (Restricted)</span>
+                                <span class="px-1.5 py-0.2 rounded-md bg-stone-100 text-stone-800 text-[0.58rem] font-bold uppercase tracking-wider">Hanya Anda</span>
+                            </div>
+                            <p class="text-[0.68rem] text-gray-500 mt-1 leading-relaxed">
+                                Hanya akun Anda (pemilik) dan administrator yang dapat mengakses hasil analisis ini. Tautan ditolak jika diakses pihak luar.
+                            </p>
+                        </div>
+                    </label>
+                </div>
+
+                {{-- Copy Link Box --}}
+                <div class="bg-gray-50 rounded-2xl p-3.5 border border-gray-200/80 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-8 h-8 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 shrink-0">
+                            <i data-lucide="link" class="w-4 h-4"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <span class="block text-[0.62rem] font-bold text-gray-400 uppercase tracking-wider">Tautan Berbagi</span>
+                            <span class="block text-xs font-mono text-gray-800 truncate" x-text="shareUrl"></span>
+                        </div>
+                    </div>
+                    <button type="button" @click="copyShareLink()"
+                        class="px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shrink-0 flex items-center gap-1.5"
+                        :class="linkCopied ? 'bg-emerald-600 text-white shadow-xs' : 'bg-white hover:bg-purple-50 text-purple-700 border border-purple-200'">
+                        <i :data-lucide="linkCopied ? 'check' : 'copy'" class="w-3.5 h-3.5"></i>
+                        <span x-text="linkCopied ? 'Tersalin!' : 'Salin Link'"></span>
+                    </button>
+                </div>
+
+                {{-- Modal Footer --}}
+                <div class="flex items-center justify-between gap-3 pt-3 border-t border-gray-100">
+                    <div class="text-[0.68rem] text-gray-400 font-medium">
+                        <span x-show="tempVisibility !== currentVisibility" class="text-amber-600 font-bold flex items-center gap-1">
+                            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Setelan berubah, klik Simpan
+                        </span>
+                        <span x-show="tempVisibility === currentVisibility" class="text-emerald-600 font-bold flex items-center gap-1">
+                            <i data-lucide="check" class="w-3.5 h-3.5"></i> Setelan aktif tersimpan
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" @click="showShareModal = false"
+                            class="px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold uppercase tracking-wider text-gray-600 hover:bg-gray-50 transition cursor-pointer">
+                            Tutup
+                        </button>
+                        <button type="button" @click="saveVisibilitySettings()" :disabled="isSavingVisibility || tempVisibility === currentVisibility"
+                            class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider transition shadow-md shadow-purple-600/20 flex items-center gap-2 cursor-pointer disabled:opacity-50">
+                            <template x-if="isSavingVisibility">
+                                <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                            </template>
+                            <span x-text="isSavingVisibility ? 'Menyimpan...' : 'Simpan Setelan'"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- Modal Fitur Cetak Laporan V2 Dalam Pengembangan --}}
         <div x-show="showPrintModal"
             class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none"
@@ -1755,6 +1959,13 @@
                 showRaw: false,
                 showSwapModal: false,
                 showPrintModal: false,
+                showShareModal: false,
+                isOwner: {{ $isOwner ? 'true' : 'false' }},
+                currentVisibility: '{{ $visibility ?? "private" }}',
+                tempVisibility: '{{ $visibility ?? "private" }}',
+                shareUrl: '{{ route("analysis.v2.result", ["analysis" => $analysis->slug, "locale" => app()->getLocale()]) }}',
+                linkCopied: false,
+                isSavingVisibility: false,
                 isSwapping: false,
                 showInsightModal: false,
                 insightTitle: '',
@@ -2246,6 +2457,87 @@
                         alert('Terjadi kesalahan jaringan.');
                         this.isSwapping = false;
                         this.showSwapModal = false;
+                    }
+                },
+
+                openShareModal() {
+                    this.tempVisibility = this.currentVisibility;
+                    this.linkCopied = false;
+                    this.showShareModal = true;
+                    this.$nextTick(() => {
+                        if (window.lucide) window.lucide.createIcons();
+                    });
+                },
+
+                copyShareLink() {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(this.shareUrl).then(() => {
+                            this.linkCopied = true;
+                            setTimeout(() => { this.linkCopied = false; }, 2500);
+                        }).catch(err => {
+                            this.fallbackCopyText(this.shareUrl);
+                        });
+                    } else {
+                        this.fallbackCopyText(this.shareUrl);
+                    }
+                },
+
+                fallbackCopyText(text) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-999999px";
+                    textArea.style.top = "-999999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        this.linkCopied = true;
+                        setTimeout(() => { this.linkCopied = false; }, 2500);
+                    } catch (err) {
+                        console.error('Fallback copy failed', err);
+                        prompt('Salin tautan ini secara manual:', text);
+                    }
+                    document.body.removeChild(textArea);
+                },
+
+                async saveVisibilitySettings() {
+                    if (this.isSavingVisibility) return;
+                    this.isSavingVisibility = true;
+
+                    try {
+                        const res = await fetch("{{ route('analysis.v2.visibility', $analysis->slug) }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                visibility: this.tempVisibility
+                            })
+                        });
+
+                        const data = await res.json();
+                        if (data.status === 'success') {
+                            this.currentVisibility = data.visibility;
+                            if (data.share_url) {
+                                this.shareUrl = data.share_url;
+                            }
+                            this.showShareModal = false;
+                            alert('Pengaturan visibilitas berhasil diperbarui! ' + (data.visibility === 'public' ? 'Tautan kini terbuka untuk publik (Open Source) tanpa login.' : (data.visibility === 'login_required' ? 'Tautan kini terbuka khusus untuk pengguna yang login.' : 'Tautan kini disetel pribadi (hanya pemilik).')));
+                        } else {
+                            alert(data.message || 'Gagal menyimpan pengaturan visibilitas.');
+                        }
+                    } catch (e) {
+                        console.error('Error updating visibility:', e);
+                        alert('Terjadi kendala saat memperbarui pengaturan visibilitas.');
+                    } finally {
+                        this.isSavingVisibility = false;
+                        this.$nextTick(() => {
+                            if (window.lucide) window.lucide.createIcons();
+                        });
                     }
                 }
             };

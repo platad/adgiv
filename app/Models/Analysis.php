@@ -29,6 +29,7 @@ class Analysis extends Model
         'result_data',
         'graph_data',
         'metrics',
+        'visibility',
     ];
 
     protected $casts = [
@@ -99,5 +100,45 @@ class Analysis extends Model
     public function isResumable(): bool
     {
         return $this->chunks()->where('status', 'failed')->exists();
+    }
+
+    public function getVisibilityAttribute($value): string
+    {
+        if (!empty($value)) {
+            return $value;
+        }
+        return $this->result_data['visibility'] ?? 'private';
+    }
+
+    public function isPublic(): bool
+    {
+        return $this->visibility === 'public';
+    }
+
+    public function isLoginRequired(): bool
+    {
+        return $this->visibility === 'login_required';
+    }
+
+    public function isPrivate(): bool
+    {
+        return !$this->isPublic() && !$this->isLoginRequired();
+    }
+
+    public function canAccess(?User $user): bool
+    {
+        if ($user && ($this->user_id === $user->id || $user->is_admin)) {
+            return true;
+        }
+
+        if ($this->isPublic()) {
+            return true;
+        }
+
+        if ($this->isLoginRequired() && $user !== null) {
+            return true;
+        }
+
+        return false;
     }
 }

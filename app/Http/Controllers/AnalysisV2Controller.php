@@ -106,7 +106,11 @@ class AnalysisV2Controller extends Controller
 
     public function getAudio(Analysis $analysis)
     {
-        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
+        $user = Auth::user();
+        if (!$analysis->canAccess($user)) {
+            abort(403, 'Akses audio tidak diizinkan.');
+        }
+
         $path = Storage::disk('local')->path($analysis->audio_path);
         
         if (!file_exists($path)) {
@@ -256,10 +260,25 @@ class AnalysisV2Controller extends Controller
 
     public function result(Analysis $analysis)
     {
-        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
-        if (!$analysis->isCompleted()) {
-            return redirect()->route('analysis.v2.processing', $analysis->slug);
+        $user = Auth::user();
+
+        if (!$analysis->canAccess($user)) {
+            if ($analysis->isLoginRequired() && !$user) {
+                return redirect()->guest(route('login', ['locale' => app()->getLocale()]))
+                    ->with('warning', 'Analisis ini disetel terbatas untuk pengguna terdaftar. Silakan masuk (login) terlebih dahulu.');
+            }
+            abort(403, 'Analisis ini disetel pribadi (Private) dan hanya dapat diakses oleh pemiliknya.');
         }
+
+        if (!$analysis->isCompleted()) {
+            if ($user && ($analysis->user_id == $user->id || $user->is_admin)) {
+                return redirect()->route('analysis.v2.processing', $analysis->slug);
+            }
+            abort(404, 'Analisis ini masih dalam tahap antrean pemrosesan.');
+        }
+
+        $isOwner = $user && ($analysis->user_id == $user->id || $user->is_admin);
+        $visibility = $analysis->visibility;
 
         $transcription = $analysis->result_data['transcription'] ?? [];
         $needsPersist = false;
@@ -458,14 +477,46 @@ class AnalysisV2Controller extends Controller
         $stats['avg_mode_confidence'] = $totalSegments > 0 ? round(($totalModeConf / $totalSegments) * 100, 1) : 0;
         $stats['avg_entropy'] = $totalSegments > 0 ? round(($totalEntropy / $totalSegments) * 100, 1) : 0;
 
-        $graphInterpretation = $analysis->result_data['graph_interpretation'] ?? null;
-        $speakerSamples = self::extractSpeakerSamples($transcription);
-
         // Komputasi Metrik Kuantitatif Sentralitas Graf (Network Science untuk Skripsi)
         $graphAnalyticsService = app(GraphAnalyticsService::class);
         $graphMetrics = $graphAnalyticsService->calculateMetrics($analysis->graph_data ?? [], $transcription);
 
-        return view('analysis.v2.result', compact('analysis', 'stats', 'transcription', 'summary', 'graphInterpretation', 'speakerSamples', 'graphMetrics'));
+        return view('analysis.v2.result', compact('analysis', 'stats', 'transcription', 'summary', 'graphInterpretation', 'speakerSamples', 'graphMetrics', 'isOwner', 'visibility'));
+    }
+
+    public function updateVisibility(Request $request, Analysis $analysis)
+    {
+        abort_if($analysis->user_id != Auth::id() && !Auth::user()->is_admin, 403);
+
+        $validated = $request->validate([
+            'visibility' => 'required|string|in:private,public,login_required',
+        ]);
+
+        $newVisibility = $validated['visibility'];
+        $resultData = $analysis->result_data ?? [];
+        $resultData['visibility'] = $newVisibility;
+        $resultData['shared_at'] = $newVisibility !== 'private' ? now()->toIso8601String() : null;
+
+        $updateData = ['result_data' => $resultData];
+
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasColumn('analyses', 'visibility')) {
+                $updateData['visibility'] = $newVisibility;
+            }
+        } catch (\Throwable $e) {
+            // Fallback anggun ke result_data jika tabel belum termigrasi di cPanel
+        }
+
+        $analysis->update($updateData);
+
+        $shareUrl = route('analysis.v2.result', ['analysis' => $analysis->slug, 'locale' => app()->getLocale()]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Pengaturan visibilitas berbagi berhasil diperbarui.',
+            'visibility' => $newVisibility,
+            'share_url' => $shareUrl,
+        ]);
     }
 
     public function interpretGraph(Request $request, Analysis $analysis)

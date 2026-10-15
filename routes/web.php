@@ -49,6 +49,10 @@ Route::get('/', function (Request $request) {
             ->name('analysis.v2.webhook')
             ->withoutMiddleware([VerifyCsrfToken::class]);
 
+        // V2 Public/Shared Accessible Routes (Otorisasi dikontrol dinamis di Controller: Public Open-Source vs Wajib Login)
+        Route::get('/analysis/v2/{analysis}/result', [\App\Http\Controllers\AnalysisV2Controller::class, 'result'])->name('analysis.v2.result');
+        Route::get('/analysis/v2/{analysis}/audio', [\App\Http\Controllers\AnalysisV2Controller::class, 'getAudio'])->name('analysis.v2.audio');
+
         Route::middleware(['auth'])->group(function () {
         
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -61,13 +65,12 @@ Route::get('/', function (Request $request) {
             Route::get('/create', [AnalysisController::class, 'create'])->name('create');
             Route::post('/initialize', [AnalysisController::class, 'initialize'])->name('initialize');
 
-            // V2 Routes
+            // V2 Authenticated Routes
             Route::prefix('v2')->name('v2.')->group(function () {
                 Route::get('/create', [\App\Http\Controllers\AnalysisV2Controller::class, 'create'])->name('create');
                 Route::post('/initialize', [\App\Http\Controllers\AnalysisV2Controller::class, 'initialize'])->name('initialize');
                 Route::get('/{analysis}/processing', [\App\Http\Controllers\AnalysisV2Controller::class, 'processing'])->name('processing');
-                Route::get('/{analysis}/result', [\App\Http\Controllers\AnalysisV2Controller::class, 'result'])->name('result');
-                Route::get('/{analysis}/audio', [\App\Http\Controllers\AnalysisV2Controller::class, 'getAudio'])->name('audio');
+                Route::post('/{analysis}/visibility', [\App\Http\Controllers\AnalysisV2Controller::class, 'updateVisibility'])->name('visibility');
                 Route::post('/{analysis}/swap-speakers', [\App\Http\Controllers\AnalysisV2Controller::class, 'swapSpeakers'])->name('swap-speakers');
                 Route::post('/{analysis}/interpret-graph', [\App\Http\Controllers\AnalysisV2Controller::class, 'interpretGraph'])->name('interpret-graph');
                 Route::post('/{analysis}/generate-substance', [\App\Http\Controllers\AnalysisV2Controller::class, 'generateSubstances'])->name('generate-substance');
