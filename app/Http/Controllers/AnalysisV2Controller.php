@@ -275,7 +275,7 @@ class AnalysisV2Controller extends Controller
             }
 
             $speaker = $item['speaker'] ?? 'Unknown';
-            $isDosen = (strcasecmp($speaker, 'Dosen') === 0 || strcasecmp($speaker, 'Supervisor') === 0);
+            $isDosen = (bool)preg_match('/\b(dosen|supervisor|pembimbing|penguji|prof|dr|pak|bu)\b/iu', $speaker);
 
             // Tentukan tipe intonasi jika belum ada
             if (empty($item['intonation_type'])) {
@@ -384,9 +384,12 @@ class AnalysisV2Controller extends Controller
 
         foreach ($transcription as $item) {
             $speaker = $item['speaker'] ?? 'Unknown';
-            if (strcasecmp($speaker, 'Dosen') === 0 || strcasecmp($speaker, 'Supervisor') === 0) {
+            if (preg_match('/\b(dosen|supervisor|pembimbing|penguji|prof|dr|pak|bu)\b/iu', $speaker)) {
                 $dosenSegments++;
-            } elseif (strcasecmp($speaker, 'Mahasiswa') === 0 || strcasecmp($speaker, 'Student') === 0) {
+            } elseif (preg_match('/\b(mhs|mahasiswa|student|terbimbing)\b/iu', $speaker)) {
+                $mhsSegments++;
+            } else {
+                // Jika tidak terdeteksi kata kunci spesifik, bandingkan dengan urutan/sample jika diperlukan
                 $mhsSegments++;
             }
 
@@ -747,7 +750,7 @@ Contoh format:
     public static function generateConciseAcademicSubstance(array $item, int $index = 0): string
     {
         $speaker = $item['speaker'] ?? 'Unknown';
-        $isDosen = (strcasecmp($speaker, 'Dosen') === 0 || strcasecmp($speaker, 'Supervisor') === 0);
+        $isDosen = (bool)preg_match('/\b(dosen|supervisor|pembimbing|penguji|prof|dr|pak|bu)\b/iu', $speaker);
         $text = trim(strip_tags($item['text'] ?? ($item['text_html'] ?? '')));
         $lower = mb_strtolower($text);
         $advice = strtolower($item['advice_giving'] ?? '');

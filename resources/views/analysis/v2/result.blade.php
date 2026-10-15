@@ -17,6 +17,29 @@
         $speakerCounts[$spk] = ($speakerCounts[$spk] ?? 0) + 1;
     }
 
+    // Role helper untuk menentukan apakah penutur adalah dosen/supervisor atau mahasiswa
+    $getSpeakerRole = function($name) use ($speakerSamples) {
+        $clean = trim($name ?? '');
+        // Cek sample metadata terlebih dahulu jika ada
+        if (!empty($speakerSamples) && is_array($speakerSamples)) {
+            foreach ($speakerSamples as $s) {
+                if (strcasecmp($s['name'] ?? '', $clean) === 0 || strcasecmp($s['original'] ?? '', $clean) === 0) {
+                    if (!empty($s['role'])) {
+                        return $s['role'];
+                    }
+                }
+            }
+        }
+        // Fallback pendeteksi cerdas dari string nama/label
+        if (preg_match('/\b(dosen|supervisor|pembimbing|penguji|prof|dr|pak|bu)\b/iu', $clean)) {
+            return 'Dosen';
+        }
+        if (preg_match('/\b(mhs|mahasiswa|student|terbimbing)\b/iu', $clean)) {
+            return 'Mahasiswa';
+        }
+        return 'Lainnya';
+    };
+
     $getAdviceBadgeStyle = function($label) {
         $l = strtolower(trim($label ?? ''));
         switch ($l) {
@@ -614,9 +637,9 @@
                             {{-- Dynamic Loop Penutur (Dosen, Mahasiswa, atau Penutur Tambahan) --}}
                             @foreach ($speakerCounts as $spkName => $count)
                                 @php
-                                    $spkLower = strtolower($spkName);
-                                    $isDosenSpk = $spkLower === 'dosen' || $spkLower === 'supervisor';
-                                    $isMhsSpk = $spkLower === 'mahasiswa' || $spkLower === 'student';
+                                    $spkRole = $getSpeakerRole($spkName);
+                                    $isDosenSpk = ($spkRole === 'Dosen' || $spkRole === 'Penguji');
+                                    $isMhsSpk = ($spkRole === 'Mahasiswa');
                                     
                                     $activeClass = $isDosenSpk 
                                         ? 'bg-purple-700 text-white shadow-sm font-black' 
@@ -638,10 +661,10 @@
                                 @endphp
                                 <button type="button" @click="setSpeakerFilter('{{ addslashes($spkName) }}')"
                                     class="px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
-                                    :class="speakerFilter.toLowerCase() === '{{ strtolower($spkName) }}' ? '{{ $activeClass }}' : 'text-gray-500 {{ $hoverClass }}'">
+                                    :class="speakerFilter.toLowerCase() === '{{ strtolower(addslashes($spkName)) }}' ? '{{ $activeClass }}' : 'text-gray-500 {{ $hoverClass }}'">
                                     <span>{{ $spkName }}</span>
                                     <span class="px-1.5 py-0.2 rounded-full text-[0.62rem]"
-                                          :class="speakerFilter.toLowerCase() === '{{ strtolower($spkName) }}' ? '{{ $badgeClass }}' : 'bg-gray-200/80 text-gray-700 font-semibold'">
+                                          :class="speakerFilter.toLowerCase() === '{{ strtolower(addslashes($spkName)) }}' ? '{{ $badgeClass }}' : 'bg-gray-200/80 text-gray-700 font-semibold'">
                                         {{ $count }}
                                     </span>
                                 </button>
@@ -655,7 +678,9 @@
                     @forelse ($transcription as $index => $item)
                         @php
                             $speaker = $item['speaker'] ?? 'Unknown';
-                            $isDosen = strcasecmp($speaker, 'Dosen') === 0 || strcasecmp($speaker, 'Supervisor') === 0;
+                            $speakerRole = $getSpeakerRole($speaker);
+                            $isDosen = ($speakerRole === 'Dosen' || $speakerRole === 'Penguji');
+                            $isMhs = ($speakerRole === 'Mahasiswa');
                             $adviceStyle = !empty($item['advice_giving']) ? $getAdviceBadgeStyle($item['advice_giving']) : null;
                             $modeStyle = !empty($item['modes_of_interaction']) ? $getModeBadgeStyle($item['modes_of_interaction']) : null;
                             
@@ -678,10 +703,15 @@
                             <div class="flex flex-col md:flex-row gap-4 md:gap-8">
                                 {{-- Speaker & Timestamp Column (Identical to V1) --}}
                                 <div class="md:w-36 flex-shrink-0 pt-1">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="font-black text-sm uppercase tracking-wider {{ $isDosen ? 'text-purple-700' : 'text-blue-600' }}">
-                                            {{ $isDosen ? 'DOSEN' : 'MAHASISWA' }}
+                                    <div class="flex items-center gap-1.5 mb-1 flex-wrap">
+                                        <span class="font-black text-sm uppercase tracking-wider {{ $isDosen ? 'text-purple-700' : ($isMhs ? 'text-blue-600' : 'text-stone-700') }}">
+                                            {{ strtoupper($speaker) }}
                                         </span>
+                                        @if($speakerRole && strtoupper($speaker) !== strtoupper($speakerRole))
+                                            <span class="text-[0.62rem] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider {{ $isDosen ? 'bg-purple-100 text-purple-700 border border-purple-200' : ($isMhs ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-stone-100 text-stone-600 border border-stone-200') }}">
+                                                {{ $speakerRole }}
+                                            </span>
+                                        @endif
                                     </div>
                                     <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">
                                         BARIS {{ $index + 1 }}
@@ -1493,12 +1523,15 @@
                 elseif ($type === 'down') $val = -1;
 
                 $speaker = $block['speaker'] ?? 'Unknown';
-                $isDosen = strcasecmp($speaker, 'Dosen') === 0 || strcasecmp($speaker, 'Supervisor') === 0;
+                $role = $getSpeakerRole($speaker);
+                $isDosen = ($role === 'Dosen' || $role === 'Penguji');
 
                 return [
                     'label' => 'Baris ' . ($idx + 1),
                     'value' => $val,
-                    'speaker' => $isDosen ? 'Dosen' : 'Mahasiswa',
+                    'speaker' => $speaker,
+                    'role' => $role,
+                    'is_dosen' => $isDosen,
                     'type' => $type === 'up' ? 'Naik' : ($type === 'down' ? 'Turun' : 'Netral'),
                     'text' => mb_strimwidth(strip_tags($block['text_html'] ?? ($block['text'] ?? '')), 0, 50, '...'),
                 ];
@@ -1652,17 +1685,24 @@
                     if (this.speakerFilter === 'all') {
                         return Array.from({ length: this.totalRows }, (_, i) => i);
                     }
-                    const targetFilter = this.speakerFilter.toLowerCase();
+                    const targetFilter = this.speakerFilter.toLowerCase().trim();
                     return this.rawRows
-                        .map((item, idx) => ({ speaker: (item.speaker || '').toLowerCase(), idx }))
+                        .map((item, idx) => ({
+                            speaker: (item.speaker || '').toLowerCase().trim(),
+                            role: (item.role || '').toLowerCase().trim(),
+                            idx
+                        }))
                         .filter(item => {
+                            if (item.speaker === targetFilter) {
+                                return true;
+                            }
                             if (targetFilter === 'dosen') {
-                                return item.speaker === 'dosen' || item.speaker === 'supervisor';
+                                return item.role === 'dosen' || item.speaker.includes('dosen') || item.speaker.includes('supervisor');
                             }
                             if (targetFilter === 'mahasiswa') {
-                                return item.speaker === 'mahasiswa' || item.speaker === 'student';
+                                return item.role === 'mahasiswa' || item.speaker.includes('mahasiswa') || item.speaker.includes('student');
                             }
-                            return item.speaker === targetFilter;
+                            return false;
                         })
                         .map(item => item.idx);
                 },
