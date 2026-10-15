@@ -644,6 +644,68 @@
                         <span class="lang-en">The interaction network graph unifies the dialogue into a dynamic living topology. Nodes represent supervisors, students, and discourse themes, while varying edge thicknesses indicate communicative density. This allows supervisors and researchers to immediately assess whether supervision was collaborative or unilateral.</span>
                         <span class="lang-zh">交互拓扑网络将整场对话提炼为鲜活的动态图谱。圆圈（节点）代表导师、学生及核心指导范畴，线条粗细直观反应互动频次。导师与科研人员可借此一目了然地获悉指导过程究竟是平等协作还是单向灌输。</span>
                     </p>
+
+                    {{-- Formulasi Matematis Sentralitas Graf (Bahan Bab 3 Skripsi) --}}
+                    <div class="mt-6 pt-6 border-t border-gray-100 space-y-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <h4 class="text-xs font-black text-gray-900 uppercase tracking-wider">
+                                <span class="lang-id">Formulasi Matematis Metrik Sentralitas Graf Berarah (Network Science)</span>
+                                <span class="lang-en">Mathematical Formulation of Directed Graph Centrality Metrics</span>
+                                <span class="lang-zh">有向图网络中心性度量数学建模</span>
+                            </h4>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                            <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-200">
+                                <span class="text-[0.62rem] font-black uppercase text-purple-700 block mb-1">1. Degree Centrality ($C_D$)</span>
+                                <div class="font-mono text-xs bg-white p-2 rounded-xl border border-gray-200 text-purple-900 font-bold text-center mb-1.5">
+                                    C_D(v) = \frac{\text{deg}_{in}(v) + \text{deg}_{out}(v)}{|V| - 1}
+                                </div>
+                                <p class="text-[0.68rem] text-gray-500 leading-snug">
+                                    <span class="lang-id">Mengukur derajat aktivitas aktor dalam menginisiasi atau menerima respons wacana bimbingan.</span>
+                                    <span class="lang-en">Measures actor activity level in initiating or receiving supervisory discourse turns.</span>
+                                    <span class="lang-zh">度量发言角色在发起或接收学术指导话语轮次中的综合活跃程度。</span>
+                                </p>
+                            </div>
+
+                            <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-200">
+                                <span class="text-[0.62rem] font-black uppercase text-indigo-700 block mb-1">2. Betweenness Centrality ($C_B$)</span>
+                                <div class="font-mono text-xs bg-white p-2 rounded-xl border border-gray-200 text-indigo-900 font-bold text-center mb-1.5">
+                                    C_B(v) = \sum_{s \neq v \neq t} \frac{\sigma_{st}(v)}{\sigma_{st}} \times \frac{1}{(|V|-1)(|V|-2)}
+                                </div>
+                                <p class="text-[0.68rem] text-gray-500 leading-snug">
+                                    <span class="lang-id">Mengidentifikasi simpul perantara krusial (<em class="font-serif">thematic bridge</em>) yang menghubungkan transisi topik bimbingan.</span>
+                                    <span class="lang-en">Identifies crucial intermediate nodes (<em class="font-serif">thematic bridges</em>) linking topic transitions.</span>
+                                    <span class="lang-zh">识别连接不同指导议题过渡的关键桥梁节点（介数中心性枢纽）。</span>
+                                </p>
+                            </div>
+
+                            <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-200">
+                                <span class="text-[0.62rem] font-black uppercase text-blue-700 block mb-1">3. Graph Density ($D$)</span>
+                                <div class="font-mono text-xs bg-white p-2 rounded-xl border border-gray-200 text-blue-900 font-bold text-center mb-1.5">
+                                    D = \frac{|E|}{|V|(|V| - 1)}
+                                </div>
+                                <p class="text-[0.68rem] text-gray-500 leading-snug">
+                                    <span class="lang-id">Kerapatan interaksi yang menggambarkan intensitas keterhubungan antar entitas percakapan.</span>
+                                    <span class="lang-en">Graph density representing the overall interconnectedness intensity between entities.</span>
+                                    <span class="lang-zh">图网络连通密度，客观表征对话实体之间相互连接的紧密程度。</span>
+                                </p>
+                            </div>
+
+                            <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-200">
+                                <span class="text-[0.62rem] font-black uppercase text-emerald-700 block mb-1">4. Reciprocity Index ($R$)</span>
+                                <div class="font-mono text-xs bg-white p-2 rounded-xl border border-gray-200 text-emerald-900 font-bold text-center mb-1.5">
+                                    R = \frac{2 \times |E_{\leftrightarrow}|}{|E|}
+                                </div>
+                                <p class="text-[0.68rem] text-gray-500 leading-snug">
+                                    <span class="lang-id">Derajat timbal balik Dosen ↔ Mahasiswa membuktikan secara empiris apakah interaksi bersifat kolaboratif ($R \ge 0.5$) atau direktif satu arah.</span>
+                                    <span class="lang-en">Reciprocity index empirically proving whether supervision was collaborative ($R \ge 0.5$) or unidirectional.</span>
+                                    <span class="lang-zh">互惠指数，科学实证师生沟通究竟属于双向协作还是单向指令主导。</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>

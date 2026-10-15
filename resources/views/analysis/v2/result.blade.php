@@ -560,6 +560,9 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Komponen Metrik Kuantitatif Sentralitas Graf (Network Science) --}}
+            @include('analysis.v2.components.graph-metrics-card', ['graphMetrics' => $graphMetrics ?? []])
         </div>
 
         {{-- Mobile Tab Switcher --}}
