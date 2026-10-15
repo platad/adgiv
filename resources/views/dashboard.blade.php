@@ -211,15 +211,25 @@
                     <div>
                         <div class="flex items-center gap-2 mb-1.5">
                             <span class="px-2.5 py-0.5 rounded-md bg-[#F2ECE1] text-amber-950 text-[0.68rem] font-bold uppercase tracking-wider border border-[#DECDBB]">
-                                Eksperimen Google Colab
+                                <span class="lang-id">Eksperimen Google Colab</span>
+                                <span class="lang-en">Google Colab Experiment</span>
+                                <span class="lang-zh">Google Colab 实验</span>
                             </span>
-                            <span class="text-xs text-stone-600 font-medium">Hasil Riset BIMA</span>
+                            <span class="text-xs text-stone-600 font-medium">
+                                <span class="lang-id">Hasil Riset BIMA</span>
+                                <span class="lang-en">BIMA Research Results</span>
+                                <span class="lang-zh">BIMA 课题研究成果</span>
+                            </span>
                         </div>
                         <h2 class="text-lg sm:text-xl font-bold text-stone-900 tracking-tight">
-                            Komparasi Model: IndoBERT Base vs RoBERTa Multi-Task
+                            <span class="lang-id">Komparasi Model: IndoBERT Base vs RoBERTa Multi-Task</span>
+                            <span class="lang-en">Model Comparison: IndoBERT Base vs RoBERTa Multi-Task</span>
+                            <span class="lang-zh">模型对比: IndoBERT 基础版 vs RoBERTa 多任务</span>
                         </h2>
                         <p class="text-xs text-stone-600 mt-0.5">
-                            Evaluasi performa klasifikasi wacana pedagogis & relasi kuasa bimbingan skripsi.
+                            <span class="lang-id">Evaluasi performa klasifikasi wacana pedagogis & relasi kuasa bimbingan skripsi.</span>
+                            <span class="lang-en">Evaluation of pedagogical discourse classification & thesis supervision power dynamics.</span>
+                            <span class="lang-zh">学术论文指导教学话语分类与权力动态关系的效能评估。</span>
                         </p>
                     </div>
 
@@ -229,17 +239,23 @@
                             <button type="button" @click="activeTab = 'overview'" 
                                     class="px-3 py-1.5 rounded-lg transition cursor-pointer"
                                     :class="activeTab === 'overview' ? 'bg-white text-stone-900 font-bold border border-[#DDD4C5]' : 'hover:text-stone-950'">
-                                Ikhtisar Fitur
+                                <span class="lang-id">Ikhtisar Fitur</span>
+                                <span class="lang-en">Feature Overview</span>
+                                <span class="lang-zh">特性概览</span>
                             </button>
                             <button type="button" @click="activeTab = 'curves'" 
                                     class="px-3 py-1.5 rounded-lg transition cursor-pointer"
                                     :class="activeTab === 'curves' ? 'bg-white text-stone-900 font-bold border border-[#DDD4C5]' : 'hover:text-stone-950'">
-                                Kurva Training Loss
+                                <span class="lang-id">Kurva Training Loss</span>
+                                <span class="lang-en">Training Loss Curves</span>
+                                <span class="lang-zh">训练损失曲线</span>
                             </button>
                             <button type="button" @click="activeTab = 'matrix'" 
                                     class="px-3 py-1.5 rounded-lg transition cursor-pointer"
                                     :class="activeTab === 'matrix' ? 'bg-white text-stone-900 font-bold border border-[#DDD4C5]' : 'hover:text-stone-950'">
-                                Confusion Matrix
+                                <span class="lang-id">Confusion Matrix</span>
+                                <span class="lang-en">Confusion Matrix</span>
+                                <span class="lang-zh">混淆矩阵</span>
                             </button>
                         </div>
 
@@ -248,7 +264,9 @@
                             <button type="button" @click="activeModel = 'both'"
                                     class="px-2.5 py-1.5 rounded-lg transition cursor-pointer"
                                     :class="activeModel === 'both' ? 'bg-stone-900 text-white font-bold' : 'hover:text-stone-950'">
-                                Keduanya
+                                <span class="lang-id">Keduanya</span>
+                                <span class="lang-en">Both</span>
+                                <span class="lang-zh">全部模型</span>
                             </button>
                             <button type="button" @click="activeModel = 'indobert'"
                                     class="px-2.5 py-1.5 rounded-lg transition cursor-pointer"
@@ -275,7 +293,9 @@
                             <div class="flex items-center justify-between pb-4 mb-4 border-b border-gray-200/80">
                                 <div>
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-blue-100/70 text-blue-800 text-[0.68rem] font-bold uppercase tracking-wider border border-blue-200">
-                                        Versi 1 (Baseline)
+                                        <span class="lang-id">Versi 1 (Baseline)</span>
+                                        <span class="lang-en">Version 1 (Baseline)</span>
+                                        <span class="lang-zh">版本 1 (基线模型)</span>
                                     </span>
                                     <h3 class="text-base font-bold text-gray-900 mt-2">IndoBERT Base Model</h3>
                                     <p class="text-xs text-gray-500">Single-Task Sequence Classification</p>
@@ -289,12 +309,24 @@
                             {{-- Metrics Summary Grid --}}
                             <div class="grid grid-cols-2 gap-3 mb-5 text-xs">
                                 <div class="bg-white rounded-xl p-3 border border-gray-200/70">
-                                    <span class="text-[0.65rem] text-gray-500 font-medium block">Akurasi Validasi</span>
+                                    <span class="text-[0.65rem] text-gray-500 font-medium block">
+                                        <span class="lang-id">Akurasi Validasi</span>
+                                        <span class="lang-en">Validation Accuracy</span>
+                                        <span class="lang-zh">验证准确度</span>
+                                    </span>
                                     <span class="text-sm font-bold text-gray-900">33.4% - 60.3%</span>
                                 </div>
                                 <div class="bg-white rounded-xl p-3 border border-gray-200/70">
-                                    <span class="text-[0.65rem] text-gray-500 font-medium block">Dimensi Analisis</span>
-                                    <span class="text-sm font-bold text-gray-900">1 Aspek Tunggal</span>
+                                    <span class="text-[0.65rem] text-gray-500 font-medium block">
+                                        <span class="lang-id">Dimensi Analisis</span>
+                                        <span class="lang-en">Analysis Dimension</span>
+                                        <span class="lang-zh">分析维度</span>
+                                    </span>
+                                    <span class="text-sm font-bold text-gray-900">
+                                        <span class="lang-id">1 Aspek Tunggal</span>
+                                        <span class="lang-en">Single Aspect</span>
+                                        <span class="lang-zh">单一维度</span>
+                                    </span>
                                 </div>
                             </div>
 
@@ -302,15 +334,27 @@
                             <div class="space-y-3 text-xs text-gray-700">
                                 <div class="flex items-start gap-2.5">
                                     <i data-lucide="info" class="w-4 h-4 text-gray-500 shrink-0 mt-0.5"></i>
-                                    <span><strong>Klasifikasi Linier Tunggal:</strong> Memprediksi satu label per segment teks tanpa memperhitungkan relasi kontekstual antar kalimat.</span>
+                                    <span>
+                                        <span class="lang-id"><strong>Klasifikasi Linier Tunggal:</strong> Memprediksi satu label per segment teks tanpa memperhitungkan relasi kontekstual antar kalimat.</span>
+                                        <span class="lang-en"><strong>Single Linear Classification:</strong> Predicts a single label per text segment without accounting for cross-turn context.</span>
+                                        <span class="lang-zh"><strong>单通道线性分类:</strong> 每个语句片段仅预测单一标签，无法捕捉跨轮次的上下文依赖关系。</span>
+                                    </span>
                                 </div>
                                 <div class="flex items-start gap-2.5">
                                     <i data-lucide="info" class="w-4 h-4 text-gray-500 shrink-0 mt-0.5"></i>
-                                    <span><strong>Keterbatasan Relasi Kuasa:</strong> Belum memiliki topologi wacana sehingga interaksi hierarki bimbingan belum terpetakan.</span>
+                                    <span>
+                                        <span class="lang-id"><strong>Keterbatasan Relasi Kuasa:</strong> Belum memiliki topologi wacana sehingga interaksi hierarki bimbingan belum terpetakan.</span>
+                                        <span class="lang-en"><strong>Power Dynamics Limitation:</strong> Lacks discourse topology mapping for supervisory hierarchical interactions.</span>
+                                        <span class="lang-zh"><strong>权力动态建模受限:</strong> 缺乏话语拓扑网络，无法映射学术指导中的师生层级互动。</span>
+                                    </span>
                                 </div>
                                 <div class="flex items-start gap-2.5">
                                     <i data-lucide="check" class="w-4 h-4 text-blue-700 shrink-0 mt-0.5"></i>
-                                    <span><strong>Inferensi Ringan:</strong> Cocok untuk ringkasan cepat pada transkrip pendek tanpa kebutuhan analisis multi-level.</span>
+                                    <span>
+                                        <span class="lang-id"><strong>Inferensi Ringan:</strong> Cocok untuk ringkasan cepat pada transkrip pendek tanpa kebutuhan analisis multi-level.</span>
+                                        <span class="lang-en"><strong>Lightweight Inference:</strong> Suitable for quick summaries of short transcripts without multi-level modeling.</span>
+                                        <span class="lang-zh"><strong>轻量级推理:</strong> 适合短篇幅转译文本的快速分析，无需复杂的多层次建模。</span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -328,7 +372,11 @@
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('analysis.create') }}" 
                                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold transition">
-                                    <span>Gunakan V1</span>
+                                    <span>
+                                        <span class="lang-id">Gunakan V1</span>
+                                        <span class="lang-en">Use V1</span>
+                                        <span class="lang-zh">使用 V1 模型</span>
+                                    </span>
                                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-gray-500"></i>
                                 </a>
                             </div>
@@ -343,7 +391,9 @@
                             <div class="flex items-center justify-between pb-4 mb-4 border-b border-purple-200/80">
                                 <div>
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-900 text-[0.68rem] font-bold uppercase tracking-wider border border-purple-200">
-                                        Versi 2 (Rekomendasi)
+                                        <span class="lang-id">Versi 2 (Rekomendasi)</span>
+                                        <span class="lang-en">Version 2 (Recommended)</span>
+                                        <span class="lang-zh">版本 2 (推荐首选)</span>
                                     </span>
                                     <h3 class="text-base font-bold text-gray-900 mt-2">RoBERTa Multi-Task + Graf</h3>
                                     <p class="text-xs text-gray-500">Cross-Discourse Dynamic Modeling</p>
@@ -357,12 +407,24 @@
                             {{-- Metrics Summary Grid --}}
                             <div class="grid grid-cols-2 gap-3 mb-5 text-xs">
                                 <div class="bg-white rounded-xl p-3 border border-purple-200/70">
-                                    <span class="text-[0.65rem] text-gray-500 font-medium block">Akurasi Validasi</span>
+                                    <span class="text-[0.65rem] text-gray-500 font-medium block">
+                                        <span class="lang-id">Akurasi Validasi</span>
+                                        <span class="lang-en">Validation Accuracy</span>
+                                        <span class="lang-zh">验证准确度</span>
+                                    </span>
                                     <span class="text-sm font-bold text-purple-950">91.6% - 94.0%</span>
                                 </div>
                                 <div class="bg-white rounded-xl p-3 border border-purple-200/70">
-                                    <span class="text-[0.65rem] text-gray-500 font-medium block">Dimensi Analisis</span>
-                                    <span class="text-sm font-bold text-purple-950">3 Tugas Simultan</span>
+                                    <span class="text-[0.65rem] text-gray-500 font-medium block">
+                                        <span class="lang-id">Dimensi Analisis</span>
+                                        <span class="lang-en">Analysis Dimension</span>
+                                        <span class="lang-zh">分析维度</span>
+                                    </span>
+                                    <span class="text-sm font-bold text-purple-950">
+                                        <span class="lang-id">3 Tugas Simultan</span>
+                                        <span class="lang-en">3 Simultaneous Tasks</span>
+                                        <span class="lang-zh">3 个同步任务</span>
+                                    </span>
                                 </div>
                             </div>
 
@@ -370,15 +432,27 @@
                             <div class="space-y-3 text-xs text-gray-700">
                                 <div class="flex items-start gap-2.5">
                                     <i data-lucide="check" class="w-4 h-4 text-purple-700 shrink-0 mt-0.5"></i>
-                                    <span><strong>Simultan 3 Dimensi:</strong> Mengklasifikasi Kategori Advice, Mode Interaksi Kuasa, dan Intonasi suara dalam satu proses pipeline.</span>
+                                    <span>
+                                        <span class="lang-id"><strong>Simultan 3 Dimensi:</strong> Mengklasifikasi Kategori Advice, Mode Interaksi Kuasa, dan Intonasi suara dalam satu proses pipeline.</span>
+                                        <span class="lang-en"><strong>Simultaneous 3 Dimensions:</strong> Jointly classifies Advice Category, Power Interaction Mode, and Tone contour in a single pipeline.</span>
+                                        <span class="lang-zh"><strong>三维联合建模:</strong> 在单一推理管道中同步预测建议类别、权力交互模式与语音语调轮廓。</span>
+                                    </span>
                                 </div>
                                 <div class="flex items-start gap-2.5">
                                     <i data-lucide="check" class="w-4 h-4 text-purple-700 shrink-0 mt-0.5"></i>
-                                    <span><strong>Topologi Graf Wacana:</strong> Memetakan dinamika timbal-balik antara dosen dan mahasiswa sepanjang sesi bimbingan.</span>
+                                    <span>
+                                        <span class="lang-id"><strong>Topologi Graf Wacana:</strong> Memetakan dinamika timbal-balik antara dosen dan mahasiswa sepanjang sesi bimbingan.</span>
+                                        <span class="lang-en"><strong>Discourse Topology Graph:</strong> Maps the reciprocal dynamics between supervisor and student throughout the session.</span>
+                                        <span class="lang-zh"><strong>话语拓扑交互图谱:</strong> 全程直观映射导师与学生在指导进程中的互动演进图谱。</span>
+                                    </span>
                                 </div>
                                 <div class="flex items-start gap-2.5">
                                     <i data-lucide="check" class="w-4 h-4 text-purple-700 shrink-0 mt-0.5"></i>
-                                    <span><strong>Loss Weighted Balancing:</strong> Mengatasi ketimpangan data minoritas secara adaptif untuk hasil yang lebih reliabel.</span>
+                                    <span>
+                                        <span class="lang-id"><strong>Loss Weighted Balancing:</strong> Mengatasi ketimpangan data minoritas secara adaptif untuk hasil yang lebih reliabel.</span>
+                                        <span class="lang-en"><strong>Loss Weighted Balancing:</strong> Adaptively handles minority class imbalance for more robust and reliable predictions.</span>
+                                        <span class="lang-zh"><strong>加权损失均衡机制:</strong> 自适应平抑少数类别样本不均衡问题，大幅提升预测稳定性。</span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -396,7 +470,11 @@
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('analysis.v2.create') }}" 
                                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-purple-700 text-white hover:bg-purple-800 text-xs font-semibold transition">
-                                    <span>Gunakan V2 (Modern)</span>
+                                    <span>
+                                        <span class="lang-id">Gunakan V2 (Modern)</span>
+                                        <span class="lang-en">Use V2 (Modern)</span>
+                                        <span class="lang-zh">使用 V2 模型 (现代推荐)</span>
+                                    </span>
                                     <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                                 </a>
                             </div>
@@ -410,7 +488,11 @@
                     <div class="bg-gray-50 rounded-2xl border border-gray-200 p-5">
                         <div class="flex items-center justify-between mb-3">
                             <div>
-                                <h4 class="text-sm font-bold text-gray-900">Kurva Evaluasi IndoBERT Base (V1)</h4>
+                                <h4 class="text-sm font-bold text-gray-900">
+                                    <span class="lang-id">Kurva Evaluasi IndoBERT Base (V1)</span>
+                                    <span class="lang-en">Evaluation Curves: IndoBERT Base (V1)</span>
+                                    <span class="lang-zh">IndoBERT 基础版 (V1) 评估曲线</span>
+                                </h4>
                                 <span class="text-[0.7rem] text-gray-500">Colab Training Loss Profile</span>
                             </div>
                             <a href="https://colab.research.google.com/drive/1yL3Y-jyT-3orbj-Y8Nt3aMBtNNpKg2WY?usp=sharing" 
@@ -428,7 +510,9 @@
                                  class="w-full h-56 object-contain">
                         </div>
                         <p class="text-xs text-gray-500 mt-3 leading-relaxed">
-                            Kurva menunjukkan penurunan loss bertahap, namun mengalami fluktuasi pada iterasi akhir data validasi.
+                            <span class="lang-id">Kurva menunjukkan penurunan loss bertahap, namun mengalami fluktuasi pada iterasi akhir data validasi.</span>
+                            <span class="lang-en">The curve shows gradual loss reduction, yet exhibits fluctuations in the final iterations of validation data.</span>
+                            <span class="lang-zh">损失曲线呈现阶段性递减，但在验证集最终迭代中表现出一定的波动性。</span>
                         </p>
                     </div>
 
@@ -436,7 +520,11 @@
                     <div class="bg-purple-50/30 rounded-2xl border border-purple-200 p-5">
                         <div class="flex items-center justify-between mb-3">
                             <div>
-                                <h4 class="text-sm font-bold text-purple-950">Kurva Evaluasi RoBERTa Multi-Task (V2)</h4>
+                                <h4 class="text-sm font-bold text-purple-950">
+                                    <span class="lang-id">Kurva Evaluasi RoBERTa Multi-Task (V2)</span>
+                                    <span class="lang-en">Evaluation Curves: RoBERTa Multi-Task (V2)</span>
+                                    <span class="lang-zh">RoBERTa 多任务版 (V2) 评估曲线</span>
+                                </h4>
                                 <span class="text-[0.7rem] text-gray-500">Multi-Loss Convergence Profile</span>
                             </div>
                             <a href="https://colab.research.google.com/drive/1p2yhLrqD3RlHxt0MQW-w09v3KJ07ae3X?usp=sharing" 
@@ -454,7 +542,9 @@
                                  class="w-full h-56 object-contain">
                         </div>
                         <p class="text-xs text-gray-600 mt-3 leading-relaxed">
-                            Loss menurun mulus dari 2.12 ke 0.48 dengan akurasi validasi konvergen stabil di 4 epoch pelatihan.
+                            <span class="lang-id">Loss menurun mulus dari 2.12 ke 0.48 dengan akurasi validasi konvergen stabil di 4 epoch pelatihan.</span>
+                            <span class="lang-en">Loss smoothly declines from 2.12 to 0.48 with stable validation accuracy converging within 4 training epochs.</span>
+                            <span class="lang-zh">训练损失从 2.12 平滑降至 0.48，在 4 轮训练周期内展现出极强的稳定性与收敛能力。</span>
                         </p>
                     </div>
                 </div>
@@ -465,8 +555,16 @@
                     <div class="bg-gray-50 rounded-2xl border border-gray-200 p-5">
                         <div class="flex items-center justify-between mb-3">
                             <div>
-                                <h4 class="text-sm font-bold text-gray-900">Distribusi Matrix IndoBERT (V1)</h4>
-                                <span class="text-[0.7rem] text-gray-500">Hasil Prediksi Kelas Bimbingan</span>
+                                <h4 class="text-sm font-bold text-gray-900">
+                                    <span class="lang-id">Distribusi Matrix IndoBERT (V1)</span>
+                                    <span class="lang-en">Matrix Distribution: IndoBERT (V1)</span>
+                                    <span class="lang-zh">IndoBERT (V1) 混淆矩阵分布</span>
+                                </h4>
+                                <span class="text-[0.7rem] text-gray-500">
+                                    <span class="lang-id">Hasil Prediksi Kelas Bimbingan</span>
+                                    <span class="lang-en">Supervision Class Prediction Results</span>
+                                    <span class="lang-zh">学术指导类别预测结果</span>
+                                </span>
                             </div>
                             <a href="https://colab.research.google.com/drive/1yL3Y-jyT-3orbj-Y8Nt3aMBtNNpKg2WY?usp=sharing" 
                                target="_blank" 
@@ -483,7 +581,9 @@
                                  class="w-full h-56 object-contain">
                         </div>
                         <p class="text-xs text-gray-500 mt-3 leading-relaxed">
-                            Terdapat dispersi prediksi pada kelas minoritas akibat ketiadaan pembobotan adaptif antar kategori.
+                            <span class="lang-id">Terdapat dispersi prediksi pada kelas minoritas akibat ketiadaan pembobotan adaptif antar kategori.</span>
+                            <span class="lang-en">Prediction dispersion occurs on minority classes due to the absence of adaptive category loss reweighting.</span>
+                            <span class="lang-zh">由于缺乏自适应类别重加权机制，少数样本类别的预测分布呈现出较为明显的离散现象。</span>
                         </p>
                     </div>
 
@@ -491,7 +591,11 @@
                     <div class="bg-purple-50/30 rounded-2xl border border-purple-200 p-5">
                         <div class="flex items-center justify-between mb-3">
                             <div>
-                                <h4 class="text-sm font-bold text-purple-950">Confusion Matrix RoBERTa (V2)</h4>
+                                <h4 class="text-sm font-bold text-purple-950">
+                                    <span class="lang-id">Confusion Matrix RoBERTa (V2)</span>
+                                    <span class="lang-en">Confusion Matrix: RoBERTa (V2)</span>
+                                    <span class="lang-zh">RoBERTa (V2) 混淆矩阵</span>
+                                </h4>
                                 <span class="text-[0.7rem] text-gray-500">Cross-Discourse Multi-Head</span>
                             </div>
                             <a href="https://colab.research.google.com/drive/1p2yhLrqD3RlHxt0MQW-w09v3KJ07ae3X?usp=sharing" 
@@ -509,7 +613,9 @@
                                  class="w-full h-56 object-contain">
                         </div>
                         <p class="text-xs text-gray-600 mt-3 leading-relaxed">
-                            Diagonal dominan kuat membuktikan keberhasilan pemisahan kategori advice dan relasi interaksi secara presisi.
+                            <span class="lang-id">Diagonal dominan kuat membuktikan keberhasilan pemisahan kategori advice dan relasi interaksi secara presisi.</span>
+                            <span class="lang-en">The strong dominant diagonal proves successful separation of advice categories and interaction relations with high precision.</span>
+                            <span class="lang-zh">强主对角线特征清晰佐证了系统在建议分类与互动关系解构上的高精度判别能力。</span>
                         </p>
                     </div>
                 </div>
@@ -530,7 +636,9 @@
                         </a>
                     </div>
                     <span class="text-[0.7rem] text-stone-500 font-medium">
-                        Klik tautan di atas untuk menguji atau me-reproduce pelatihan di Google Colab.
+                        <span class="lang-id">Klik tautan di atas untuk menguji atau me-reproduce pelatihan di Google Colab.</span>
+                        <span class="lang-en">Click links above to test or reproduce training in Google Colab.</span>
+                        <span class="lang-zh">点击上方链接可在 Google Colab 中测试或复现模型训练。</span>
                     </span>
                 </div>
             </div>
@@ -728,18 +836,22 @@
                         <span class="lang-en">Analysis History</span>
                         <span class="lang-zh">语音分析历史记录</span>
                     </h2>
-                    <p class="text-xs text-gray-400 font-medium mt-0.5">Kelola dan telusuri seluruh riwayat sesi percakapan Anda</p>
+                    <p class="text-xs text-gray-400 font-medium mt-0.5">
+                        <span class="lang-id">Kelola dan telusuri seluruh riwayat sesi percakapan Anda</span>
+                        <span class="lang-en">Manage and explore your complete session history</span>
+                        <span class="lang-zh">集中管理与复盘您全部的学术辅导会话分析归档</span>
+                    </p>
                 </div>
 
                 {{-- Filter Controls --}}
                 <div class="flex flex-wrap items-center gap-3">
-                    {{-- Search Input --}}
+                    {{-- Search Input with multi-language placeholder --}}
                     <div class="relative w-full sm:w-56">
                         <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
                         <input type="text"
                             x-model="searchQuery"
                             @input="onSearchInput()"
-                            placeholder="Cari judul sesi..."
+                            placeholder="{{ app()->getLocale() === 'zh' ? '搜索会话标题...' : (app()->getLocale() === 'en' ? 'Search session title...' : 'Cari judul sesi...') }}"
                             class="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-medium text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition shadow-sm">
                     </div>
 
@@ -748,17 +860,23 @@
                         <button type="button" @click="setVersionFilter('all')"
                             class="px-2.5 py-1.5 rounded-lg transition-all cursor-pointer"
                             :class="selectedVersion === 'all' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'">
-                            Semua
+                            <span class="lang-id">Semua</span>
+                            <span class="lang-en">All</span>
+                            <span class="lang-zh">全部</span>
                         </button>
                         <button type="button" @click="setVersionFilter('1')"
                             class="px-2.5 py-1.5 rounded-lg transition-all cursor-pointer"
                             :class="selectedVersion === '1' ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'">
-                            Versi 1
+                            <span class="lang-id">Versi 1</span>
+                            <span class="lang-en">Version 1</span>
+                            <span class="lang-zh">版本 1</span>
                         </button>
                         <button type="button" @click="setVersionFilter('2')"
                             class="px-2.5 py-1.5 rounded-lg transition-all cursor-pointer"
                             :class="selectedVersion === '2' ? 'bg-white text-purple-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'">
-                            Versi 2
+                            <span class="lang-id">Versi 2</span>
+                            <span class="lang-en">Version 2</span>
+                            <span class="lang-zh">版本 2</span>
                         </button>
                     </div>
                 </div>
@@ -1080,7 +1198,9 @@
                      class="absolute bottom-16 right-0 mb-2 w-64 bg-gray-900/98 backdrop-blur-2xl border border-white/15 rounded-3xl p-3 shadow-2xl flex flex-col gap-2">
                     
                     <div class="px-3 py-1.5 border-b border-white/10 text-[0.62rem] font-black uppercase tracking-widest text-white/50">
-                        Mulai Analisis Cepat
+                        <span class="lang-id">Mulai Analisis Cepat</span>
+                        <span class="lang-en">Quick Start Analysis</span>
+                        <span class="lang-zh">快速启动分析</span>
                     </div>
 
                     {{-- Analisis RoBERTa --}}
@@ -1089,7 +1209,11 @@
                             <i data-lucide="sparkles" class="w-4 h-4"></i>
                         </div>
                         <div class="min-w-0">
-                            <div class="text-xs font-bold truncate">Suara (RoBERTa)</div>
+                            <div class="text-xs font-bold truncate">
+                                <span class="lang-id">Suara (RoBERTa)</span>
+                                <span class="lang-en">Voice (RoBERTa)</span>
+                                <span class="lang-zh">语音 (RoBERTa)</span>
+                            </div>
                             <div class="text-[0.6rem] text-purple-300/70 truncate">Model V2 + Topologi Graf</div>
                         </div>
                     </a>
@@ -1100,7 +1224,11 @@
                             <i data-lucide="mic" class="w-4 h-4"></i>
                         </div>
                         <div class="min-w-0">
-                            <div class="text-xs font-bold truncate">Suara (IndoBERT)</div>
+                            <div class="text-xs font-bold truncate">
+                                <span class="lang-id">Suara (IndoBERT)</span>
+                                <span class="lang-en">Voice (IndoBERT)</span>
+                                <span class="lang-zh">语音 (IndoBERT)</span>
+                            </div>
                             <div class="text-[0.6rem] text-red-300/70 truncate">Model V1 + G-MLLM</div>
                         </div>
                     </a>
@@ -1111,8 +1239,16 @@
                             <i data-lucide="file-text" class="w-4 h-4"></i>
                         </div>
                         <div class="min-w-0">
-                            <div class="text-xs font-bold truncate">Analisis PDF</div>
-                            <div class="text-[0.6rem] text-orange-300/70 truncate">Materi & telaah dokumen</div>
+                            <div class="text-xs font-bold truncate">
+                                <span class="lang-id">Analisis PDF</span>
+                                <span class="lang-en">PDF Analysis</span>
+                                <span class="lang-zh">PDF 分析</span>
+                            </div>
+                            <div class="text-[0.6rem] text-orange-300/70 truncate">
+                                <span class="lang-id">Materi & telaah dokumen</span>
+                                <span class="lang-en">Doc content review</span>
+                                <span class="lang-zh">学术论文文档审阅</span>
+                            </div>
                         </div>
                     </a>
                 </div>
