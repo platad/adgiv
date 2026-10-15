@@ -481,6 +481,9 @@ class AnalysisV2Controller extends Controller
         $graphAnalyticsService = app(GraphAnalyticsService::class);
         $graphMetrics = $graphAnalyticsService->calculateMetrics($analysis->graph_data ?? [], $transcription);
 
+        $graphInterpretation = $analysis->result_data['graph_interpretation'] ?? null;
+        $speakerSamples = self::extractSpeakerSamples($transcription);
+
         return view('analysis.v2.result', compact('analysis', 'stats', 'transcription', 'summary', 'graphInterpretation', 'speakerSamples', 'graphMetrics', 'isOwner', 'visibility'));
     }
 
