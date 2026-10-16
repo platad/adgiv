@@ -398,14 +398,6 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
-                        {{-- Tombol Generate AI Substansi --}}
-                        <button type="button" @click="generateAiSubstance()" :disabled="generatingSubstance"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-purple-200 bg-purple-50/80 hover:bg-purple-100 text-purple-700 text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
-                            title="Generate ulasan substansi akademik cerdas & ringkas per baris menggunakan AI">
-                            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-600" :class="generatingSubstance ? 'animate-spin' : ''"></i>
-                            <span x-text="generatingSubstance ? 'Memproses AI...' : 'Generate AI Substansi'"></span>
-                        </button>
-
                         {{-- Automatic Responsive Speaker Filter Pills (Wrap gracefully, No dots) --}}
                         <div class="flex flex-wrap items-center gap-1.5 bg-gray-100/80 p-1.5 rounded-2xl border border-gray-200 text-xs font-bold shrink-0 self-start sm:self-auto max-w-full">
                             {{-- Tombol Semua --}}
@@ -471,7 +463,8 @@
                                 str_contains($item['agent_insight'], 'Dosen berperan mengarahkan wacana dengan') ||
                                 str_contains($item['agent_insight'], 'AI belum memberikan ulasan')
                             );
-                            if (!empty($item['agent_insight']) && !$isOldBoilerplate) {
+                            $isTooShort = !empty($item['agent_insight']) && str_word_count($item['agent_insight']) < 15;
+                            if (!empty($item['agent_insight']) && !$isOldBoilerplate && !$isTooShort) {
                                 $academicSubstance = $item['agent_insight'];
                             } else {
                                 $academicSubstance = \App\Http\Controllers\AnalysisV2Controller::generateConciseAcademicSubstance($item, $index);
