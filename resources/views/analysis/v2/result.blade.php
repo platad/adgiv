@@ -761,7 +761,7 @@
             </div> {{-- End of Main Canvas (Left/Center Column) --}}
 
             {{-- Right Analytical Sidebar Panel (Canva Workspace Style: Sticky on Scroll, Floats naturally at top) --}}
-            <aside class="space-y-6 lg:col-span-5 xl:col-span-4 transition-all lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1"
+            <aside class="space-y-6 lg:col-span-5 xl:col-span-4 transition-all lg:sticky lg:top-24 self-start"
                    x-show="isSidebarOpen"
                    x-transition:enter="transition ease-out duration-200"
                    x-transition:enter-start="opacity-0 translate-x-4"

@@ -601,8 +601,8 @@
 
     {{-- Main Content Wrapper --}}
     <div class="flex-1 flex flex-col w-full px-4 pt-20 pb-24 lg:pl-52 lg:pr-8 lg:py-10 relative">
-        {{-- The main panel --}}
-        <main class="flex-1 w-full flex flex-col relative overflow-hidden">
+        {{-- The main panel: overflow-visible so sticky children can stick relative to viewport --}}
+        <main class="flex-1 w-full flex flex-col relative">
             {{ $slot }}
         </main>
     </div>
