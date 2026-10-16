@@ -783,42 +783,42 @@
                         </button>
                     </div>
 
-                    {{-- Tab Pills Switcher --}}
-                    <div class="grid grid-cols-6 gap-1 p-1 bg-gray-100 rounded-xl text-[0.6rem] font-bold">
+                    {{-- Tab Pills Switcher (Spacious 2-Row Grid: 3 cols x 2 rows) --}}
+                    <div class="grid grid-cols-3 gap-1.5 p-1.5 bg-gray-100/90 rounded-2xl text-[0.68rem] font-bold">
                         <button type="button" @click="switchSidebarTab('ringkasan')"
-                            class="py-2 rounded-lg transition-all text-center flex flex-col items-center gap-1 cursor-pointer"
-                            :class="sidebarTab === 'ringkasan' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-800'">
-                            <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
+                            class="py-2.5 px-2 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                            :class="sidebarTab === 'ringkasan' ? 'bg-white text-purple-700 shadow-sm font-black' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'">
+                            <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 shrink-0"></i>
                             <span class="truncate">Ringkasan</span>
                         </button>
                         <button type="button" @click="switchSidebarTab('graf')"
-                            class="py-2 rounded-lg transition-all text-center flex flex-col items-center gap-1 cursor-pointer"
-                            :class="sidebarTab === 'graf' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-800'">
-                            <i data-lucide="network" class="w-3.5 h-3.5"></i>
+                            class="py-2.5 px-2 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                            :class="sidebarTab === 'graf' ? 'bg-white text-purple-700 shadow-sm font-black' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'">
+                            <i data-lucide="network" class="w-3.5 h-3.5 shrink-0"></i>
                             <span class="truncate">Graf</span>
                         </button>
                         <button type="button" @click="switchSidebarTab('alur')"
-                            class="py-2 rounded-lg transition-all text-center flex flex-col items-center gap-1 cursor-pointer"
-                            :class="sidebarTab === 'alur' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-800'">
-                            <i data-lucide="git-branch" class="w-3.5 h-3.5"></i>
+                            class="py-2.5 px-2 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                            :class="sidebarTab === 'alur' ? 'bg-white text-purple-700 shadow-sm font-black' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'">
+                            <i data-lucide="git-branch" class="w-3.5 h-3.5 shrink-0"></i>
                             <span class="truncate">Alur</span>
                         </button>
                         <button type="button" @click="switchSidebarTab('metrik')"
-                            class="py-2 rounded-lg transition-all text-center flex flex-col items-center gap-1 cursor-pointer"
-                            :class="sidebarTab === 'metrik' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-800'">
-                            <i data-lucide="binary" class="w-3.5 h-3.5"></i>
+                            class="py-2.5 px-2 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                            :class="sidebarTab === 'metrik' ? 'bg-white text-purple-700 shadow-sm font-black' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'">
+                            <i data-lucide="binary" class="w-3.5 h-3.5 shrink-0"></i>
                             <span class="truncate">Sentral</span>
                         </button>
                         <button type="button" @click="switchSidebarTab('intonasi')"
-                            class="py-2 rounded-lg transition-all text-center flex flex-col items-center gap-1 cursor-pointer"
-                            :class="sidebarTab === 'intonasi' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-800'">
-                            <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                            class="py-2.5 px-2 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                            :class="sidebarTab === 'intonasi' ? 'bg-white text-purple-700 shadow-sm font-black' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'">
+                            <i data-lucide="activity" class="w-3.5 h-3.5 shrink-0"></i>
                             <span class="truncate">Intonasi</span>
                         </button>
                         <button type="button" @click="switchSidebarTab('distribusi')"
-                            class="py-2 rounded-lg transition-all text-center flex flex-col items-center gap-1 cursor-pointer"
-                            :class="sidebarTab === 'distribusi' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-800'">
-                            <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i>
+                            class="py-2.5 px-2 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                            :class="sidebarTab === 'distribusi' ? 'bg-white text-purple-700 shadow-sm font-black' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'">
+                            <i data-lucide="pie-chart" class="w-3.5 h-3.5 shrink-0"></i>
                             <span class="truncate">Distribusi</span>
                         </button>
                     </div>
