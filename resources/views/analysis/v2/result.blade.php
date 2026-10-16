@@ -758,100 +758,6 @@
                     </div>
                 </template>
             </div> {{-- End of Transkripsi & Penanda Wacana Card --}}
-
-            {{-- Hasil Analisis Akhir (Placed on the Main Canvas directly below Transcript) --}}
-            <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8 relative overflow-hidden">
-                <div class="absolute -right-6 -top-6 text-purple-50 pointer-events-none">
-                    <i data-lucide="brain-circuit" class="w-44 h-44"></i>
-                </div>
-
-                <div class="flex items-center justify-between gap-4 mb-6 relative z-10 border-b border-gray-100 pb-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
-                            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-base font-black uppercase tracking-tight text-gray-900">Hasil Analisis Akhir</h2>
-                            <p class="text-xs text-gray-400 font-medium">Sintesis kategori bimbingan, modalitas relasi kuasa, dan intonasi dominan wacana</p>
-                        </div>
-                    </div>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[0.65rem] font-bold">
-                        <i data-lucide="sparkles" class="w-3 h-3 text-purple-600"></i> Executive Synthesis
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 relative z-10">
-                    {{-- Kategori Advice --}}
-                    <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col justify-center">
-                        <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1">
-                            Kategori Advice
-                        </span>
-                        <span class="font-bold text-gray-900 leading-tight block break-words text-sm">
-                            {{ $summary['kategori_advice'] ?? 'Saran Bimbingan Akademik' }}
-                        </span>
-                    </div>
-
-                    {{-- Karakter Relasi --}}
-                    <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col justify-center">
-                        <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1">
-                            Karakter Relasi
-                        </span>
-                        <span class="font-bold text-gray-900 leading-tight block break-words text-sm">
-                            {{ $summary['karakter_relasi'] ?? 'Kondusif & Seimbang' }}
-                        </span>
-                    </div>
-
-                    {{-- Intonasi Dominan --}}
-                    <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col justify-center">
-                        <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1">
-                            Intonasi Dominan
-                        </span>
-                        <span class="font-bold text-gray-900 leading-tight block break-words text-sm">
-                            {{ $summary['intonasi_dominan'] ?? 'Intonasi Seimbang' }}
-                        </span>
-                    </div>
-
-                    {{-- Ranah Bicara --}}
-                    <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col justify-center">
-                        <span class="block text-[0.6rem] font-black text-gray-400 uppercase tracking-widest mb-1">
-                            Ranah Bicara
-                        </span>
-                        <span class="font-bold text-gray-900 leading-tight block break-words text-sm">
-                            {{ $summary['ranah_pembicaraan'] ?? 'Bimbingan Skripsi & Pendalaman Metodologi Penelitian' }}
-                        </span>
-                    </div>
-                </div>
-
-                {{-- Umpan Balik & Rekomendasi Grid --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-                    {{-- Umpan Balik --}}
-                    <div class="bg-purple-600 rounded-2xl p-5 text-white shadow-md shadow-purple-600/20 flex flex-col justify-between">
-                        <div>
-                            <span class="block text-[0.6rem] font-black text-purple-200 uppercase tracking-widest mb-2 flex items-center">
-                                <i data-lucide="target" class="w-3.5 h-3.5 mr-1.5"></i>
-                                <span>Umpan Balik</span>
-                            </span>
-                            <p class="font-medium text-xs sm:text-sm leading-relaxed text-purple-50">
-                                {{ ucfirst($summary['arah_tujuan'] ?? 'Dosen mengarahkan mahasiswa dengan fokus pada penyempurnaan landasan teori, metodologi, dan perumusan simpulan yang valid.') }}
-                            </p>
-                        </div>
-                    </div>
-
-                    {{-- Rekomendasi --}}
-                    <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 text-emerald-900 flex flex-col justify-between">
-                        <div>
-                            <span class="block text-[0.6rem] font-black text-emerald-600 uppercase tracking-widest mb-2 flex items-center">
-                                <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1.5"></i>
-                                <span>Rekomendasi</span>
-                            </span>
-                            <p class="font-medium text-xs sm:text-sm leading-relaxed text-emerald-800">
-                                {{ ucfirst($summary['saran_perbaikan'] ?? 'Mahasiswa disarankan menindaklanjuti catatan revisi Dosen, mengonfirmasi instrumen riset, dan menyusun target mingguan agar jadwal bimbingan berjalan optimal.') }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div> {{-- End of Hasil Analisis Akhir Card --}}
-
             </div> {{-- End of Main Canvas (Left/Center Column) --}}
 
             {{-- Right Analytical Sidebar Panel (Canva Workspace Style) --}}
@@ -878,7 +784,13 @@
                     </div>
 
                     {{-- Tab Pills Switcher --}}
-                    <div class="grid grid-cols-5 gap-1 p-1 bg-gray-100 rounded-xl text-[0.62rem] font-bold">
+                    <div class="grid grid-cols-6 gap-1 p-1 bg-gray-100 rounded-xl text-[0.6rem] font-bold">
+                        <button type="button" @click="switchSidebarTab('ringkasan')"
+                            class="py-2 rounded-lg transition-all text-center flex flex-col items-center gap-1 cursor-pointer"
+                            :class="sidebarTab === 'ringkasan' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-800'">
+                            <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
+                            <span class="truncate">Ringkasan</span>
+                        </button>
                         <button type="button" @click="switchSidebarTab('graf')"
                             class="py-2 rounded-lg transition-all text-center flex flex-col items-center gap-1 cursor-pointer"
                             :class="sidebarTab === 'graf' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-800'">
@@ -909,6 +821,97 @@
                             <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i>
                             <span class="truncate">Distribusi</span>
                         </button>
+                    </div>
+                </div>
+
+                {{-- Tab 0 (PRIORITAS): Hasil Analisis Akhir (Executive Synthesis) --}}
+                <div x-show="sidebarTab === 'ringkasan'" class="space-y-6">
+                    <div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-6 relative overflow-hidden">
+                        <div class="absolute -right-6 -top-6 text-purple-50 pointer-events-none">
+                            <i data-lucide="brain-circuit" class="w-40 h-40"></i>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3 mb-5 relative z-10 border-b border-gray-100 pb-4">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
+                                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-sm font-black uppercase tracking-tight text-gray-900">Hasil Analisis Akhir</h2>
+                                    <p class="text-[0.65rem] text-gray-400 font-medium">Sintesis kategori bimbingan, relasi kuasa, & intonasi</p>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[0.62rem] font-bold">
+                                <i data-lucide="sparkles" class="w-3 h-3 text-purple-600"></i> Prioritas
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5 relative z-10">
+                            {{-- Kategori Advice --}}
+                            <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 flex flex-col justify-center">
+                                <span class="block text-[0.58rem] font-black text-gray-400 uppercase tracking-widest mb-1">
+                                    Kategori Advice
+                                </span>
+                                <span class="font-bold text-gray-900 leading-tight block break-words text-xs sm:text-sm">
+                                    {{ $summary['kategori_advice'] ?? 'Saran Bimbingan Akademik' }}
+                                </span>
+                            </div>
+
+                            {{-- Karakter Relasi --}}
+                            <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 flex flex-col justify-center">
+                                <span class="block text-[0.58rem] font-black text-gray-400 uppercase tracking-widest mb-1">
+                                    Karakter Relasi
+                                </span>
+                                <span class="font-bold text-gray-900 leading-tight block break-words text-xs sm:text-sm">
+                                    {{ $summary['karakter_relasi'] ?? 'Kondusif & Seimbang' }}
+                                </span>
+                            </div>
+
+                            {{-- Intonasi Dominan --}}
+                            <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 flex flex-col justify-center">
+                                <span class="block text-[0.58rem] font-black text-gray-400 uppercase tracking-widest mb-1">
+                                    Intonasi Dominan
+                                </span>
+                                <span class="font-bold text-gray-900 leading-tight block break-words text-xs sm:text-sm">
+                                    {{ $summary['intonasi_dominan'] ?? 'Intonasi Seimbang' }}
+                                </span>
+                            </div>
+
+                            {{-- Ranah Bicara --}}
+                            <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 flex flex-col justify-center">
+                                <span class="block text-[0.58rem] font-black text-gray-400 uppercase tracking-widest mb-1">
+                                    Ranah Bicara
+                                </span>
+                                <span class="font-bold text-gray-900 leading-tight block break-words text-xs sm:text-sm">
+                                    {{ $summary['ranah_pembicaraan'] ?? 'Bimbingan Skripsi & Pendalaman Metodologi Penelitian' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        {{-- Umpan Balik & Rekomendasi Grid --}}
+                        <div class="space-y-3 relative z-10">
+                            {{-- Umpan Balik --}}
+                            <div class="bg-purple-600 rounded-2xl p-4 text-white shadow-md shadow-purple-600/20">
+                                <span class="block text-[0.58rem] font-black text-purple-200 uppercase tracking-widest mb-1.5 flex items-center">
+                                    <i data-lucide="target" class="w-3.5 h-3.5 mr-1.5"></i>
+                                    <span>Umpan Balik</span>
+                                </span>
+                                <p class="font-medium text-xs leading-relaxed text-purple-50">
+                                    {{ ucfirst($summary['arah_tujuan'] ?? 'Dosen mengarahkan mahasiswa dengan fokus pada penyempurnaan landasan teori, metodologi, dan perumusan simpulan yang valid.') }}
+                                </p>
+                            </div>
+
+                            {{-- Rekomendasi --}}
+                            <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 text-emerald-900">
+                                <span class="block text-[0.58rem] font-black text-emerald-600 uppercase tracking-widest mb-1.5 flex items-center">
+                                    <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1.5"></i>
+                                    <span>Rekomendasi</span>
+                                </span>
+                                <p class="font-medium text-xs leading-relaxed text-emerald-800">
+                                    {{ ucfirst($summary['saran_perbaikan'] ?? 'Mahasiswa disarankan menindaklanjuti catatan revisi Dosen, mengonfirmasi instrumen riset, dan menyusun target mingguan agar jadwal bimbingan berjalan optimal.') }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1945,7 +1948,7 @@
                 insightRelation: '',
                 insightXai: null,
                 activeMobileTab: 'transkrip',
-                sidebarTab: 'graf', // 'graf', 'alur', 'metrik', 'intonasi', 'ringkasan'
+                sidebarTab: 'ringkasan', // 'ringkasan', 'graf', 'alur', 'metrik', 'intonasi', 'distribusi'
                 isSidebarOpen: true,
                 currentPage: 1,
                 pageSize: 10,
