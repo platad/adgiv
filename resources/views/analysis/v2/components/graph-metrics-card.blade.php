@@ -9,103 +9,116 @@
     $topBridge = $gSummary['top_bridge']['name'] ?? 'Bimbingan Metodologi';
 @endphp
 
-<div class="mt-8 pt-8 border-t border-gray-100" x-data="{ activeMetricTab: 'overview', showFormulaModal: false }">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+<div class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-5 space-y-5" x-data="{ activeMetricTab: 'overview', showFormulaModal: false }">
+    {{-- Header Section --}}
+    <div class="flex flex-col gap-3 pb-4 border-b border-gray-100">
+        <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                     <i data-lucide="calculator" class="w-4 h-4"></i>
                 </div>
-                <h3 class="text-sm font-black uppercase tracking-wider text-gray-900">
-                    Metrik Kuantitatif Sentralitas Graf (Network Science)
-                </h3>
+                <div>
+                    <span class="text-[0.6rem] font-black uppercase tracking-widest text-emerald-600 block">Network Science</span>
+                    <h3 class="text-xs sm:text-sm font-black uppercase text-gray-900 leading-tight">
+                        Sentralitas Graf & Topologi
+                    </h3>
+                </div>
             </div>
-            <p class="text-xs text-gray-500 font-medium">
-                Kajian matematis struktur jejaring interaksi: mengukur sentralitas aktor, simpul jembatan (<em class="font-serif">betweenness bridge</em>), dan indeks timbal balik dialogis (<em class="font-serif">reciprocity</em>).
-            </p>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[0.6rem] font-bold border border-emerald-200 shrink-0">
+                <i data-lucide="check-circle" class="w-3 h-3 text-emerald-600"></i>
+                <span>Empiris</span>
+            </span>
         </div>
 
-        <div class="flex items-center gap-2">
+        <p class="text-[0.72rem] text-gray-500 font-medium leading-relaxed">
+            Kajian matematis struktur jejaring interaksi: mengukur sentralitas aktor, simpul jembatan (<em class="font-serif">betweenness bridge</em>), dan indeks timbal balik dialogis (<em class="font-serif">reciprocity</em>).
+        </p>
+
+        <div>
             <button type="button" @click="showFormulaModal = true"
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold transition border border-purple-200 shadow-2xs active:scale-95 cursor-pointer">
                 <i data-lucide="file-text" class="w-3.5 h-3.5 text-purple-600"></i>
                 <span>Lihat Formula Matematis</span>
             </button>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[0.65rem] font-bold border border-emerald-200">
-                <i data-lucide="check-circle" class="w-3 h-3 text-emerald-600"></i>
-                <span>Terverifikasi Empiris</span>
-            </span>
         </div>
     </div>
 
-    {{-- 4 Stat Pillar Cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    {{-- 4 Stat Pillar Cards (Responsive 2 Columns in Sidebar, 4 Columns on Wide Screen) --}}
+    <div class="grid grid-cols-2 gap-3">
         {{-- Card 1: Reciprocity Index --}}
-        <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-200/70 relative overflow-hidden group hover:bg-white hover:shadow-xs transition">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-[0.62rem] font-black uppercase tracking-wider text-gray-400">Indeks Timbal Balik</span>
-                <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">R</span>
+        <div class="bg-gray-50/90 rounded-2xl p-3 sm:p-3.5 border border-gray-200/70 relative overflow-hidden group hover:bg-white hover:border-emerald-200 hover:shadow-xs transition flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[0.6rem] font-black uppercase tracking-wider text-gray-400">Timbal Balik</span>
+                    <span class="w-5 h-5 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center text-[0.65rem] font-bold">R</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-black text-gray-900 mb-0.5">
+                    {{ $reciprocityPct }}%
+                </div>
+                <div class="text-[0.65rem] font-bold text-emerald-700 leading-tight">
+                    {{ $charText }}
+                </div>
             </div>
-            <div class="text-2xl font-black text-gray-900 mb-1">
-                {{ $reciprocityPct }}%
-            </div>
-            <div class="text-[0.68rem] font-semibold text-emerald-700 leading-snug">
-                {{ $charText }}
-            </div>
-            <div class="w-full bg-gray-200 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div class="w-full bg-gray-200 h-1.5 rounded-full mt-2.5 overflow-hidden">
                 <div class="bg-emerald-500 h-full rounded-full" style="width: {{ min(100, $reciprocityPct) }}%"></div>
             </div>
         </div>
 
         {{-- Card 2: Dominant Actor --}}
-        <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-200/70 relative overflow-hidden group hover:bg-white hover:shadow-xs transition">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-[0.62rem] font-black uppercase tracking-wider text-gray-400">Aktor Sentral Utama</span>
-                <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold">C_D</span>
+        <div class="bg-gray-50/90 rounded-2xl p-3 sm:p-3.5 border border-gray-200/70 relative overflow-hidden group hover:bg-white hover:border-purple-200 hover:shadow-xs transition flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[0.6rem] font-black uppercase tracking-wider text-gray-400">Aktor Sentral</span>
+                    <span class="w-5 h-5 rounded-md bg-purple-100 text-purple-700 flex items-center justify-center text-[0.65rem] font-bold">C_D</span>
+                </div>
+                <div class="text-sm sm:text-base font-black text-purple-950 truncate mb-0.5" title="{{ $dominantActor }}">
+                    {{ $dominantActor }}
+                </div>
+                <div class="text-[0.62rem] text-gray-500 leading-tight">
+                    Skor: <strong class="text-purple-700 font-bold">{{ $gSummary['dominant_actor']['score'] ?? 0 }}</strong>
+                </div>
             </div>
-            <div class="text-base font-black text-purple-950 truncate mb-1" title="{{ $dominantActor }}">
-                {{ $dominantActor }}
-            </div>
-            <div class="text-[0.68rem] text-gray-500 leading-snug">
-                Skor Sentralitas Derajat: <strong class="text-purple-700 font-bold">{{ $gSummary['dominant_actor']['score'] ?? 0 }}</strong>
-            </div>
-            <div class="mt-3 flex items-center gap-1.5 text-[0.65rem] text-gray-400 font-medium">
-                <i data-lucide="arrow-right-left" class="w-3 h-3 text-purple-500"></i>
-                <span>{{ $gSummary['dominant_actor']['total_degree'] ?? 0 }} Ujaran Terhubung</span>
+            <div class="mt-2.5 flex items-center gap-1 text-[0.6rem] text-gray-400 font-medium truncate">
+                <i data-lucide="arrow-right-left" class="w-3 h-3 text-purple-500 shrink-0"></i>
+                <span class="truncate">{{ $gSummary['dominant_actor']['total_degree'] ?? 0 }} Ujaran</span>
             </div>
         </div>
 
         {{-- Card 3: Top Thematic Bridge (Betweenness) --}}
-        <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-200/70 relative overflow-hidden group hover:bg-white hover:shadow-xs transition">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-[0.62rem] font-black uppercase tracking-wider text-gray-400">Simpul Jembatan Wacana</span>
-                <span class="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">C_B</span>
+        <div class="bg-gray-50/90 rounded-2xl p-3 sm:p-3.5 border border-gray-200/70 relative overflow-hidden group hover:bg-white hover:border-indigo-200 hover:shadow-xs transition flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[0.6rem] font-black uppercase tracking-wider text-gray-400">Jembatan Topik</span>
+                    <span class="w-5 h-5 rounded-md bg-indigo-100 text-indigo-700 flex items-center justify-center text-[0.65rem] font-bold">C_B</span>
+                </div>
+                <div class="text-sm sm:text-base font-black text-indigo-950 truncate mb-0.5" title="{{ $topBridge }}">
+                    {{ $topBridge }}
+                </div>
+                <div class="text-[0.62rem] text-gray-500 leading-tight">
+                    Skor: <strong class="text-indigo-700 font-bold">{{ $gSummary['top_bridge']['score'] ?? 0 }}</strong>
+                </div>
             </div>
-            <div class="text-base font-black text-indigo-950 truncate mb-1" title="{{ $topBridge }}">
-                {{ $topBridge }}
-            </div>
-            <div class="text-[0.68rem] text-gray-500 leading-snug">
-                Skor Betweenness: <strong class="text-indigo-700 font-bold">{{ $gSummary['top_bridge']['score'] ?? 0 }}</strong>
-            </div>
-            <div class="mt-3 flex items-center gap-1.5 text-[0.65rem] text-gray-400 font-medium">
-                <i data-lucide="git-merge" class="w-3 h-3 text-indigo-500"></i>
-                <span>Penghubung Lintas Bahasan</span>
+            <div class="mt-2.5 flex items-center gap-1 text-[0.6rem] text-gray-400 font-medium truncate">
+                <i data-lucide="git-merge" class="w-3 h-3 text-indigo-500 shrink-0"></i>
+                <span class="truncate">Lintas Bahasan</span>
             </div>
         </div>
 
         {{-- Card 4: Graph Density --}}
-        <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-200/70 relative overflow-hidden group hover:bg-white hover:shadow-xs transition">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-[0.62rem] font-black uppercase tracking-wider text-gray-400">Kerapatan Graf (Density)</span>
-                <span class="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">D</span>
+        <div class="bg-gray-50/90 rounded-2xl p-3 sm:p-3.5 border border-gray-200/70 relative overflow-hidden group hover:bg-white hover:border-blue-200 hover:shadow-xs transition flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[0.6rem] font-black uppercase tracking-wider text-gray-400">Kerapatan (Density)</span>
+                    <span class="w-5 h-5 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center text-[0.65rem] font-bold">D</span>
+                </div>
+                <div class="text-xl sm:text-2xl font-black text-gray-900 mb-0.5">
+                    {{ $densityPct }}%
+                </div>
+                <div class="text-[0.62rem] text-gray-500 leading-tight truncate">
+                    {{ $gSummary['unique_edges_count'] ?? 0 }} Jalur / {{ $gSummary['node_count'] ?? 0 }} Simpul
+                </div>
             </div>
-            <div class="text-2xl font-black text-gray-900 mb-1">
-                {{ $densityPct }}%
-            </div>
-            <div class="text-[0.68rem] text-gray-500 leading-snug">
-                {{ $gSummary['unique_edges_count'] ?? 0 }} Jalur dari {{ $gSummary['node_count'] ?? 0 }} Simpul
-            </div>
-            <div class="w-full bg-gray-200 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div class="w-full bg-gray-200 h-1.5 rounded-full mt-2.5 overflow-hidden">
                 <div class="bg-blue-500 h-full rounded-full" style="width: {{ min(100, $densityPct) }}%"></div>
             </div>
         </div>
@@ -113,22 +126,24 @@
 
     {{-- Tabs & Tabular Breakdown Table --}}
     <div class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-2xs">
-        <div class="border-b border-gray-200 bg-gray-50/60 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-1.5 text-xs font-bold">
+        <div class="border-b border-gray-200 bg-gray-50/70 p-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-1.5">
+            <div class="grid grid-cols-2 gap-1 w-full text-xs font-bold">
                 <button type="button" @click="activeMetricTab = 'overview'"
-                    class="px-3 py-1.5 rounded-xl transition cursor-pointer"
+                    class="px-2.5 py-1.5 rounded-xl transition cursor-pointer text-center truncate text-[0.65rem]"
                     :class="activeMetricTab === 'overview' ? 'bg-white text-purple-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-900'">
-                    Top Sentralitas Derajat (Degree)
+                    Sentralitas Derajat
                 </button>
                 <button type="button" @click="activeMetricTab = 'betweenness'"
-                    class="px-3 py-1.5 rounded-xl transition cursor-pointer"
+                    class="px-2.5 py-1.5 rounded-xl transition cursor-pointer text-center truncate text-[0.65rem]"
                     :class="activeMetricTab === 'betweenness' ? 'bg-white text-indigo-700 shadow-xs font-black' : 'text-gray-500 hover:text-gray-900'">
-                    Top Simpul Jembatan (Betweenness)
+                    Simpul Jembatan
                 </button>
             </div>
-            <span class="text-[0.65rem] text-gray-400 font-semibold italic">
-                *Data dihitung dinamis dari matriks relasi topologi ujaran
-            </span>
+            <div class="mt-1 text-center sm:text-right w-full">
+                <span class="text-[0.62rem] text-gray-400 font-semibold italic">
+                    *Dihitung dinamis dari matriks relasi topologi ujaran
+                </span>
+            </div>
         </div>
 
         {{-- Tab 1: Degree Centrality Table --}}
