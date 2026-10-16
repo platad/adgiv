@@ -155,8 +155,8 @@
         </div>
         @endguest
 
-        {{-- Canva-Style Workspace Toolbar (Clean Card floating at top) --}}
-        <div class="sticky top-4 z-40 bg-white/95 backdrop-blur-xl border border-gray-200/90 rounded-2xl px-4 sm:px-6 py-3.5 mb-8 shadow-sm transition-all">
+        {{-- Canva-Style Workspace Toolbar (Clean Card at top, Not Sticky) --}}
+        <div class="relative z-10 bg-white/95 border border-gray-200/90 rounded-2xl px-4 sm:px-6 py-3.5 mb-8 shadow-sm transition-all">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 
                 {{-- Left: Back Link & Document Title & Status Badges --}}
@@ -761,7 +761,7 @@
             </div> {{-- End of Main Canvas (Left/Center Column) --}}
 
             {{-- Right Analytical Sidebar Panel (Canva Workspace Style: Sticky on Scroll, Floats naturally at top) --}}
-            <aside class="space-y-6 lg:col-span-5 xl:col-span-4 transition-all lg:sticky lg:top-24 self-start"
+            <aside class="space-y-6 lg:col-span-5 xl:col-span-4 transition-all lg:sticky lg:top-6 self-start"
                    x-show="isSidebarOpen"
                    x-transition:enter="transition ease-out duration-200"
                    x-transition:enter-start="opacity-0 translate-x-4"
